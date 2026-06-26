@@ -4,7 +4,12 @@
 **Time:** 7:00 PM – 7:30 PM  
 
 ### Attendance
-* All team members were present except Bhabani Kundu, who was absent due to illness.
+* Amit Kumar Patra (21f1000426)
+* Devi Vrinda A (21f1001205)
+* Jatin Bhardwaj (23f2004867)
+* Shibin Mohammed N P(23f2005132)
+
+Absent: Bhabani Kundu (21f3000243) due to illness.
 
 ### Agenda
 * Discuss the two options for the project topic.
