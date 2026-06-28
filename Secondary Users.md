@@ -1,4 +1,4 @@
-Secondary Users
+# Secondary Users
 
 These users interact with the system for governance, membership, and compliance purposes. They are important stakeholders but are not involved in the club's day-to-day event organization or management.
 
@@ -33,250 +33,62 @@ A student interested in joining the drama club but who is not yet an active memb
 
 ---
 
-# USER RESEARCH & PAIN POINT ANALYSIS
-
-*(Based on interviews with Club President, Faculty Coordinator, Existing Members, New Members, and Regulatory Body representatives)*
-
-## 1. Research Objective
-
-To understand the challenges faced in managing memberships, organizing events, maintaining compliance, and improving communication within a university drama club.
-
----
-
-## 2. Key Observational Insights
-
-### Observation 1: Manual Membership Management
-
-Membership applications are handled through Google Forms, emails, making tracking difficult.
-
-### Observation 2: Scattered Communication
-
-Announcements are shared across multiple platforms (WhatsApp, email, social media), causing members to miss important updates.
-
-### Observation 3: Lack of Centralized Records
-
-Club information such as attendance, membership status, event participation, approvals, and finances is stored in different locations without a unified system.
-
----
-
-# 3. Stakeholder Pain Points
-
-## 3.1 Regulatory Body
-
-* Receives incomplete or inconsistent event proposals.
-* Difficulty verifying whether club activities follow institutional policies.
-* Financial reports are submitted manually.
-* Approval requests are often delayed due to missing information.
-* No centralized record of previously approved events.
-
-**Core Issue:** Compliance monitoring is inefficient because approvals and documentation are handled manually.
-
----
-
-## 3.2 New Member
-
-* Doesn't know eligibility requirements.
-* Membership process is unclear.
-* No way to track application status.
-* Frequently misses audition or interview announcements.
-* Doesn't know whether their application has been accepted or rejected.
-
-**Core Issue:** Lack of transparency and communication during the onboarding process.
-
----
-
-# 4. Cross-Stakeholder Patterns
-
-Recurring issues across multiple users include:
-
-* Manual paperwork (digital)
-* Delayed approvals
-* Poor communication
-* Lack of application tracking
-* Missing documentation
-* No centralized member database
-* Difficulty maintaining compliance records
-
----
-
-# 5. Root Causes Identified
-
-* No centralized membership system
-* Manual approval workflow
-* Lack of automated notifications
-* Google sheet/doc-based compliance records
-* Poor visibility into application status
-* Disconnected communication channels
-
----
-
-# 6. Overall Conclusion
-
-The drama club functions successfully but faces administrative challenges due to fragmented processes. A centralized digital platform would improve membership management, regulatory compliance, communication, and transparency while reducing administrative workload.
-
----
 ## Epic 1: Membership Discovery & Onboarding (New Members)
 
-### Discovery & Application
+**Story 1: Discovery & Comprehensive Application**
+As a New Member, I want a unified digital application hub where I can browse club requirements, upload media portfolios, save my progress as a draft, and submit a standardized form, so that I can complete the entire application process remotely at my own pace.
 
-* **Story 1.1:** As a New Member, I want to browse upcoming public events, available club roles, and eligibility criteria on a public dashboard, so that I can make an informed decision before applying.
-* **Specific:** Defines exactly what information will be displayed (events, roles, criteria) on a specific interface (public dashboard).
-* **Measurable:** Can be validated by checking if the dashboard successfully loads and displays these three exact data points.
-* **Achievable:** Pulling public data from a database to a frontend view is a standard, low-complexity feature.
-* **Relevant:** Directly supports the user's goal of making an informed application decision.
-* **Time-bound:** Information updates and displays in real-time upon page load.
+  * **Specific:** Combines discovery (browsing roles), media uploads, draft saving, and final submission into a single user workflow.
+  * **Measurable:** Validated when a user successfully views club details, uploads a file, saves a draft, and the database receives the final, complete submission.
+  * **Achievable:** Standard multi-step web form implementation utilizing cloud storage for media and database sessions for draft saving.
+  * **Relevant:** Removes all physical barriers to entry and accommodates users who need time to gather materials.
+  * **Time-bound:** Drafts are saved instantly, and final submission is processed synchronously upon clicking "Submit."
 
+**Story 2: Real-Time Tracking & Interview Scheduling**
+As a New Member, I want a dynamic progress dashboard that visually tracks my application status, sends automated notifications, and allows me to manage/reschedule my audition slots, so that I am always informed and can balance club requirements with my academic schedule.
 
-* **Story 1.2:** As a New Member, I want to submit a standardized online membership application, so that I can apply remotely without needing physical paperwork.
-* **Specific:** Replaces physical paperwork with a digital, standardized form.
-* **Measurable:** Validated by the successful creation of a new application record in the database.
-* **Achievable:** Standard web form implementation with basic data validation.
-* **Relevant:** Removes geographical and physical barriers to joining the club.
-* **Time-bound:** Form submission is processed instantaneously upon clicking "Submit."
+  * **Specific:** Consolidates visual state tracking, automated email/in-app alerts, and two-way calendar management.
+  * **Measurable:** Validated when UI visually updates on status change, a notification is successfully dispatched, and calendar slot changes log accurately in the database.
+  * **Achievable:** Integration of standard frontend state mapping, a notification API (like SendGrid), and basic calendar CRUD operations.
+  * **Relevant:** Drastically reduces administrative overhead and applicant anxiety by automating status updates and scheduling conflicts.
+  * **Time-bound:** Status changes reflect instantly on the dashboard, and notifications trigger immediately upon a schedule update.
 
+**Story 3: Decision Resolution & Seamless Integration**
+As a New Member, I want to receive a clear final decision that either provides standardized feedback for rejection or unlocks a digital "Onboarding Kit" (rules, links, schedules) upon acceptance, so that I have immediate closure or a seamless transition into the club.
 
-* **Story 1.3:** As a New Member, I want to securely upload media files (e.g., audition videos, portfolio links, or ID documents) during registration, so that my skills can be evaluated efficiently.
-* **Specific:** Targets the upload of specific file types (videos, documents) and external links during the registration flow.
-* **Measurable:** The system restricts invalid file types/sizes and successfully links accepted files to the user profile.
-* **Achievable:** Can be built using standard cloud storage APIs (e.g., AWS S3) and file input validation.
-* **Relevant:** Essential for clubs that require skill-based evaluations.
-* **Time-bound:** Uploads occur and validate synchronously during the active registration session.
-
-
-* **Story 1.4:** As a New Member, I want the ability to save my application as a "Draft", so that I can gather necessary documents and complete the submission later.
-* **Specific:** Adds a definitive "Save Draft" action to preserve incomplete form state.
-* **Measurable:** A user can log out, log back in, and retrieve the exact form data previously entered.
-* **Achievable:** Requires a database flag for "draft" status or session storage implementation.
-* **Relevant:** Reduces application abandonment rates when users need to pause and find documents.
-* **Time-bound:** State is saved immediately upon action, with no loss of data.
-
-
-
-### Tracking & Communication
-
-* **Story 1.5:** As a New Member, I want a visual progress tracker on my profile (e.g., Submitted -> Under Review -> Audition -> Decision), so that I have real-time transparency regarding my application status.
-* **Specific:** Defines a step-by-step visual UI component mapped to predefined application states.
-* **Measurable:** The tracker UI updates precisely when the backend status string changes.
-* **Achievable:** Standard frontend state mapping (similar to e-commerce order tracking).
-* **Relevant:** Reduces member anxiety and decreases status-inquiry messages to club admins.
-* **Time-bound:** The visual tracker reflects status changes immediately as admins process them.
-
-
-* **Story 1.6:** As a New Member, I want to receive automated email or in-app notifications for interview/audition schedules, so that I can block my calendar and not miss the opportunity.
-* **Specific:** Triggers automated alerts through defined channels (email/in-app) when a schedule is created.
-* **Measurable:** Verifiable via email delivery logs and in-app read receipts.
-* **Achievable:** Integration with standard notification services (e.g., SendGrid, Firebase).
-* **Relevant:** Ensures applicants don't miss crucial evaluation steps.
-* **Time-bound:** Notifications are dispatched instantly when the admin finalizes the schedule.
-
-
-* **Story 1.7:** As a New Member, I want the system to allow me to confirm or request a reschedule for my audition slot, so that I can manage academic conflicts without losing my chance to join.
-* **Specific:** Provides interactive options (Confirm/Reschedule) attached to a calendar slot.
-* **Measurable:** System logs the applicant's response and updates the admin's scheduling dashboard accordingly.
-* **Achievable:** Basic two-way interaction logic linked to the scheduling database.
-* **Relevant:** Accommodates student life realities (classes, exams) while keeping the club organized.
-* **Time-bound:** The user's response is reflected instantly in the club's scheduling queue.
-
-
-
-### Decision & Integration
-
-* **Story 1.8:** As a New Member, if my application is rejected, I want to view standardized feedback or reasons (e.g., "Did not meet criteria," "Audition full"), so that I can improve and reapply next semester.
-* **Specific:** Delivers predefined rejection reason codes/strings to the user's dashboard.
-* **Measurable:** The user interface successfully displays the specific reason selected by the reviewer.
-* **Achievable:** Passing a string variable from the admin review panel to the user dashboard.
-* **Relevant:** Provides closure and constructive guidance for future attempts.
-* **Time-bound:** Feedback becomes visible the exact moment the "Rejected" status is published.
-
-
-* **Story 1.9:** As a New Member, upon acceptance, I want automatic access to a digital "Onboarding Kit" (club rules, WhatsApp group links, meeting schedules), so that I can seamlessly integrate into the club.
-* **Specific:** Automatically unlocks a specific set of digital assets (rules, links, schedules) upon acceptance.
-* **Measurable:** Accepted users can access the kit page; pending/rejected users are blocked by a 403 error or hidden UI.
-* **Achievable:** Role-Based Access Control (RBAC) updating the user's role from "Applicant" to "Member."
-* **Relevant:** Ensures immediate, frictionless integration into club activities.
-* **Time-bound:** Access permissions are updated simultaneously with the acceptance decision.
-
-
+  * **Specific:** Defines the two ultimate outcomes of the journey: displaying rejection reason codes or granting role-based access to onboarding materials.
+  * **Measurable:** Accepted users successfully view the onboarding assets, while rejected users are blocked from those assets and see their specific feedback text instead.
+  * **Achievable:** Implementation of Role-Based Access Control (RBAC) tied to the application's final status flag.
+  * **Relevant:** Ensures rejected students know how to improve, while accepted students can immediately participate in club activities.
+  * **Time-bound:** Access permissions and feedback visibility update the exact moment the regulatory admin finalizes the decision.
 
 ---
 
 ## Epic 2: Regulatory Compliance & Governance (Regulatory Body)
 
-### Proposal Review & Approvals
+**Story 4: Standardized Proposal Workflow & Approvals**
+As a Regulatory Body, I want an automated event review system that enforces standardized templates, alerts me to upcoming deadlines, and allows me to approve, reject, or request specific revisions with one click, so that I can efficiently manage proposals without missing crucial details.
 
-* **Story 2.1:** As a Regulatory Body, I want event proposals to follow a mandatory, standardized digital template, so that I never receive incomplete requests missing key details (venue, budget, safety plan).
-* **Specific:** Enforces mandatory fields (venue, budget, safety) on all event submissions.
-* **Measurable:** The system actively blocks submission and throws an error if any required field is empty.
-* **Achievable:** Standard frontend and backend form validation logic.
-* **Relevant:** Eliminates back-and-forth communication over missing basic information.
-* **Time-bound:** Validation checks execute instantly during the user's submission attempt.
+  * **Specific:** Merges mandatory form templates, deadline-based alerts, and a multi-path decision matrix (Approve/Reject/Revise) with commenting.
+  * **Measurable:** System blocks incomplete submissions, fires proximity alerts, and successfully logs the admin's decision and comments to the proposal record.
+  * **Achievable:** Standard form validation, chron-job scheduling for alerts, and updating a record's state machine via a UI dashboard.
+  * **Relevant:** Eliminates back-and-forth emails over missing details and creates a clear, auditable trail of decisions.
+  * **Time-bound:** Deadlines trigger scheduled alerts daily, and decisions/revisions route back to the club instantly upon clicking the action button.
 
+**Story 5: Financial Auditing & Policy Distribution**
+As a Regulatory Body, I want an auditing dashboard that provides view-only access to club financial ledgers, historical event logs, and the ability to pin institutional rulebooks, so that I can easily verify expenditures and proactively enforce current compliance guidelines.
 
-* **Story 2.2:** As a Regulatory Body, I want the ability to request specific "Revisions" on a proposal rather than just approving/rejecting it, so that the club can easily correct minor errors without restarting the whole process.
-* **Specific:** Adds a distinct "Revision Requested" workflow state with an attached comment field.
-* **Measurable:** Proposal status updates correctly and the club leader receives the specific revision notes.
-* **Achievable:** Adding a tertiary path to the standard binary (Approve/Reject) workflow state machine.
-* **Relevant:** Saves significant administrative time for both parties on minor corrections.
-* **Time-bound:** The proposal is immediately routed back to the club's active queue upon request.
+  * **Specific:** Consolidates historical data querying, read-only financial tracking, and global document pinning into one compliance hub.
+  * **Measurable:** Admin can successfully filter historical records, read (but not edit) expense receipts, and pin a PDF that becomes globally visible to all club leaders.
+  * **Achievable:** Simple RBAC applied to financial tables, standard database query filters, and document upload capabilities.
+  * **Relevant:** Crucial for annual institutional reviews, preventing fraud, and ensuring clubs have no excuse for policy violations.
+  * **Time-bound:** Read-only data reflects club inputs in real-time, and pinned documents appear globally immediately upon upload.
 
+**Story 6: Disciplinary Governance & Member Eligibility**
+As a Regulatory Body, I want a secure governance module that automatically flags members failing institutional eligibility and provides a confidential portal for misconduct grievances, so that I can ensure student safety and enforce strict participation rules.
 
-* **Story 2.3:** As a Regulatory Body, I want to approve or reject event requests with a single click and leave official comments, so that the decision-making process is fully documented and transparent.
-* **Specific:** Consolidates the decision action into a one-click UI with an accompanying text area for official remarks.
-* **Measurable:** The database logs the action, the timestamp, the user ID of the approver, and the text comment.
-* **Achievable:** Standard CRUD operation updating the record status and appending a log entry.
-* **Relevant:** Creates a clear, auditable trail of who approved what and why.
-* **Time-bound:** Audit logs are generated and stamped instantaneously upon the button click.
-
-
-* **Story 2.4:** As a Regulatory Body, I want automated alerts (email/dashboard) when an event proposal is nearing its targeted date, so that I can prioritize time-sensitive approvals.
-* **Specific:** Triggers alerts based on a date proximity threshold (e.g., 7 days before event date).
-* **Measurable:** System successfully generates and dispatches the alert when the chronological condition is met.
-* **Achievable:** Can be implemented via a daily scheduled cron job checking date differences.
-* **Relevant:** Prevents clubs from having to cancel events due to bureaucratic bottlenecks.
-* **Time-bound:** Executed automatically at predefined intervals (e.g., checked daily at midnight).
-
-
-
-### Financial & Policy Auditing
-
-* **Story 2.5:** As a Regulatory Body, I want view-only access to the club’s digital financial ledger and uploaded expense receipts, so that I can easily verify that allocated institutional funds are utilized appropriately.
-* **Specific:** Grants specific permission level (Read-Only) to specific data structures (ledgers, receipts).
-* **Measurable:** Regulatory users can view the data but the UI and backend reject any attempts to edit, delete, or create records.
-* **Achievable:** Standard implementation of Role-Based Access Control (RBAC).
-* **Relevant:** Ensures financial accountability without risking accidental data corruption by auditors.
-* **Time-bound:** Auditors have real-time, 24/7 access to the financial data as it is updated.
-
-
-* **Story 2.6:** As a Regulatory Body, I want to view a historical log of all past events, budgets, and compliance records, so that I can efficiently generate end-of-year audit reports.
-* **Specific:** Consolidates historical data (events, budgets, compliance) into a single queryable interface.
-* **Measurable:** User can filter past records by academic year, club, or status, and view the results.
-* **Achievable:** Standard database querying and list rendering.
-* **Relevant:** Crucial for annual institutional reviews and funding allocations.
-* **Time-bound:** Reports and historical views are generated on-demand without delay.
-
-
-* **Story 2.7:** As a Regulatory Body, I want to upload and pin institutional rulebooks and compliance checklists to the system dashboard, so that club leaders always have access to the most up-to-date guidelines before planning an event.
-* **Specific:** Allows admins to upload documents and visually pin them to the top of the user dashboard.
-* **Measurable:** Uploaded documents are visibly anchored on the club leader's dashboard and can be successfully downloaded.
-* **Achievable:** File upload handling and a boolean "is_pinned" flag in the database.
-* **Relevant:** Proactively prevents compliance violations by making rules highly visible.
-* **Time-bound:** Documents appear globally to all club leaders immediately upon pinning.
-
-
-
-### Disciplinary & Member Governance
-
-* **Story 2.8:** As a Regulatory Body, I want a dedicated, confidential "Grievance Portal" where members can securely submit complaints regarding misconduct, so that I can intervene and enforce disciplinary actions promptly.
-* **Specific:** Creates a sequestered form and viewing portal exclusively for misconduct reports.
-* **Measurable:** Submissions bypass standard club leaders and are visible solely to Regulatory Body accounts.
-* **Achievable:** Distinct database table with strict access control layers.
-* **Relevant:** Ensures student safety and provides a fear-free channel for whistleblowing.
-* **Time-bound:** Grievances are secured and flagged to regulatory bodies the moment they are submitted.
-
-
-* **Story 2.9:** As a Regulatory Body, I want the system to flag active members who no longer meet institutional eligibility requirements (e.g., academic probation, graduation), so that I can ensure only valid students are participating.
-* **Specific:** Visually marks user accounts that fail predefined institutional criteria.
-* **Measurable:** The system accurately places a "flag" icon or restricts access for users whose status changes in the student database.
-* **Achievable:** Requires an API integration or routine data sync with the institution's primary student information system (SIS).
-* **Relevant:** Enforces institutional policy automatically, removing the burden of manual checking.
-* **Time-bound:** Syncs and updates member status based on a defined automated schedule (e.g., nightly batch processing).
+  * **Specific:** Integrates automated user-eligibility flagging (e.g., academic probation) with a sequestered, confidential reporting tool for grievances.
+  * **Measurable:** The system successfully places restriction flags on targeted user accounts and routes confidential submissions directly to regulatory admins, bypassing club-level leaders.
+  * **Achievable:** Requires data syncing with the main Student Information System (SIS) and a distinct, permission-locked database table for grievances.
+  * **Relevant:** Protects the institution from liability by automating eligibility enforcement and providing a safe whistleblowing channel.
+  * **Time-bound:** Grievances lock and route instantly upon submission; eligibility flags sync based on a predefined schedule (e.g., nightly batch runs).
