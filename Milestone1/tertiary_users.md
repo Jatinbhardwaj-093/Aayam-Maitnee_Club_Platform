@@ -15,7 +15,6 @@ Organizations, businesses, or individuals interested in promoting their products
 * Receiving updates regarding event schedules and promotional activities.
 
 **The system must provide** a sponsorship request portal, proposal tracking, secure document sharing, communication tools, and notification support to facilitate smooth collaboration.
----
 
 ### 2. Other Clubs / Industries / Organizations
 
@@ -30,8 +29,6 @@ Student clubs, NGOs, industries, or organizations seeking collaboration with the
 * Tracking the approval status of collaboration requests. 
 
 **The system must provide** an online collaboration request system, event proposal management, messaging support, and status tracking for partnership activities.
-
----
 
 ### 3. Educational Institutions (Schools / Colleges)
 
