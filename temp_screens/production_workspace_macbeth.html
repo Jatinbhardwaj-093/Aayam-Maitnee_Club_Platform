@@ -1,0 +1,448 @@
+<!DOCTYPE html><html class="light" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Production Workspace - The Matinee Club</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&amp;family=Source+Sans+3:wght@400;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary": "#496365",
+                    "primary-container": "#fff9d2",
+                    "surface-variant": "#e6e2dd",
+                    "secondary-fixed-dim": "#adcbdd",
+                    "on-background": "#1c1b19",
+                    "surface-container-high": "#ece7e3",
+                    "surface-dim": "#ddd9d5",
+                    "on-tertiary-fixed-variant": "#324b4d",
+                    "tertiary-fixed-dim": "#b0ccce",
+                    "inverse-surface": "#31302d",
+                    "on-secondary-container": "#4a6677",
+                    "surface-container-low": "#f7f3ee",
+                    "on-primary-fixed-variant": "#4a482c",
+                    "error-container": "#ffdad6",
+                    "outline-variant": "#cac6b9",
+                    "on-primary-container": "#767253",
+                    "on-tertiary-fixed": "#041f21",
+                    "inverse-primary": "#cdc8a3",
+                    "on-primary-fixed": "#1e1c05",
+                    "on-surface-variant": "#49473d",
+                    "on-surface": "#1c1b19",
+                    "surface-container": "#f1ede9",
+                    "surface-bright": "#fdf9f4",
+                    "primary": "#635f41",
+                    "secondary": "#466272",
+                    "on-error": "#ffffff",
+                    "surface-container-highest": "#e6e2dd",
+                    "on-secondary": "#ffffff",
+                    "secondary-container": "#c6e4f7",
+                    "surface-container-lowest": "#ffffff",
+                    "surface": "#fdf9f4",
+                    "tertiary-container": "#e2fdff",
+                    "on-primary": "#ffffff",
+                    "background": "#fdf9f4",
+                    "primary-fixed-dim": "#cdc8a3",
+                    "inverse-on-surface": "#f4f0eb",
+                    "surface-tint": "#635f41",
+                    "on-error-container": "#93000a",
+                    "outline": "#7a776c",
+                    "error": "#ba1a1a",
+                    "on-tertiary-container": "#5c7678",
+                    "on-tertiary": "#ffffff",
+                    "primary-fixed": "#e9e4be",
+                    "on-secondary-fixed": "#001e2c",
+                    "secondary-fixed": "#c9e7fa",
+                    "tertiary-fixed": "#cce8ea",
+                    "on-secondary-fixed-variant": "#2e4a5a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "unit": "4px",
+                    "margin-desktop": "64px",
+                    "gutter": "24px",
+                    "margin-mobile": "16px",
+                    "container-max": "1280px"
+            },
+            "fontFamily": {
+                    "headline-lg": ["Playfair Display"],
+                    "body-lg": ["\"Source Sans 3\""],
+                    "label-md": ["\"Source Sans 3\""],
+                    "headline-lg-mobile": ["Playfair Display"],
+                    "display-lg": ["Playfair Display"],
+                    "headline-md": ["Playfair Display"],
+                    "body-md": ["\"Source Sans 3\""]
+            },
+            "fontSize": {
+                    "headline-lg": ["40px", {"lineHeight": "48px", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                    "display-lg": ["56px", {"lineHeight": "64px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-md": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+      body {
+        background-color: #fdf9f4;
+        color: #1c1b19;
+      }
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .glass-nav {
+        background: rgba(253, 249, 244, 0.7);
+        backdrop-filter: blur(20px);
+      }
+      .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+      .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+      .custom-scrollbar::-webkit-scrollbar-thumb { background: #cac6b9; border-radius: 10px; }
+      .circular-progress {
+        background: radial-gradient(closest-side, #f7f3ee 79%, transparent 80% 100%),
+                    conic-gradient(#635f41 75%, #e6e2dd 0);
+      }
+    </style>
+</head>
+<body class="font-body-md text-body-md antialiased">
+<!-- Top Bar Navigation -->
+<nav class="fixed top-0 right-0 left-0 h-16 glass-nav flex justify-between items-center px-margin-desktop w-full transition-colors duration-200 z-50">
+<div class="flex items-center gap-4">
+<span class="font-headline-md text-headline-md text-primary">The Matinee Club</span>
+</div>
+<div class="hidden md:flex items-center gap-8 font-label-md text-label-md">
+<a class="text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">Gallery</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">Schedule</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">Members</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-primary text-2xl">search</button>
+<div class="w-8 h-8 rounded-full bg-primary-fixed flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-xl">account_circle</span>
+</div>
+</div>
+</nav>
+<!-- Side Navigation Shell -->
+<aside class="fixed left-0 bottom-0 w-64 bg-surface-container-low flex flex-col py-8 px-6 z-40 top-16" style="height: calc(100vh - 4rem);">
+<div class="mb-10">
+<h2 class="font-headline-md text-headline-md text-primary">Matinee Edition</h2>
+<p class="text-on-surface-variant text-xs uppercase tracking-widest mt-1">Premium Theater Club</p>
+</div>
+<nav class="flex-1 flex flex-col gap-2">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest transition-all duration-200 rounded-lg group" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-surface-container-highest text-primary font-bold transition-all duration-200 rounded-lg group" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">theater_comedy</span>
+<span class="font-label-md text-label-md">Productions</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest transition-all duration-200 rounded-lg group" href="#">
+<span class="material-symbols-outlined">palette</span>
+<span class="font-label-md text-label-md">Gallery</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest transition-all duration-200 rounded-lg group" href="#">
+<span class="material-symbols-outlined">groups</span>
+<span class="font-label-md text-label-md">Cast</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest transition-all duration-200 rounded-lg group" href="#">
+<span class="material-symbols-outlined">history</span>
+<span class="font-label-md text-label-md">Archives</span>
+</a>
+</nav>
+<button class="mt-auto w-full py-3 bg-primary text-on-primary font-label-md text-label-md rounded shadow-sm hover:opacity-90 active:scale-95 transition-all">
+            Reserve Seat
+        </button>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 pt-24 pb-16 px-margin-desktop max-w-container-max mx-auto">
+<!-- Header Section -->
+<header class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-12">
+<div>
+<nav class="flex items-center gap-2 text-on-surface-variant mb-2">
+<span class="text-xs font-label-md uppercase tracking-widest">Productions</span>
+<span class="material-symbols-outlined text-xs">chevron_right</span>
+<span class="text-xs font-label-md uppercase tracking-widest text-primary">Macbeth</span>
+</nav>
+<h1 class="font-headline-lg text-headline-lg text-on-surface">Production Workspace: Macbeth</h1>
+</div>
+<div class="inline-flex items-center gap-2 px-4 py-2 bg-secondary-container text-on-secondary-container rounded-full border border-secondary/10">
+<span class="material-symbols-outlined text-sm">schedule</span>
+<span class="font-label-md text-label-md">Opening Night: 14 Days Remaining</span>
+</div>
+</header>
+<!-- Metric Row -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-gutter mb-12">
+<!-- Attendance Tracker -->
+<div class="bg-surface-container-low p-6 rounded-lg border border-outline-variant/30 flex flex-col h-full">
+<div class="flex justify-between items-center mb-6">
+<h3 class="font-label-md text-label-md text-on-surface-variant flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-sm">person_check</span>
+                        ATTENDANCE TRACKER
+                    </h3>
+<span class="text-xs text-on-surface-variant">Live</span>
+</div>
+<ul class="space-y-4 custom-scrollbar overflow-y-auto max-h-40">
+<li class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-surface-container-highest flex items-center justify-center text-primary font-bold text-xs">EW</div>
+<span class="text-body-md font-semibold">Elena Wells</span>
+</div>
+<span class="px-2 py-0.5 text-[10px] font-bold uppercase rounded bg-green-100 text-green-700">Present</span>
+</li>
+<li class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-surface-container-highest flex items-center justify-center text-primary font-bold text-xs">JT</div>
+<span class="text-body-md font-semibold">Julian Thorne</span>
+</div>
+<span class="px-2 py-0.5 text-[10px] font-bold uppercase rounded bg-amber-100 text-amber-700">Late</span>
+</li>
+<li class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-surface-container-highest flex items-center justify-center text-primary font-bold text-xs">MC</div>
+<span class="text-body-md font-semibold">M. Chen</span>
+</div>
+<span class="px-2 py-0.5 text-[10px] font-bold uppercase rounded bg-outline-variant text-on-surface-variant">Expected</span>
+</li>
+</ul>
+</div>
+<!-- Production Pipeline -->
+<div class="bg-surface-container-low p-6 rounded-lg border border-outline-variant/30 flex flex-col items-center justify-center text-center">
+<h3 class="font-label-md text-label-md text-on-surface-variant mb-4 w-full text-left uppercase tracking-widest">Pipeline</h3>
+<div class="relative flex items-center justify-center w-32 h-32 circular-progress rounded-full mb-4 shadow-sm">
+<span class="font-headline-md text-headline-md text-primary">75%</span>
+</div>
+<p class="text-xs text-on-surface-variant font-label-md">Technical Phase: Lighting &amp; Blocking</p>
+</div>
+<!-- Rehearsal Spaces -->
+<div class="bg-surface-container-low p-6 rounded-lg border border-outline-variant/30 flex flex-col">
+<h3 class="font-label-md text-label-md text-on-surface-variant mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-sm">room</span>
+                    REHEARSAL SPACES
+                </h3>
+<div class="space-y-6">
+<div class="flex items-start gap-4">
+<div class="p-2 bg-primary-container rounded">
+<span class="material-symbols-outlined text-primary">theater_comedy</span>
+</div>
+<div>
+<p class="font-bold text-body-md">Main Stage</p>
+<p class="text-xs text-secondary flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>
+                                Rehearsal In Progress
+                            </p>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<div class="p-2 bg-surface-container-highest rounded">
+<span class="material-symbols-outlined text-on-surface-variant">meeting_room</span>
+</div>
+<div>
+<p class="font-bold text-body-md">Studio B</p>
+<p class="text-xs text-on-surface-variant">Available</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Split Column Section -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-gutter mb-12">
+<!-- Left: Scene Blocking -->
+<div class="lg:col-span-7 bg-surface-container-low p-8 rounded-lg border border-outline-variant/30">
+<div class="flex justify-between items-center mb-8 border-b border-outline-variant pb-4">
+<h3 class="font-headline-md text-headline-md text-on-surface">Scene Blocking &amp; Notes</h3>
+<button class="flex items-center gap-2 text-primary font-label-md text-label-md hover:underline decoration-2 underline-offset-4">
+<span class="material-symbols-outlined text-sm">download</span>
+                        Full Script.pdf
+                    </button>
+</div>
+<div class="space-y-8">
+<div class="flex flex-col md:flex-row gap-6">
+<div class="flex-1">
+<label class="block text-xs font-label-md uppercase tracking-widest text-on-surface-variant mb-3">Active Focus</label>
+<div class="bg-surface-bright p-4 border-l-4 border-primary rounded shadow-sm">
+<p class="font-bold text-body-lg text-primary">Act III, Scene I - The Banquet</p>
+<div class="flex flex-wrap gap-2 mt-3">
+<span class="bg-secondary-container text-on-secondary-container px-2 py-1 rounded-sm text-[11px] font-bold">M. Chen - 2:00 PM</span>
+<span class="bg-secondary-container text-on-secondary-container px-2 py-1 rounded-sm text-[11px] font-bold">E. Wells - 2:00 PM</span>
+</div>
+</div>
+</div>
+</div>
+<div class="flex flex-col">
+<label class="text-xs font-label-md uppercase tracking-widest text-on-surface-variant mb-3">Director's Production Notes</label>
+<textarea class="w-full h-40 bg-surface-bright border-x-0 border-t-0 border-b-2 border-outline-variant focus:border-primary focus:ring-0 transition-all font-body-md text-body-md placeholder:italic placeholder:text-outline-variant p-4" placeholder="Input scene adjustments, cues for the stagehands, or specific actor feedback here..."></textarea>
+</div>
+<div class="space-y-4">
+<p class="text-xs font-label-md uppercase tracking-widest text-on-surface-variant">Upcoming Schedule</p>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="p-3 border border-outline-variant rounded flex justify-between items-center hover:bg-surface-bright transition-colors cursor-pointer group">
+<span class="text-body-md">Act IV, Scene II</span>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary">arrow_forward</span>
+</div>
+<div class="p-3 border border-outline-variant rounded flex justify-between items-center hover:bg-surface-bright transition-colors cursor-pointer group">
+<span class="text-body-md">Act V, Scene I</span>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary">arrow_forward</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right: Logistics Ledger -->
+<div class="lg:col-span-5 bg-surface-container-low p-8 rounded-lg border border-outline-variant/30 flex flex-col">
+<div class="mb-8 border-b border-outline-variant pb-4">
+<h3 class="font-headline-md text-headline-md text-on-surface">Logistics Ledger</h3>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="text-xs font-label-md uppercase tracking-widest text-on-surface-variant">
+<th class="pb-4 font-normal">Asset ID</th>
+<th class="pb-4 font-normal">Item</th>
+<th class="pb-4 font-normal">Borrower</th>
+<th class="pb-4 font-normal text-right">Timer</th>
+</tr>
+</thead>
+<tbody class="text-body-md">
+<tr class="border-b border-outline-variant/20 hover:bg-surface-bright transition-colors">
+<td class="py-4 font-mono text-xs">PROP-042</td>
+<td class="py-4 font-semibold">Vintage Dagger</td>
+<td class="py-4">J. Thorne</td>
+<td class="py-4 text-right">
+<span class="bg-error-container text-on-error-container px-2 py-1 rounded-full text-[10px] font-bold">4h Remaining</span>
+</td>
+</tr>
+<tr class="border-b border-outline-variant/20 hover:bg-surface-bright transition-colors">
+<td class="py-4 font-mono text-xs">AV-9182</td>
+<td class="py-4 font-semibold">Stage Mic #4</td>
+<td class="py-4">Sound Tech</td>
+<td class="py-4 text-right">
+<span class="text-on-surface-variant text-xs">Ongoing</span>
+</td>
+</tr>
+<tr class="border-b border-outline-variant/20 hover:bg-surface-bright transition-colors">
+<td class="py-4 font-mono text-xs">COST-112</td>
+<td class="py-4 font-semibold">Regal Robe</td>
+<td class="py-4">E. Wells</td>
+<td class="py-4 text-right">
+<span class="text-on-surface-variant text-xs">2d</span>
+</td>
+</tr>
+<tr class="border-b border-outline-variant/20 hover:bg-surface-bright transition-colors">
+<td class="py-4 font-mono text-xs">PROP-055</td>
+<td class="py-4 font-semibold">Feast Props</td>
+<td class="py-4">Stage Mgmt</td>
+<td class="py-4 text-right">
+<span class="text-on-surface-variant text-xs">Active</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="mt-auto pt-8">
+<button class="w-full flex items-center justify-center gap-2 py-4 border-2 border-dashed border-outline-variant rounded-lg text-on-surface-variant font-label-md hover:border-primary hover:text-primary transition-all">
+<span class="material-symbols-outlined">add_circle</span>
+                        Register New Asset Transfer
+                    </button>
+</div>
+</div>
+</section>
+<!-- Bottom Section: Financials -->
+<section class="bg-surface-container-low p-8 rounded-lg border border-outline-variant/30">
+<div class="flex justify-between items-center mb-8 border-b border-outline-variant pb-4">
+<h3 class="font-headline-md text-headline-md text-on-surface">Expense Reimbursements</h3>
+<div class="flex gap-4">
+<button class="text-secondary font-label-md text-label-md hover:opacity-80">View Budget Report</button>
+<button class="bg-primary text-on-primary px-6 py-2 rounded font-label-md text-label-md hover:opacity-90">Submit New Claim</button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="text-xs font-label-md uppercase tracking-widest text-on-surface-variant">
+<th class="pb-4 font-normal">Date</th>
+<th class="pb-4 font-normal">Item Description</th>
+<th class="pb-4 font-normal">Amount</th>
+<th class="pb-4 font-normal">Status</th>
+<th class="pb-4 font-normal text-right">Receipt</th>
+</tr>
+</thead>
+<tbody class="text-body-md">
+<tr class="border-b border-outline-variant/20">
+<td class="py-6 text-on-surface-variant">Oct 12, 2023</td>
+<td class="py-6 font-semibold">Dry Cleaning - Royal Capes (4)</td>
+<td class="py-6">$142.50</td>
+<td class="py-6">
+<span class="flex items-center gap-1.5 text-amber-700">
+<span class="material-symbols-outlined text-sm">pending</span>
+                                    Pending Approval
+                                </span>
+</td>
+<td class="py-6 text-right">
+<div class="inline-block w-12 h-16 bg-surface-container-highest rounded border border-outline-variant overflow-hidden cursor-pointer hover:opacity-80 transition-opacity">
+<img class="w-full h-full object-cover" data-alt="A high-resolution photograph of a crumpled paper receipt with thermal printing details, lying on a minimalist wooden gallery table. The lighting is soft and natural, emphasizing the creamy white tones of the paper against the warm wood. The overall aesthetic is clean and organized, fitting a premium workspace design with a sophisticated, professional mood." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCqmUvfRD-h5WNv0AUCoVmotHspFToNTiKkpkqKJiqjrndRyZFlGj71ir-vuX6P1vvBus-jvrREO0ZSYrWz6TsF_S4PgKvc8Ocay40YpMcCweDq99t3PTs0S9t8feKKkHXbfMe-wda8tGIIazmyGkU_RhdzQSg8IT7Z4LiYKZ74fOJwHzikQUBox1mtsq7CRXjyzbNMfGdapO3kbwcBVxhq-LIcDlqLCEPnt87BYpT4RRJyRl3i4vsgLg1AX4Dc3eOQxO7E3OyOiFNf">
+</div>
+</td>
+</tr>
+<tr class="border-b border-outline-variant/20">
+<td class="py-6 text-on-surface-variant">Oct 10, 2023</td>
+<td class="py-6 font-semibold">Rehearsal Catering - Night Shift</td>
+<td class="py-6">$285.00</td>
+<td class="py-6">
+<span class="flex items-center gap-1.5 text-green-700">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                                    Processed
+                                </span>
+</td>
+<td class="py-6 text-right">
+<div class="inline-block w-12 h-16 bg-surface-container-highest rounded border border-outline-variant overflow-hidden cursor-pointer hover:opacity-80 transition-opacity">
+<img class="w-full h-full object-cover" data-alt="A crisp, close-up shot of a modern digital payment receipt displayed on a smartphone screen, reflecting soft studio lighting. The color palette features whites and soft blues, maintaining a high-end, clean gallery aesthetic. The composition is focused and minimalist, evoking a sense of efficiency and professional financial management in a theater production office." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA0aRmAA8oXZcElvh7bhkDP6av7E30aE2jMl7G4FHLYS7URjguVhZivfncvqwAg2pnOKSWI1AY0KNc1FDrriNBh3nMx7AKmZIjSnzQoP8kw14kdVySC5TQZa5g1tlIA6-dgkTe8V-tg9Sq7fOS6E-g77UzeYe8cKVKZn7WxWb_U1q1K7oE3p8HBVGw88aLuNF8hJr_nXGXeufl4BqXzcyXULp2NXMTGwj0OdG2j0NisaqPMg4eihs5jwt6lvTMcGg47oFgQsM1LTRyb">
+</div>
+</td>
+</tr>
+<tr class="border-b border-outline-variant/20">
+<td class="py-6 text-on-surface-variant">Oct 08, 2023</td>
+<td class="py-6 font-semibold">Emergency Script Printing (30 copies)</td>
+<td class="py-6">$55.20</td>
+<td class="py-6">
+<span class="flex items-center gap-1.5 text-primary font-semibold">
+<span class="material-symbols-outlined text-sm">verified</span>
+                                    Approved
+                                </span>
+</td>
+<td class="py-6 text-right">
+<div class="inline-block w-12 h-16 bg-surface-container-highest rounded border border-outline-variant overflow-hidden cursor-pointer hover:opacity-80 transition-opacity">
+<img class="w-full h-full object-cover" data-alt="An artistic flat-lay photograph showing a printed receipt pinned to a corkboard next to a theater program. The scene is lit by warm, ambient light typical of a prestigious art gallery's backstage. The focus is sharp on the texture of the paper and the sharp typography, aligning with a luxury minimalist branding that values meticulous record-keeping and production detail." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAO8-1dgGs1uOApFqVrHj70oqeq1oV7ixHvfHeH8sLALxJEWqu8iOwcpsGnK-BsfopgC5inv7yaOyEWe56lFrBKEL4Zhx9xLml2y4rVRSXA8KSmoJgtTW0zk-61S_vnFjnZl227b3H30k-Vd6HNMPOpGz4sngv8IcvIj_0AQjgLQxL9LBrEFKJhp16pBEAvfCc2pywqHxEm0kfg4Z8ieyd2ld5zVsNW7sS18UXQE7xUNZRWgyppG1-EkNiGyyT5c1mZvLATNOVfNZUV">
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</main>
+<script>
+        // Micro-interaction for attendance list
+        document.querySelectorAll('li').forEach(item => {
+            item.addEventListener('mouseenter', () => {
+                item.style.transform = 'translateX(4px)';
+                item.style.transition = 'transform 0.2s ease';
+            });
+            item.addEventListener('mouseleave', () => {
+                item.style.transform = 'translateX(0)';
+            });
+        });
+    </script>
+</body></html>

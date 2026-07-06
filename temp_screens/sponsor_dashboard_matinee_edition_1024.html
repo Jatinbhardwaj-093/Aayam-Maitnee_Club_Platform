@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Backstage Pass | Sponsor Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&amp;family=Source+Sans+3:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "on-error-container": "#93000a",
+                "on-secondary": "#ffffff",
+                "on-secondary-container": "#4a6677",
+                "surface": "#fdf9f4",
+                "surface-container": "#f1ede9",
+                "tertiary": "#496365",
+                "inverse-surface": "#31302d",
+                "on-tertiary-fixed-variant": "#324b4d",
+                "surface-dim": "#ddd9d5",
+                "outline": "#7a776c",
+                "outline-variant": "#cac6b9",
+                "on-tertiary": "#ffffff",
+                "surface-bright": "#fdf9f4",
+                "inverse-on-surface": "#f4f0eb",
+                "primary-fixed-dim": "#cdc8a3",
+                "surface-container-highest": "#e6e2dd",
+                "on-background": "#1c1b19",
+                "on-primary-fixed": "#1e1c05",
+                "on-primary": "#ffffff",
+                "secondary-container": "#c6e4f7",
+                "on-surface": "#1c1b19",
+                "on-surface-variant": "#49473d",
+                "on-error": "#ffffff",
+                "on-secondary-fixed": "#001e2c",
+                "surface-variant": "#e6e2dd",
+                "primary-container": "#fff9d2",
+                "secondary-fixed-dim": "#adcbdd",
+                "tertiary-fixed": "#cce8ea",
+                "inverse-primary": "#cdc8a3",
+                "surface-container-lowest": "#ffffff",
+                "tertiary-container": "#e2fdff",
+                "tertiary-fixed-dim": "#b0ccce",
+                "on-primary-container": "#767253",
+                "secondary": "#466272",
+                "surface-container-low": "#f7f3ee",
+                "on-tertiary-container": "#5c7678",
+                "error": "#ba1a1a",
+                "primary": "#635f41",
+                "on-tertiary-fixed": "#041f21",
+                "error-container": "#ffdad6",
+                "on-secondary-fixed-variant": "#2e4a5a",
+                "secondary-fixed": "#c9e7fa",
+                "on-primary-fixed-variant": "#4a482c",
+                "surface-tint": "#635f41",
+                "primary-fixed": "#e9e4be",
+                "background": "#fdf9f4",
+                "surface-container-high": "#ece7e3"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.125rem",
+                "lg": "0.25rem",
+                "xl": "0.5rem",
+                "full": "0.75rem"
+        },
+        "spacing": {
+                "margin-mobile": "16px",
+                "container-max": "1280px",
+                "unit": "4px",
+                "gutter": "24px",
+                "margin-desktop": "64px"
+        },
+        "fontFamily": {
+                "headline-lg-mobile": [
+                        "Playfair Display"
+                ],
+                "headline-md": [
+                        "Playfair Display"
+                ],
+                "label-md": [
+                        "\"Source Sans 3\""
+                ],
+                "display-lg": [
+                        "Playfair Display"
+                ],
+                "body-lg": [
+                        "\"Source Sans 3\""
+                ],
+                "body-md": [
+                        "\"Source Sans 3\""
+                ],
+                "headline-lg": [
+                        "Playfair Display"
+                ]
+        },
+        "fontSize": {
+                "headline-lg-mobile": [
+                        "32px",
+                        {
+                                "lineHeight": "40px",
+                                "fontWeight": "600"
+                        }
+                ],
+                "headline-md": [
+                        "28px",
+                        {
+                                "lineHeight": "36px",
+                                "fontWeight": "600"
+                        }
+                ],
+                "label-md": [
+                        "14px",
+                        {
+                                "lineHeight": "20px",
+                                "letterSpacing": "0.05em",
+                                "fontWeight": "600"
+                        }
+                ],
+                "display-lg": [
+                        "56px",
+                        {
+                                "lineHeight": "64px",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "body-lg": [
+                        "18px",
+                        {
+                                "lineHeight": "28px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "body-md": [
+                        "16px",
+                        {
+                                "lineHeight": "24px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "headline-lg": [
+                        "40px",
+                        {
+                                "lineHeight": "48px",
+                                "fontWeight": "600"
+                        }
+                ]
+        }
+},
+    },
+  }
+</script>
+<style>
+        .gallery-card {
+            background: #ffffff;
+            border: 1px solid rgba(122, 119, 108, 0.15);
+            box-shadow: 0 4px 24px -2px rgba(122, 119, 108, 0.05);
+        }
+        .soft-glow:hover {
+            box-shadow: 0 0 30px rgba(140, 192, 235, 0.1);
+        }
+        .luminous-gradient {
+            background: linear-gradient(135deg, #fff9d2 0%, #ffebcc 100%);
+        }
+        .gallery-border {
+            border: 1px solid rgba(122, 119, 108, 0.2);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #fdf9f4;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cac6b9;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md selection:bg-secondary-container selection:text-on-secondary-container">
+<!-- Top Navigation Bar -->
+<nav class="fixed top-0 w-full z-50 flex justify-between items-center px-margin-desktop h-20 bg-surface/90 backdrop-blur-xl border-b border-outline-variant/30">
+<div class="flex items-center gap-8">
+<span class="font-headline-md text-headline-md font-bold text-primary tracking-tight">StageDoor</span>
+<div class="hidden md:flex gap-6 items-center">
+<a class="text-primary border-b-2 border-primary pb-1 font-label-md text-label-md" href="#">Dashboard</a>
+<a class="text-on-surface-variant hover:text-on-surface transition-colors font-label-md text-label-md" href="#">Performances</a>
+<a class="text-on-surface-variant hover:text-on-surface transition-colors font-label-md text-label-md" href="#">Philanthropy</a>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative group">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary transition-colors">notifications</span>
+<span class="absolute -top-1 -right-1 w-2 h-2 bg-secondary rounded-full"></span>
+</div>
+<div class="flex items-center gap-3 pl-6 border-l border-outline-variant/30">
+<div class="text-right">
+<p class="font-label-md text-label-md text-on-surface font-bold">Lord Harrington</p>
+<p class="text-[10px] uppercase tracking-widest text-on-surface-variant">Grand Benefactor</p>
+</div>
+<div class="w-10 h-10 rounded-full border border-outline-variant/30 p-0.5 overflow-hidden">
+<img class="w-full h-full object-cover rounded-full" data-alt="A portrait of a distinguished middle-aged man in a bespoke tuxedo, set against a dark, moody theater lobby with warm spotlighting. The lighting is dramatic and high-contrast, reflecting a premium VIP lounge aesthetic. The color palette includes deep blacks and subtle gold highlights, creating a sense of exclusivity and prestige." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAqk0-tbkesis2iI0cykeEewuxhTZbpbeIsxl2DHVAAsxVHSc1FhNgHTwRqHlJ-l-YvKU8NfdW3PkfMXyonTrJ-L-zBh085EOmadkV4GCovjQpyrrwvVgP8F7PSLzlgVp5O9aPOazD7d1XLqpfyL1pXbc5JnEZPbsHPTxHPIjPfMqwWuxwgWNaI5hkrzBGY_IjYNJQHGJV1JK6ZD9Q2ct9YCZXpqbs3pTBj3iCVEX_BjIU0hWRGiJk30keNDfTqw8_F8C0oi_IZl3U"/>
+</div>
+</div>
+</div>
+</nav>
+<!-- Sidebar (Desktop) -->
+<aside class="hidden md:flex flex-col fixed left-0 top-20 h-[calc(100vh-80px)] py-8 px-6 gap-4 bg-surface-container-low border-r border-outline-variant/30 w-64">
+<div class="mb-4">
+<p class="font-label-md text-[11px] text-on-surface-variant uppercase tracking-widest mb-4">Sponsor Menu</p>
+<nav class="space-y-1">
+<a class="flex items-center gap-3 p-3 bg-primary-container text-on-primary-container rounded font-bold transition-all duration-200" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Overview</span>
+</a>
+<a class="flex items-center gap-3 p-3 text-on-surface-variant hover:bg-surface-container rounded transition-all duration-200 hover:translate-x-1" href="#">
+<span class="material-symbols-outlined">auto_graph</span>
+<span class="font-label-md text-label-md">Impact Log</span>
+</a>
+<a class="flex items-center gap-3 p-3 text-on-surface-variant hover:bg-surface-container rounded transition-all duration-200 hover:translate-x-1" href="#">
+<span class="material-symbols-outlined">confirmation_number</span>
+<span class="font-label-md text-label-md">VIP Booking</span>
+</a>
+<a class="flex items-center gap-3 p-3 text-on-surface-variant hover:bg-surface-container rounded transition-all duration-200 hover:translate-x-1" href="#">
+<span class="material-symbols-outlined">theater_comedy</span>
+<span class="font-label-md text-label-md">Recognition</span>
+</a>
+</nav>
+</div>
+<div class="mt-auto space-y-4">
+<div class="bg-primary-container/30 p-4 rounded border border-primary-container">
+<p class="font-label-md text-[11px] text-primary mb-1 uppercase tracking-wider">Upcoming Event</p>
+<p class="font-headline-md text-base text-on-surface mb-3">Gala Rehearsal</p>
+<button class="w-full py-2 bg-primary text-on-primary font-bold rounded text-xs active:scale-95 duration-200 uppercase tracking-widest">RSVP NOW</button>
+</div>
+<div class="flex flex-col gap-1">
+<a class="flex items-center gap-3 p-2 text-on-surface-variant hover:text-primary transition-colors text-sm" href="#">
+<span class="material-symbols-outlined text-sm">settings</span>
+<span>Settings</span>
+</a>
+<a class="flex items-center gap-3 p-2 text-on-surface-variant hover:text-primary transition-colors text-sm" href="#">
+<span class="material-symbols-outlined text-sm">help</span>
+<span>Sponsor Support</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="md:ml-64 pt-28 pb-12 px-margin-mobile md:px-margin-desktop">
+<!-- Welcome Hero -->
+<header class="mb-12">
+<h1 class="font-display-lg text-display-lg text-on-surface mb-2">Welcome Back, <span class="text-primary italic">Lord Harrington</span>.</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">Your continued patronage has secured the future of the performing arts. Explore your exclusive benefits within the <span class="font-semibold text-secondary">Matinee Gallery</span>.</p>
+</header>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<!-- Recognition Preview -->
+<div class="md:col-span-4 luminous-gradient p-8 rounded-xl border border-outline-variant/40 soft-glow flex flex-col items-center justify-center text-center relative overflow-hidden group">
+<div class="relative z-10">
+<span class="material-symbols-outlined text-primary text-5xl mb-4" style="font-variation-settings: 'FILL' 1;">chair</span>
+<p class="font-label-md text-[11px] text-on-primary-container uppercase tracking-widest mb-2">Recognition Preview</p>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-6">Orchestra Row A, Seat 12</h3>
+<div class="w-48 h-16 bg-[#FDF9F4] flex items-center justify-center rounded-sm shadow-sm border border-outline-variant/30 relative">
+<div class="absolute inset-1 border border-primary-container/50"></div>
+<span class="font-serif font-bold text-on-surface text-lg tracking-widest uppercase">Harrington</span>
+</div>
+<p class="mt-6 text-sm text-on-surface-variant font-label-md">Engraved in solid brass</p>
+</div>
+</div>
+<!-- Impact Log -->
+<div class="md:col-span-8 gallery-card p-8 rounded-xl soft-glow">
+<div class="flex justify-between items-end mb-8">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Supporter's Impact Log</h3>
+<p class="text-on-surface-variant text-sm font-body-md">Quantifiable value of your contributions</p>
+</div>
+<button class="text-secondary text-sm flex items-center gap-2 hover:underline font-label-md">
+                        Download Report <span class="material-symbols-outlined text-sm">download</span>
+</button>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+<div class="p-6 bg-surface-container-low rounded border border-outline-variant/20">
+<span class="material-symbols-outlined text-secondary mb-2">lightbulb</span>
+<p class="text-2xl font-bold text-on-surface">32</p>
+<p class="text-[10px] text-on-surface-variant uppercase font-bold tracking-widest">New Stage Lights Funded</p>
+</div>
+<div class="p-6 bg-surface-container-low rounded border border-outline-variant/20">
+<span class="material-symbols-outlined text-secondary mb-2">school</span>
+<p class="text-2xl font-bold text-on-surface">15</p>
+<p class="text-[10px] text-on-surface-variant uppercase font-bold tracking-widest">Youth Scholarships</p>
+</div>
+<div class="p-6 bg-surface-container-low rounded border border-outline-variant/20">
+<span class="material-symbols-outlined text-secondary mb-2">architecture</span>
+<p class="text-2xl font-bold text-on-surface">2</p>
+<p class="text-[10px] text-on-surface-variant uppercase font-bold tracking-widest">Set Design Renovations</p>
+</div>
+</div>
+<div class="mt-8 h-32 w-full bg-surface-container-highest/30 rounded p-4 flex items-end justify-between gap-2 overflow-hidden">
+<!-- Chart utilizing the new soft blue/cream tokens -->
+<div class="w-full bg-secondary/10 h-12 rounded-t-sm relative group hover:bg-secondary/20 transition-colors"><div class="absolute bottom-0 w-full bg-secondary-fixed-dim h-2/3 rounded-t-sm"></div></div>
+<div class="w-full bg-secondary/10 h-16 rounded-t-sm relative group hover:bg-secondary/20 transition-colors"><div class="absolute bottom-0 w-full bg-secondary-fixed-dim h-3/4 rounded-t-sm"></div></div>
+<div class="w-full bg-secondary/10 h-10 rounded-t-sm relative group hover:bg-secondary/20 transition-colors"><div class="absolute bottom-0 w-full bg-secondary-fixed-dim h-1/2 rounded-t-sm"></div></div>
+<div class="w-full bg-secondary/10 h-24 rounded-t-sm relative group hover:bg-secondary/20 transition-colors"><div class="absolute bottom-0 w-full bg-secondary-fixed-dim h-5/6 rounded-t-sm"></div></div>
+<div class="w-full bg-secondary/10 h-20 rounded-t-sm relative group hover:bg-secondary/20 transition-colors"><div class="absolute bottom-0 w-full bg-secondary h-full rounded-t-sm shadow-[0_-4px_12px_rgba(70,98,114,0.2)]"></div></div>
+<div class="w-full bg-secondary/10 h-14 rounded-t-sm relative group hover:bg-secondary/20 transition-colors"><div class="absolute bottom-0 w-full bg-secondary-fixed-dim h-2/3 rounded-t-sm"></div></div>
+<div class="w-full bg-secondary/10 h-18 rounded-t-sm relative group hover:bg-secondary/20 transition-colors"><div class="absolute bottom-0 w-full bg-secondary-fixed-dim h-4/5 rounded-t-sm"></div></div>
+</div>
+</div>
+<!-- VIP Ticket Booking -->
+<div class="md:col-span-7 space-y-6">
+<div class="flex items-center justify-between">
+<h3 class="font-headline-md text-headline-md text-on-surface">Priority Opening Nights</h3>
+<div class="flex gap-2">
+<button class="w-8 h-8 rounded-full border border-outline-variant flex items-center justify-center hover:bg-secondary/10 transition-colors">
+<span class="material-symbols-outlined text-sm">chevron_left</span>
+</button>
+<button class="w-8 h-8 rounded-full border border-outline-variant flex items-center justify-center hover:bg-secondary/10 transition-colors">
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Booking Cards -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+<div class="gallery-card rounded-xl overflow-hidden border border-outline-variant/20 hover:border-secondary/40 transition-all group">
+<div class="h-40 relative">
+<img class="w-full h-full object-cover" data-alt="A cinematic, wide-angle shot of a classic Shakespearean stage production, focusing on 'Macbeth' with dramatic crimson and amber lighting. Smoke and hazy atmospheric effects fill the background, while a solitary actor stands in a powerful silhouette. The image conveys the intense, moody energy of a high-stakes opening night in a prestigious theater." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBiX7Z1cSXaaFk76YZsbihSTsIyU3X7i8_CFP4FTIDWM3Fwx1Pq9pSpKa3KrP0ugwmpfrDI-XUM21Z9fEiCR_PodysSYv6gh0J6PaspwQr1F1RBAEydgw9C9Y8PuJW4jBUiXa6YDJsub-Eyn5KsXX7sjG29Y92d615Z1yNR2nywh-9gnCMAu-U7r1WHSPP70BPfnty7e7DraEVt5FYLLT_KgHAcM7AAVsFHANxjAhCn4JnQICuBpji-xafzNWFul-lfsM5wUC7sc24"/>
+<div class="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent"></div>
+<span class="absolute top-4 left-4 bg-tertiary text-on-tertiary px-3 py-1 rounded-sm text-[10px] font-bold tracking-widest uppercase">Exclusive Early Access</span>
+</div>
+<div class="p-6">
+<h4 class="font-headline-md text-lg text-on-surface mb-1">Macbeth: The Noir Edition</h4>
+<p class="text-xs text-on-surface-variant mb-4 flex items-center gap-1 font-label-md">
+<span class="material-symbols-outlined text-sm">calendar_month</span> Oct 24, 2024
+                            </p>
+<button class="w-full py-3 bg-secondary text-white font-bold rounded text-sm soft-glow transition-all active:scale-95 uppercase tracking-widest">Book Lounge Seats</button>
+</div>
+</div>
+<div class="gallery-card rounded-xl overflow-hidden border border-outline-variant/20 hover:border-secondary/40 transition-all group">
+<div class="h-40 relative">
+<img class="w-full h-full object-cover" data-alt="A modern ballet performance captured mid-movement, with dancers dressed in elegant, flowing white costumes. The lighting is cold blue and stark white, creating a glassmorphic and ethereal atmosphere. The background is a minimalist, high-contrast dark stage that emphasizes the grace and athleticism of the performers. The overall style is sophisticated and high-tech." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA4KV879C8POselMdpSjmVD6IUFQOxfLZDML4aNGRYZDmFF5K0m0had-hqJotIRryszgJ28r7gL3RmUC5EyeqQKNBJY63Pxb7ZjiQFoMeLOHHYyBIrhIcNS9JaNhGdr3rSFOk1OfAJhFth6FU4Jj9wT1LrqUljr2jsHBmAeDbzZV7zD0u5VDZqA_nCItStxmF5Kyz-Emic8niBytzMYLXhVz_4rEtmgxWdXdjgMrVK5kXgOZV-rxTEHxUti7qxZWdN7iGqvXv3hA70"/>
+<div class="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent"></div>
+<span class="absolute top-4 left-4 bg-secondary-container text-on-secondary-container px-3 py-1 rounded-sm text-[10px] font-bold tracking-widest uppercase">Opening Gala</span>
+</div>
+<div class="p-6">
+<h4 class="font-headline-md text-lg text-on-surface mb-1">Ethereal Motion: Ballet</h4>
+<p class="text-xs text-on-surface-variant mb-4 flex items-center gap-1 font-label-md">
+<span class="material-symbols-outlined text-sm">calendar_month</span> Nov 12, 2024
+                            </p>
+<button class="w-full py-3 border border-secondary text-secondary font-bold rounded text-sm hover:bg-secondary/5 transition-all active:scale-95 uppercase tracking-widest">Pre-Order Tickets</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Financial Transparency -->
+<div class="md:col-span-5 gallery-card p-8 rounded-xl soft-glow">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-6">Financial Overview</h3>
+<div class="space-y-6">
+<div>
+<div class="flex justify-between text-xs font-bold uppercase tracking-widest mb-2">
+<span class="text-on-surface-variant">Production Allocation</span>
+<span class="text-secondary">65%</span>
+</div>
+<div class="w-full h-2 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-[65%] rounded-full shadow-[0_0_8px_rgba(70,98,114,0.3)]"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-xs font-bold uppercase tracking-widest mb-2">
+<span class="text-on-surface-variant">Educational Programs</span>
+<span class="text-secondary">20%</span>
+</div>
+<div class="w-full h-2 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-secondary-fixed-dim w-[20%] rounded-full"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-xs font-bold uppercase tracking-widest mb-2">
+<span class="text-on-surface-variant">Facility Upkeep</span>
+<span class="text-secondary">15%</span>
+</div>
+<div class="w-full h-2 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-outline-variant w-[15%] rounded-full"></div>
+</div>
+</div>
+<div class="mt-8 p-5 bg-secondary-container/20 rounded border-l-4 border-secondary">
+<p class="text-sm italic text-on-secondary-container leading-relaxed">"Your recent $50k endowment has been fully allocated to the 'Future Stars' youth conservatory program, providing instruments and coaching for 20 students."</p>
+<p class="text-[10px] uppercase font-bold text-secondary mt-3 tracking-widest">— Executive Producer</p>
+</div>
+</div>
+</div>
+<!-- Backstage Tour Invites -->
+<div class="md:col-span-12 gallery-card p-8 rounded-xl">
+<div class="flex items-center gap-4 mb-8">
+<span class="material-symbols-outlined text-secondary text-3xl">gallery_thumbnail</span>
+<h3 class="font-headline-md text-headline-md text-on-surface">Gallery Event Schedule</h3>
+</div>
+<div class="flex flex-col md:flex-row gap-6 overflow-x-auto pb-4 custom-scrollbar">
+<div class="min-w-[300px] flex-1 bg-surface-container-low p-6 rounded border border-outline-variant/10 relative group hover:border-secondary/30 transition-all">
+<div class="absolute top-4 right-4">
+<span class="material-symbols-outlined text-secondary opacity-30 group-hover:opacity-100 transition-opacity">verified</span>
+</div>
+<p class="text-secondary font-bold text-[10px] uppercase tracking-[0.2em] mb-2">Next Week</p>
+<h4 class="text-lg font-bold text-on-surface mb-2 font-headline-md">Private Costume Workshop</h4>
+<p class="text-sm text-on-surface-variant mb-4 font-body-md">Meet the designers behind the upcoming 18th-century period piece.</p>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-on-surface-variant text-sm">schedule</span>
+<span class="text-xs text-on-surface-variant font-label-md">Aug 12, 6:00 PM</span>
+</div>
+</div>
+<div class="min-w-[300px] flex-1 bg-surface-container-low p-6 rounded border border-outline-variant/10 relative group hover:border-secondary/30 transition-all">
+<p class="text-on-surface-variant font-bold text-[10px] uppercase tracking-[0.2em] mb-2">In 2 Weeks</p>
+<h4 class="text-lg font-bold text-on-surface mb-2 font-headline-md">Acoustic Sound Check</h4>
+<p class="text-sm text-on-surface-variant mb-4 font-body-md">An intimate preview of the orchestral arrangement in the main hall.</p>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-on-surface-variant text-sm">schedule</span>
+<span class="text-xs text-on-surface-variant font-label-md">Aug 20, 4:30 PM</span>
+</div>
+</div>
+<div class="min-w-[300px] flex-1 bg-surface-container-low p-6 rounded border border-outline-variant/10 relative group hover:border-secondary/30 transition-all">
+<p class="text-on-surface-variant font-bold text-[10px] uppercase tracking-[0.2em] mb-2">Next Month</p>
+<h4 class="text-lg font-bold text-on-surface mb-2 font-headline-md">Director's Dinner</h4>
+<p class="text-sm text-on-surface-variant mb-4 font-body-md">Black-tie formal dinner with the creative board and leading cast members.</p>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-on-surface-variant text-sm">schedule</span>
+<span class="text-xs text-on-surface-variant font-label-md">Sept 05, 8:00 PM</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full py-12 px-margin-desktop flex flex-col md:flex-row justify-between items-center gap-6 border-t border-outline-variant/10 bg-surface-container-lowest text-on-surface-variant">
+<div class="flex flex-col items-center md:items-start">
+<span class="font-bold text-primary text-label-md font-label-md tracking-widest">THE BACKSTAGE PASS</span>
+<p class="font-label-md text-[11px] mt-1 uppercase tracking-widest">© 2024 Theater Club Excellence. All rights reserved.</p>
+</div>
+<div class="flex gap-8">
+<a class="font-label-md text-xs uppercase tracking-widest text-on-surface-variant hover:text-primary transition-colors" href="#">Contact</a>
+<a class="font-label-md text-xs uppercase tracking-widest text-on-surface-variant hover:text-primary transition-colors" href="#">Terms</a>
+<a class="font-label-md text-xs uppercase tracking-widest text-on-surface-variant hover:text-primary transition-colors" href="#">Privacy</a>
+</div>
+<div class="flex gap-4">
+<a class="w-8 h-8 rounded-full border border-outline-variant/20 flex items-center justify-center hover:bg-primary/10 transition-all text-on-surface-variant hover:text-primary" href="#">
+<svg class="w-4 h-4 fill-current" viewbox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"></path></svg>
+</a>
+<a class="w-8 h-8 rounded-full border border-outline-variant/20 flex items-center justify-center hover:bg-primary/10 transition-all text-on-surface-variant hover:text-primary" href="#">
+<svg class="w-4 h-4 fill-current" viewbox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"></path></svg>
+</a>
+</div>
+</footer>
+<!-- Interactive Layer: Spotlight Cursor Effect -->
+<div class="pointer-events-none fixed inset-0 z-0 transition-opacity duration-500 opacity-0 bg-[radial-gradient(circle_at_var(--x)_var(--y),rgba(140,192,235,0.05)_0%,transparent_50%)]" id="cursor-spotlight"></div>
+<script>
+        document.addEventListener('mousemove', (e) => {
+            const spotlight = document.getElementById('cursor-spotlight');
+            spotlight.style.opacity = '1';
+            spotlight.style.setProperty('--x', `${e.clientX}px`);
+            spotlight.style.setProperty('--y', `${e.clientY}px`);
+        });
+
+        // Small interaction for buttons
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                btn.classList.add('scale-95');
+                setTimeout(() => btn.classList.remove('scale-95'), 100);
+            });
+        });
+    </script>
+</body></html>
