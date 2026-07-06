@@ -1,0 +1,509 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>DramaClub | Where Stories Come Alive</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&amp;family=Source+Sans+3:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container": "#f1ede8",
+                        "outline": "#7a776c",
+                        "inverse-surface": "#31302d",
+                        "on-surface": "#1c1b19",
+                        "surface-dim": "#ddd9d5",
+                        "primary-fixed": "#eae3bd",
+                        "on-primary-fixed": "#1f1c05",
+                        "surface-variant": "#e6e2dd",
+                        "primary-fixed-dim": "#cdc7a3",
+                        "on-tertiary-fixed-variant": "#314b4d",
+                        "on-background": "#1c1c19",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed": "#cbe8ea",
+                        "secondary-container": "#BFDDF0",
+                        "on-tertiary-fixed": "#031f21",
+                        "on-secondary-fixed": "#001e2c",
+                        "primary": "#8CC0EB",
+                        "on-error-container": "#93000a",
+                        "surface-container-highest": "#e6e2dd",
+                        "on-secondary": "#1c1b19",
+                        "error-container": "#ffdad6",
+                        "on-tertiary": "#ffffff",
+                        "surface-tint": "#635f41",
+                        "outline-variant": "#cbc6b9",
+                        "secondary-fixed": "#c9e7fa",
+                        "on-primary-fixed-variant": "#4b472b",
+                        "on-secondary-container": "#2e4a59",
+                        "tertiary": "#314b4d",
+                        "inverse-primary": "#cdc7a3",
+                        "primary-container": "#8CC0EB",
+                        "on-tertiary-container": "#c2dee0",
+                        "surface-container-high": "#ebe8e3",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-fixed-variant": "#2e4a59",
+                        "error": "#ba1a1a",
+                        "background": "#fdf9f4",
+                        "on-primary": "#ffffff",
+                        "surface-container-low": "#f7f3ee",
+                        "surface-bright": "#fdf9f4",
+                        "surface": "#fdf9f4",
+                        "secondary": "#8CC0EB",
+                        "inverse-on-surface": "#f4f0eb",
+                        "on-primary-container": "#ffffff",
+                        "tertiary-fixed-dim": "#b0ccce",
+                        "secondary-fixed-dim": "#adcbdd",
+                        "tertiary-container": "#496365",
+                        "on-surface-variant": "#49473d"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "4px",
+                        "lg": "6px",
+                        "xl": "8px",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container-max": "1280px",
+                        "unit": "4px",
+                        "gutter": "24px",
+                        "margin-mobile": "16px",
+                        "margin-desktop": "64px",
+                        "section-gap": "100px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Playfair Display"],
+                        "body-md": ["Source Sans 3"],
+                        "headline-lg": ["Playfair Display"],
+                        "headline-md": ["Playfair Display"],
+                        "body-lg": ["Source Sans 3"],
+                        "label-md": ["Source Sans 3"],
+                        "headline-lg-mobile": ["Playfair Display"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["64px", {"lineHeight": "72px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-lg": ["48px", {"lineHeight": "56px", "fontWeight": "600"}],
+                        "headline-md": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "headline-lg-mobile": ["32px", {"lineHeight": "40px", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .stage-glow {
+            box-shadow: 0 10px 40px -10px rgba(140, 192, 235, 0.15);
+        }
+        .theatrical-gradient {
+            background: linear-gradient(to top, rgba(253, 249, 244, 1) 0%, rgba(253, 249, 244, 0) 100%);
+        }
+        .playbill-divider {
+            width: 1px;
+            background-color: #8CC0EB;
+            height: 40px;
+        }
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        /* Standard desktop width constraint */
+        .desktop-max-width {
+            max-width: 1440px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md selection:bg-primary-container selection:text-on-primary-container">
+<!-- Top Navigation Bar -->
+<nav class="fixed top-0 w-full z-50 glass-nav border-b border-outline-variant/30 shadow-sm">
+<div class="flex justify-between items-center px-margin-desktop py-5 max-w-container-max mx-auto">
+<div class="flex items-center gap-3">
+<img alt="Drama Club Logo" class="h-10 w-10" src="https://lh3.googleusercontent.com/aida/AP1WRLueIlGxYsKHA10jd1841bsz6Sh1idZLtKI-GicMqyPKjzqFKU4RCnMrCcBiaZqgb0KYHmxln0mqaiBUPuslpjwM518W66BnPZnYNmmP8xd3mSz3BCGCj1UXHnSYkn2gJTbl9yaXAJSBLUGgxzkKZKpMm_rb5JdvZBo9fJLgwYqv7ubjiXhIe0NBQ1hiOnK5_p0lIuTZN3W_ye97pTtFTO7pYnxPpa5nKm78Y3rc9E0RopOirTrYQbtG--s">
+<span class="font-display-lg text-[28px] text-on-surface tracking-tighter leading-none">DramaClub</span>
+</div>
+<div class="hidden md:flex items-center gap-10 font-label-md text-label-md">
+<a class="text-secondary border-b-2 border-secondary pb-1 cursor-pointer transition-colors duration-300" href="#">Productions</a>
+<a class="text-on-surface-variant hover:text-secondary cursor-pointer transition-colors duration-300" href="#">Membership</a>
+<a class="text-on-surface-variant hover:text-secondary cursor-pointer transition-colors duration-300" href="#">Calendar</a>
+<a class="text-on-surface-variant hover:text-secondary cursor-pointer transition-colors duration-300" href="#">Gallery</a>
+<a class="text-on-surface-variant hover:text-secondary cursor-pointer transition-colors duration-300" href="#">About</a>
+</div>
+<button class="bg-primary text-on-primary px-8 py-2.5 rounded-lg font-label-md hover:opacity-90 transition-all duration-300 active:scale-95 shadow-sm">
+            Join the Cast
+        </button>
+</div>
+</nav>
+<!-- Hero Section -->
+<header class="relative h-[90vh] min-h-[700px] flex items-center justify-center overflow-hidden bg-[#BFDDF0]/10 desktop-max-width">
+<div class="absolute inset-0 bg-gradient-to-b from-transparent via-background/40 to-background z-1"></div>
+<div class="relative z-10 text-center px-margin-mobile md:px-margin-desktop max-w-4xl mx-auto space-y-10">
+<h1 class="font-display-lg text-headline-lg-mobile md:text-display-lg text-on-surface leading-[1.1]">
+            Where Stories <span class="italic text-primary">Come Alive</span>
+</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto leading-relaxed">
+            Welcome to the Drama Club — a vibrant community where creativity, passion, and performance come together to transform the ordinary into the extraordinary.
+        </p>
+<div class="flex flex-col sm:flex-row items-center justify-center gap-6 pt-4">
+<button class="w-full sm:w-auto px-10 py-4 bg-primary text-on-primary rounded-lg font-label-md hover:opacity-90 transition-all duration-300 flex items-center justify-center gap-3 shadow-xl">
+                Join the Club
+                <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+<button class="w-full sm:w-auto px-10 py-4 border-2 border-primary text-primary rounded-lg font-label-md hover:bg-primary/5 transition-all duration-300">
+                Explore Events
+            </button>
+</div>
+</div>
+<div class="absolute bottom-16 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-60 animate-bounce">
+<span class="font-label-sm uppercase tracking-widest text-on-surface-variant">Scroll</span>
+<span class="material-symbols-outlined">expand_more</span>
+</div>
+</header>
+<!-- About Section -->
+<section class="py-section-gap px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
+<div class="relative rounded-xl overflow-hidden shadow-2xl stage-glow group">
+<div class="aspect-[4/5] bg-cover bg-center group-hover:scale-105 transition-transform duration-1000" data-alt="A cinematic, low-angle photograph of an empty university theater stage at night." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC_RZmy9pe0JiQbkGRlYyUNAI8ujcidLuxwkFnJYTL_48jRHxlr-UKLVFbr1ACqUP8z6nU3doGKQUxnnlKML6IBYHqiQ_8IbNtC8FwI-48La7rjIXYlw5HH82uDZePn4ngJF25msGjBygi1y4Br0wUmGYVi7vIInYlxrBRMFmlUqwRih1Ib-1PfY-_Yi6Awx1dGIAdy9insfUKbWTddESwpOSKBbDzOt_klV9bSddvqPVjT7Tk3QQYYLk19W34dRUNrklTluHNa50U')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-background/40 to-transparent"></div>
+</div>
+<div class="space-y-12">
+<div class="space-y-6">
+<span class="font-label-md text-primary uppercase tracking-[0.2em]">Our Mission</span>
+<h2 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface leading-tight">Illuminating the <br> Human Experience</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed">
+                    The University Drama Club serves as a creative sanctuary for students of all disciplines. We believe that theater is more than just performance—it's a tool for empathy, a laboratory for collaboration, and a stage for the voices of tomorrow. Our goal is to foster artistic growth while building a community that lasts long after the final bow.
+                </p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="p-8 rounded-lg bg-surface-container-low border border-outline-variant/30 hover:border-primary/50 transition-all duration-300 hover:shadow-md">
+<span class="material-symbols-outlined text-primary mb-5" style="font-size: 36px;">theater_comedy</span>
+<h4 class="font-label-md text-on-surface mb-3 text-base">Stage Productions</h4>
+<p class="font-label-sm text-on-surface-variant leading-relaxed">Full-scale plays and musicals.</p>
+</div>
+<div class="p-8 rounded-lg bg-surface-container-low border border-outline-variant/30 hover:border-primary/50 transition-all duration-300 hover:shadow-md">
+<span class="material-symbols-outlined text-primary mb-5" style="font-size: 36px;">school</span>
+<h4 class="font-label-md text-on-surface mb-3 text-base">Workshops</h4>
+<p class="font-label-sm text-on-surface-variant leading-relaxed">Acting, lighting, and scriptwriting.</p>
+</div>
+<div class="p-8 rounded-lg bg-surface-container-low border border-outline-variant/30 hover:border-primary/50 transition-all duration-300 hover:shadow-md">
+<span class="material-symbols-outlined text-primary mb-5" style="font-size: 36px;">emoji_events</span>
+<h4 class="font-label-md text-on-surface mb-3 text-base">Competitions</h4>
+<p class="font-label-sm text-on-surface-variant leading-relaxed">Regional and national festivals.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Quick Highlights (Stats) -->
+<section class="py-20 bg-surface-container-lowest border-y border-outline-variant/30 desktop-max-width">
+<div class="px-margin-desktop max-w-container-max mx-auto grid grid-cols-2 lg:grid-cols-4 gap-gutter">
+<div class="text-center p-8 space-y-3">
+<p class="font-display-lg text-primary text-headline-lg">150+</p>
+<p class="font-label-md text-on-surface-variant uppercase tracking-widest text-xs">Active Members</p>
+</div>
+<div class="text-center p-8 space-y-3 border-l border-outline-variant/30">
+<p class="font-display-lg text-primary text-headline-lg">12</p>
+<p class="font-label-md text-on-surface-variant uppercase tracking-widest text-xs">Annual Shows</p>
+</div>
+<div class="text-center p-8 space-y-3 lg:border-l border-outline-variant/30">
+<p class="font-display-lg text-primary text-headline-lg">25</p>
+<p class="font-label-md text-on-surface-variant uppercase tracking-widest text-xs">Awards Won</p>
+</div>
+<div class="text-center p-8 space-y-3 border-l border-outline-variant/30">
+<p class="font-display-lg text-primary text-headline-lg">10k</p>
+<p class="font-label-md text-on-surface-variant uppercase tracking-widest text-xs">Yearly Audience</p>
+</div>
+</div>
+</section>
+<!-- Core Team Section -->
+<section class="py-section-gap px-margin-desktop max-w-container-max mx-auto">
+<div class="text-center mb-20 space-y-5">
+<span class="font-label-md text-primary uppercase tracking-[0.2em]">The Visionaries</span>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Meet Our Core Team</h2>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+<!-- Team Member 1 -->
+<div class="group bg-white rounded-xl p-10 text-center hover:bg-surface-container transition-all duration-500 stage-glow border border-outline-variant/20 hover:border-primary/30">
+<div class="relative w-36 h-36 mx-auto mb-8">
+<img class="w-full h-full object-cover rounded-full border-2 border-primary/20 p-1.5" data-alt="A professional, warm portrait of Dr. Sarah Vance" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjiEFkOcAegUxUafZI47ytryqjdlPATynFtrO5zd0d-GbkfnjYX4BvA2JehS__GxNwMKk4OTtlRy6B427y1tRQ3P4qUQHsVpqyT_mfpBkfYZVMS8mclig4g3hCYFY1heJUCOCxKLWB6GC7VY24UGdzR8ekV3vrdCPgsWRYhZyjBfKXZfozpWH0Y3xv7OUJikSP-DcqE-JA6NOJM4cjcGNFBl2JFz1dUMjzcLtTN8uoZRBoNFLWkqRk4FyJlbpm4LuQAVbFmyyzq08">
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface group-hover:text-primary transition-colors mb-1">Dr. Sarah Vance</h3>
+<p class="font-label-sm text-primary uppercase tracking-widest mb-6 text-xs font-semibold">Faculty Coordinator</p>
+<p class="font-body-md text-on-surface-variant text-sm leading-relaxed">Passionate about Shakespearian contemporary adaptations and student mentorship.</p>
+</div>
+<!-- Team Member 2 -->
+<div class="group bg-white rounded-xl p-10 text-center hover:bg-surface-container transition-all duration-500 border border-outline-variant/20 hover:border-primary/30">
+<div class="relative w-36 h-36 mx-auto mb-8">
+<img class="w-full h-full object-cover rounded-full border-2 border-primary/20 p-1.5" data-alt="Portrait of Julian Thorne" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMS1tG5AfFeRG-67BIVUfeqT-_U-YFIM87AfA0HnVp0-dtiJvdln95ITiJBPqfIwSoLfFyqEymlHm8LlfxLVFxhP8TPbNa-CdArzpM5pM1syq5cv6fB1uxQa1g8McMtI4C97mSs-qBfVsLmZ8dn1HtQ9FVJOMYOYwIKVMgUEYH_wueBh0yBCMT-v5RaBXnl4-ZyP5NejaXB8_6UoOW7-u10LSaj0xDSF0z4nRwrhmLnjBrH7KI76bwS2yxldNdBZCWTz1wr8cN7jk">
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface group-hover:text-primary transition-colors mb-1">Julian Thorne</h3>
+<p class="font-label-sm text-primary uppercase tracking-widest mb-6 text-xs font-semibold">Club President</p>
+<p class="font-body-md text-on-surface-variant text-sm leading-relaxed">Directing student with a vision for immersive theater and new narratives.</p>
+</div>
+<!-- Team Member 3 -->
+<div class="group bg-white rounded-xl p-10 text-center hover:bg-surface-container transition-all duration-500 border border-outline-variant/20 hover:border-primary/30">
+<div class="relative w-36 h-36 mx-auto mb-8">
+<img class="w-full h-full object-cover rounded-full border-2 border-primary/20 p-1.5" data-alt="Portrait of Elena Rossi" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBdgrkYuwTu8A9zc-C5pwuYMxuMRzf19GTOsHa-y-72cm4HKnYfbCUz3KyMCf07uaVKOUGN547p8X_o4PkMKyC2yygSSmczYffvO_xMq9ML8iJk8KAT_s8CKnZsVKWaa3ZmrNk8iNP53S7HwirmHbih-Al38QLXSXucUzW_0zIMTRdKbLIACl6E4_kDU7a6nhy-mcRVOIxEHEAoprDov_SX7beR969fOPyGJ-8-4VWYJih-ty4YRZfcKkIzpUy8f3jyTIBdqvHgjE0">
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface group-hover:text-primary transition-colors mb-1">Elena Rossi</h3>
+<p class="font-label-sm text-primary uppercase tracking-widest mb-6 text-xs font-semibold">Vice President</p>
+<p class="font-body-md text-on-surface-variant text-sm leading-relaxed">Managing large-scale musical productions and theatrical logistics.</p>
+</div>
+<!-- Team Member 4 -->
+<div class="group bg-white rounded-xl p-10 text-center hover:bg-surface-container transition-all duration-500 border border-outline-variant/20 hover:border-primary/30">
+<div class="relative w-36 h-36 mx-auto mb-8">
+<img class="w-full h-full object-cover rounded-full border-2 border-primary/20 p-1.5" data-alt="Portrait of Mark Chen" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCDUmPSgX8wtm9QfxkunImgL6OF58qtKZHYE31gIctO9ng6XJtENGTL6Z6qKKY8SjaMr-1a9QBMyZd2rxsQ5hQqRZnMSNZK7iPGE60-Kobob80_D3zo-x_Y_GFkthQefoTezPvyzuHDPc4k-MLm4F_wRSzrTHyOXPZ9z3isHdLbenlAhzkwo4e_dhjywkKS5wQc7FF7HdBvcPIHhToirTmX0OfdwwCzZMpW7eNthY0DxgWCV0_f09lVAn33Wbv_9W41ogzUgYngqvI">
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface group-hover:text-primary transition-colors mb-1">Mark Chen</h3>
+<p class="font-label-sm text-primary uppercase tracking-widest mb-6 text-xs font-semibold">Tech Lead</p>
+<p class="font-body-md text-on-surface-variant text-sm leading-relaxed">Crafting immersive soundscapes and lighting magic for every performance.</p>
+</div>
+</div>
+</section>
+<!-- Upcoming Events Preview -->
+<section class="py-section-gap bg-surface-container-low desktop-max-width">
+<div class="px-margin-desktop max-w-container-max mx-auto">
+<div class="flex flex-col md:flex-row justify-between items-end mb-20 gap-6">
+<div class="space-y-4">
+<span class="font-label-md text-primary uppercase tracking-[0.2em]">The Playbill</span>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Upcoming Performances</h2>
+</div>
+<button class="flex items-center gap-3 font-label-md text-primary group text-base">
+                View Full Season
+                <span class="material-symbols-outlined transition-transform group-hover:translate-x-2">trending_flat</span>
+</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+<!-- Event 1 -->
+<div class="group space-y-8">
+<div class="relative aspect-[3/4] rounded-lg overflow-hidden shadow-xl border border-outline-variant/30">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" data-alt="Poster for Macbeth" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCHg5WSxji-OZpeJ5lkki_sYmnuo7vHPNfdS3zxRoubrcSfBDlbgI636GCvFv7yPWvLvW_EtMYWKLCRbJXgkwDa2pzFHLAHRDU7W4ym95bGKnpceB6oJm0JDrTdQkA_RcrxfPbTEpIrhXxsiEP1_RrXtXZZwTCPKQ2V9Wzz6CWY1s-FT48yegmmx3d9Xs24jscL2B36jg9WA_D6BrdiJyvVEuuZQrhzqB3B5PUAetJvQyAJ1FAcOkZMPIKq2AInU2iuqFI5mvk7Igk">
+<div class="absolute top-6 left-6 px-5 py-2.5 bg-primary text-on-primary font-label-md rounded shadow-lg backdrop-blur-md bg-opacity-90">
+                        MAR 15-18
+                    </div>
+</div>
+<div class="flex gap-6">
+<div class="flex flex-col items-center justify-center">
+<span class="font-headline-md text-primary leading-none text-4xl">15</span>
+<span class="font-label-sm uppercase text-on-surface-variant tracking-widest mt-1">MAR</span>
+</div>
+<div class="playbill-divider self-center"></div>
+<div class="space-y-2">
+<h3 class="font-headline-md text-headline-md text-on-surface leading-tight">The Tragedy of Macbeth</h3>
+<p class="font-label-sm text-on-surface-variant flex items-center gap-2">
+<span class="material-symbols-outlined text-base">location_on</span>
+                            Main Auditorium • 7:00 PM
+                        </p>
+</div>
+</div>
+<button class="w-full py-4 border-2 border-outline-variant/30 rounded-lg font-label-md text-on-surface hover:border-primary hover:text-primary hover:bg-white transition-all duration-300">View Details</button>
+</div>
+<!-- Event 2 -->
+<div class="group space-y-8">
+<div class="relative aspect-[3/4] rounded-lg overflow-hidden shadow-xl border border-outline-variant/30">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" data-alt="Poster for Neon Dreams" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDsNtt20OfKq8P7B0AaQb_cGzE_SmJSLOZQldrPyD-UoPKWgdzWbmGCwi2e_aIHHsJVPxH4G2mSVyl1wiTbtnRIvxGtAqpu4FciOxQCf3LmLX6M-IJhKElpRCg3dwWreugKRy4Jb7RLPoZVXRht_0L8-yhYJSiShhDWWEdZ2yVLuXKoWqj1APj_a-14BGYeW2vLDpkv_wimyQneQ2kprxnuAtK8kBblDScVlmxiNpXz2vFVzHWjuYbOVEg7SIZmRaLvqM0oEZHW2Js">
+<div class="absolute top-6 left-6 px-5 py-2.5 bg-primary text-on-primary font-label-md rounded shadow-lg backdrop-blur-md bg-opacity-90">
+                        APR 05-10
+                    </div>
+</div>
+<div class="flex gap-6">
+<div class="flex flex-col items-center justify-center">
+<span class="font-headline-md text-primary leading-none text-4xl">05</span>
+<span class="font-label-sm uppercase text-on-surface-variant tracking-widest mt-1">APR</span>
+</div>
+<div class="playbill-divider self-center"></div>
+<div class="space-y-2">
+<h3 class="font-headline-md text-headline-md text-on-surface leading-tight">Neon Dreams: The Musical</h3>
+<p class="font-label-sm text-on-surface-variant flex items-center gap-2">
+<span class="material-symbols-outlined text-base">location_on</span>
+                            Studio Theater • 8:30 PM
+                        </p>
+</div>
+</div>
+<button class="w-full py-4 border-2 border-outline-variant/30 rounded-lg font-label-md text-on-surface hover:border-primary hover:text-primary hover:bg-white transition-all duration-300">View Details</button>
+</div>
+<!-- Event 3 -->
+<div class="group space-y-8">
+<div class="relative aspect-[3/4] rounded-lg overflow-hidden shadow-xl border border-outline-variant/30">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" data-alt="Poster for Writers Showcase" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAXfoUv6k_QXECOjAz9MvfU-m3JW49Qs4xejAOL9UP13QP-Okp9wKy3vSM9HH0ePhh7llrtZXZq4KA2mni1Si7N0guBiwUx02KfgXxCXDUaRAwIDDaykni4lO_aJ6vB3lGO5fNiGuCeyD4Q-2I6BCn5vg3ER1Co_jhlp3spO4rYIEVCkf_pjf8PO4be0dASylN5uIJOr9zZ1gU09apMU2LdIflK0q2_9rhyNBZu10yiF4wOcHcsPpLQunl_b5cdooQepIEIpnZrqDk">
+<div class="absolute top-6 left-6 px-5 py-2.5 bg-primary text-on-primary font-label-md rounded shadow-lg backdrop-blur-md bg-opacity-90">
+                        MAY 22
+                    </div>
+</div>
+<div class="flex gap-6">
+<div class="flex flex-col items-center justify-center">
+<span class="font-headline-md text-primary leading-none text-4xl">22</span>
+<span class="font-label-sm uppercase text-on-surface-variant tracking-widest mt-1">MAY</span>
+</div>
+<div class="playbill-divider self-center"></div>
+<div class="space-y-2">
+<h3 class="font-headline-md text-headline-md text-on-surface leading-tight">Annual Writers Showcase</h3>
+<p class="font-label-sm text-on-surface-variant flex items-center gap-2">
+<span class="material-symbols-outlined text-base">location_on</span>
+                            Black Box • 6:00 PM
+                        </p>
+</div>
+</div>
+<button class="w-full py-4 border-2 border-outline-variant/30 rounded-lg font-label-md text-on-surface hover:border-primary hover:text-primary hover:bg-white transition-all duration-300">View Details</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Gallery Preview -->
+<section class="py-section-gap px-margin-desktop max-w-container-max mx-auto">
+<div class="text-center mb-20">
+<span class="font-label-md text-primary uppercase tracking-[0.2em]">Moments in Time</span>
+<h2 class="font-headline-lg text-headline-lg text-on-surface mt-5">Behind the Velvet Curtain</h2>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-6 auto-rows-[280px]">
+<div class="row-span-2 col-span-2 relative group overflow-hidden rounded-xl cursor-pointer shadow-lg" onclick="openLightbox(0)">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" data-alt="Wide production shot" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBKaduSFsL3v_v3HlPudk1JtqW9DKQhLhqqT_kaO94UzK1eJT7yUhaHRouAsPBmFbHm49eu-EPFRz4vZ1uYERz7X_ZYEIOFVKgyYc_Ro2DFr83XHj81kKWJw5gVvSrFoGThSVATpTwSIY-_ZZNqxVy6cwahtU4uxNQVNYJDvs1bDBjs_p61U7d_Vt9gzjwL2316IhcY72GTDYm8SxuytIe4uP06ciSjTMQXNR_N643teOOJW6R5-lBWuIAfA-RfeoKTRcHr6AaMFzE">
+<div class="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+<div class="bg-white/90 p-4 rounded-full shadow-2xl">
+<span class="material-symbols-outlined text-primary text-4xl">zoom_in</span>
+</div>
+</div>
+</div>
+<div class="relative group overflow-hidden rounded-xl cursor-pointer shadow-lg" onclick="openLightbox(1)">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" data-alt="Candid student actress" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAiaeU-snCEG41GNFihD-bDuKrWr6WUL6WxfPDZWlyL_YGRT5qaqsPYzZ8hnnDLOazNUpm4ItvajNIsnnsUBtZMhXoHeUsWrgz7ELFkyzl0TKDF3a29LFl5Cj62eQy-w1hO1x3DveJDNB45m7rElOphjclf2IKPLxevapkp78ZbIFaaY2u9fr5-KcizZ6fLTqaPkBwlXEqslQ3EQ4wzhYFvNUwAgvNwlv69JHDbS__1o31o7Dou93kTaTxA6d378y1m3j0YKFWXo3c">
+<div class="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+<div class="bg-white/90 p-3 rounded-full shadow-2xl">
+<span class="material-symbols-outlined text-primary text-2xl">zoom_in</span>
+</div>
+</div>
+</div>
+<div class="row-span-2 relative group overflow-hidden rounded-xl cursor-pointer shadow-lg" onclick="openLightbox(2)">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" data-alt="Rehearsal action shot" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBZPQDLrD_sWssL7oY6l8g6ciPINbsyv20-20nJKRm5dwf9WpyfbYWl1cyAIE13c_S29XER4x2-L5wuF_UPCi9tZTvcVqtd6yN2eo-0pQBrHuERBugSVmh1soQlALnVEpS62hg-cnMjecW0NZhciDWcXqyGj3iWBEVidAomyQ5oEE2Xs8L3gajaRjLRgQixFI12ytM9vuCC_oroDv2D-_bXNsAD-3axh0A5GTfid_bxsq-ObhrGOzyTsJzDjabiLD0cktcoYHXZDH0">
+<div class="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+<div class="bg-white/90 p-3 rounded-full shadow-2xl">
+<span class="material-symbols-outlined text-primary text-2xl">zoom_in</span>
+</div>
+</div>
+</div>
+<div class="relative group overflow-hidden rounded-xl cursor-pointer shadow-lg" onclick="openLightbox(3)">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" data-alt="Costume detail" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCkQ9IjsajUaLH9v6dLbeHSduqWVMaXL9ERqVWInogeOSXkP79fxkDUzX51KevjqxAVbJdrJP8fKkZqmagYhLGSZiNozim2ybkFbrpi3Gx_SZuXZUt3a_nmMZoj8_9TUMX7_jTbi8eVRC03SxrIk5q5T8yup_eGFwFjE_-RiTfju-DflzJwL-4Km6mA6Z1E6lwX9L77FYW7ffDYBLhYhHEBsELuh-6Sy51eaLBIZMKkyXYZWqjiOg8wntGpkGgMI5rmvCS-8MF48II">
+<div class="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+<div class="bg-white/90 p-3 rounded-full shadow-2xl">
+<span class="material-symbols-outlined text-primary text-2xl">zoom_in</span>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-20 text-center">
+<button class="px-12 py-5 border-2 border-primary text-primary rounded-lg font-label-md hover:bg-primary/5 transition-all duration-300">
+            View Full Gallery
+        </button>
+</div>
+</section>
+<!-- Join CTA -->
+<section class="relative py-32 bg-primary overflow-hidden desktop-max-width">
+<div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+<div class="relative z-10 px-margin-desktop max-w-container-max mx-auto text-center space-y-10">
+<h2 class="font-display-lg text-headline-lg text-on-primary max-w-3xl mx-auto">Ready to Take the Stage?</h2>
+<p class="font-body-lg text-body-lg text-on-primary/90 max-w-2xl mx-auto leading-relaxed">
+            Whether you're an aspiring actor, a tech enthusiast, or a creative writer, there's a place for you in our cast. No experience required—just passion.
+        </p>
+<button class="px-16 py-6 bg-white text-primary rounded-lg font-label-md text-xl hover:scale-105 transition-transform shadow-2xl active:scale-95">
+            Join the Club Now
+        </button>
+</div>
+</section>
+<!-- Footer -->
+<footer class="w-full py-24 bg-surface-container-lowest border-t border-outline-variant/30 desktop-max-width">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-16 px-margin-desktop max-w-container-max mx-auto">
+<div class="space-y-8 col-span-1">
+<div class="flex items-center gap-3">
+<img alt="Drama Club Logo" class="h-12 w-12" src="https://lh3.googleusercontent.com/aida/AP1WRLueIlGxYsKHA10jd1841bsz6Sh1idZLtKI-GicMqyPKjzqFKU4RCnMrCcBiaZqgb0KYHmxln0mqaiBUPuslpjwM518W66BnPZnYNmmP8xd3mSz3BCGCj1UXHnSYkn2gJTbl9yaXAJSBLUGgxzkKZKpMm_rb5JdvZBo9fJLgwYqv7ubjiXhIe0NBQ1hiOnK5_p0lIuTZN3W_ye97pTtFTO7pYnxPpa5nKm78Y3rc9E0RopOirTrYQbtG--s">
+<span class="font-display-lg text-[28px] text-on-surface">DramaClub</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                Dedicated to artistic excellence and student creativity at the University since 1984. Bringing theater to the heart of campus life.
+            </p>
+</div>
+<div class="space-y-6">
+<h4 class="font-label-md text-on-surface uppercase tracking-widest text-xs font-bold">Quick Links</h4>
+<ul class="space-y-3 font-body-md text-body-md text-on-surface-variant">
+<li class="hover:text-primary cursor-pointer transition-colors">Production Archive</li>
+<li class="hover:text-primary cursor-pointer transition-colors">Membership Portal</li>
+<li class="hover:text-primary cursor-pointer transition-colors">Safety Guidelines</li>
+<li class="hover:text-primary cursor-pointer transition-colors">FAQs</li>
+</ul>
+</div>
+<div class="space-y-6">
+<h4 class="font-label-md text-on-surface uppercase tracking-widest text-xs font-bold">Legal</h4>
+<ul class="space-y-3 font-body-md text-body-md text-on-surface-variant">
+<li class="hover:text-primary cursor-pointer transition-colors">Terms of Service</li>
+<li class="hover:text-primary cursor-pointer transition-colors">Privacy Policy</li>
+<li class="hover:text-primary cursor-pointer transition-colors">Media Release</li>
+</ul>
+</div>
+<div class="space-y-6">
+<h4 class="font-label-md text-on-surface uppercase tracking-widest text-xs font-bold">Contact Us</h4>
+<ul class="space-y-4 font-body-md text-body-md text-on-surface-variant">
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-base">mail</span>
+                    hello@universitydramaclub.edu
+                </li>
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-base">location_on</span>
+                    Theater Wing, Arts Building
+                </li>
+<li class="flex items-center gap-6 mt-6">
+<span class="material-symbols-outlined text-on-surface-variant hover:text-primary cursor-pointer transition-colors" style="font-size: 24px;">public</span>
+<span class="material-symbols-outlined text-on-surface-variant hover:text-primary cursor-pointer transition-colors" style="font-size: 24px;">movie</span>
+<span class="material-symbols-outlined text-on-surface-variant hover:text-primary cursor-pointer transition-colors" style="font-size: 24px;">photo_camera</span>
+</li>
+</ul>
+</div>
+</div>
+<div class="px-margin-desktop max-w-container-max mx-auto mt-24 pt-10 border-t border-outline-variant/30 text-center">
+<p class="font-body-md text-body-md text-on-surface-variant text-sm tracking-wide">© 2024 University Drama Club. All rights reserved.</p>
+</div>
+</footer>
+<!-- Lightbox/Dialog -->
+<div class="fixed inset-0 z-[100] glass-nav hidden items-center justify-center p-12 backdrop-blur-3xl" id="lightbox">
+<button class="absolute top-10 right-10 text-on-surface-variant hover:text-on-surface transition-colors" onclick="closeLightbox()">
+<span class="material-symbols-outlined text-5xl">close</span>
+</button>
+<div class="max-w-6xl w-full">
+<img class="w-full h-auto max-h-[85vh] object-contain rounded-xl shadow-2xl border-4 border-white/50" id="lightbox-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgcng9IjgiIGZpbGw9IiNlOGVhZWQiLz48cGF0aCBkPSJNMTcwIDEzMCBsMzAgNDAgbDIwLTE1IGw0MCA1NSBIMTQweiIgZmlsbD0iI2JkYzFjNiIvPjxjaXJjbGUgY3g9IjI1MCIgY3k9IjEyMCIgcj0iMTgiIGZpbGw9IiNiZGMxYzYiLz48L3N2Zz4=">
+</div>
+</div>
+<script>
+    function openLightbox(index) {
+        const lightbox = document.getElementById('lightbox');
+        const img = document.getElementById('lightbox-img');
+        const galleryImgs = [
+            "https://lh3.googleusercontent.com/aida-public/AB6AXuBKaduSFsL3v_v3HlPudk1JtqW9DKQhLhqqT_kaO94UzK1eJT7yUhaHRouAsPBmFbHm49eu-EPFRz4vZ1uYERz7X_ZYEIOFVKgyYc_Ro2DFr83XHj81kKWJw5gVvSrFoGThSVATpTwSIY-_ZZNqxVy6cwahtU4uxNQVNYJDvs1bDBjs_p61U7d_Vt9gzjwL2316IhcY72GTDYm8SxuytIe4uP06ciSjTMQXNR_N643teOOJW6R5-lBWuIAfA-RfeoKTRcHr6AaMFzE",
+            "https://lh3.googleusercontent.com/aida-public/AB6AXuAiaeU-snCEG41GNFihD-bDuKrWr6WUL6WxfPDZWlyL_YGRT5qaqsPYzZ8hnnDLOazNUpm4ItvajNIsnnsUBtZMhXoHeUsWrgz7ELFkyzl0TKDF3a29LFl5Cj62eQy-w1hO1x3DveJDNB45m7rElOphjclf2IKPLxevapkp78ZbIFaaY2u9fr5-KcizZ6fLTqaPkBwlXEqslQ3EQ4wzhYFvNUwAgvNwlv69JHDbS__1o31o7Dou93kTaTxA6d378y1m3j0YKFWXo3c",
+            "https://lh3.googleusercontent.com/aida-public/AB6AXuBZPQDLrD_sWssL7oY6l8g6ciPINbsyv20-20nJKRm5dwf9WpyfbYWl1cyAIE13c_S29XER4x2-L5wuF_UPCi9tZTvcVqtd6yN2eo-0pQBrHuERBugSVmh1soQlALnVEpS62hg-cnMjecW0NZhciDWcXqyGj3iWBEVidAomyQ5oEE2Xs8L3gajaRjLRgQixFI12ytM9vuCC_oroDv2D-_bXNsAD-3axh0A5GTfid_bxsq-ObhrGOzyTsJzDjabiLD0cktcoYHXZDH0",
+            "https://lh3.googleusercontent.com/aida-public/AB6AXuCkQ9IjsajUaLH9v6dLbeHSduqWVMaXL9ERqVWInogeOSXkP79fxkDUzX51KevjqxAVbJdrJP8fKkZqmagYhLGSZiNozim2ybkFbrpi3Gx_SZuXZUt3a_nmMZoj8_9TUMX7_jTbi8eVRC03SxrIk5q5T8yup_eGFwFjE_-RiTfju-DflzJwL-4Km6mA6Z1E6lwX9L77FYW7ffDYBLhYhHEBsELuh-6Sy51eaLBIZMKkyXYZWqjiOg8wntGpkGgMI5rmvCS-8MF48II"
+        ];
+        img.src = galleryImgs[index];
+        lightbox.classList.remove('hidden');
+        lightbox.classList.add('flex');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+        const lightbox = document.getElementById('lightbox');
+        lightbox.classList.add('hidden');
+        lightbox.classList.remove('flex');
+        document.body.style.overflow = 'auto';
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeLightbox();
+    });
+</script>
+</body></html>

@@ -1,0 +1,452 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>StageDoor | Core Member Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&amp;family=Source+Sans+3:wght@400;500;600;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<style>
+        body {
+            background-color: #fdf9f4;
+            color: #1c1b19;
+            font-family: 'Source Sans 3', sans-serif;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(202, 198, 185, 0.4);
+        }
+
+        .spotlight-glow {
+            box-shadow: 0 4px 20px rgba(99, 95, 65, 0.05);
+        }
+
+        .spotlight-glow-hover:hover {
+            box-shadow: 0 8px 30px rgba(99, 95, 65, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .matinee-accent {
+            background: linear-gradient(135deg, #635f41 0%, #4a482c 100%);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #fdf9f4;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cac6b9;
+            border-radius: 10px;
+        }
+
+        .kanban-column {
+            background: rgba(241, 237, 233, 0.5);
+            min-height: 400px;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error-container": "#93000a",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-container": "#4a6677",
+                        "surface": "#fdf9f4",
+                        "surface-container": "#f1ede9",
+                        "tertiary": "#496365",
+                        "inverse-surface": "#31302d",
+                        "on-tertiary-fixed-variant": "#324b4d",
+                        "surface-dim": "#ddd9d5",
+                        "outline": "#7a776c",
+                        "outline-variant": "#cac6b9",
+                        "on-tertiary": "#ffffff",
+                        "surface-bright": "#fdf9f4",
+                        "inverse-on-surface": "#f4f0eb",
+                        "primary-fixed-dim": "#cdc8a3",
+                        "surface-container-highest": "#e6e2dd",
+                        "on-background": "#1c1b19",
+                        "on-primary-fixed": "#1e1c05",
+                        "on-primary": "#ffffff",
+                        "secondary-container": "#c6e4f7",
+                        "on-surface": "#1c1b19",
+                        "on-surface-variant": "#49473d",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed": "#001e2c",
+                        "surface-variant": "#e6e2dd",
+                        "primary-container": "#fff9d2",
+                        "secondary-fixed-dim": "#adcbdd",
+                        "tertiary-fixed": "#cce8ea",
+                        "inverse-primary": "#cdc8a3",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-container": "#e2fdff",
+                        "tertiary-fixed-dim": "#b0ccce",
+                        "on-primary-container": "#767253",
+                        "secondary": "#466272",
+                        "surface-container-low": "#f7f3ee",
+                        "on-tertiary-container": "#5c7678",
+                        "error": "#ba1a1a",
+                        "primary": "#635f41",
+                        "on-tertiary-fixed": "#041f21",
+                        "error-container": "#ffdad6",
+                        "on-secondary-fixed-variant": "#2e4a5a",
+                        "secondary-fixed": "#c9e7fa",
+                        "on-primary-fixed-variant": "#4a482c",
+                        "surface-tint": "#635f41",
+                        "primary-fixed": "#e9e4be",
+                        "background": "#fdf9f4",
+                        "surface-container-high": "#ece7e3"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "margin-mobile": "16px",
+                        "container-max": "1280px",
+                        "unit": "4px",
+                        "gutter": "24px",
+                        "margin-desktop": "64px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Playfair Display"],
+                        "headline-md": ["Playfair Display"],
+                        "label-md": ["Source Sans 3"],
+                        "display-lg": ["Playfair Display"],
+                        "body-lg": ["Source Sans 3"],
+                        "body-md": ["Source Sans 3"],
+                        "headline-lg": ["Playfair Display"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                        "headline-md": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "display-lg": ["56px", {"lineHeight": "64px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-lg": ["40px", {"lineHeight": "48px", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-surface text-on-surface custom-scrollbar">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 flex justify-between items-center px-margin-desktop h-20 bg-surface/90 backdrop-blur-xl border-b border-outline-variant/50 shadow-sm">
+<div class="font-headline-md text-headline-md font-bold text-primary tracking-tight">StageDoor</div>
+<div class="hidden md:flex items-center gap-8">
+<a class="font-body-md text-body-md text-primary font-bold border-b-2 border-primary pb-1" href="#">Dashboard</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Productions</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Resources</a>
+<div class="relative ml-4">
+<input class="bg-surface-container border border-outline-variant rounded-lg px-6 py-2 text-label-md font-label-md focus:ring-1 focus:ring-primary w-64 text-on-surface placeholder:text-on-surface-variant/50" placeholder="Search assets..." type="text">
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-surface-container-high transition-all duration-300 rounded-full active:scale-95">
+<span class="material-symbols-outlined text-primary" data-icon="notifications">notifications</span>
+</button>
+<div class="w-10 h-10 rounded-full bg-surface-container-highest overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="Portrait of theater director" src="https://lh3.googleusercontent.com/aida-public/AB6AXuANRk6JpE7iqDJAvjNazy-eCAg4myCochW3nnCucZwFCUkbvKjnUGZqLrvNpG5w96stDNAPpmObO3uaLRuzGiWQJBIbxftFH8UQyE3HCycqcW7EBK4g2g1cQYrmHFiY_k4ulNRii8QA5b5jyZct-cChZyD-jVzlw33aD2BOJSWNroHLWGU1w92cmhHTqKFkQtXauvvKCP9ThTQYgIutFg0pAWk8OpB-Y1OtjzxC7ofuCg-TD1RImeUK-9gU-OQY1zOyqaVivSges4o">
+</div>
+</div>
+</nav>
+<!-- SideNavBar -->
+<aside class="hidden md:flex flex-col fixed left-0 top-0 h-full py-8 px-4 gap-4 bg-surface-container-low border-r border-outline-variant/30 pt-24 w-64">
+<div class="px-4 mb-6">
+<div class="font-headline-md text-headline-md text-primary font-bold">Thespian Hub</div>
+<div class="text-label-md font-label-md text-on-surface-variant uppercase tracking-wider text-[10px]">Spotlight Member</div>
+</div>
+<div class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container text-on-primary-container rounded-lg font-bold transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+<span class="font-label-md text-label-md">Production Schedule</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="menu_book">menu_book</span>
+<span class="font-label-md text-label-md">Script Library</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="campaign">campaign</span>
+<span class="font-label-md text-label-md">Announcements</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+<span class="font-label-md text-label-md">Profile</span>
+</a>
+</div>
+<div class="mt-auto flex flex-col gap-1 border-t border-outline-variant/30 pt-4">
+<button class="w-full matinee-accent text-on-primary font-bold py-3 px-4 rounded-lg flex items-center justify-center gap-2 mb-4 hover:opacity-90 active:scale-95 transition-all shadow-sm">
+<span class="material-symbols-outlined text-sm" data-icon="event_available">event_available</span>
+<span class="font-label-md text-label-md">Next Rehearsal</span>
+</button>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span class="font-label-md text-label-md">Support</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="md:ml-64 pt-24 pb-12 px-8 lg:px-margin-desktop">
+<!-- Header Section -->
+<header class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+<div>
+<h1 class="font-display-lg text-display-lg text-primary mb-2">Backstage Pass</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-xl">Advanced management dashboard for the Core Production Team. High-stakes coordination for "The Phantom's Echo."</p>
+</div>
+<div class="flex gap-4">
+<div class="glass-panel px-6 py-4 rounded-xl flex items-center gap-4 spotlight-glow border-primary/20">
+<div class="w-12 h-12 rounded-lg bg-secondary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-secondary-container" data-icon="stadium">stadium</span>
+</div>
+<div>
+<p class="text-label-md font-label-md text-on-surface-variant text-[12px] uppercase">Opening Night</p>
+<p class="font-headline-md text-headline-md text-primary">14 Days</p>
+</div>
+</div>
+</div>
+</header>
+<!-- Management Tools -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Attendance Tracker -->
+<section class="lg:col-span-4 glass-panel rounded-xl p-6 spotlight-glow-hover transition-all">
+<div class="flex items-center justify-between mb-6">
+<h3 class="font-headline-md text-headline-md text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="group_add">group_add</span>
+                        Attendance
+                    </h3>
+<span class="px-3 py-1 bg-secondary-container/50 text-on-secondary-container text-label-md font-bold rounded-full text-[10px]">LIVE</span>
+</div>
+<div class="space-y-4">
+<div class="flex items-center justify-between p-3 rounded-lg bg-surface-container-low border border-outline-variant/30">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs font-bold">EJ</div>
+<span class="font-body-md text-body-md font-medium">Erik J. (Lead)</span>
+</div>
+<div class="flex gap-2">
+<button class="p-1 text-tertiary hover:bg-tertiary/10 rounded"><span class="material-symbols-outlined" data-icon="check_circle">check_circle</span></button>
+<button class="p-1 text-on-surface-variant/40 hover:bg-error/10 hover:text-error rounded"><span class="material-symbols-outlined" data-icon="cancel">cancel</span></button>
+</div>
+</div>
+<div class="flex items-center justify-between p-3 rounded-lg bg-surface-container-low border-l-4 border-secondary-container border border-outline-variant/30">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs font-bold">CD</div>
+<span class="font-body-md text-body-md font-medium">Christine D.</span>
+</div>
+<span class="text-label-md font-bold text-secondary text-[12px]">Late (15m)</span>
+</div>
+<div class="flex items-center justify-between p-3 rounded-lg bg-surface-container-low border border-outline-variant/30">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs font-bold">RM</div>
+<span class="font-body-md text-body-md font-medium">Raoul M.</span>
+</div>
+<div class="flex gap-2">
+<button class="p-1 text-tertiary hover:bg-tertiary/10 rounded"><span class="material-symbols-outlined" data-icon="check_circle">check_circle</span></button>
+<button class="p-1 text-on-surface-variant/40 hover:bg-error/10 hover:text-error rounded"><span class="material-symbols-outlined" data-icon="cancel">cancel</span></button>
+</div>
+</div>
+</div>
+<button class="w-full mt-6 py-2 border border-outline hover:bg-primary/5 text-primary text-label-md font-bold rounded-lg transition-colors">View All Members</button>
+</section>
+<!-- Scene Blocking Notes -->
+<section class="lg:col-span-8 glass-panel rounded-xl p-6 spotlight-glow-hover transition-all flex flex-col">
+<div class="flex items-center justify-between mb-6">
+<h3 class="font-headline-md text-headline-md text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="edit_note">edit_note</span>
+                        Scene Blocking Notes
+                    </h3>
+<div class="flex gap-2">
+<button class="p-2 hover:bg-surface-container-high rounded-lg text-on-surface-variant"><span class="material-symbols-outlined" data-icon="share">share</span></button>
+<button class="p-2 hover:bg-surface-container-high rounded-lg text-on-surface-variant"><span class="material-symbols-outlined" data-icon="history">history</span></button>
+</div>
+</div>
+<div class="flex-grow bg-surface-container-lowest rounded-lg p-6 font-body-md text-body-md border border-outline-variant/30 leading-relaxed">
+<p class="text-primary font-bold mb-4">Act II, Scene 4: The Masquerade</p>
+<ul class="space-y-4 text-on-surface-variant">
+<li class="flex gap-3"><span class="text-primary font-bold">•</span> Erik should enter from upstage center, but stay within the shadows until the third refrain.</li>
+<li class="flex gap-3"><span class="text-primary font-bold">•</span> Ensemble needs to maintain a tighter circle during the 'Red Death' sequence to emphasize claustrophobia.</li>
+<li class="flex gap-3"><span class="text-primary font-bold">•</span> Lighting Cue 42: Fade crimson flood to 20% slowly as the Phantom descends.</li>
+</ul>
+<div class="mt-8 pt-4 border-t border-outline-variant/30 flex items-center justify-between">
+<span class="text-label-md font-label-md italic text-on-tertiary-container">Last edited by Director Vance (2m ago)</span>
+<div class="flex -space-x-2">
+<div class="w-6 h-6 rounded-full border border-surface bg-[#cdc8a3]"></div>
+<div class="w-6 h-6 rounded-full border border-surface bg-[#adcbdd]"></div>
+<div class="w-6 h-6 rounded-full border border-surface bg-[#b0ccce]"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Production Pipeline -->
+<section class="lg:col-span-12 mt-4">
+<div class="flex items-center justify-between mb-6">
+<h3 class="font-headline-md text-headline-md text-primary">Production Pipeline</h3>
+<button class="matinee-accent px-6 py-2 rounded-lg text-on-primary font-bold text-label-md shadow-sm hover:opacity-90 transition-all">
+                        + New Task
+                    </button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Column: Technical -->
+<div class="kanban-column rounded-xl p-4 border border-outline-variant/30">
+<div class="flex items-center justify-between mb-4 px-2">
+<span class="font-label-md text-label-md font-bold uppercase tracking-widest text-on-surface-variant text-[11px]">Technical</span>
+<span class="text-[11px] font-bold bg-surface-variant text-on-surface-variant px-2 py-0.5 rounded">3</span>
+</div>
+<div class="space-y-4">
+<div class="bg-surface-container-lowest p-4 rounded-lg border border-outline-variant/30 spotlight-glow-hover transition-all">
+<span class="text-[10px] uppercase font-bold tracking-tighter text-error mb-2 block">Priority High</span>
+<p class="font-body-md text-body-md mb-3 text-on-surface">Re-wire under-stage speakers for 7.1 surround</p>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-on-surface-variant/60" data-icon="schedule">schedule</span>
+<span class="text-label-md font-label-md text-on-surface-variant text-[12px]">Due Tomorrow</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-4 rounded-lg border border-outline-variant/30 spotlight-glow-hover transition-all">
+<p class="font-body-md text-body-md mb-3 text-on-surface">Program automated trapdoor winch system</p>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-on-surface-variant/60" data-icon="person">person</span>
+<span class="text-label-md font-label-md text-on-surface-variant text-[12px]">Tech Team</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Column: Set Design -->
+<div class="kanban-column rounded-xl p-4 border border-outline-variant/30">
+<div class="flex items-center justify-between mb-4 px-2">
+<span class="font-label-md text-label-md font-bold uppercase tracking-widest text-on-surface-variant text-[11px]">Set Design</span>
+<span class="text-[11px] font-bold bg-surface-variant text-on-surface-variant px-2 py-0.5 rounded">2</span>
+</div>
+<div class="space-y-4">
+<div class="bg-surface-container-lowest p-4 rounded-lg border border-outline-variant/30 spotlight-glow-hover transition-all">
+<p class="font-body-md text-body-md mb-3 text-on-surface">Final patina application on grand chandelier</p>
+<div class="w-full bg-surface-container h-1.5 rounded-full mb-2">
+<div class="bg-primary h-full w-[65%] rounded-full"></div>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-4 rounded-lg border border-outline-variant/30 spotlight-glow-hover transition-all">
+<p class="font-body-md text-body-md mb-3 text-on-surface">Upholster velvet chairs for VIP box</p>
+</div>
+</div>
+</div>
+<!-- Column: Completed -->
+<div class="kanban-column rounded-xl p-4 border border-outline-variant/30">
+<div class="flex items-center justify-between mb-4 px-2">
+<span class="font-label-md text-label-md font-bold uppercase tracking-widest text-on-surface-variant text-[11px]">Staged</span>
+<span class="material-symbols-outlined text-tertiary" data-icon="check_circle">check_circle</span>
+</div>
+<div class="space-y-4">
+<div class="bg-surface-container-low p-4 rounded-lg border border-outline-variant/10 opacity-60">
+<p class="font-body-md text-body-md line-through text-on-surface-variant">Stage floor painting (Granite effect)</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Costume Inventory -->
+<section class="lg:col-span-12 mt-8">
+<div class="flex items-center justify-between mb-8">
+<div>
+<h3 class="font-headline-md text-headline-md text-primary">Costume Inventory</h3>
+<p class="text-body-md text-on-surface-variant">Real-time status tracking for the Wardrobe Department</p>
+</div>
+<div class="flex gap-2">
+<button class="px-4 py-2 bg-surface-container rounded-lg border border-outline-variant text-on-surface hover:bg-surface-container-high transition-colors font-bold text-label-md">Filters</button>
+<button class="px-4 py-2 bg-surface-container rounded-lg border border-outline-variant text-on-surface hover:bg-surface-container-high transition-colors font-bold text-label-md">Export PDF</button>
+</div>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-gutter">
+<!-- Costume Card 1 -->
+<div class="group relative bg-surface-container-lowest rounded-xl overflow-hidden border border-outline-variant/40 spotlight-glow-hover transition-all">
+<div class="aspect-[3/4] relative">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Intricate historical costume" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBmHaXQ0B_T2Lots9p9dfd9TPKze6-yzjRafVJx37bzNV6moKvSgoc12sGW9QXWeqxjP-nTfUBvJmhu7NHYI-onhW1WrnS5Xa8oijd8yWbf7e3e4ht4tFWLJS3wH7bXnXxCgTrmNpCY9WPNvEY8DwyBF5L6YqKJiYxODWZlhmqh8ag28mTUFcSZ6JAJfG6XmBHwLDSJqb6OEQQYNlTV3vvgzOYESQ51zFpi2BA_8lOuzBV0ooucne7SghMT58N6izzBWPUXnfDyfrs">
+<div class="absolute top-2 right-2 px-2 py-1 bg-[#b0ccce] text-[#041f21] text-[10px] font-bold rounded">READY</div>
+</div>
+<div class="p-4">
+<p class="font-body-md text-body-md text-primary font-bold">Phantom's Cloak</p>
+<p class="text-label-md font-label-md text-on-surface-variant text-[12px]">Lead Character</p>
+</div>
+</div>
+<!-- Costume Card 2 -->
+<div class="group relative bg-surface-container-lowest rounded-xl overflow-hidden border border-outline-variant/40 spotlight-glow-hover transition-all">
+<div class="aspect-[3/4] relative">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Ballerina tutu costume" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDam0NP8yWmBiMFfNWj64NpDMgyxDkarYjdMZrshSdrWbjX3Idiuu4rET_CPQt26pe60xMOEv9lmBgzocb1NPKo9nskSdWwem_JZKOaY3aasDWZhO7p5qKsufM7L1sn5TqH4wG57WAGZughagwiWbqFxSKHb12DsBGTXII2wXJHcTtff7KFiXUPEkdlHtNjFqCSMWhOIXDw8QYYlEqHu-D5sbqnY35RF1pQbPZtUNmdr1Pt9hFG0SixISndtm5KbBFAFlnDRzAkb40">
+<div class="absolute top-2 right-2 px-2 py-1 bg-primary-fixed text-on-primary-fixed-variant text-[10px] font-bold rounded">IN REPAIR</div>
+</div>
+<div class="p-4">
+<p class="font-body-md text-body-md text-primary font-bold">Christine Act I</p>
+<p class="text-label-md font-label-md text-on-surface-variant text-[12px]">Damaged Hem</p>
+</div>
+</div>
+<!-- Costume Card 3 -->
+<div class="group relative bg-surface-container-lowest rounded-xl overflow-hidden border border-outline-variant/40 spotlight-glow-hover transition-all">
+<div class="aspect-[3/4] relative">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Historical waistcoats" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA277h0VZF4zOSjzNwU5B1JRtKF4IEdLxK_q7ByY2bv6SQ-AD_hP0lhs_h_O040vIJzyFnGi3SodZrZeUtTkiOo64oZlr_n02RAo7f198FdxBnGaiIzVtEF_XYiqExkoLdpQl4FNMTedFzmCkoWJA72TF5wmzNHsOst2IoPRGxOttpWcleGrL_aut8XWgbCwKlTD-8-Y7JC_BiZHEraeWVtda9QIU1bh1j1-JYxTfxx5Rbeo_s6_xgiojnqf-Z1i_wi7jCrOwSvcPo">
+<div class="absolute top-2 right-2 px-2 py-1 bg-[#b0ccce] text-[#041f21] text-[10px] font-bold rounded">READY</div>
+</div>
+<div class="p-4">
+<p class="font-body-md text-body-md text-primary font-bold">Ensemble Vests</p>
+<p class="text-label-md font-label-md text-on-surface-variant text-[12px]">Quantity: 12</p>
+</div>
+</div>
+<!-- Costume Card 4 -->
+<div class="group relative bg-surface-container-lowest rounded-xl overflow-hidden border border-outline-variant/40 spotlight-glow-hover transition-all">
+<div class="aspect-[3/4] relative">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Masquerade masks" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCHA3oujcsEwXc-aLS1f_7qHkYajmxIKAZ_hVTs8pGHBmN3bKFHYnziitNjUXPQxPuek8FAIkiO-SYwB6iz3ypvQVCzwHnEzXUnDfeHAwCUqy8LrsJ6OOpvi6Y-sROA19QcyvGw35x_emfg-0KvAocH-dxVaBdsMsZu0qZFBeG91MVdDuqtABfWPjokTpyPwYZUtJCqlruN7el5lZkJncnsCAlXf2dyJh3Xcd-V9NIQvZYqrYM0FyUa1gUmMoZJG9Ssu6XwA-Fo84c">
+<div class="absolute top-2 right-2 px-2 py-1 bg-secondary-container text-on-secondary-container text-[10px] font-bold rounded">STAGED</div>
+</div>
+<div class="p-4">
+<p class="font-body-md text-body-md text-primary font-bold">Masquerade Masks</p>
+<p class="text-label-md font-label-md text-on-surface-variant text-[12px]">Prop Dept.</p>
+</div>
+</div>
+<!-- Add Costume Button -->
+<div class="aspect-[3/4] rounded-xl border-2 border-dashed border-outline-variant flex flex-col items-center justify-center gap-4 hover:border-primary/50 hover:bg-primary/5 transition-all cursor-pointer group">
+<div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center group-hover:bg-primary-container transition-all">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary" data-icon="add_circle">add_circle</span>
+</div>
+<span class="text-label-md font-bold text-on-surface-variant group-hover:text-primary">Add Item</span>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full py-12 px-margin-desktop flex flex-col md:flex-row justify-between items-center gap-6 bg-surface-container-low border-t border-outline-variant/30">
+<div class="font-label-md text-label-md text-on-surface-variant text-[12px]">
+            © 2024 Theater Club Excellence. All rights reserved.
+        </div>
+<div class="flex gap-8">
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">Contact</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">Terms</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">Privacy</a>
+</div>
+<div class="font-headline-md text-headline-md font-bold text-primary">StageDoor</div>
+</footer>
+<script>
+        // Micro-interactions for search bar
+        const searchInput = document.querySelector('input[type="text"]');
+        searchInput.addEventListener('focus', () => {
+            searchInput.classList.add('md:w-80');
+            searchInput.classList.remove('md:w-64');
+        });
+        searchInput.addEventListener('blur', () => {
+            searchInput.classList.remove('md:w-80');
+            searchInput.classList.add('md:w-64');
+        });
+    </script>
+</body></html>

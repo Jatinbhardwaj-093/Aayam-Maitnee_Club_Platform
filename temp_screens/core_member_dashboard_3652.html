@@ -1,0 +1,470 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>StageDoor | Core Member Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Playfair+Display:wght@600;700&amp;family=Geist:wght@400;500;600&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;family=Inter:wght@100..900&amp;family=Playfair+Display:wght@100..900&amp;display=swap" rel="stylesheet">
+<style>
+        @font-face {
+            font-family: 'Geist';
+            src: url('https://cdn.jsdelivr.net/npm/geist@1.0.3/dist/fonts/geist-sans/Geist-Regular.woff2') format('woff2');
+        }
+        
+        body {
+            background-color: #131313;
+            color: #e5e2e1;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .glass-panel {
+            background: rgba(26, 26, 26, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(51, 51, 51, 0.5);
+        }
+
+        .spotlight-glow {
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.05);
+        }
+
+        .spotlight-glow-hover:hover {
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.15);
+        }
+
+        .velvet-accent {
+            background: linear-gradient(135deg, #960711 0%, #410003 100%);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #131313;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #4d4732;
+            border-radius: 10px;
+        }
+
+        .kanban-column {
+            background: rgba(28, 27, 27, 0.4);
+            min-height: 400px;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-secondary-fixed-variant": "#92030f",
+                      "on-tertiary-container": "#605f5e",
+                      "primary": "#fff6df",
+                      "surface": "#131313",
+                      "surface-container-lowest": "#0e0e0e",
+                      "surface-bright": "#393939",
+                      "surface-container-low": "#1c1b1b",
+                      "surface-variant": "#353534",
+                      "on-primary-fixed": "#221b00",
+                      "secondary-fixed": "#ffdad6",
+                      "surface-tint": "#e9c400",
+                      "surface-dim": "#131313",
+                      "on-tertiary": "#313030",
+                      "outline-variant": "#4d4732",
+                      "on-tertiary-fixed-variant": "#474746",
+                      "surface-container-high": "#2a2a2a",
+                      "on-secondary-container": "#ff9f95",
+                      "on-surface-variant": "#d0c6ab",
+                      "inverse-on-surface": "#313030",
+                      "primary-fixed-dim": "#e9c400",
+                      "on-error-container": "#ffdad6",
+                      "inverse-surface": "#e5e2e1",
+                      "on-secondary-fixed": "#410003",
+                      "on-secondary": "#690007",
+                      "on-primary": "#3a3000",
+                      "on-primary-fixed-variant": "#544600",
+                      "secondary-container": "#960711",
+                      "outline": "#999077",
+                      "inverse-primary": "#705d00",
+                      "tertiary-fixed-dim": "#c8c6c5",
+                      "secondary": "#ffb4ac",
+                      "surface-container": "#201f1f",
+                      "on-error": "#690005",
+                      "on-tertiary-fixed": "#1c1b1b",
+                      "tertiary-fixed": "#e5e2e1",
+                      "error-container": "#93000a",
+                      "tertiary": "#f9f5f5",
+                      "primary-fixed": "#ffe16d",
+                      "on-background": "#e5e2e1",
+                      "primary-container": "#ffd700",
+                      "secondary-fixed-dim": "#ffb4ac",
+                      "error": "#ffb4ab",
+                      "surface-container-highest": "#353534",
+                      "on-primary-container": "#705e00",
+                      "on-surface": "#e5e2e1",
+                      "tertiary-container": "#dcd9d9",
+                      "background": "#131313"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "unit": "8px",
+                      "margin-desktop": "64px",
+                      "gutter": "24px",
+                      "margin-mobile": "16px",
+                      "container-max": "1280px"
+              },
+              "fontFamily": {
+                      "body-lg": ["Inter"],
+                      "label-sm": ["Geist"],
+                      "headline-lg": ["Playfair Display"],
+                      "headline-md": ["Playfair Display"],
+                      "label-md": ["Geist"],
+                      "display-lg-mobile": ["Playfair Display"],
+                      "display-lg": ["Playfair Display"],
+                      "body-md": ["Inter"]
+              },
+              "fontSize": {
+                      "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                      "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.08em", "fontWeight": "500"}],
+                      "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                      "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                      "display-lg-mobile": ["40px", {"lineHeight": "48px", "fontWeight": "700"}],
+                      "display-lg": ["56px", {"lineHeight": "64px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+              }
+            },
+          },
+        }
+    </script>
+</head>
+<body class="bg-surface text-on-surface custom-scrollbar">
+<!-- TopNavBar from Shared Components -->
+<nav class="fixed top-0 w-full z-50 flex justify-between items-center px-margin-desktop h-20 bg-surface/80 backdrop-blur-xl dark:bg-surface/80 border-b border-outline-variant/30 shadow-[0_0_20px_rgba(255,215,0,0.05)]">
+<div class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed tracking-tight">StageDoor</div>
+<div class="hidden md:flex items-center gap-8">
+<a class="font-body-md text-body-md text-primary border-b-2 border-primary pb-1" href="#">Dashboard</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors" href="#">Productions</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors" href="#">Resources</a>
+<div class="relative ml-4">
+<input class="bg-surface-container-high border-none rounded-full px-6 py-2 text-label-md font-label-md focus:ring-1 focus:ring-primary-container w-64 text-on-surface" placeholder="Search assets..." type="text">
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-surface-bright/20 transition-all duration-300 rounded-full active:scale-95 duration-200">
+<span class="material-symbols-outlined text-primary" data-icon="notifications">notifications</span>
+</button>
+<div class="w-10 h-10 rounded-full bg-surface-container-highest overflow-hidden border border-outline-variant/30">
+<img class="w-full h-full object-cover" data-alt="Close-up portrait of a professional theater director wearing a dark turtleneck, lit with dramatic high-contrast side lighting that emphasizes texture and character. The background is a moody, dark theater stage with subtle bokeh from stage lights. The overall aesthetic is cinematic and prestigious, aligning with a high-end theatrical production environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuANRk6JpE7iqDJAvjNazy-eCAg4myCochW3nnCucZwFCUkbvKjnUGZqLrvNpG5w96stDNAPpmObO3uaLRuzGiWQJBIbxftFH8UQyE3HCycqcW7EBK4g2g1cQYrmHFiY_k4ulNRii8QA5b5jyZct-cChZyD-jVzlw33aD2BOJSWNroHLWGU1w92cmhHTqKFkQtXauvvKCP9ThTQYgIutFg0pAWk8OpB-Y1OtjzxC7ofuCg-TD1RImeUK-9gU-OQY1zOyqaVivSges4o">
+</div>
+</div>
+</nav>
+<!-- SideNavBar from Shared Components -->
+<aside class="hidden md:flex flex-col fixed left-0 top-0 h-full py-8 px-4 gap-4 bg-surface-container-low dark:bg-surface-container-low border-r border-outline-variant/20 pt-24 w-64">
+<div class="px-4 mb-6">
+<div class="font-headline-md text-headline-md text-primary font-bold">Thespian Hub</div>
+<div class="text-label-sm font-label-sm text-on-surface-variant opacity-70">Spotlight Member</div>
+</div>
+<div class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container text-on-primary-container rounded-lg font-bold transition-all duration-200 hover:translate-x-1" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+<span class="font-label-md text-label-md">Production Schedule</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-variant/30 rounded-lg transition-all duration-200 hover:translate-x-1" href="#">
+<span class="material-symbols-outlined" data-icon="menu_book">menu_book</span>
+<span class="font-label-md text-label-md">Script Library</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-variant/30 rounded-lg transition-all duration-200 hover:translate-x-1" href="#">
+<span class="material-symbols-outlined" data-icon="campaign">campaign</span>
+<span class="font-label-md text-label-md">Announcements</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-variant/30 rounded-lg transition-all duration-200 hover:translate-x-1" href="#">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+<span class="font-label-md text-label-md">Profile</span>
+</a>
+</div>
+<div class="mt-auto flex flex-col gap-1 border-t border-outline-variant/20 pt-4">
+<button class="w-full velvet-accent text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center gap-2 mb-4 hover:brightness-110 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-sm" data-icon="event_available">event_available</span>
+<span class="font-label-md text-label-md">Next Rehearsal</span>
+</button>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-variant/30 rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span class="font-label-md text-label-md">Support</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-variant/30 rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="md:ml-64 pt-24 pb-12 px-8 lg:px-margin-desktop">
+<!-- Header Section -->
+<header class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+<div>
+<h1 class="font-display-lg text-display-lg text-primary mb-2">Backstage Pass</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-xl">Advanced management dashboard for the Core Production Team. High-stakes coordination for "The Phantom's Echo."</p>
+</div>
+<div class="flex gap-4">
+<div class="glass-panel px-6 py-4 rounded-xl flex items-center gap-4 spotlight-glow">
+<div class="w-12 h-12 rounded-lg bg-secondary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary" data-icon="stadium">stadium</span>
+</div>
+<div>
+<p class="text-label-sm font-label-sm text-on-surface-variant">Opening Night</p>
+<p class="font-headline-md text-headline-md text-primary">14 Days</p>
+</div>
+</div>
+</div>
+</header>
+<!-- Bento Grid Management Tools -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Attendance Tracker Widget -->
+<section class="lg:col-span-4 glass-panel rounded-xl p-6 spotlight-glow-hover transition-all">
+<div class="flex items-center justify-between mb-6">
+<h3 class="font-headline-md text-headline-md text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-container" data-icon="group_add">group_add</span>
+                        Attendance
+                    </h3>
+<span class="px-3 py-1 bg-secondary-container/30 text-secondary text-label-sm font-label-sm rounded-full">LIVE</span>
+</div>
+<div class="space-y-4">
+<div class="flex items-center justify-between p-3 rounded-lg bg-surface-variant/20">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-container/20 flex items-center justify-center text-primary text-xs">EJ</div>
+<span class="font-body-md text-body-md">Erik J. (Lead)</span>
+</div>
+<div class="flex gap-2">
+<button class="p-1 text-green-500 hover:bg-green-500/10 rounded"><span class="material-symbols-outlined" data-icon="check_circle">check_circle</span></button>
+<button class="p-1 text-on-surface-variant hover:bg-white/5 rounded"><span class="material-symbols-outlined" data-icon="cancel">cancel</span></button>
+</div>
+</div>
+<div class="flex items-center justify-between p-3 rounded-lg bg-surface-variant/20 border-l-4 border-secondary-container">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-container/20 flex items-center justify-center text-primary text-xs">CD</div>
+<span class="font-body-md text-body-md">Christine D.</span>
+</div>
+<span class="text-label-sm font-label-sm text-secondary">Late (15m)</span>
+</div>
+<div class="flex items-center justify-between p-3 rounded-lg bg-surface-variant/20">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-container/20 flex items-center justify-center text-primary text-xs">RM</div>
+<span class="font-body-md text-body-md">Raoul M.</span>
+</div>
+<div class="flex gap-2">
+<button class="p-1 text-green-500 hover:bg-green-500/10 rounded"><span class="material-symbols-outlined" data-icon="check_circle">check_circle</span></button>
+<button class="p-1 text-on-surface-variant hover:bg-white/5 rounded"><span class="material-symbols-outlined" data-icon="cancel">cancel</span></button>
+</div>
+</div>
+</div>
+<button class="w-full mt-6 py-2 border border-outline-variant hover:bg-primary/5 text-primary text-label-md font-label-md rounded-lg transition-colors">View All Members</button>
+</section>
+<!-- Scene Blocking Notes -->
+<section class="lg:col-span-8 glass-panel rounded-xl p-6 spotlight-glow-hover transition-all flex flex-col">
+<div class="flex items-center justify-between mb-6">
+<h3 class="font-headline-md text-headline-md text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-container" data-icon="edit_note">edit_note</span>
+                        Scene Blocking Notes
+                    </h3>
+<div class="flex gap-2">
+<button class="p-2 hover:bg-surface-bright/20 rounded-lg text-on-surface-variant"><span class="material-symbols-outlined" data-icon="share">share</span></button>
+<button class="p-2 hover:bg-surface-bright/20 rounded-lg text-on-surface-variant"><span class="material-symbols-outlined" data-icon="history">history</span></button>
+</div>
+</div>
+<div class="flex-grow bg-surface-container-lowest rounded-lg p-6 font-body-md text-body-md border border-outline-variant/10 leading-relaxed shadow-inner">
+<p class="text-primary/90 font-bold mb-4">Act II, Scene 4: The Masquerade</p>
+<ul class="space-y-4 text-on-surface-variant">
+<li class="flex gap-3"><span class="text-primary-container">•</span> Erik should enter from upstage center, but stay within the shadows until the third refrain.</li>
+<li class="flex gap-3"><span class="text-primary-container">•</span> Ensemble needs to maintain a tighter circle during the 'Red Death' sequence to emphasize the claustrophobia.</li>
+<li class="flex gap-3"><span class="text-primary-container">•</span> Lighting Cue 42: Fade crimson flood to 20% slowly as the Phantom descends.</li>
+</ul>
+<div class="mt-8 pt-4 border-t border-outline-variant/10 flex items-center justify-between">
+<span class="text-label-sm font-label-sm italic text-on-tertiary-container">Last edited by Director Vance (2m ago)</span>
+<div class="flex -space-x-2">
+<div class="w-6 h-6 rounded-full border border-surface bg-gray-500"></div>
+<div class="w-6 h-6 rounded-full border border-surface bg-red-500"></div>
+<div class="w-6 h-6 rounded-full border border-surface bg-blue-500"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Production Task List (Kanban View) -->
+<section class="lg:col-span-12 mt-4">
+<div class="flex items-center justify-between mb-6">
+<h3 class="font-headline-md text-headline-md text-primary">Production Pipeline</h3>
+<button class="velvet-accent px-6 py-2 rounded-lg text-label-md font-label-md font-bold shadow-lg hover:shadow-secondary/20 transition-all">
+                        + New Task
+                    </button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Column: Technical -->
+<div class="kanban-column rounded-xl p-4 border border-outline-variant/10">
+<div class="flex items-center justify-between mb-4 px-2">
+<span class="font-label-md text-label-md font-bold uppercase tracking-widest text-on-surface-variant">Technical</span>
+<span class="text-label-sm font-label-sm bg-surface-variant px-2 rounded">3</span>
+</div>
+<div class="space-y-4">
+<div class="bg-surface-container-high p-4 rounded-lg border border-outline-variant/20 spotlight-glow-hover transition-all">
+<span class="text-[10px] uppercase font-bold tracking-tighter text-secondary mb-2 block">Priority High</span>
+<p class="font-body-md text-body-md mb-3">Re-wire under-stage speakers for 7.1 surround</p>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm opacity-50" data-icon="schedule">schedule</span>
+<span class="text-label-sm font-label-sm opacity-60">Due Tomorrow</span>
+</div>
+</div>
+<div class="bg-surface-container-high p-4 rounded-lg border border-outline-variant/20 spotlight-glow-hover transition-all">
+<p class="font-body-md text-body-md mb-3">Program automated trapdoor winch system</p>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm opacity-50" data-icon="person">person</span>
+<span class="text-label-sm font-label-sm opacity-60">Tech Team</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Column: Set Design -->
+<div class="kanban-column rounded-xl p-4 border border-outline-variant/10">
+<div class="flex items-center justify-between mb-4 px-2">
+<span class="font-label-md text-label-md font-bold uppercase tracking-widest text-on-surface-variant">Set Design</span>
+<span class="text-label-sm font-label-sm bg-surface-variant px-2 rounded">2</span>
+</div>
+<div class="space-y-4">
+<div class="bg-surface-container-high p-4 rounded-lg border border-outline-variant/20 spotlight-glow-hover transition-all">
+<p class="font-body-md text-body-md mb-3">Final patina application on grand chandelier</p>
+<div class="w-full bg-surface/50 h-1 rounded-full mb-2">
+<div class="bg-primary-container h-full w-[65%] rounded-full shadow-[0_0_8px_#ffd700]"></div>
+</div>
+</div>
+<div class="bg-surface-container-high p-4 rounded-lg border border-outline-variant/20 spotlight-glow-hover transition-all">
+<p class="font-body-md text-body-md mb-3">Upholster velvet chairs for VIP box</p>
+</div>
+</div>
+</div>
+<!-- Column: Completed -->
+<div class="kanban-column rounded-xl p-4 border border-outline-variant/10 opacity-70">
+<div class="flex items-center justify-between mb-4 px-2">
+<span class="font-label-md text-label-md font-bold uppercase tracking-widest text-on-surface-variant">Staged</span>
+<span class="material-symbols-outlined text-green-500" data-icon="check_circle">check_circle</span>
+</div>
+<div class="space-y-4">
+<div class="bg-surface-container p-4 rounded-lg border border-outline-variant/5">
+<p class="font-body-md text-body-md line-through text-on-tertiary-container">Stage floor painting (Granite effect)</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Costume Inventory Visual Gallery -->
+<section class="lg:col-span-12 mt-8">
+<div class="flex items-center justify-between mb-8">
+<div>
+<h3 class="font-headline-md text-headline-md text-primary">Costume Inventory</h3>
+<p class="text-label-md font-label-md text-on-surface-variant">Real-time status tracking for the Wardrobe Department</p>
+</div>
+<div class="flex gap-2">
+<button class="px-4 py-2 bg-surface-container rounded-lg border border-outline-variant/20 text-on-surface-variant hover:text-primary transition-colors">Filters</button>
+<button class="px-4 py-2 bg-surface-container rounded-lg border border-outline-variant/20 text-on-surface-variant hover:text-primary transition-colors">Export PDF</button>
+</div>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-gutter">
+<!-- Costume Card 1 -->
+<div class="group relative bg-surface-container-high rounded-xl overflow-hidden border border-outline-variant/20 spotlight-glow-hover transition-all">
+<div class="aspect-[3/4] relative">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Close-up of an intricate, historical theatrical costume featuring deep crimson velvet, ornate gold embroidery, and delicate lace. The lighting is focused and dramatic, highlighting the rich textures and craftsmanship. The costume is presented on a mannequin against a dark, atmospheric studio background. Style is opulent and professional, suited for a high-end opera or theater production." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBmHaXQ0B_T2Lots9p9dfd9TPKze6-yzjRafVJx37bzNV6moKvSgoc12sGW9QXWeqxjP-nTfUBvJmhu7NHYI-onhW1WrnS5Xa8oijd8yWbf7e3e4ht4tFWLJS3wH7bXnXxCgTrmNpCY9WPNvEY8DwyBF5L6YqKJiYxODWZlhmqh8ag28mTUFcSZ6JAJfG6XmBHwLDSJqb6OEQQYNlTV3vvgzOYESQ51zFpi2BA_8lOuzBV0ooucne7SghMT58N6izzBWPUXnfDyfrs">
+<div class="absolute top-2 right-2 px-2 py-1 bg-green-500 text-white text-[10px] font-bold rounded">READY</div>
+</div>
+<div class="p-4">
+<p class="font-body-md text-body-md text-primary font-bold">Phantom's Cloak</p>
+<p class="text-label-sm font-label-sm text-on-surface-variant">Lead Character</p>
+</div>
+</div>
+<!-- Costume Card 2 -->
+<div class="group relative bg-surface-container-high rounded-xl overflow-hidden border border-outline-variant/20 spotlight-glow-hover transition-all">
+<div class="aspect-[3/4] relative">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A detailed view of a ballerina's tutu, ivory-white with silver sequins and multiple layers of delicate tulle. The garment is lit by soft, ethereal stage lighting that creates a shimmering effect. The atmosphere is poetic and classic, suggesting a prestigious ballet or theater rehearsal setting. The background is muted and dark, keeping all focus on the garment's intricate details." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDam0NP8yWmBiMFfNWj64NpDMgyxDkarYjdMZrshSdrWbjX3Idiuu4rET_CPQt26pe60xMOEv9lmBgzocb1NPKo9nskSdWwem_JZKOaY3aasDWZhO7p5qKsufM7L1sn5TqH4wG57WAGZughagwiWbqFxSKHb12DsBGTXII2wXJHcTtff7KFiXUPEkdlHtNjFqCSMWhOIXDw8QYYlEqHu-D5sbqnY35RF1pQbPZtUNmdr1Pt9hFG0SixISndtm5KbBFAFlnDRzAkb40">
+<div class="absolute top-2 right-2 px-2 py-1 bg-yellow-600 text-white text-[10px] font-bold rounded">IN REPAIR</div>
+</div>
+<div class="p-4">
+<p class="font-body-md text-body-md text-primary font-bold">Christine Act I</p>
+<p class="text-label-sm font-label-sm text-on-surface-variant">Damaged Hem</p>
+</div>
+</div>
+<!-- Costume Card 3 -->
+<div class="group relative bg-surface-container-high rounded-xl overflow-hidden border border-outline-variant/20 spotlight-glow-hover transition-all">
+<div class="aspect-[3/4] relative">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Dozens of identical period-appropriate waistcoats in muted earth tones hanging on a circular professional garment rack in a dimly lit backstage area. The scene is organized and cinematic, with a soft overhead glow catching the fabric textures. The aesthetic reflects a high-budget theater production's wardrobe department, focused on order and detail." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA277h0VZF4zOSjzNwU5B1JRtKF4IEdLxK_q7ByY2bv6SQ-AD_hP0lhs_h_O040vIJzyFnGi3SodZrZeUtTkiOo64oZlr_n02RAo7f198FdxBnGaiIzVtEF_XYiqExkoLdpQl4FNMTedFzmCkoWJA72TF5wmzNHsOst2IoPRGxOttpWcleGrL_aut8XWgbCwKlTD-8-Y7JC_BiZHEraeWVtda9QIU1bh1j1-JYxTfxx5Rbeo_s6_xgiojnqf-Z1i_wi7jCrOwSvcPo">
+<div class="absolute top-2 right-2 px-2 py-1 bg-green-500 text-white text-[10px] font-bold rounded">READY</div>
+</div>
+<div class="p-4">
+<p class="font-body-md text-body-md text-primary font-bold">Ensemble Vests</p>
+<p class="text-label-sm font-label-sm text-on-surface-variant">Quantity: 12</p>
+</div>
+</div>
+<!-- Costume Card 4 -->
+<div class="group relative bg-surface-container-high rounded-xl overflow-hidden border border-outline-variant/20 spotlight-glow-hover transition-all">
+<div class="aspect-[3/4] relative">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A collection of ornate, feathered Venetian masquerade masks arranged on a dark velvet-covered table. The lighting is dramatic, casting long shadows and making the gold leaf and jewels on the masks glitter intensely. The style is mysterious, exclusive, and theatrical, perfectly matching the theme of a grand stage masquerade." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCHA3oujcsEwXc-aLS1f_7qHkYajmxIKAZ_hVTs8pGHBmN3bKFHYnziitNjUXPQxPuek8FAIkiO-SYwB6iz3ypvQVCzwHnEzXUnDfeHAwCUqy8LrsJ6OOpvi6Y-sROA19QcyvGw35x_emfg-0KvAocH-dxVaBdsMsZu0qZFBeG91MVdDuqtABfWPjokTpyPwYZUtJCqlruN7el5lZkJncnsCAlXf2dyJh3Xcd-V9NIQvZYqrYM0FyUa1gUmMoZJG9Ssu6XwA-Fo84c">
+<div class="absolute top-2 right-2 px-2 py-1 bg-secondary-container text-white text-[10px] font-bold rounded">STAGED</div>
+</div>
+<div class="p-4">
+<p class="font-body-md text-body-md text-primary font-bold">Masquerade Masks</p>
+<p class="text-label-sm font-label-sm text-on-surface-variant">Prop Dept.</p>
+</div>
+</div>
+<!-- Add Costume Button -->
+<div class="aspect-[3/4] rounded-xl border-2 border-dashed border-outline-variant/30 flex flex-col items-center justify-center gap-4 hover:border-primary-container/50 transition-colors cursor-pointer group">
+<div class="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center group-hover:bg-primary-container/20 transition-all">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary-container" data-icon="add_circle">add_circle</span>
+</div>
+<span class="text-label-md font-label-md text-on-surface-variant group-hover:text-primary-container">Add Item</span>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- Footer from Shared Components -->
+<footer class="w-full py-8 px-margin-desktop flex flex-col md:flex-row justify-between items-center gap-4 bg-surface-container-lowest dark:bg-surface-container-lowest border-t border-outline-variant/10">
+<div class="font-label-sm text-label-sm text-on-surface-variant">
+            © 2024 Theater Club Excellence. All rights reserved.
+        </div>
+<div class="flex gap-8">
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Contact</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Terms</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Privacy</a>
+</div>
+<div class="font-bold text-primary">StageDoor</div>
+</footer>
+<script>
+        // Micro-interactions for Kanban cards
+        document.querySelectorAll('.kanban-column div[class*="bg-surface-container-high"]').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-2px)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0)';
+            });
+        });
+
+        // Search bar interaction
+        const searchInput = document.querySelector('input[type="text"]');
+        searchInput.addEventListener('focus', () => {
+            searchInput.classList.add('w-80');
+            searchInput.classList.remove('w-64');
+        });
+        searchInput.addEventListener('blur', () => {
+            searchInput.classList.remove('w-80');
+            searchInput.classList.add('w-64');
+        });
+    </script>
+</body></html>

@@ -1,0 +1,399 @@
+<!DOCTYPE html><html class="scroll-smooth" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Production Gallery | The Matinee Club</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;family=Source+Sans+3:ital,wght@0,200..900;1,200..900&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-surface-variant": "#49473d",
+                    "inverse-surface": "#31302d",
+                    "on-error": "#ffffff",
+                    "on-primary-fixed": "#1e1c05",
+                    "surface-variant": "#e6e2dd",
+                    "surface-container-lowest": "#ffffff",
+                    "error": "#ba1a1a",
+                    "surface-container-high": "#ece7e3",
+                    "surface-bright": "#fdf9f4",
+                    "primary-fixed": "#e9e4be",
+                    "on-secondary-container": "#4a6677",
+                    "primary-container": "#fff9d2",
+                    "secondary": "#466272",
+                    "on-primary": "#ffffff",
+                    "primary-fixed-dim": "#cdc8a3",
+                    "tertiary": "#496365",
+                    "surface": "#fdf9f4",
+                    "inverse-on-surface": "#f4f0eb",
+                    "surface-container-low": "#f7f3ee",
+                    "on-background": "#1c1b19",
+                    "on-tertiary-fixed": "#041f21",
+                    "primary": "#635f41",
+                    "inverse-primary": "#cdc8a3",
+                    "on-secondary-fixed-variant": "#2e4a5a",
+                    "on-tertiary": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "error-container": "#ffdad6",
+                    "on-tertiary-container": "#5c7678",
+                    "outline-variant": "#cac6b9",
+                    "tertiary-container": "#e2fdff",
+                    "surface-container": "#f1ede9",
+                    "surface-dim": "#ddd9d5",
+                    "on-tertiary-fixed-variant": "#324b4d",
+                    "on-primary-container": "#767253",
+                    "tertiary-fixed": "#cce8ea",
+                    "on-secondary": "#ffffff",
+                    "surface-tint": "#635f41",
+                    "secondary-container": "#c6e4f7",
+                    "on-primary-fixed-variant": "#4a482c",
+                    "on-surface": "#1c1b19",
+                    "on-secondary-fixed": "#001e2c",
+                    "secondary-fixed-dim": "#adcbdd",
+                    "tertiary-fixed-dim": "#b0ccce",
+                    "secondary-fixed": "#c9e7fa",
+                    "outline": "#7a776c",
+                    "background": "#fdf9f4",
+                    "surface-container-highest": "#e6e2dd"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "margin-desktop": "64px",
+                    "margin-mobile": "16px",
+                    "gutter": "24px",
+                    "unit": "4px",
+                    "container-max": "1280px"
+            },
+            "fontFamily": {
+                    "label-md": ["\"Source Sans 3\""],
+                    "headline-md": ["Playfair Display"],
+                    "body-md": ["\"Source Sans 3\""],
+                    "headline-lg": ["Playfair Display"],
+                    "body-lg": ["\"Source Sans 3\""],
+                    "headline-lg-mobile": ["Playfair Display"],
+                    "display-lg": ["Playfair Display"]
+            },
+            "fontSize": {
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-md": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-lg": ["40px", {"lineHeight": "48px", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                    "display-lg": ["56px", {"lineHeight": "64px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .masonry-grid {
+            column-count: 1;
+            column-gap: 24px;
+        }
+        @media (min-width: 768px) { .masonry-grid { column-count: 2; } }
+        @media (min-width: 1024px) { .masonry-grid { column-count: 3; } }
+        
+        .masonry-item {
+            break-inside: avoid;
+            margin-bottom: 24px;
+        }
+
+        .glass-effect {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-surface/70 backdrop-blur-md h-16 flex justify-between items-center max-w-container mx-auto px-6 md:px-margin-desktop transition-all">
+<div class="flex items-center gap-8">
+<span class="font-headline-md text-headline-md text-primary tracking-tight">The Matinee Club</span>
+<div class="hidden md:flex items-center gap-6">
+<a class="font-body-md text-body-md text-primary font-bold border-b-2 border-primary transition-colors cursor-pointer" href="#">Gallery</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors cursor-pointer" href="#">Schedule</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors cursor-pointer" href="#">Members</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden lg:flex items-center bg-surface-variant/30 px-4 py-1.5 rounded-full border border-outline-variant/30">
+<span class="material-symbols-outlined text-on-surface-variant text-sm mr-2" data-icon="search">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-label-md font-label-md w-32 xl:w-48" placeholder="Search gallery..." type="text">
+</div>
+<button class="material-symbols-outlined text-secondary cursor-pointer hover:opacity-80 transition-all" data-icon="notifications">notifications</button>
+<button class="material-symbols-outlined text-secondary cursor-pointer hover:opacity-80 transition-all" data-icon="settings">settings</button>
+<img class="w-8 h-8 rounded-full object-cover border border-outline-variant" data-alt="A portrait of a sophisticated theatre member with a refined aesthetic, set against a soft, creamy background with elegant lighting that highlights professional features, matching the matinee art gallery brand." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBqem5B01EFaVI8GkhGQtk0dN0Z-oPijYW7qByKFGg7pdGD4N-A1b6ayX368bh0sf8kizyUMIoowjgZKq4WKXE1d6LKASMXlAjBxwULY8Ep7Jvf4ioDSCh4eSpO5BDQ9aqLctWx--Y325LF3ZNFAISu7VsIhCXEKyTXiz3NQErhDEg0nElgt40hs_lZsRfrKrltVt3PpP_QreTRPYlMdxiIn-QS-rO650PkC5uTnvi1B3x5N0xFomQYCuZDeOHwSepdpK4o_ix7C8w">
+</div>
+</nav>
+<!-- SideNavBar (Desktop Only) -->
+<aside class="fixed left-0 top-0 h-full w-64 z-40 bg-surface-container-low hidden md:flex flex-col py-24 px-4 gap-y-6">
+<div class="px-4 mb-4">
+<h2 class="font-headline-md text-headline-md text-primary">Matinee Edition</h2>
+<p class="font-label-md text-label-md text-on-surface-variant opacity-70">Prestige Arts Gallery</p>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-4 px-4 py-3 cursor-pointer transition-all duration-200 hover:bg-surface-variant group">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-label-md text-on-surface-variant group-hover:text-primary">Dashboard</span>
+</div>
+<div class="flex items-center gap-4 px-4 py-3 cursor-pointer transition-all duration-200 hover:bg-surface-variant group">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary" data-icon="theater_comedy">theater_comedy</span>
+<span class="font-label-md text-label-md text-on-surface-variant group-hover:text-primary">Productions</span>
+</div>
+<div class="flex items-center gap-4 px-4 py-3 cursor-pointer transition-all duration-200 bg-surface-variant border-r-2 border-primary group">
+<span class="material-symbols-outlined text-primary" data-icon="photo_library">photo_library</span>
+<span class="font-label-md text-label-md text-primary font-bold">Gallery</span>
+</div>
+<div class="flex items-center gap-4 px-4 py-3 cursor-pointer transition-all duration-200 hover:bg-surface-variant group">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary" data-icon="groups">groups</span>
+<span class="font-label-md text-label-md text-on-surface-variant group-hover:text-primary">Cast</span>
+</div>
+<div class="flex items-center gap-4 px-4 py-3 cursor-pointer transition-all duration-200 hover:bg-surface-variant group">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary" data-icon="history">history</span>
+<span class="font-label-md text-label-md text-on-surface-variant group-hover:text-primary">Archives</span>
+</div>
+</div>
+<div class="mt-auto px-4 space-y-4">
+<button class="w-full bg-[#8CC0EB] text-[#1c1b19] py-3 rounded-lg font-label-md text-label-md hover:brightness-105 transition-all shadow-sm">
+                Upload Photos
+            </button>
+<div class="flex flex-col gap-2 border-t border-outline-variant pt-4">
+<div class="flex items-center gap-3 py-1 cursor-pointer hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-sm" data-icon="help_outline">help_outline</span>
+<span class="font-label-md text-label-md">Help</span>
+</div>
+<div class="flex items-center gap-3 py-1 cursor-pointer hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-sm" data-icon="policy">policy</span>
+<span class="font-label-md text-label-md">Privacy</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="md:ml-64 pt-24 pb-16 px-margin-mobile md:px-margin-desktop min-h-screen">
+<!-- Page Header -->
+<header class="max-w-container-max mx-auto mb-16 text-center md:text-left">
+<h1 class="font-display-lg text-display-lg md:text-display-lg text-on-background mb-4">Production Gallery</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">
+                A visual history of our performances and backstage moments. From the grand stage to the intimate craft behind the scenes.
+            </p>
+</header>
+<!-- Category Filters -->
+<div class="max-w-container-max mx-auto mb-12 flex flex-wrap gap-3 justify-center md:justify-start">
+<button class="px-6 py-2 rounded-full bg-secondary-container text-on-secondary-container font-label-md text-label-md">All Works</button>
+<button class="px-6 py-2 rounded-full bg-surface-container-high text-on-surface-variant font-label-md text-label-md hover:bg-secondary-container transition-colors">Performances</button>
+<button class="px-6 py-2 rounded-full bg-surface-container-high text-on-surface-variant font-label-md text-label-md hover:bg-secondary-container transition-colors">Backstage</button>
+<button class="px-6 py-2 rounded-full bg-surface-container-high text-on-surface-variant font-label-md text-label-md hover:bg-secondary-container transition-colors">Costume &amp; Set</button>
+<button class="px-6 py-2 rounded-full bg-surface-container-high text-on-surface-variant font-label-md text-label-md hover:bg-secondary-container transition-colors">Cast &amp; Crew</button>
+</div>
+<!-- Masonry Grid -->
+<section class="max-w-container-max mx-auto masonry-grid">
+<!-- Item 1: Macbeth Performance -->
+<div class="masonry-item group cursor-pointer" onclick="openLightbox(0)">
+<div class="relative overflow-hidden rounded-xl border border-outline-variant bg-surface-container-low transition-transform duration-500 hover:scale-[1.02]">
+<img class="w-full aspect-[4/5] object-cover" data-alt="A dramatic wide shot of a Shakespearean theatre performance on a sunlit afternoon. Actors in rich, textured velvet costumes stand on a wooden stage with soft, atmospheric lighting spilling from tall gallery windows. The mood is sophisticated and historic, with a focus on graceful movements and prestige." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCvT8DkI55TbpL8qfn1uiEa7EQ3zlJ84okxTHO36oTK-IsJ1fTi2BTjbqyNrxs-gVJ3tsSOwP6TcwpoP7zdLC56sAPAASwXVEXNJgYcmGHEPwIzZrIlBltrgbFyIUwX-hBKxrLaSesJ1lYA-ddFJdOL66CKnaXaY0CaofNfo2zYOunuJ0BZ85DqZKD0DiX_RTJi4C-tWfejBwiFheFV3e7GRK_QyAIPW1RX6fWkK-tS2OxbnnY9LY-in4aOrRZ3WrrbmxFgZkULkKg">
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+<p class="text-white font-label-md text-label-md uppercase tracking-wider mb-1">Performance</p>
+<h3 class="text-white font-headline-md text-headline-md leading-tight">Macbeth: The Banquet Scene</h3>
+</div>
+</div>
+</div>
+<!-- Item 2: Costume Fitting -->
+<div class="masonry-item group cursor-pointer" onclick="openLightbox(1)">
+<div class="relative overflow-hidden rounded-xl border border-outline-variant bg-surface-container-low transition-transform duration-500 hover:scale-[1.02]">
+<img class="w-full aspect-[1/1] object-cover" data-alt="A close-up of an intricate costume fitting in a brightly lit, sun-drenched atelier. A tailor is adjusting silk and lace garments on a mannequin. The room is filled with rolls of fine fabrics and sketches. The aesthetic is clean, intellectual, and airy, using soft peach and azure blue accents in the background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuALToEMbv6J6BwAxhic6ESEgyRsNewy_MDIks1EHrH-Ckt6-ql0PgqyZMkh1n4gK9Wg-uE-gdz2vwzEHdY_9TlJ48_UceXcBpgnzTcr0WFcNNHnC2cH4z8mSGlqw47qebBPjBz93OFFwM2qBoPwL4FTkD_ZkVLOBuBQRZRxkjBM--Gc0olW5PTL1VQsGKerdyeEkTAKlmqYYvpwdJrlqfxGzGK0gdiiqlU8JRKfbodMGidt0Fwlq2bpD61bFdkKvaTJMfR7Opb9dV0">
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+<p class="text-white font-label-md text-label-md uppercase tracking-wider mb-1">Backstage</p>
+<h3 class="text-white font-headline-md text-headline-md leading-tight">Lace &amp; Silk Adjustments</h3>
+</div>
+</div>
+</div>
+<!-- Item 3: Set Construction -->
+<div class="masonry-item group cursor-pointer" onclick="openLightbox(2)">
+<div class="relative overflow-hidden rounded-xl border border-outline-variant bg-surface-container-low transition-transform duration-500 hover:scale-[1.02]">
+<img class="w-full aspect-[16/9] object-cover" data-alt="A wide view of a theatre set under construction in a spacious, bright hall. Large wooden structures and painted canvases create a sense of scale and craftsmanship. Dust motes dance in the morning sunlight streaming through clerestory windows. The style is industrial yet graceful, highlighting the artistry of manual labor in a prestigious gallery context." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBYXyqoPIOZOzO16DdwdrZbnnzm2e-q94h0QkpQcQuqTsvYFlxLKlG5TdMPnYeGjhEkN6j7Y_CJd_RDy8O6faoGFaat_4mPLRgdgExPV8y8TG025QLL2h7QD6HQRRPGV5PTOdryLYjxW6uDQSu94TFWrDNlHJ8nmvTaxo9te0Hll8BUwexIGBsN4fMyyeUkyW110LRFEOKTz3SGxmcVTU_ng-MQQzJXTvol6VuRbxWKJRgpYlAT9hLNWPXKhGEAVWriNpTxgcAInvU">
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+<p class="text-white font-label-md text-label-md uppercase tracking-wider mb-1">Production</p>
+<h3 class="text-white font-headline-md text-headline-md leading-tight">The Scaffoldings of Verona</h3>
+</div>
+</div>
+</div>
+<!-- Item 4: Cast Celebration -->
+<div class="masonry-item group cursor-pointer" onclick="openLightbox(3)">
+<div class="relative overflow-hidden rounded-xl border border-outline-variant bg-surface-container-low transition-transform duration-500 hover:scale-[1.02]">
+<img class="w-full aspect-[3/4] object-cover" data-alt="A candid, heartwarming photo of a diverse cast celebrating after a successful matinee performance. They are gathered in a sunlit lounge area with champagne flutes, laughing and embracing. The lighting is warm and golden, evoking a sense of refined community and joy. The color palette is composed of creamy whites and soft blues." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCzMng01RUr7wmEWEAg7k255rlJjBXwifJSsO0zo1ucorVFdirxB64tKcP7hx52xB5yD6_mypYFQYjbYZ7lVtjcEimvezmFLG4kARo_hQfpd7N3GCo2WNyzAl5YelCfE8FAgR9tTTNBDjDa53MfOKC-Ptby88Y8CePOIpGjtR9iPOwwHSj9PAlGagPbI7_5AkW9KLbQ_YJbfYrkSfJaIfhOTA-MAstob4sXK7ktpwh3Y06oqskBG1w2--1PG_qgLmppSGOvJhvwVDk">
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+<p class="text-white font-label-md text-label-md uppercase tracking-wider mb-1">Community</p>
+<h3 class="text-white font-headline-md text-headline-md leading-tight">Opening Night Toast</h3>
+</div>
+</div>
+</div>
+<!-- Item 5: Rehearsal Focus -->
+<div class="masonry-item group cursor-pointer" onclick="openLightbox(4)">
+<div class="relative overflow-hidden rounded-xl border border-outline-variant bg-surface-container-low transition-transform duration-500 hover:scale-[1.02]">
+<img class="w-full aspect-[1/1] object-cover" data-alt="A focused rehearsal shot featuring a lead actor studying a script in a quiet, minimalist studio. The room is filled with soft, diffused light. A simple wooden chair and an elegant floor lamp provide a clean, uncluttered composition. The mood is intellectual and calm, perfectly capturing the matinee theme of graceful preparation and prestige." src="https://lh3.googleusercontent.com/aida-public/AB6AXuASLTS4OImazk_StQq5XklX8yxJ6Pj49MQ-aQdWRZduiITkCHaX2oBM2rSALA7AFrhAcS32QUBb3dE4xSLbKzEY_gPkd0zyx9UEO-ebXgPTfrC332-FN_KNStLPs66L5oZ3U9O9ajUX0JMv5YtFL7cidd2ERtGgGQfe3KNr-DbnWQAp5CMMwS6IAdamncx8f4IEHzLSCZlU663ponFGfp3_KXGr31LusUYa1iTPzv6fv824BoK3tcc9bPQK3nO8f3ok4MSeRvkyftc">
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+<p class="text-white font-label-md text-label-md uppercase tracking-wider mb-1">Process</p>
+<h3 class="text-white font-headline-md text-headline-md leading-tight">Finding the Character</h3>
+</div>
+</div>
+</div>
+<!-- Item 6: Stage Lighting -->
+<div class="masonry-item group cursor-pointer" onclick="openLightbox(5)">
+<div class="relative overflow-hidden rounded-xl border border-outline-variant bg-surface-container-low transition-transform duration-500 hover:scale-[1.02]">
+<img class="w-full aspect-[16/9] object-cover" data-alt="A high-key architectural shot of the theatre's ceiling and light rigging. The structure is elegant and modern, with sky blue accents against a creamy white ceiling. The lighting is bright and airy, transforming the technical equipment into an abstract art installation. The image conveys a sense of prestigious technical excellence." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7FW4k6mz0yfXdLFubtiDZB_g0xS8oYXSsxI76-W39qCTRDX7InfYGSqbCDEgmExx74AyVw2pAKPWXPZGRwieKwumiHXmKt8M5NiPZ0qzuJF3GHQ6haTlvBuZgryIIvY2dhjVfb1YoSMtwJIVOJ2reQSXGt-4fk8F4HsdeIOB299ePvpWZ2H0Zt2eiaCjtVwyCIrbHlFcsR_7xIFzPv4MS6LQ0_8QHZsnJ2K2t0lMYanW8eIuqcpZZdw8USWlj_SU4OtFDd-yNpsI">
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+<p class="text-white font-label-md text-label-md uppercase tracking-wider mb-1">Technical</p>
+<h3 class="text-white font-headline-md text-headline-md leading-tight">Atmospheric Rigging</h3>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Lightbox Modal -->
+<div class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 md:p-8 bg-inverse-surface/90 backdrop-blur-xl transition-all duration-300 opacity-0" id="lightbox">
+<!-- Close Button -->
+<button class="absolute top-6 right-6 text-white bg-white/10 hover:bg-white/20 p-2 rounded-full transition-colors z-[110]" onclick="closeLightbox()">
+<span class="material-symbols-outlined" data-icon="close">close</span>
+</button>
+<div class="max-w-6xl w-full flex flex-col lg:flex-row bg-surface rounded-2xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300">
+<!-- Image Area -->
+<div class="flex-1 bg-black/5 flex items-center justify-center relative min-h-[300px]">
+<img class="max-h-[819px] w-full object-contain" id="lightbox-img" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB6mBeqFI5EpUr3D3xQgzkJ2TjNGMCREOQLAdwminh4_BFLE_VLU6A1eTsxL-Zo67dLpe0spKPpSsGg0M6ZOIuuhOLjFo6J9aj96GgENTWRgtuZ5bFswi2PmOd6XTbzJs_MLr8yXQHEyaq4I7XTPkCTP9Pmu-iKRmuGA5qSwRDd5OoCo8b_A-JKchPlqlVXEiGO3Nyg_B0FNrehDziWtsr5SYJIKvPqDRjhVf0BTDfnohLnlbXM7Ti3AOm1es7lkskMG2DycmFAh1A">
+</div>
+<!-- Details Area -->
+<div class="w-full lg:w-[400px] p-8 flex flex-col">
+<div class="mb-8">
+<span class="bg-primary-container text-on-primary-container px-3 py-1 rounded-full font-label-md text-label-md uppercase" id="lightbox-category">Category</span>
+<h2 class="font-headline-lg text-headline-lg text-primary mt-4 mb-2" id="lightbox-title">Production Title</h2>
+<p class="font-body-md text-body-md text-on-surface-variant" id="lightbox-desc">A beautiful moment captured during our most recent performance.</p>
+</div>
+<div class="space-y-6">
+<div>
+<h4 class="font-label-md text-label-md text-primary uppercase border-b border-outline-variant pb-2 mb-3">Featured Cast</h4>
+<div class="flex flex-wrap gap-2" id="lightbox-cast">
+<!-- Cast Chips Generated by JS -->
+</div>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-primary uppercase border-b border-outline-variant pb-2 mb-3">Performance Date</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">March 14, 2024</p>
+</div>
+</div>
+<div class="mt-auto pt-8 flex gap-3">
+<button class="flex-1 flex items-center justify-center gap-2 bg-secondary text-white py-3 rounded-lg font-label-md text-label-md hover:bg-primary transition-all">
+<span class="material-symbols-outlined text-sm" data-icon="share">share</span>
+                        Share
+                    </button>
+<button class="flex-1 flex items-center justify-center gap-2 border border-secondary text-secondary py-3 rounded-lg font-label-md text-label-md hover:bg-secondary-container transition-all">
+<span class="material-symbols-outlined text-sm" data-icon="download">download</span>
+                        Download
+                    </button>
+</div>
+</div>
+</div>
+</div>
+<script>
+        const galleryData = [
+            {
+                title: "Macbeth: The Banquet Scene",
+                desc: "A pivotal moment from the 2024 Spring production, showcasing the tension and grandeur of our sun-filled gallery set.",
+                category: "Performance",
+                img: "https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?auto=format&fit=crop&q=80&w=1200",
+                cast: ["Sebastian V.", "Elena W.", "Marcus Thorne"]
+            },
+            {
+                title: "Lace & Silk Adjustments",
+                desc: "An intimate look at the craftsmanship behind the scenes in our atelier. Every thread is curated to catch the matinee light.",
+                category: "Backstage",
+                img: "https://images.unsplash.com/photo-1558507652-2d9626c4e67a?auto=format&fit=crop&q=80&w=1200",
+                cast: ["Clara Rossi", "Julian M."]
+            },
+            {
+                title: "The Scaffoldings of Verona",
+                desc: "Our production team works tirelessly to create the physical world where our stories live. A masterpiece of engineering.",
+                category: "Production",
+                img: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&q=80&w=1200",
+                cast: ["Arturo G.", "Dina K."]
+            },
+            {
+                title: "Opening Night Toast",
+                desc: "The joy of completion. Our community gathers to celebrate another successful run under the afternoon sun.",
+                category: "Community",
+                img: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&q=80&w=1200",
+                cast: ["Whole Ensemble"]
+            },
+            {
+                title: "Finding the Character",
+                desc: "Solitary study is where the magic begins. A quiet moment in the North Wing studio.",
+                category: "Process",
+                img: "https://images.unsplash.com/photo-1503095396549-807a8bc3667c?auto=format&fit=crop&q=80&w=1200",
+                cast: ["Sebastian V."]
+            },
+            {
+                title: "Atmospheric Rigging",
+                desc: "Technical excellence meets aesthetic grace. Our light rig is designed to mimic natural daylight transitions.",
+                category: "Technical",
+                img: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&q=80&w=1200",
+                cast: ["Technical Crew"]
+            }
+        ];
+
+        function openLightbox(index) {
+            const data = galleryData[index];
+            const lightbox = document.getElementById('lightbox');
+            const img = document.getElementById('lightbox-img');
+            const title = document.getElementById('lightbox-title');
+            const desc = document.getElementById('lightbox-desc');
+            const category = document.getElementById('lightbox-category');
+            const castContainer = document.getElementById('lightbox-cast');
+
+            img.src = data.img;
+            title.textContent = data.title;
+            desc.textContent = data.desc;
+            category.textContent = data.category;
+            
+            castContainer.innerHTML = '';
+            data.cast.forEach(name => {
+                const chip = document.createElement('span');
+                chip.className = 'bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full font-label-md text-[12px] uppercase';
+                chip.textContent = name;
+                castContainer.appendChild(chip);
+            });
+
+            lightbox.classList.remove('hidden');
+            setTimeout(() => {
+                lightbox.classList.remove('opacity-0');
+            }, 10);
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox() {
+            const lightbox = document.getElementById('lightbox');
+            lightbox.classList.add('opacity-0');
+            setTimeout(() => {
+                lightbox.classList.add('hidden');
+                document.body.style.overflow = '';
+            }, 300);
+        }
+
+        // Close on ESC key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeLightbox();
+        });
+    </script>
+</body></html>

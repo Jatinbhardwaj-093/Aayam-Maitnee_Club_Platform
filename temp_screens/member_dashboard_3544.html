@@ -1,0 +1,379 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>StageDoor | Member Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Playfair+Display:wght@600;700&amp;family=Geist:wght@400;500;600&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;family=Inter:wght@100..900&amp;family=Playfair+Display:wght@100..900&amp;display=swap" rel="stylesheet">
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(26, 26, 26, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(51, 51, 51, 0.5);
+        }
+        .spotlight-glow {
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.08);
+        }
+        .spotlight-hover:hover {
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.15);
+            border-color: #ffd700;
+        }
+        .velvet-gradient {
+            background: radial-gradient(circle at top left, #252525, #131313);
+        }
+        .ticket-edge {
+            mask-image: radial-gradient(circle at 0 50%, transparent 8px, black 8.5px),
+                        radial-gradient(circle at 100% 50%, transparent 8px, black 8.5px);
+            mask-composite: intersect;
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #131313; }
+        ::-webkit-scrollbar-thumb { background: #333333; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #ffd700; }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary-fixed-variant": "#92030f",
+                    "on-tertiary-container": "#605f5e",
+                    "primary": "#fff6df",
+                    "surface": "#131313",
+                    "surface-container-lowest": "#0e0e0e",
+                    "surface-bright": "#393939",
+                    "surface-container-low": "#1c1b1b",
+                    "surface-variant": "#353534",
+                    "on-primary-fixed": "#221b00",
+                    "secondary-fixed": "#ffdad6",
+                    "surface-tint": "#e9c400",
+                    "surface-dim": "#131313",
+                    "on-tertiary": "#313030",
+                    "outline-variant": "#4d4732",
+                    "on-tertiary-fixed-variant": "#474746",
+                    "surface-container-high": "#2a2a2a",
+                    "on-secondary-container": "#ff9f95",
+                    "on-surface-variant": "#d0c6ab",
+                    "inverse-on-surface": "#313030",
+                    "primary-fixed-dim": "#e9c400",
+                    "on-error-container": "#ffdad6",
+                    "inverse-surface": "#e5e2e1",
+                    "on-secondary-fixed": "#410003",
+                    "on-secondary": "#690007",
+                    "on-primary": "#3a3000",
+                    "on-primary-fixed-variant": "#544600",
+                    "secondary-container": "#960711",
+                    "outline": "#999077",
+                    "inverse-primary": "#705d00",
+                    "tertiary-fixed-dim": "#c8c6c5",
+                    "secondary": "#ffb4ac",
+                    "surface-container": "#201f1f",
+                    "on-error": "#690005",
+                    "on-tertiary-fixed": "#1c1b1b",
+                    "tertiary-fixed": "#e5e2e1",
+                    "error-container": "#93000a",
+                    "tertiary": "#f9f5f5",
+                    "primary-fixed": "#ffe16d",
+                    "on-background": "#e5e2e1",
+                    "primary-container": "#ffd700",
+                    "secondary-fixed-dim": "#ffb4ac",
+                    "error": "#ffb4ab",
+                    "surface-container-highest": "#353534",
+                    "on-primary-container": "#705e00",
+                    "on-surface": "#e5e2e1",
+                    "tertiary-container": "#dcd9d9",
+                    "background": "#131313"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "unit": "8px",
+                    "margin-desktop": "64px",
+                    "gutter": "24px",
+                    "margin-mobile": "16px",
+                    "container-max": "1280px"
+            },
+            "fontFamily": {
+                    "body-lg": ["Inter"],
+                    "label-sm": ["Geist"],
+                    "headline-lg": ["Playfair Display"],
+                    "headline-md": ["Playfair Display"],
+                    "label-md": ["Geist"],
+                    "display-lg-mobile": ["Playfair Display"],
+                    "display-lg": ["Playfair Display"],
+                    "body-md": ["Inter"]
+            },
+            "fontSize": {
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.08em", "fontWeight": "500"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                    "display-lg-mobile": ["40px", {"lineHeight": "48px", "fontWeight": "700"}],
+                    "display-lg": ["56px", {"lineHeight": "64px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+</head>
+<body class="bg-surface text-on-surface font-body-md overflow-x-hidden">
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-margin-desktop h-20 bg-surface/80 backdrop-blur-xl border-b border-outline-variant/30 shadow-[0_0_20px_rgba(255,215,0,0.05)]">
+<div class="flex items-center gap-8">
+<h1 class="font-headline-md text-headline-md font-bold text-primary tracking-tight">StageDoor</h1>
+<nav class="hidden md:flex gap-6 items-center">
+<a class="font-body-md text-body-md text-primary border-b-2 border-primary pb-1" href="#">Dashboard</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors" href="#">Productions</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors" href="#">Resources</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-on-surface-variant hover:bg-surface-bright/20 rounded-full transition-all duration-300 active:scale-95">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="w-10 h-10 rounded-full overflow-hidden border border-outline-variant/30 spotlight-glow">
+<img class="w-full h-full object-cover" data-alt="A sophisticated close-up portrait of a theater performer with dramatic stage lighting, deep shadows, and subtle warm highlights. The background is a dark velvet texture, fitting the exclusive StageDoor aesthetic with a high-contrast cinematic feel." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5CcNzZILV9TSTAyisO-QoPJ23APh8OMz4TxG8Li7rJiOy1JWJVEGikyyvRN1eh9V8tI8nSqRLcjBzEIWKUbGecYh-AFXLZOasvYtgdLZ9oikLqGTvnm6Haq4A3FWVarUwIG8jfBGf8mHxKAPhJoPc90E7oJqlVSZfutMX6ArxWPtDost_7wiPC6zW-AmEwQa5UxY6RejOb71tKXxZ0J2UgHZAmAjzFBOYA3I0FjbOwI0g1ZrPe9-N9n5t6qbAvm8u0WuDKzvIBI8">
+</div>
+</div>
+</header>
+<!-- Sidebar (Shared Component) -->
+<aside class="hidden md:flex flex-col fixed left-0 top-0 h-full py-8 px-4 gap-4 bg-surface-container-low border-r border-outline-variant/20 w-64 z-40 mt-20">
+<div class="flex flex-col gap-2">
+<a class="flex items-center gap-4 p-3 bg-primary-container text-on-primary-container rounded-lg font-bold transition-all duration-200" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-label-md text-label-md">Production Schedule</span>
+</a>
+<a class="flex items-center gap-4 p-3 text-on-surface-variant hover:bg-surface-variant/30 rounded-lg transition-all duration-200 hover:translate-x-1" href="#">
+<span class="material-symbols-outlined">menu_book</span>
+<span class="font-label-md text-label-md">Script Library</span>
+</a>
+<a class="flex items-center gap-4 p-3 text-on-surface-variant hover:bg-surface-variant/30 rounded-lg transition-all duration-200 hover:translate-x-1" href="#">
+<span class="material-symbols-outlined">campaign</span>
+<span class="font-label-md text-label-md">Announcements</span>
+</a>
+<a class="flex items-center gap-4 p-3 text-on-surface-variant hover:bg-surface-variant/30 rounded-lg transition-all duration-200 hover:translate-x-1" href="#">
+<span class="material-symbols-outlined">account_circle</span>
+<span class="font-label-md text-label-md">Profile</span>
+</a>
+</div>
+<div class="mt-auto flex flex-col gap-2 pt-4 border-t border-outline-variant/10">
+<a class="flex items-center gap-4 p-3 text-on-surface-variant hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-label-md text-label-md">Support</span>
+</a>
+<a class="flex items-center gap-4 p-3 text-on-surface-variant hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="md:ml-64 pt-20 pb-12 px-4 md:px-margin-desktop min-h-screen">
+<!-- Hero Section -->
+<section class="relative w-full h-[400px] rounded-xl overflow-hidden mb-12 group">
+
+<div class="absolute inset-0 bg-gradient-to-t from-surface via-surface/40 to-transparent"></div>
+<div class="absolute inset-0 bg-cover bg-center -z-10 transition-transform duration-700 group-hover:scale-105" data-alt="A wide cinematic shot of a classic grand theater stage seen from the wings, with heavy velvet curtains, glowing spotlight beams cutting through atmospheric haze, and empty rows of plush seating in the shadows. Dark gold and deep black color palette." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBeJdvkGlzOCp6dXv46v4ZsebPhKNVddCW6pWQyKeXvIfeEpM9QLLCYWOo23efYSuqmX_Rt-1Bax86ffVqivw20TTxJtfBFhkdrA_2SKKRDJpkbjqZ_jBQPmP3CHlrgQYZOPN8pu97q97E_q_sBZu1Sysx7-szMX1016Qd8XRszLS5e22XegfVW4F9rKRi869yDahVVjkXsKiuoVz4h3SJW9saEdYh42G4n9HoWud-62WNbHiXuVX4__ra57Ed9IHlbipaInoRcB9s')"></div>
+<div class="relative h-full flex flex-col justify-end p-12 max-w-4xl">
+<span class="inline-block px-3 py-1 mb-4 rounded-full bg-secondary-container text-on-secondary-container font-label-md text-label-md w-fit">Now Starring: Romeo &amp; Juliet</span>
+<h2 class="font-display-lg text-display-lg text-primary mb-4 leading-tight">Welcome back to the Stage, <span class="text-white">Sebastian</span></h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">The curtains rise in 14 days. Your focus today: Act III, Scene I - The Duel at Verona's Square.</p>
+</div>
+</section>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Rehearsal Schedule (Spotlight Highlight) -->
+<div class="lg:col-span-8 glass-card rounded-xl p-8 velvet-gradient spotlight-glow">
+<div class="flex justify-between items-center mb-8">
+<h3 class="font-headline-md text-headline-md text-primary flex items-center gap-3">
+<span class="material-symbols-outlined">event_upcoming</span>
+                        Rehearsal Schedule
+                    </h3>
+<button class="text-on-surface-variant hover:text-primary transition-colors font-label-md text-label-md">View Monthly</button>
+</div>
+<div class="space-y-4">
+<!-- Active/Today Item -->
+<div class="p-6 rounded-lg bg-primary-container/10 border border-primary/30 relative overflow-hidden spotlight-hover transition-all group">
+<div class="absolute top-0 left-0 w-1 h-full bg-primary shadow-[0_0_10px_#ffd700]"></div>
+<div class="flex flex-col md:flex-row justify-between md:items-center gap-4">
+<div>
+<span class="font-label-sm text-label-sm text-primary uppercase tracking-widest">Today • 14:00 - 17:00</span>
+<h4 class="font-headline-md text-headline-md mt-1">Full Cast Rehearsal: Act III</h4>
+<p class="text-on-surface-variant mt-1">Main Stage | Director: Elena Vance</p>
+</div>
+<button class="px-6 py-3 bg-primary text-surface font-bold rounded hover:shadow-[0_0_15px_rgba(255,215,0,0.5)] transition-shadow">Check In</button>
+</div>
+</div>
+<!-- Upcoming Item -->
+<div class="p-6 rounded-lg bg-surface-container-high border border-outline-variant/20 hover:border-outline-variant/50 transition-all">
+<div class="flex flex-col md:flex-row justify-between md:items-center gap-4 opacity-70">
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">Tomorrow • 10:00 - 12:00</span>
+<h4 class="font-headline-md text-headline-md mt-1">Movement &amp; Choreography</h4>
+<p class="text-on-surface-variant mt-1">Studio B | Coach: Marcus Thorne</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">arrow_forward_ios</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Line Tracker Widget -->
+<div class="lg:col-span-4 flex flex-col gap-gutter">
+<div class="glass-card rounded-xl p-8 velvet-gradient h-full">
+<h3 class="font-headline-md text-headline-md text-primary mb-6">Line Tracker</h3>
+<div class="relative flex flex-col items-center justify-center pt-4">
+<svg class="w-48 h-48 transform -rotate-90">
+<circle class="text-surface-container-highest" cx="96" cy="96" fill="transparent" r="88" stroke="currentColor" stroke-width="8"></circle>
+<circle class="text-primary shadow-[0_0_10px_#ffd700]" cx="96" cy="96" fill="transparent" r="88" stroke="currentColor" stroke-dasharray="552.9" stroke-dashoffset="138.2" stroke-width="8"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center mt-4">
+<span class="text-4xl font-bold">75%</span>
+<span class="text-label-sm text-on-surface-variant uppercase">Memorized</span>
+</div>
+</div>
+<div class="mt-8 space-y-3">
+<div class="flex justify-between text-label-md">
+<span class="text-on-surface-variant">Total Lines</span>
+<span>412</span>
+</div>
+<div class="flex justify-between text-label-md">
+<span class="text-on-surface-variant">Scene II Checkpoint</span>
+<span class="text-primary">Passed</span>
+</div>
+</div>
+</div>
+<!-- Cast Call Notifications -->
+<div class="glass-card rounded-xl p-6 bg-secondary-container/5 border-secondary-container/20">
+<div class="flex items-center gap-2 mb-4 text-secondary">
+<span class="material-symbols-outlined">campaign</span>
+<h4 class="font-label-md font-bold uppercase tracking-widest">Cast Call</h4>
+</div>
+<p class="text-body-md font-medium mb-2">New Production: Macbeth</p>
+<p class="text-label-sm text-on-surface-variant mb-4">Auditions open for 'Banquo' and 'Macduff'. Register by Friday.</p>
+<a class="inline-flex items-center gap-2 text-primary font-label-md hover:underline" href="#">
+                        Review Details <span class="material-symbols-outlined text-sm">open_in_new</span>
+</a>
+</div>
+</div>
+<!-- Script Library Grid -->
+<div class="lg:col-span-12 glass-card rounded-xl p-8 velvet-gradient mb-12">
+<div class="flex justify-between items-center mb-8">
+<h3 class="font-headline-md text-headline-md text-primary flex items-center gap-3">
+<span class="material-symbols-outlined">menu_book</span>
+                        Script Library
+                    </h3>
+<div class="flex gap-2">
+<button class="p-2 border border-outline-variant/30 rounded-lg hover:bg-surface-bright/20"><span class="material-symbols-outlined">grid_view</span></button>
+<button class="p-2 border border-outline-variant/30 rounded-lg hover:bg-surface-bright/20"><span class="material-symbols-outlined">list</span></button>
+</div>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+<!-- Script Cover 1 -->
+<div class="group cursor-pointer">
+<div class="relative aspect-[3/4] rounded-lg overflow-hidden border border-outline-variant/20 mb-3 transition-transform duration-300 group-hover:-translate-y-2 spotlight-hover">
+<div class="w-full h-full bg-cover bg-center" data-alt="A stylized minimalist digital script cover for Romeo and Juliet, featuring a gold dagger intertwined with a red rose against a deep charcoal textured background. Elegant serif typography, cinematic lighting." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuB0E8_lZAmzoziI32gu6IAWqwAqMMFFcZtBuVlnsKE6yNi18KphKtjIbsuH0ydM095RpYDbDuQXFQSKiLYXZTWE-4zOfxzf_ubqZi6MXs9bN_wD1JIuSOMOA8NatRvgPGlgDti8xadb3Auf873T86-Jh8zxpHhymaa0SICI8lf0X7rKaZaG1xPXYsXvc70U5dHqESdex1i2FMUSTWdK4QbM96n0kIZ6gLSZD400D3uweSLDWWtxthp1mSKygqh3UsxhwQtMwDiKnEo')"></div>
+<div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+<span class="material-symbols-outlined text-white text-4xl">download</span>
+</div>
+</div>
+<p class="font-label-md font-bold">Romeo &amp; Juliet</p>
+<p class="font-label-sm text-on-surface-variant">v2.4 Final Revision</p>
+</div>
+<!-- Script Cover 2 -->
+<div class="group cursor-pointer">
+<div class="relative aspect-[3/4] rounded-lg overflow-hidden border border-outline-variant/20 mb-3 transition-transform duration-300 group-hover:-translate-y-2 spotlight-hover">
+<div class="w-full h-full bg-cover bg-center" data-alt="A dark and moody book cover design for 'The Crucible' featuring a glowing spectral forest and a hangman's silhouette in minimalist gold foil style on black velvet. High contrast, dramatic stage lighting effect." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAo94hBgiHM6cU3WJiCBB3aLuOH6BTSdLdaeNzqaHkK1imQ69e74jDItrZXlpRcVg4-zo4IlatEn974gW66EHwZB1x_0WYzUnHjbYhXD_El2Edn43Uw63hSgA9EKS_EFJwTVVzm_fND3vEA-Tq1n7V8-YZ0GKiIkgLljUPa8BBxcyYketC5L-lb_XlszCpg6OX5ZQd5Nay6Of4lJ7bzp6zlGztTiJF_EycFiBIw2jWJDo70RhWMZ7G9Clfe1h3YIImGPuebCGDI_lM')"></div>
+<div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+<span class="material-symbols-outlined text-white text-4xl">download</span>
+</div>
+</div>
+<p class="font-label-md font-bold">The Crucible</p>
+<p class="font-label-sm text-on-surface-variant">Classic Edition</p>
+</div>
+<!-- Script Cover 3 -->
+<div class="group cursor-pointer">
+<div class="relative aspect-[3/4] rounded-lg overflow-hidden border border-outline-variant/20 mb-3 transition-transform duration-300 group-hover:-translate-y-2 spotlight-hover">
+<div class="w-full h-full bg-cover bg-center" data-alt="A modern theatrical script cover for 'Waiting for Godot' featuring a single golden spotlight hitting a bare minimalist tree silhouette on a dark textured background. Elegant design with gold accents." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuB1y2hEAjgAuo8UHRzcyBiSsYcJQHIyTpF2xIlILZR3hDkGPtidFHoE_MIwrcACHDrOFqJEBd2IwSZSYbc1owtQWJcneekM8A5r5fy1rjAw_pmr7jGnvimfzm9CeQtkyu3Wat2WhPq9o9eRfTors_N2wQLmwqsxplvdxKOVSaSqcqtg6V0UAsgKWSNvx-50mk5GSbL4bU_Fv96DqnM7nIVmYIGYU11RsJVmwuM9YBniJUzW4AIpQrxfdGox-GoQpVQnPVeQ1nA0v00')"></div>
+<div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+<span class="material-symbols-outlined text-white text-4xl">download</span>
+</div>
+</div>
+<p class="font-label-md font-bold">Waiting for Godot</p>
+<p class="font-label-sm text-on-surface-variant">Director's Notes</p>
+</div>
+<!-- Script Cover 4 -->
+<div class="group cursor-pointer">
+<div class="relative aspect-[3/4] rounded-lg overflow-hidden border border-outline-variant/20 mb-3 transition-transform duration-300 group-hover:-translate-y-2 spotlight-hover">
+<div class="w-full h-full bg-cover bg-center" data-alt="A dramatic book cover for 'Hamlet' featuring a stylized golden skull crown with deep blood red drips on a high-gloss black surface. Minimalist, premium theater aesthetic with dramatic lighting." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCW-5MGm-Wn5dea-pV_b_IGFmayd7R5Hx7N-bUhMGf9naGTckuVarfFGXg2ccjReWLZr4XHSdw1PxKg4tIj8LLeQGOMpNabMC9n_c127TBhHCLLp-_nkpIsYX75dZe5aApXuPObO8rtgDWE-44-ocYnRpcxf7VLmWtbq_m1yS55q_H0iDrOBpgALteQqec66PrW5hgRhCUymflSC5i8PRQcEDUKeDnM2q7x4hgQ-l7yLsjDEUn7Ea3VTxiS9w7AawCL74SS1PS5N8g')"></div>
+<div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+<span class="material-symbols-outlined text-white text-4xl">download</span>
+</div>
+</div>
+<p class="font-label-md font-bold">Hamlet</p>
+<p class="font-label-sm text-on-surface-variant">Archival Script</p>
+</div>
+<!-- Add New Script Placeholder -->
+<div class="flex flex-col items-center justify-center aspect-[3/4] rounded-lg border-2 border-dashed border-outline-variant/20 hover:border-primary/50 transition-colors group">
+<span class="material-symbols-outlined text-4xl text-on-surface-variant group-hover:text-primary mb-2">add_circle</span>
+<span class="font-label-sm text-on-surface-variant group-hover:text-primary">Request Access</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full py-8 px-margin-desktop flex flex-col md:flex-row justify-between items-center gap-4 bg-surface-container-lowest border-t border-outline-variant/10">
+<div class="flex items-center gap-4">
+<span class="font-bold text-primary font-headline-md">StageDoor</span>
+<span class="text-on-surface-variant text-sm font-label-sm">© 2024 Theater Club Excellence. All rights reserved.</span>
+</div>
+<div class="flex gap-6">
+<a class="font-label-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Contact</a>
+<a class="font-label-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Terms</a>
+<a class="font-label-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Privacy</a>
+</div>
+</footer>
+<!-- Bottom Nav for Mobile -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full bg-surface-container-low border-t border-outline-variant/20 px-4 py-2 flex justify-around items-center z-50">
+<a class="flex flex-col items-center p-2 text-primary" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-[10px] uppercase font-bold">Home</span>
+</a>
+<a class="flex flex-col items-center p-2 text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="text-[10px] uppercase">Schedule</span>
+</a>
+<a class="flex flex-col items-center p-2 text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">menu_book</span>
+<span class="text-[10px] uppercase">Scripts</span>
+</a>
+<a class="flex flex-col items-center p-2 text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">account_circle</span>
+<span class="text-[10px] uppercase">Profile</span>
+</a>
+</nav>
+<script>
+        // Simple micro-interaction for circular progress animation
+        window.addEventListener('DOMContentLoaded', () => {
+            const circle = document.querySelector('circle.text-primary');
+            if (circle) {
+                circle.style.transition = 'stroke-dashoffset 2s ease-in-out';
+                // Trigger animation after a short delay
+                setTimeout(() => {
+                    circle.style.strokeDashoffset = '138.2';
+                }, 100);
+            }
+        });
+    </script>
+</body></html>
