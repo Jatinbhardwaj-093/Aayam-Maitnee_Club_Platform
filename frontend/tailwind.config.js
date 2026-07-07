@@ -14,6 +14,19 @@ export default {
         'card-surface': '#f7f3ee',
         highlight: '#8CC0EB',
 
+        // Matinee Club Theme Colors
+        'primary-container': '#fff9d2',
+        'on-primary-container': '#767253',
+        'surface-container-low': '#f7f3ee',
+        'surface-container-high': '#ece7e3',
+        'surface-container-highest': '#e6e2dd',
+        'outline-variant': '#cac6b9',
+        'on-surface-variant': '#49473d',
+        'on-surface': '#1c1b19',
+        'azure-blue': '#8CC0EB',
+        'soft-peach': '#FFEBCC',
+        'sky-blue': '#BFDDF0',
+
         // Standard shadcn variables
         border: "var(--border)",
         input: "var(--input)",

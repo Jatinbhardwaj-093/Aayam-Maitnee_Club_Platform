@@ -1,19 +1,9 @@
 import React, { useState } from "react";
-import { Link, Outlet, useLocation } from "react-router-dom";
-import { 
-  Home, 
-  LayoutDashboard, 
-  Folder, 
-  Users, 
-  Image as ImageIcon, 
-  Coins, 
-  Menu, 
-  Bell, 
-  User, 
-  ShieldCheck,
-  ClipboardList,
-  ChevronLeft,
-  ChevronRight,
+import { Outlet, useLocation } from "react-router-dom";
+import {
+  Menu,
+  Bell,
+  User,
   LogOut,
   Settings,
   ShieldAlert
@@ -23,24 +13,8 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-
-interface NavItem {
-  label: string;
-  path: string;
-  icon: React.ComponentType<any>;
-  description: string;
-}
-
-const navItems: NavItem[] = [
-  { label: "Drama Club Home", path: "/", icon: Home, description: "Public landing page" },
-  { label: "Member Dashboard", path: "/member", icon: LayoutDashboard, description: "Your rehearsals & schedules" },
-  { label: "Macbeth Workspace", path: "/workspace", icon: Folder, description: "Props transfers & expenses" },
-  { label: "Auditions & Casting", path: "/auditions", icon: Users, description: "Casting portal & applications" },
-  { label: "Sponsor Dashboard", path: "/sponsor", icon: Coins, description: "VIP lounge & sponsorships" },
-  { label: "Production Gallery", path: "/gallery", icon: ImageIcon, description: "Performances & backstage media" },
-  { label: "Production Office", path: "/admin", icon: ShieldCheck, description: "Director availability & admin" },
-  { label: "Backstage Pass", path: "/backstage", icon: ClipboardList, description: "Tasks & check-ins" },
-];
+import { SidebarProvider, useSidebar } from "@/components/ui/sidebar";
+import { Sidebar, navItems } from "@/components/Sidebar";
 
 const personas = [
   { name: "Julian Devereux", role: "Lead Actor & Member", initials: "JD", email: "julian.d@matinee.club" },
@@ -49,10 +23,9 @@ const personas = [
   { name: "Sarah Vance", role: "Director & Coordinator", initials: "SV", email: "sarah.v@matinee.club" },
 ];
 
-export default function AppLayout() {
+function AppLayoutInner() {
   const location = useLocation();
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const { collapsed, openMobile, setOpenMobile } = useSidebar();
 
   // Interactive States
   const [hasUnread, setHasUnread] = useState(true);
@@ -92,121 +65,14 @@ export default function AppLayout() {
     setProfileSettingsOpen(false);
   };
 
-  const SidebarContent = ({ isMobile = false }) => {
-    const collapsed = isCollapsed && !isMobile;
-
-    return (
-      <div className="flex flex-col h-full bg-[#f7f3ee] border-r border-[#e6e2dd] text-[#466272] font-sans">
-        {/* Sidebar Brand Header */}
-        <div className={`p-6 border-b border-[#e6e2dd] flex ${collapsed ? "flex-col items-center gap-4" : "items-center justify-between"}`}>
-          {collapsed ? (
-            <>
-              <span className="text-lg font-bold font-serif text-[#635f41]">SD</span>
-              <button 
-                onClick={() => setIsCollapsed(false)} 
-                className="text-[#466272] hover:text-[#635f41] p-1.5 hover:bg-[#e6e2dd]/60 rounded-full transition-all"
-                title="Expand Sidebar"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </>
-          ) : (
-            <>
-              <div>
-                <span className="text-[10px] uppercase tracking-widest text-[#635f41] font-bold">AAYAM</span>
-                <h2 className="text-xl font-bold font-serif text-[#635f41] mt-0.5 leading-tight">The Matinee Club</h2>
-              </div>
-              {!isMobile && (
-                <button 
-                  onClick={() => setIsCollapsed(true)} 
-                  className="text-[#466272] hover:text-[#635f41] p-1.5 hover:bg-[#e6e2dd]/60 rounded-full transition-all"
-                  title="Collapse Sidebar"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-              )}
-            </>
-          )}
-        </div>
-
-        {/* Navigation List */}
-        <nav className={`flex-1 px-4 py-6 space-y-1.5 overflow-y-auto ${collapsed ? "flex flex-col items-center" : ""}`}>
-          {navItems.map((item) => {
-            const isActive = location.pathname === item.path;
-            const Icon = item.icon;
-
-            if (collapsed) {
-              return (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className={`flex items-center justify-center w-10 h-10 rounded-[8px] transition-all group relative ${
-                    isActive
-                      ? "bg-[#635f41]/10 text-[#635f41] font-bold"
-                      : "hover:bg-[#635f41]/5 hover:text-[#635f41]"
-                  }`}
-                  title={item.label}
-                >
-                  <Icon className={`w-5 h-5 transition-transform group-hover:scale-110 ${
-                    isActive ? "text-[#635f41]" : "text-[#466272]/70"
-                  }`} />
-                </Link>
-              );
-            }
-
-            return (
-              <Link
-                key={item.path}
-                to={item.path}
-                onClick={() => setMobileOpen(false)}
-                className={`flex items-center gap-3 px-4 py-3 rounded-[8px] text-sm font-medium transition-all group relative ${
-                  isActive
-                    ? "bg-[#635f41]/10 text-[#635f41] font-bold"
-                    : "hover:bg-[#635f41]/5 hover:text-[#635f41]"
-                }`}
-              >
-                <Icon className={`w-5 h-5 transition-transform group-hover:scale-105 ${
-                  isActive ? "text-[#635f41]" : "text-[#466272]/70"
-                }`} />
-                <div className="flex flex-col">
-                  <span>{item.label}</span>
-                  <span className="text-[10px] text-[#466272]/65 font-normal leading-none mt-0.5 group-hover:text-[#466272]/85">
-                    {item.description}
-                  </span>
-                </div>
-              </Link>
-            );
-          })}
-        </nav>
-
-        {/* Footer Info (Interactive Profile Trigger) */}
-        <button 
-          onClick={() => setProfileSettingsOpen(true)}
-          className={`p-4 border-t border-[#e6e2dd] bg-[#e6e2dd]/40 flex text-left w-full hover:bg-[#e6e2dd]/65 transition-all ${collapsed ? "justify-center" : "items-center gap-3"}`}
-          title="User Account Details"
-        >
-          <div className="w-9 h-9 rounded-full bg-[#635f41]/10 border border-[#e6e2dd] flex items-center justify-center text-[#635f41] font-bold flex-shrink-0">
-            {activeUser.initials}
-          </div>
-          {!collapsed && (
-            <div className="flex-1 min-w-0">
-              <p className="text-xs font-semibold text-[#635f41] truncate">{activeUser.name}</p>
-              <p className="text-[10px] text-[#466272]/75 truncate">{activeUser.role}</p>
-            </div>
-          )}
-        </button>
-      </div>
-    );
-  };
-
-  const sidebarWidthClass = isCollapsed ? "w-[72px]" : "w-64 xl:w-72";
+  const sidebarWidthClass = collapsed ? "w-[72px]" : "w-64 xl:w-72";
 
   return (
     <div className="min-h-screen flex bg-[#fdf9f4] text-[#466272] font-sans">
       {/* Desktop Sidebar */}
       <aside className={`hidden md:block ${sidebarWidthClass} flex-shrink-0 transition-all duration-300`}>
         <div className={`fixed top-0 left-0 bottom-0 ${sidebarWidthClass} transition-all duration-300`}>
-          <SidebarContent isMobile={false} />
+          <Sidebar activeUser={activeUser} onOpenProfileSettings={() => setProfileSettingsOpen(true)} isMobile={false} />
         </div>
       </aside>
 
@@ -216,12 +82,12 @@ export default function AppLayout() {
         <header className="sticky top-0 z-40 bg-[#fdf9f4]/80 backdrop-blur-md border-b border-[#e6e2dd] h-16 flex items-center justify-between px-6">
           <div className="flex items-center gap-4">
             {/* Mobile Sidebar Trigger */}
-            <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+            <Sheet open={openMobile} onOpenChange={setOpenMobile}>
               <SheetTrigger render={<Button variant="ghost" size="icon" className="md:hidden text-[#466272] hover:bg-[#f7f3ee]" />}>
                 <Menu className="w-5 h-5" />
               </SheetTrigger>
               <SheetContent side="left" className="p-0 w-72 border-r-0">
-                <SidebarContent isMobile={true} />
+                <Sidebar activeUser={activeUser} onOpenProfileSettings={() => setProfileSettingsOpen(true)} isMobile={true} />
               </SheetContent>
             </Sheet>
 
@@ -288,7 +154,7 @@ export default function AppLayout() {
                 </div>
                 <DialogFooter className="sm:justify-between items-center gap-4">
                   <span className="text-[11px] text-[#466272]/60 italic">Authenticated via Aayam Hub</span>
-                   <Button onClick={() => setNotificationsOpen(false)} className="bg-[#8CC0EB] text-[#1c1b19] hover:bg-[#8CC0EB]/90 rounded-[8px]">
+                  <Button onClick={() => setNotificationsOpen(false)} className="bg-[#8CC0EB] text-[#1c1b19] hover:bg-[#8CC0EB]/90 rounded-[8px]">
                     Dismiss
                   </Button>
                 </DialogFooter>
@@ -317,11 +183,10 @@ export default function AppLayout() {
                     <button
                       key={p.name}
                       onClick={() => handleSwitchPersona(p.name)}
-                      className={`w-full p-3 rounded-[8px] border text-left flex items-center justify-between hover:bg-[#e6e2dd]/40 transition-all ${
-                        activeUser.name === p.name 
-                          ? "border-[#8CC0EB] bg-white font-bold text-[#635f41]" 
-                          : "border-[#e6e2dd] bg-[#f7f3ee]/40 text-[#466272]"
-                      }`}
+                      className={`w-full p-3 rounded-[8px] border text-left flex items-center justify-between hover:bg-[#e6e2dd]/40 transition-all ${activeUser.name === p.name
+                        ? "border-[#8CC0EB] bg-white font-bold text-[#635f41]"
+                        : "border-[#e6e2dd] bg-[#f7f3ee]/40 text-[#466272]"
+                        }`}
                     >
                       <div>
                         <p className="text-sm font-semibold">{p.name}</p>
@@ -367,7 +232,7 @@ export default function AppLayout() {
                 </div>
                 <div className="space-y-1">
                   <label className="text-xs font-semibold text-[#635f41]">Display Name</label>
-                  <Input 
+                  <Input
                     value={editName}
                     onChange={(e) => setEditName(e.target.value)}
                     className="border-[#e6e2dd] focus-visible:ring-[#8CC0EB] bg-white text-sm"
@@ -376,7 +241,7 @@ export default function AppLayout() {
                 </div>
                 <div className="space-y-1">
                   <label className="text-xs font-semibold text-[#635f41]">Role Designation</label>
-                  <Input 
+                  <Input
                     value={editRole}
                     onChange={(e) => setEditRole(e.target.value)}
                     className="border-[#e6e2dd] focus-visible:ring-[#8CC0EB] bg-white text-sm"
@@ -385,7 +250,7 @@ export default function AppLayout() {
                 </div>
                 <div className="space-y-1">
                   <label className="text-xs font-semibold text-[#635f41]">Email Address</label>
-                  <Input 
+                  <Input
                     type="email"
                     value={editEmail}
                     onChange={(e) => setEditEmail(e.target.value)}
@@ -395,9 +260,9 @@ export default function AppLayout() {
                 </div>
               </div>
               <DialogFooter className="gap-2 sm:gap-0">
-                <Button 
-                  type="button" 
-                  variant="outline" 
+                <Button
+                  type="button"
+                  variant="outline"
                   onClick={() => setProfileSettingsOpen(false)}
                   className="border-2 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 rounded-[8px]"
                 >
@@ -417,5 +282,13 @@ export default function AppLayout() {
         </main>
       </div>
     </div>
+  );
+}
+
+export default function AppLayout() {
+  return (
+    <SidebarProvider>
+      <AppLayoutInner />
+    </SidebarProvider>
   );
 }
