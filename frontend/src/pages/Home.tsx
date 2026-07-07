@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, Star, Calendar, ShieldCheck, Ticket } from "lucide-react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import JoinClubForm from "@/components/JoinClubForm";
 
 interface Performance {
   id: string;
@@ -66,15 +67,16 @@ export default function Home() {
           Step behind the velvet curtain. Experience high-stakes theatrical elegance, cutting-edge stagecraft, and members-only exclusivity at The Matinee Club.
         </p>
         <div className="flex flex-wrap gap-[16px] justify-center pt-[16px]">
+          <JoinClubForm />
           <Link 
             to="/member" 
-            className={buttonVariants({ size: "lg", className: "bg-[#8CC0EB] hover:bg-[#8CC0EB]/90 text-[#1c1b19] font-semibold rounded-[8px] px-[40px] py-[16px] shadow-md transition-all active:scale-95" })}
+            className={buttonVariants({ variant: "outline", size: "lg", className: "border-2 border-[#8CC0EB] text-[#8CC0EB] hover:bg-[#8CC0EB]/5 font-semibold rounded-[8px] px-[40px] py-[16px] shadow-sm transition-all active:scale-95" })}
           >
             Enter Aayam <ArrowRight className="w-4 h-4 ml-2" />
           </Link>
           <Link 
             to="/auditions" 
-            className={buttonVariants({ variant: "outline", size: "lg", className: "border-2 border-[#8CC0EB] text-[#8CC0EB] hover:bg-[#8CC0EB]/5 font-semibold rounded-[8px] px-[40px] py-[16px] transition-all active:scale-95" })}
+            className={buttonVariants({ variant: "ghost", size: "lg", className: "text-[#466272] hover:bg-[#635f41]/5 font-semibold rounded-[8px] px-[40px] py-[16px] transition-all active:scale-95" })}
           >
             View Open Castings
           </Link>
