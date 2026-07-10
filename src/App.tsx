@@ -1,11 +1,11 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AppLayout from "./components/AppLayout";
 import Home from "./pages/Home";
-import MemberDashboard from "./pages/MemberDashboard";
+import MemberDashboard from "./pages/member/MemberDashboard";
 import ProductionWorkspace from "./pages/ProductionWorkspace";
-import AuditionsCasting from "./pages/AuditionsCasting";
+import AuditionsCasting from "./pages/member/AuditionsCasting";
 import SponsorDashboard from "./pages/SponsorDashboard";
-import ProductionGallery from "./pages/ProductionGallery";
+import ProductionGallery from "./pages/member/ProductionGallery";
 import ProductionOffice from "./pages/ProductionOffice";
 import BackstagePass from "./pages/BackstagePass";
 
