@@ -13,7 +13,6 @@
     "allowArbitraryExtensions": true,
     "skipLibCheck": true,
     /* Path Mapping configuration */
-    "baseUrl": ".",
     "paths": {
       "@/*": [
         "./src/*"
