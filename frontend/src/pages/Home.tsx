@@ -42,12 +42,13 @@ interface Member {
   role: string;
   avatarLetter: string;
   bio: string;
+  avatarUrl: string;
 }
 
 const team: Member[] = [
-  { name: "Lord Harrington", role: "Grand Patron & Sponsor", avatarLetter: "H", bio: "Generously funding Matinee performances and providing VIP lounge resources." },
-  { name: "Julian Devereux", role: "Lead Actor (Macbeth)", avatarLetter: "J", bio: "Guiding the creative ensemble and heading theatrical development." },
-  { name: "Sebastian Vance", role: "Production Coordinator", avatarLetter: "S", bio: "Ensuring props, scheduling, and stagecraft runs in perfect harmony." },
+  { name: "Lakshya Hari", role: "Grand Patron & Sponsor", avatarLetter: "L", bio: "Generously funding Matinee performances and providing VIP lounge resources.", avatarUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&h=150&q=80" },
+  { name: "Jayesh Dave", role: "Lead Actor (Macbeth)", avatarLetter: "J", bio: "Guiding the creative ensemble and heading theatrical development.", avatarUrl: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&h=150&q=80" },
+  { name: "Siddharth Verma", role: "Production Coordinator", avatarLetter: "S", bio: "Ensuring props, scheduling, and stagecraft runs in perfect harmony.", avatarUrl: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=150&h=150&q=80" },
 ];
 
 export default function Home() {
@@ -163,8 +164,8 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-[24px]">
           {team.map((member, idx) => (
             <div key={idx} className="bg-[#f7f3ee] border border-[#e6e2dd] rounded-[8px] p-[32px] text-center flex flex-col items-center space-y-[16px]">
-              <div className="w-[64px] h-[64px] rounded-full bg-[#635f41]/10 border border-[#635f41]/30 flex items-center justify-center text-xl font-bold text-[#635f41]">
-                {member.avatarLetter}
+              <div className="w-[64px] h-[64px] rounded-full overflow-hidden border border-[#635f41]/30 flex-shrink-0 bg-gray-200">
+                <img src={member.avatarUrl} alt={member.name} className="w-full h-full object-cover" />
               </div>
               <div>
                 <h3 className="font-bold text-[18px] text-[#635f41]">{member.name}</h3>

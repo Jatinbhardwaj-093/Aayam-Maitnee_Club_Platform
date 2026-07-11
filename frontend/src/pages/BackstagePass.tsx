@@ -13,10 +13,10 @@ interface CrewTask {
 }
 
 const initialTasks: CrewTask[] = [
-  { id: "T1", task: "Iron Lord Macbeth's banquet robe", assignedTo: "Elena Wells", category: "Wardrobe", isCompleted: true },
-  { id: "T2", task: "Mix dry ice and verify fog machine level", assignedTo: "M. Chen", category: "Props", isCompleted: false },
-  { id: "T3", task: "Configure spot lighting cue for apparition", assignedTo: "Julian Thorne", category: "Lighting", isCompleted: false },
-  { id: "T4", task: "Test cauldron sound effects", assignedTo: "Sarah Vance", category: "Sound", isCompleted: true },
+  { id: "T1", task: "Iron Lord Macbeth's banquet robe", assignedTo: "Ishita Sen", category: "Wardrobe", isCompleted: true },
+  { id: "T2", task: "Mix dry ice and verify fog machine level", assignedTo: "Manish Chaudhari", category: "Props", isCompleted: false },
+  { id: "T3", task: "Configure spot lighting cue for apparition", assignedTo: "Jayesh Dave", category: "Lighting", isCompleted: false },
+  { id: "T4", task: "Test cauldron sound effects", assignedTo: "Sneha Vyas", category: "Sound", isCompleted: true },
 ];
 
 export default function BackstagePass() {

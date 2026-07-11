@@ -23,9 +23,9 @@ interface ExpenseClaim {
 }
 
 const initialAssets: AssetTransfer[] = [
-  { id: "A001", item: "Banquet Goblet (Gold-plated)", borrower: "Julian Devereux", timer: "2 Days Remaining" },
-  { id: "A002", item: "Macbeth Ornamental Dagger", borrower: "Lady Macbeth (Emma)", timer: "5 Hours Remaining" },
-  { id: "A003", item: "Witches' Cauldron (Iron)", borrower: "Sebastian Vance", timer: "Returned" },
+  { id: "A001", item: "Banquet Goblet (Gold-plated)", borrower: "Jayesh Dave", timer: "2 Days Remaining" },
+  { id: "A002", item: "Macbeth Ornamental Dagger", borrower: "Lady Macbeth (Ishita)", timer: "5 Hours Remaining" },
+  { id: "A003", item: "Witches' Cauldron (Iron)", borrower: "Siddharth Verma", timer: "Returned" },
 ];
 
 const initialExpenses: ExpenseClaim[] = [
@@ -134,7 +134,7 @@ export default function ProductionWorkspace() {
                   <div className="space-y-1">
                     <label className="text-xs font-semibold text-[#635f41]">Borrower Name</label>
                     <Input
-                      placeholder="e.g., Emma Vance"
+                      placeholder="e.g., Sneha Vyas"
                       value={newAssetBorrower}
                       onChange={(e) => setNewAssetBorrower(e.target.value)}
                       className="border-[#e6e2dd] focus-visible:ring-[#8CC0EB]"

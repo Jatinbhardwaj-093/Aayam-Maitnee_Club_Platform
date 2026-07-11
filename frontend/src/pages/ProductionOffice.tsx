@@ -16,10 +16,10 @@ interface RosterMember {
 }
 
 const initialRoster: RosterMember[] = [
-  { id: "R01", name: "Elena Wells", role: "Actor (Lady Macbeth)", phone: "+1 555-0199", email: "elena.w@matinee.club", isAvailable: true },
-  { id: "R02", name: "Julian Thorne", role: "Actor (Macbeth)", phone: "+1 555-0143", email: "julian.t@matinee.club", isAvailable: true },
-  { id: "R03", name: "Sarah Vance", role: "Director Coordinator", phone: "+1 555-0177", email: "sarah.v@matinee.club", isAvailable: false },
-  { id: "R04", name: "M. Chen", role: "Lead Stagehand", phone: "+1 555-0168", email: "m.chen@matinee.club", isAvailable: true },
+  { id: "R01", name: "Ishita Sen", role: "Actor (Lady Macbeth)", phone: "+91 98765 00001", email: "ishita.s@matinee.club", isAvailable: true },
+  { id: "R02", name: "Jayesh Dave", role: "Actor (Macbeth)", phone: "+91 98765 43210", email: "jayesh.d@matinee.club", isAvailable: true },
+  { id: "R03", name: "Sneha Vyas", role: "Director Coordinator", phone: "+91 98765 00003", email: "sneha.v@matinee.club", isAvailable: false },
+  { id: "R04", name: "Manish Chaudhari", role: "Lead Stagehand", phone: "+91 98765 00004", email: "manish.c@matinee.club", isAvailable: true },
 ];
 
 export default function ProductionOffice() {
@@ -40,7 +40,7 @@ export default function ProductionOffice() {
       id: `R0${roster.length + 1}`,
       name: newName,
       role: newRole,
-      phone: newPhone || "+1 555-0100",
+      phone: newPhone || "+91 98765 00000",
       email: newEmail || `${newName.toLowerCase().replace(" ", ".")}@matinee.club`,
       isAvailable: true,
     };
@@ -92,7 +92,7 @@ export default function ProductionOffice() {
                 <div className="space-y-1">
                   <label className="text-xs font-semibold text-[#635f41]">Cast/Crew Name</label>
                   <Input
-                    placeholder="e.g., Benedict Cumberbatch"
+                    placeholder="e.g., Kabir Bedi"
                     value={newName}
                     onChange={(e) => setNewName(e.target.value)}
                     className="border-[#e6e2dd] focus-visible:ring-[#8CC0EB]"

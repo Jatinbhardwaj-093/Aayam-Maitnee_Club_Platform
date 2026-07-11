@@ -1,22 +1,27 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AppLayout from "./components/AppLayout";
-import Landing from "./pages/website_landing/Landing";
-import Plays from "./pages/website_landing/Plays";
-import Events from "./pages/website_landing/Events";
-import Directory from "./pages/website_landing/Directory";
-import Profile from "./pages/website_landing/Profile";
+import Home from "./pages/Home";
+import MemberDashboard from "./pages/member/MemberDashboard";
+import ProductionWorkspace from "./pages/ProductionWorkspace";
+import AuditionsCasting from "./pages/member/AuditionsCasting";
+import SponsorDashboard from "./pages/SponsorDashboard";
+import ProductionGallery from "./pages/member/ProductionGallery";
+import ProductionOffice from "./pages/ProductionOffice";
+import BackstagePass from "./pages/BackstagePass";
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<AppLayout />}>
-          <Route index element={<Landing />} />
-          <Route path="plays" element={<Plays />} />
-          <Route path="events" element={<Events />} />
-          <Route path="directory" element={<Directory />} />
-          <Route path="profile" element={<Profile />} />
-          <Route path="profile/:memberId" element={<Profile />} />
+          <Route index element={<Home />} />
+          <Route path="member" element={<MemberDashboard />} />
+          <Route path="workspace" element={<ProductionWorkspace />} />
+          <Route path="auditions" element={<AuditionsCasting />} />
+          <Route path="sponsor" element={<SponsorDashboard />} />
+          <Route path="gallery" element={<ProductionGallery />} />
+          <Route path="admin" element={<ProductionOffice />} />
+          <Route path="backstage" element={<BackstagePass />} />
         </Route>
       </Routes>
     </BrowserRouter>
