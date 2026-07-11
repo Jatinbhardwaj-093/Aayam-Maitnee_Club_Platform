@@ -71,6 +71,14 @@ export default function ProductionGallery() {
   const [category, setCategory] = useState<"Rehearsals" | "Live Show" | "Backstage">("Rehearsals");
   const [photographer, setPhotographer] = useState("Jayesh Dave");
   const [imageUrl, setImageUrl] = useState(presetImages[0].url);
+  const sanitizeImageUrl = (value: string) => {
+    try {
+      const parsedUrl = new URL(value, window.location.origin);
+      return parsedUrl.protocol === "http:" || parsedUrl.protocol === "https:" ? parsedUrl.toString() : presetImages[0].url;
+    } catch {
+      return presetImages[0].url;
+    }
+  };
 
   const handleLike = (id: string) => {
     setMedia(prev => prev.map(item => {
@@ -88,7 +96,7 @@ export default function ProductionGallery() {
   const handleDownload = (url: string, filename: string) => {
     // Open image or simulate download
     const link = document.createElement("a");
-    link.href = url;
+    link.href = sanitizeImageUrl(url);
     link.target = "_blank";
     link.download = `${filename.toLowerCase().replace(/ /g, "_")}.jpg`;
     document.body.appendChild(link);
@@ -234,7 +242,7 @@ export default function ProductionGallery() {
             {/* Image Wrapper */}
             <div className="relative aspect-video overflow-hidden bg-gray-100">
               <img
-                src={item.imageUrl}
+                src={sanitizeImageUrl(item.imageUrl)}
                 alt={item.title}
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
