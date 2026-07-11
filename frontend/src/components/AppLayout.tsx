@@ -430,7 +430,7 @@ export default function AppLayout() {
 
                     <div className="space-y-1">
                       <label className="text-xs font-semibold text-[#635f41] block mb-1">Member Classification</label>
-                      <Select value={rolePreference} onValueChange={(val) => setRolePreference(val)}>
+                      <Select value={rolePreference} onValueChange={(val) => setRolePreference(val ?? "")}>
                         <SelectTrigger className="w-full border-[#e6e2dd] bg-white text-[#466272] hover:bg-gray-50 focus:ring-[#8CC0EB] text-sm h-10 px-3 flex items-center justify-between rounded-lg">
                           <SelectValue placeholder="Select Classification" />
                         </SelectTrigger>

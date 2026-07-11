@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Calendar as CalendarIcon, Clock, MapPin, Check, X, BookOpen, AlertCircle, CheckCircle } from "lucide-react";
+import { Calendar as CalendarIcon, Clock, MapPin, Check, X, BookOpen, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";

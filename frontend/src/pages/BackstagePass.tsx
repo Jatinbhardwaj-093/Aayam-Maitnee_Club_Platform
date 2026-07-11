@@ -166,7 +166,7 @@ export default function BackstagePass() {
               <label className="text-xs font-semibold text-[#635f41]">Category</label>
               <select
                 value={newCategory}
-                onChange={(e) => setNewCategory(e.target.value as any)}
+                onChange={(e) => setNewCategory(e.target.value as CrewTask["category"])}
                 className="w-full rounded-md border border-[#e6e2dd] bg-white px-3 py-2 text-sm text-[#466272] outline-none focus:ring-1 focus:ring-[#8CC0EB] focus:border-[#8CC0EB]"
               >
                 <option value="Props">Props</option>
