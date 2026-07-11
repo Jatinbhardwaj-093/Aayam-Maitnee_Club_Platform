@@ -8,6 +8,13 @@ import SponsorDashboard from "./pages/SponsorDashboard";
 import ProductionGallery from "./pages/member/ProductionGallery";
 import ProductionOffice from "./pages/ProductionOffice";
 import BackstagePass from "./pages/BackstagePass";
+import MaintainerDashboard from "./pages/MaintainerDashboard";
+import PlatformAnalytics from "./pages/PlatformAnalytics";
+import ComplianceLedger from "./pages/ComplianceLedger";
+import ProductionControlPanel from "./pages/ProductionControlPanel";
+import MemberProfileAudit from "./pages/MemberProfileAudit";
+import MediaModeration from "./pages/MediaModeration";
+import EventsManagement from "./pages/EventsManagement";
 
 export default function App() {
   return (
@@ -22,6 +29,13 @@ export default function App() {
           <Route path="gallery" element={<ProductionGallery />} />
           <Route path="admin" element={<ProductionOffice />} />
           <Route path="backstage" element={<BackstagePass />} />
+          <Route path="maintainer" element={<MaintainerDashboard />} />
+          <Route path="analytics" element={<PlatformAnalytics />} />
+          <Route path="compliance" element={<ComplianceLedger />} />
+          <Route path="control-panel" element={<ProductionControlPanel />} />
+          <Route path="profile-audit" element={<MemberProfileAudit />} />
+          <Route path="media-moderation" element={<MediaModeration />} />
+          <Route path="events-admin" element={<EventsManagement />} />
         </Route>
       </Routes>
     </BrowserRouter>

@@ -14,6 +14,22 @@ export default {
         'card-surface': '#f7f3ee',
         highlight: '#8CC0EB',
 
+        // The Matinee Gallery / Stitch design system colors
+        'on-surface': '#1c1b19',
+        'on-surface-variant': '#49473d',
+        outline: '#7a776c',
+        'outline-variant': '#cac6b9',
+        error: '#ba1a1a',
+        'error-container': '#ffdad6',
+        'on-error-container': '#93000a',
+        'surface-container-lowest': '#ffffff',
+        'surface-container-low': '#f7f3ee',
+        'surface-container': '#f1ede9',
+        'surface-container-high': '#ece7e3',
+        'surface-container-highest': '#e6e2dd',
+        'primary-container': '#fff9d2',
+        'on-primary-container': '#767253',
+
         // Standard shadcn variables
         border: "var(--border)",
         input: "var(--input)",

@@ -1,21 +1,26 @@
 import React, { useState } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import Sidebar from "./Sidebar";
-import { 
-  Home, 
-  LayoutDashboard, 
-  Folder, 
-  Users, 
-  Image as ImageIcon, 
-  Coins, 
-  Menu, 
-  Bell, 
-  User, 
+import {
+  Home,
+  LayoutDashboard,
+  Folder,
+  Users,
+  Image as ImageIcon,
+  Coins,
+  Menu,
+  Bell,
+  User,
   ShieldCheck,
   ClipboardList,
   LogOut,
   Settings,
-  ShieldAlert
+  ShieldAlert,
+  LineChart,
+  Scale,
+  Sliders,
+  HardDrive,
+  Calendar
 } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
@@ -49,11 +54,22 @@ const navItems: NavItem[] = [
   { label: "Backstage Pass", path: "/backstage", icon: ClipboardList, description: "Tasks & check-ins" },
 ];
 
+const maintainerNavItems: NavItem[] = [
+  { label: "Maintainer Dashboard", path: "/maintainer", icon: LayoutDashboard, description: "System & Core Maintenance" },
+  { label: "Platform Analytics", path: "/analytics", icon: LineChart, description: "Forecasting & system health" },
+  { label: "Compliance Ledger", path: "/compliance", icon: Scale, description: "Financial audit & ledger" },
+  { label: "Production Control", path: "/control-panel", icon: Sliders, description: "Technical & access control panel" },
+  { label: "Profile Audit", path: "/profile-audit", icon: Users, description: "Member profile & audit trail" },
+  { label: "Media Moderation", path: "/media-moderation", icon: HardDrive, description: "Review gallery content & storage" },
+  { label: "Events Management", path: "/events-admin", icon: Calendar, description: "Proposal curation & concurrent lock editor" },
+];
+
 const personas = [
   { name: "Jayesh Dave", role: "Lead Actor & Member", initials: "JD", email: "jayesh.d@matinee.club" },
   { name: "Siddharth Verma", role: "Production Coordinator", initials: "SV", email: "siddharth.v@matinee.club" },
   { name: "Lakshya Hari", role: "Grand Patron & Sponsor", initials: "LH", email: "lakshya.h@matinee.club" },
   { name: "Sneha Vyas", role: "Director & Coordinator", initials: "SV", email: "sneha.v@matinee.club" },
+  { name: "Julian Devereux", role: "Core Maintainer", initials: "JD", email: "maintainer@matinee.club" },
 ];
 
 export default function AppLayout() {
@@ -82,16 +98,20 @@ export default function AppLayout() {
 
   const isLandingPage = location.pathname === "/";
 
-  const filteredNavItems = navItems.filter((item) => {
-    const isMember = activeUser?.role.toLowerCase().includes("member") || false;
-    if (isMember) {
-      // Display only Home, Member Dashboard, Auditions & Casting, and Gallery.
-      return ["/", "/member", "/auditions", "/gallery"].includes(item.path);
-    }
-    return true;
-  });
+  const filteredNavItems = activeUser?.role.toLowerCase().includes("maintainer")
+    ? maintainerNavItems
+    : navItems.filter((item) => {
+      const isMember = activeUser?.role.toLowerCase().includes("member") || false;
+      if (isMember) {
+        // Display only Home, Member Dashboard, Auditions & Casting, and Gallery.
+        return ["/", "/member", "/auditions", "/gallery"].includes(item.path);
+      }
+      return true;
+    });
 
-  const activeItem = navItems.find((item) => item.path === location.pathname) || navItems[0];
+  const activeItem = navItems.find((item) => item.path === location.pathname) ||
+    maintainerNavItems.find((item) => item.path === location.pathname) ||
+    navItems[0];
 
   const handleSwitchPersona = (personaName: string) => {
     const selected = personas.find(p => p.name === personaName);
@@ -118,6 +138,11 @@ export default function AppLayout() {
         setHeadshotName("lakshya_headshot.jpg");
         setResumeName("lakshya_resume.pdf");
         setRolePreference("Creative Designer");
+      } else if (personaName === "Julian Devereux") {
+        setEditNumber("+91 98765 88888");
+        setHeadshotName("julian_headshot.jpg");
+        setResumeName("julian_resume.pdf");
+        setRolePreference("Core Maintainer");
       } else {
         setEditNumber("+91 98765 33333");
         setHeadshotName("sneha_headshot.jpg");
@@ -156,13 +181,13 @@ export default function AppLayout() {
       {!isLandingPage && activeUser && (
         <aside className={`hidden md:block ${sidebarWidthClass} flex-shrink-0 transition-all duration-300`}>
           <div className={`fixed top-0 left-0 bottom-0 ${sidebarWidthClass} transition-all duration-300`}>
-            <Sidebar 
-              isCollapsed={isCollapsed} 
-              setIsCollapsed={setIsCollapsed} 
-              filteredNavItems={filteredNavItems} 
-              activeUser={activeUser} 
-              setProfileSettingsOpen={setProfileSettingsOpen} 
-              isMobile={false} 
+            <Sidebar
+              isCollapsed={isCollapsed}
+              setIsCollapsed={setIsCollapsed}
+              filteredNavItems={filteredNavItems}
+              activeUser={activeUser}
+              setProfileSettingsOpen={setProfileSettingsOpen}
+              isMobile={false}
             />
           </div>
         </aside>
@@ -180,14 +205,14 @@ export default function AppLayout() {
                   <Menu className="w-5 h-5" />
                 </SheetTrigger>
                 <SheetContent side="left" className="p-0 w-72 border-r-0">
-                  <Sidebar 
-                    isCollapsed={isCollapsed} 
-                    setIsCollapsed={setIsCollapsed} 
-                    filteredNavItems={filteredNavItems} 
-                    activeUser={activeUser} 
-                    setProfileSettingsOpen={setProfileSettingsOpen} 
-                    setMobileOpen={setMobileOpen} 
-                    isMobile={true} 
+                  <Sidebar
+                    isCollapsed={isCollapsed}
+                    setIsCollapsed={setIsCollapsed}
+                    filteredNavItems={filteredNavItems}
+                    activeUser={activeUser}
+                    setProfileSettingsOpen={setProfileSettingsOpen}
+                    setMobileOpen={setMobileOpen}
+                    isMobile={true}
                   />
                 </SheetContent>
               </Sheet>
@@ -258,15 +283,15 @@ export default function AppLayout() {
                     </div>
                     <DialogFooter className="sm:justify-between items-center gap-4">
                       <span className="text-[11px] text-[#466272]/60 italic">Authenticated via Aayam Hub</span>
-                       <Button onClick={() => setNotificationsOpen(false)} className="bg-[#8CC0EB] text-[#1c1b19] hover:bg-[#8CC0EB]/90 rounded-[8px]">
+                      <Button onClick={() => setNotificationsOpen(false)} className="bg-[#8CC0EB] text-[#1c1b19] hover:bg-[#8CC0EB]/90 rounded-[8px]">
                         Dismiss
                       </Button>
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
-                
+
                 {isLandingPage && (
-                  <button 
+                  <button
                     onClick={() => setProfileSettingsOpen(true)}
                     className="w-9 h-9 rounded-full bg-[#635f41]/10 border border-[#e6e2dd] flex items-center justify-center text-[#635f41] font-bold text-sm hover:bg-[#635f41]/15 transition-all"
                     title="User Profile Settings"
@@ -298,11 +323,10 @@ export default function AppLayout() {
                       <button
                         key={p.name}
                         onClick={() => handleSwitchPersona(p.name)}
-                        className={`w-full p-3 rounded-[8px] border text-left flex items-center justify-between hover:bg-[#e6e2dd]/40 transition-all ${
-                          activeUser && activeUser.name === p.name 
-                            ? "border-[#8CC0EB] bg-white font-bold text-[#635f41]" 
-                            : "border-[#e6e2dd] bg-[#f7f3ee]/40 text-[#466272]"
-                        }`}
+                        className={`w-full p-3 rounded-[8px] border text-left flex items-center justify-between hover:bg-[#e6e2dd]/40 transition-all ${activeUser && activeUser.name === p.name
+                          ? "border-[#8CC0EB] bg-white font-bold text-[#635f41]"
+                          : "border-[#e6e2dd] bg-[#f7f3ee]/40 text-[#466272]"
+                          }`}
                       >
                         <div>
                           <p className="text-sm font-semibold">{p.name}</p>
@@ -353,8 +377,8 @@ export default function AppLayout() {
 
                     <div className="space-y-1">
                       <label className="text-xs font-semibold text-[#635f41]">Display Name</label>
-                      <Input 
-                        placeholder="e.g., Jayesh Dave" 
+                      <Input
+                        placeholder="e.g., Jayesh Dave"
                         value={editName}
                         onChange={(e) => setEditName(e.target.value)}
                         className="border-[#e6e2dd] focus-visible:ring-[#8CC0EB] text-sm h-10 bg-white"
@@ -364,8 +388,8 @@ export default function AppLayout() {
 
                     <div className="space-y-1">
                       <label className="text-xs font-semibold text-[#635f41]">Phone Number</label>
-                      <Input 
-                        placeholder="e.g., +91 98765 43210" 
+                      <Input
+                        placeholder="e.g., +91 98765 43210"
                         value={editNumber}
                         onChange={(e) => setEditNumber(e.target.value)}
                         className="border-[#e6e2dd] focus-visible:ring-[#8CC0EB] text-sm h-10 bg-white"
@@ -375,9 +399,9 @@ export default function AppLayout() {
 
                     <div className="space-y-1">
                       <label className="text-xs font-semibold text-[#635f41]">Email Address</label>
-                      <Input 
+                      <Input
                         type="email"
-                        placeholder="e.g., jayesh.d@matinee.club" 
+                        placeholder="e.g., jayesh.d@matinee.club"
                         value={editEmail}
                         onChange={(e) => setEditEmail(e.target.value)}
                         className="border-[#e6e2dd] focus-visible:ring-[#8CC0EB] text-sm h-10 bg-white"
@@ -394,15 +418,15 @@ export default function AppLayout() {
                         </div>
                         <label className="bg-[#8CC0EB] text-[#1c1b19] hover:bg-[#8CC0EB]/90 cursor-pointer rounded-[4px] px-2.5 py-1 text-[10px] font-semibold transition-all">
                           Upload File
-                          <input 
-                            type="file" 
-                            accept="image/*" 
-                            className="hidden" 
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
                             onChange={(e) => {
                               if (e.target.files && e.target.files[0]) {
                                 setHeadshotName(e.target.files[0].name);
                               }
-                            }} 
+                            }}
                           />
                         </label>
                       </div>
@@ -414,15 +438,15 @@ export default function AppLayout() {
                         </div>
                         <label className="bg-[#8CC0EB] text-[#1c1b19] hover:bg-[#8CC0EB]/90 cursor-pointer rounded-[4px] px-2.5 py-1 text-[10px] font-semibold transition-all">
                           Upload File
-                          <input 
-                            type="file" 
-                            accept=".pdf" 
-                            className="hidden" 
+                          <input
+                            type="file"
+                            accept=".pdf"
+                            className="hidden"
                             onChange={(e) => {
                               if (e.target.files && e.target.files[0]) {
                                 setResumeName(e.target.files[0].name);
                               }
-                            }} 
+                            }}
                           />
                         </label>
                       </div>
@@ -440,6 +464,7 @@ export default function AppLayout() {
                             <SelectItem value="Technical Crew" className="hover:bg-[#8CC0EB]/10 rounded-md py-1.5 px-3 cursor-pointer">Technical Crew</SelectItem>
                             <SelectItem value="Creative Designer" className="hover:bg-[#8CC0EB]/10 rounded-md py-1.5 px-3 cursor-pointer">Creative Designer</SelectItem>
                             <SelectItem value="Director" className="hover:bg-[#8CC0EB]/10 rounded-md py-1.5 px-3 cursor-pointer">Director</SelectItem>
+                            <SelectItem value="Core Maintainer" className="hover:bg-[#8CC0EB]/10 rounded-md py-1.5 px-3 cursor-pointer">Core Maintainer</SelectItem>
                           </SelectGroup>
                         </SelectContent>
                       </Select>
@@ -448,9 +473,9 @@ export default function AppLayout() {
                 </div>
 
                 <div className="mt-8 pt-4 border-t border-[#e6e2dd] flex flex-col sm:flex-row gap-2">
-                  <Button 
-                    type="button" 
-                    variant="outline" 
+                  <Button
+                    type="button"
+                    variant="outline"
                     onClick={handleLogOut}
                     className="border-2 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 rounded-[8px] flex-1"
                   >
@@ -478,8 +503,8 @@ export default function AppLayout() {
                   Your current role (<strong className="text-[#635f41]">{activeUser.role}</strong>) does not have authorization to access this operational area.
                 </p>
               </div>
-              <Link 
-                to="/member" 
+              <Link
+                to="/member"
                 className="bg-[#8CC0EB] hover:bg-[#8CC0EB]/90 text-[#1c1b19] font-semibold text-xs rounded-[8px] py-2.5 px-6 shadow-sm transition-all active:scale-95 flex items-center gap-2"
               >
                 Return to Dashboard
