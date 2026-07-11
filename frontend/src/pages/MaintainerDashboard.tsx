@@ -1,8 +1,5 @@
 import { useState } from "react";
 import {
-    Search,
-    MoreVertical,
-    Plus,
     TrendingUp,
     ArrowRight,
     Shirt,
@@ -11,15 +8,13 @@ import {
     Volume2,
     Calendar,
     Settings,
-    Trash2,
-    CheckCircle2,
-    XCircle,
-    Edit
+    Edit,
+    Clock,
+    Zap,
+    Activity
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import {
     Dialog,
     DialogContent,
@@ -29,17 +24,6 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@/components/ui/dialog";
-
-interface RosterMember {
-    id: string;
-    name: string;
-    email: string;
-    role: string;
-    roleBg: string;
-    roleText: string;
-    availability: string;
-    isAvailable: boolean;
-}
 
 interface RoomBooking {
     id: string;
@@ -51,49 +35,6 @@ interface RoomBooking {
 }
 
 export default function MaintainerDashboard() {
-    // Members State
-    const [roster, setRoster] = useState<RosterMember[]>([
-        {
-            id: "EW",
-            name: "Elena Wells",
-            email: "elena.w@stagedoor.art",
-            role: "Lead Actress",
-            roleBg: "bg-[#BFDDF0]",
-            roleText: "text-[#2e4a5a]",
-            availability: "Full-time",
-            isAvailable: true,
-        },
-        {
-            id: "MK",
-            name: "Marcus Kane",
-            email: "m.kane@stagedoor.art",
-            role: "Stage Manager",
-            roleBg: "bg-[#FFEBCC]",
-            roleText: "text-[#4a482c]",
-            availability: "Rehearsals Only",
-            isAvailable: true,
-        },
-        {
-            id: "SC",
-            name: "Sofia Chen",
-            email: "s.chen@stagedoor.art",
-            role: "Set Designer",
-            roleBg: "bg-[#BFDDF0]",
-            roleText: "text-[#2e4a5a]",
-            availability: "On-call",
-            isAvailable: false,
-        },
-    ]);
-
-    const [searchTerm, setSearchTerm] = useState("");
-    const [memberDialogOpen, setMemberDialogOpen] = useState(false);
-
-    // New Member Form States
-    const [newMemberName, setNewMemberName] = useState("");
-    const [newMemberEmail, setNewMemberEmail] = useState("");
-    const [newMemberRole, setNewMemberRole] = useState("Lead Actress");
-    const [newMemberAvailability, setNewMemberAvailability] = useState("Full-time");
-
     // Bookings State
     const [bookings, setBookings] = useState<RoomBooking[]>([
         {
@@ -134,39 +75,6 @@ export default function MaintainerDashboard() {
     const [playbillSold, setPlaybillSold] = useState(18);
     const [corporatePatrons, setCorporatePatrons] = useState(12);
 
-    // Form Submit Handlers
-    const handleAddMember = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!newMemberName || !newMemberEmail) return;
-
-        const initials = newMemberName
-            .split(" ")
-            .map((n) => n[0])
-            .join("")
-            .toUpperCase()
-            .slice(0, 2);
-
-        const isLead = newMemberRole.toLowerCase().includes("act") || newMemberRole.toLowerCase().includes("lead");
-        const roleBg = isLead ? "bg-[#BFDDF0]" : "bg-[#FFEBCC]";
-        const roleText = isLead ? "text-[#2e4a5a]" : "text-[#4a482c]";
-
-        const newMember: RosterMember = {
-            id: initials || "NM",
-            name: newMemberName,
-            email: newMemberEmail,
-            role: newMemberRole,
-            roleBg,
-            roleText,
-            availability: newMemberAvailability,
-            isAvailable: true,
-        };
-
-        setRoster([...roster, newMember]);
-        setNewMemberName("");
-        setNewMemberEmail("");
-        setMemberDialogOpen(false);
-    };
-
     const handleAddBooking = (e: React.FormEvent) => {
         e.preventDefault();
         if (!newBookingTitle || !newBookingDetails) return;
@@ -186,22 +94,6 @@ export default function MaintainerDashboard() {
         setBookingDialogOpen(false);
     };
 
-    const toggleMemberAvailability = (memberId: string) => {
-        setRoster(
-            roster.map((m) => (m.id === memberId ? { ...m, isAvailable: !m.isAvailable } : m))
-        );
-    };
-
-    const deleteMember = (memberId: string) => {
-        setRoster(roster.filter((m) => m.id !== memberId));
-    };
-
-    const filteredRoster = roster.filter(
-        (m) =>
-            m.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            m.role.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
     return (
         <div className="space-y-8 font-sans text-[#466272] max-w-[1280px] mx-auto min-h-screen">
             {/* Header Section */}
@@ -215,191 +107,83 @@ export default function MaintainerDashboard() {
             {/* Bento Grid Layout */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-                {/* Member Database - 8 Columns */}
+                {/* Operational Insights - 8 Columns */}
                 <div className="lg:col-span-8 bg-white rounded-xl border border-[#cac6b9] p-6 shadow-[0_8px_32px_rgba(140,192,235,0.08)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                    <div className="flex items-center justify-between mb-6">
                         <div>
-                            <h3 className="text-[28px] font-semibold font-serif text-[#635f41]">Member Database</h3>
-                            <p className="text-xs uppercase tracking-wider text-[#49473d]/70 font-semibold mt-0.5">Active cast and crew directory</p>
-                        </div>
-
-                        <div className="flex items-center gap-3">
-                            <div className="relative w-full sm:w-48">
-                                <Search className="absolute left-3 top-2.5 h-4 w-4 text-[#466272]/50" />
-                                <Input
-                                    placeholder="Search members..."
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="pl-9 bg-[#F8F9FA] border-0 border-b-2 border-[#E1E2E6] focus-visible:ring-0 focus-visible:border-[#8CC0EB] rounded-none h-9 text-xs transition-colors"
-                                />
-                            </div>
-
-                            <Dialog open={memberDialogOpen} onOpenChange={setMemberDialogOpen}>
-                                <DialogTrigger render={
-                                    <Button className="bg-[#8CC0EB] text-[#001e2c] hover:bg-[#8CC0EB]/90 font-bold rounded-lg text-xs py-2 px-3 flex items-center gap-1" />
-                                }>
-                                    <Plus className="w-3.5 h-3.5" /> Add Member
-                                </DialogTrigger>
-                                <DialogContent className="bg-[#fdf9f4] border border-[#cac6b9] text-[#466272]">
-                                    <form onSubmit={handleAddMember}>
-                                        <DialogHeader className="space-y-2">
-                                            <DialogTitle className="font-serif text-[#635f41] text-lg">Add Roster Member</DialogTitle>
-                                            <DialogDescription className="text-[#466272]/85 text-xs">
-                                                Add a new cast or crew member to the active StageDoor roster.
-                                            </DialogDescription>
-                                        </DialogHeader>
-                                        <div className="py-4 space-y-4">
-                                            <div className="space-y-1">
-                                                <label className="text-xs font-semibold text-[#635f41]">Full Name</label>
-                                                <Input
-                                                    placeholder="e.g. Elena Wells"
-                                                    value={newMemberName}
-                                                    onChange={(e) => setNewMemberName(e.target.value)}
-                                                    className="bg-[#F8F9FA] border-0 border-b-2 border-[#E1E2E6] focus-visible:ring-0 focus-visible:border-[#8CC0EB] rounded-none"
-                                                    required
-                                                />
-                                            </div>
-                                            <div className="space-y-1">
-                                                <label className="text-xs font-semibold text-[#635f41]">Email Address</label>
-                                                <Input
-                                                    type="email"
-                                                    placeholder="elena.w@stagedoor.art"
-                                                    value={newMemberEmail}
-                                                    onChange={(e) => setNewMemberEmail(e.target.value)}
-                                                    className="bg-[#F8F9FA] border-0 border-b-2 border-[#E1E2E6] focus-visible:ring-0 focus-visible:border-[#8CC0EB] rounded-none"
-                                                    required
-                                                />
-                                            </div>
-                                            <div className="grid grid-cols-2 gap-4">
-                                                <div className="space-y-1">
-                                                    <label className="text-xs font-semibold text-[#635f41]">Designation/Role</label>
-                                                    <select
-                                                        value={newMemberRole}
-                                                        onChange={(e) => setNewMemberRole(e.target.value)}
-                                                        className="w-full bg-[#F8F9FA] border-0 border-b-2 border-[#E1E2E6] focus:ring-0 focus:border-[#8CC0EB] h-9 text-xs"
-                                                    >
-                                                        <option value="Lead Actress">Lead Actress</option>
-                                                        <option value="Lead Actor">Lead Actor</option>
-                                                        <option value="Stage Manager">Stage Manager</option>
-                                                        <option value="Set Designer">Set Designer</option>
-                                                        <option value="Lighting Tech">Lighting Tech</option>
-                                                        <option value="Sound Engineer">Sound Engineer</option>
-                                                    </select>
-                                                </div>
-                                                <div className="space-y-1">
-                                                    <label className="text-xs font-semibold text-[#635f41]">Availability</label>
-                                                    <select
-                                                        value={newMemberAvailability}
-                                                        onChange={(e) => setNewMemberAvailability(e.target.value)}
-                                                        className="w-full bg-[#F8F9FA] border-0 border-b-2 border-[#E1E2E6] focus:ring-0 focus:border-[#8CC0EB] h-9 text-xs"
-                                                    >
-                                                        <option value="Full-time">Full-time</option>
-                                                        <option value="Rehearsals Only">Rehearsals Only</option>
-                                                        <option value="On-call">On-call</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <DialogFooter>
-                                            <Button type="button" variant="outline" onClick={() => setMemberDialogOpen(false)} className="border-2 border-[#8CC0EB] text-[#8CC0EB] hover:bg-[#8CC0EB]/5 rounded-lg text-xs">
-                                                Cancel
-                                            </Button>
-                                            <Button type="submit" className="bg-[#8CC0EB] text-[#001e2c] hover:bg-[#8CC0EB]/90 rounded-lg text-xs font-bold">
-                                                Add to Directory
-                                            </Button>
-                                        </DialogFooter>
-                                    </form>
-                                </DialogContent>
-                            </Dialog>
+                            <h3 className="text-[28px] font-semibold font-serif text-[#635f41]">Operational Efficiency</h3>
+                            <p className="text-xs uppercase tracking-wider text-[#49473d]/70 font-semibold mt-0.5 font-sans">Performance metrics for the current season</p>
                         </div>
                     </div>
 
-                    <div className="overflow-x-auto">
-                        <Table>
-                            <TableHeader>
-                                <TableRow className="border-b border-[#cac6b9] hover:bg-transparent">
-                                    <TableHead className="pb-4 font-semibold text-xs tracking-wider text-[#49473d]/60 uppercase">Member</TableHead>
-                                    <TableHead className="pb-4 font-semibold text-xs tracking-wider text-[#49473d]/60 uppercase">Role</TableHead>
-                                    <TableHead className="pb-4 font-semibold text-xs tracking-wider text-[#49473d]/60 uppercase">Availability</TableHead>
-                                    <TableHead className="pb-4 font-semibold text-xs tracking-wider text-[#49473d]/60 uppercase text-center">Status</TableHead>
-                                    <TableHead className="pb-4 font-semibold text-xs tracking-wider text-[#49473d]/60 uppercase text-right">Actions</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody className="divide-y divide-[#cac6b9]/30">
-                                {filteredRoster.map((member) => (
-                                    <TableRow key={member.id} className="hover:bg-[#f7f3ee]/35 border-0">
-                                        <TableCell className="py-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-full bg-[#FFF9D2] border border-[#cac6b9] flex items-center justify-center text-xs font-bold text-[#635f41] flex-shrink-0">
-                                                    {member.id}
-                                                </div>
-                                                <div>
-                                                    <div className="font-bold text-[#1c1b19]">{member.name}</div>
-                                                    <div className="text-xs text-[#49473d] opacity-80">{member.email}</div>
-                                                </div>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell className="py-4">
-                                            <Badge className={`px-3 py-0.5 ${member.roleBg} ${member.roleText} rounded-full text-[10px] font-bold uppercase border-0 shadow-none`}>
-                                                {member.role}
-                                            </Badge>
-                                        </TableCell>
-                                        <TableCell className="py-4">
-                                            <div className="flex items-center gap-1.5 text-xs text-[#466272]">
-                                                <span className="w-2 h-2 rounded-full bg-[#635f41]"></span> {member.availability}
-                                            </div>
-                                        </TableCell>
-                                        <TableCell className="py-4 text-center">
-                                            <button
-                                                onClick={() => toggleMemberAvailability(member.id)}
-                                                className={`inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full border transition-colors ${member.isAvailable
-                                                    ? "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100"
-                                                    : "bg-red-50 text-red-700 border-red-200 hover:bg-red-100"
-                                                    }`}
-                                                title="Click to toggle availability"
-                                            >
-                                                {member.isAvailable ? (
-                                                    <>
-                                                        <CheckCircle2 className="w-3 h-3" /> Available
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <XCircle className="w-3 h-3" /> Checked Out
-                                                    </>
-                                                )}
-                                            </button>
-                                        </TableCell>
-                                        <TableCell className="py-4 text-right">
-                                            <div className="flex items-center justify-end gap-1.5">
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    onClick={() => deleteMember(member.id)}
-                                                    className="h-8 w-8 hover:bg-[#ffdad6] hover:text-[#ba1a1a] text-[#49473d]/70 rounded-full"
-                                                    title="Delete Member"
-                                                >
-                                                    <Trash2 className="w-3.5 h-3.5" />
-                                                </Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="h-8 w-8 text-[#49473d] hover:bg-[#f7f3ee] rounded-full"
-                                                >
-                                                    <MoreVertical className="w-3.5 h-3.5" />
-                                                </Button>
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                                {filteredRoster.length === 0 && (
-                                    <TableRow>
-                                        <TableCell colSpan={5} className="text-center py-6 text-xs text-[#49473d]/60">
-                                            No members matched "{searchTerm}"
-                                        </TableCell>
-                                    </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
+                    {/* Stat Cards Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                        <div className="p-4 bg-[#f7f3ee] rounded-lg border border-[#cac6b9]/30">
+                            <p className="text-[11px] text-[#49473d]/70 uppercase tracking-wider font-bold mb-1 font-sans">Venue Utilization</p>
+                            <div className="flex items-center justify-between">
+                                <span className="text-lg font-bold text-[#1c1b19] font-sans">84%</span>
+                                <span className="text-[#635f41] text-xs font-bold font-sans">+5%</span>
+                            </div>
+                        </div>
+                        <div className="p-4 bg-[#f7f3ee] rounded-lg border border-[#cac6b9]/30">
+                            <p className="text-[11px] text-[#49473d]/70 uppercase tracking-wider font-bold mb-1 font-sans">Resource Turnover</p>
+                            <div className="flex items-center justify-between">
+                                <span className="text-lg font-bold text-[#1c1b19] font-sans">12.4 days</span>
+                                <Clock className="text-[#466272] w-4 h-4" />
+                            </div>
+                        </div>
+                        <div className="p-4 bg-[#f7f3ee] rounded-lg border border-[#cac6b9]/30">
+                            <p className="text-[11px] text-[#49473d]/70 uppercase tracking-wider font-bold mb-1 font-sans">Tech Support SLA</p>
+                            <div className="flex items-center justify-between">
+                                <span className="text-lg font-bold text-[#1c1b19] font-sans">18 mins</span>
+                                <Zap className="text-[#635f41] w-4 h-4" />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Facility Health Index */}
+                    <div>
+                        <h4 className="font-bold text-[#1c1b19] text-xs uppercase tracking-wider text-[#49473d]/70 mb-4 flex items-center gap-2 font-sans">
+                            <Activity className="w-4 h-4 text-[#635f41]" /> Facility Health Index
+                        </h4>
+                        <div className="space-y-4">
+                            <div className="space-y-1">
+                                <div className="flex justify-between text-xs font-bold text-[#49473d] font-sans">
+                                    <span>Stage Lighting</span>
+                                    <span>98%</span>
+                                </div>
+                                <div className="w-full bg-[#e6e2dd] h-1.5 rounded-full overflow-hidden">
+                                    <div className="bg-[#635f41] h-full" style={{ width: "98%" }}></div>
+                                </div>
+                            </div>
+                            <div className="space-y-1">
+                                <div className="flex justify-between text-xs font-bold text-[#49473d] font-sans">
+                                    <span>Audio Rig</span>
+                                    <span>92%</span>
+                                </div>
+                                <div className="w-full bg-[#e6e2dd] h-1.5 rounded-full overflow-hidden">
+                                    <div className="bg-[#8CC0EB] h-full" style={{ width: "92%" }}></div>
+                                </div>
+                            </div>
+                            <div className="space-y-1">
+                                <div className="flex justify-between text-xs font-bold text-[#49473d] font-sans">
+                                    <span>Backstage HVAC</span>
+                                    <span>85%</span>
+                                </div>
+                                <div className="w-full bg-[#e6e2dd] h-1.5 rounded-full overflow-hidden">
+                                    <div className="bg-[#635f41] h-full" style={{ width: "85%" }}></div>
+                                </div>
+                            </div>
+                            <div className="space-y-1">
+                                <div className="flex justify-between text-xs font-bold text-[#49473d] font-sans">
+                                    <span>Rigging Safety</span>
+                                    <span>100%</span>
+                                </div>
+                                <div className="w-full bg-[#e6e2dd] h-1.5 rounded-full overflow-hidden">
+                                    <div className="bg-[#8CC0EB] h-full" style={{ width: "100%" }}></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
