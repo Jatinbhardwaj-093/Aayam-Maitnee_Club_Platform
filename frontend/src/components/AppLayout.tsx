@@ -59,9 +59,9 @@ const maintainerNavItems: NavItem[] = [
   { label: "Platform Analytics", path: "/analytics", icon: LineChart, description: "Forecasting & system health" },
   { label: "Compliance Ledger", path: "/compliance", icon: Scale, description: "Financial audit & ledger" },
   { label: "Production Control", path: "/control-panel", icon: Sliders, description: "Technical & access control panel" },
-  { label: "Profile Audit", path: "/profile-audit", icon: Users, description: "Member profile & audit trail" },
   { label: "Media Moderation", path: "/media-moderation", icon: HardDrive, description: "Review gallery content & storage" },
   { label: "Events Management", path: "/events-admin", icon: Calendar, description: "Proposal curation & concurrent lock editor" },
+  { label: "Members Directory", path: "/directory", icon: Users, description: "Ensemble & crew directory" },
 ];
 
 const personas = [

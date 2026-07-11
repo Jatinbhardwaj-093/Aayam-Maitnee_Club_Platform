@@ -76,13 +76,16 @@ body {
   width: 6px;
   height: 6px;
 }
+
 ::-webkit-scrollbar-track {
   background: transparent;
 }
+
 ::-webkit-scrollbar-thumb {
   background: #cac6b9;
   border-radius: 10px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: #635f41;
 }
@@ -98,20 +101,24 @@ h1 {
   font-size: 56px;
   letter-spacing: -1.68px;
   margin: 32px 0;
+
   @media (max-width: 1024px) {
     font-size: 36px;
     margin: 20px 0;
   }
 }
+
 h2 {
   font-size: 24px;
   line-height: 118%;
   letter-spacing: -0.24px;
   margin: 0 0 8px;
+
   @media (max-width: 1024px) {
     font-size: 20px;
   }
 }
+
 p {
   margin: 0;
 }
@@ -136,6 +143,7 @@ code {
     --font-heading: 'Playfair Display', serif;
     --font-sans: 'Source Sans 3', sans-serif;
   }
+
   :root {
     --background: oklch(1 0 0);
     --foreground: oklch(0.145 0 0);
@@ -170,6 +178,7 @@ code {
     --sidebar-border: oklch(0.922 0 0);
     --sidebar-ring: oklch(0.708 0 0);
   }
+
   .dark {
     --background: oklch(0.145 0 0);
     --foreground: oklch(0.985 0 0);
@@ -203,12 +212,15 @@ code {
     --sidebar-border: oklch(1 0 0 / 10%);
     --sidebar-ring: oklch(0.556 0 0);
   }
+
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
+
   html {
     @apply font-sans;
   }
@@ -460,5 +472,145 @@ code {
 .compliance-ledger select option,
 .production-control select option {
   background-color: #ffffff !important;
+  color: #1c1b19 !important;
+}
+
+/* Members Directory scoped styles */
+.members-directory {
+  background-color: #fdf9f4 !important;
+}
+
+.members-directory .font-headline-lg {
+  font-family: 'Playfair Display', Georgia, serif !important;
+}
+
+.members-directory .text-headline-lg {
+  font-size: 40px !important;
+  line-height: 48px !important;
+  font-weight: 600 !important;
+}
+
+.members-directory .font-body-lg {
+  font-family: 'Source Sans 3', sans-serif !important;
+}
+
+.members-directory .text-body-lg {
+  font-size: 18px !important;
+  line-height: 28px !important;
+  font-weight: 400 !important;
+}
+
+.members-directory .font-display-lg {
+  font-family: 'Playfair Display', Georgia, serif !important;
+}
+
+.members-directory .text-display-lg {
+  font-size: 56px !important;
+  line-height: 64px !important;
+  letter-spacing: -0.02em !important;
+  font-weight: 700 !important;
+}
+
+.members-directory .font-label-md {
+  font-family: 'Source Sans 3', sans-serif !important;
+}
+
+.members-directory .text-label-md {
+  font-size: 14px !important;
+  line-height: 20px !important;
+  letter-spacing: 0.05em !important;
+  font-weight: 600 !important;
+}
+
+.members-directory .font-body-md {
+  font-family: 'Source Sans 3', sans-serif !important;
+}
+
+.members-directory .text-body-md {
+  font-size: 16px !important;
+  line-height: 24px !important;
+  font-weight: 400 !important;
+}
+
+.members-directory .font-body-sm {
+  font-family: 'Source Sans 3', sans-serif !important;
+}
+
+.members-directory .text-body-sm {
+  font-size: 14px !important;
+  line-height: 20px !important;
+  font-weight: 400 !important;
+}
+
+.members-directory .text-headline-md {
+  font-size: 28px !important;
+  line-height: 36px !important;
+  font-weight: 600 !important;
+}
+
+.members-directory .font-headline-md {
+  font-family: 'Playfair Display', Georgia, serif !important;
+}
+
+/* Material Symbols alignment inside members directory */
+.members-directory .material-symbols-outlined {
+  font-family: 'Material Symbols Outlined' !important;
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+}
+
+.members-directory .glass-panel {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* Rounded Corner Overrides mimicking mockup's Tailwind custom config */
+.members-directory .rounded-xl {
+  border-radius: 0.5rem !important;
+  /* 8px */
+}
+
+.members-directory .rounded-full {
+  border-radius: 0.75rem !important;
+  /* 12px */
+}
+
+.members-directory .rounded-2xl {
+  border-radius: 1rem !important;
+  /* 16px */
+}
+
+/* Members Directory Text Color Overrides */
+.members-directory .text-secondary {
+  color: #466272 !important;
+}
+
+.members-directory .text-tertiary {
+  color: #496365 !important;
+}
+
+.members-directory .text-primary {
+  color: #635f41 !important;
+}
+
+.members-directory .text-on-surface-variant {
+  color: #49473d !important;
+}
+
+.members-directory .text-on-surface {
+  color: #1c1b19 !important;
+}
+
+.members-directory .text-on-background {
   color: #1c1b19 !important;
 }
