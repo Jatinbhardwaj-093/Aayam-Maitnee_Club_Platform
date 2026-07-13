@@ -110,7 +110,7 @@ export default function AppLayout() {
   const handleLoginSubmit = async (email: string) => {
     setLoginError(null);
     try {
-      const response = await fetch("http://localhost:5001/api/login", {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5001"}/api/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
