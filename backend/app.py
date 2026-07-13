@@ -92,6 +92,7 @@ def join_club():
         availability=data['availability'],
         bio=data['bio'],
         portfolio=portfolio,
+        interest=data['interest'],
         status='Pending',
         emergency_name=data['emergencyName'],
         emergency_phone=data['emergencyPhone']
@@ -255,4 +256,4 @@ def logout():
     })
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5001, debug=True)

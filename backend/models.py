@@ -32,6 +32,9 @@ class User(db.Model):
     portfolio = db.Column(db.String(200), nullable=True)
     emergency_name = db.Column(db.String(100), nullable=True)
     emergency_phone = db.Column(db.String(20), nullable=True)
+    state = db.Column(db.String(100), nullable=True)
+    country = db.Column(db.String(100), nullable=True)
+    interest = db.Column(db.String(100), nullable=True)
 
     roles = db.relationship("Role", secondary=user_roles, back_populates="users")
     membership = db.relationship("Membership", back_populates="user", uselist=False, cascade="all, delete-orphan")
@@ -50,6 +53,8 @@ class User(db.Model):
             'age': self.age,
             'address': self.address,
             'city': self.city,
+            'state': self.state,
+            'country': self.country,
             'phone': self.phone,
             'level': self.level,
             'area_of_interest': self.area_of_interest,
@@ -58,6 +63,7 @@ class User(db.Model):
             'availability': self.availability,
             'bio': self.bio,
             'portfolio': self.portfolio,
+            'interest': self.interest,
             'emergency_name': self.emergency_name,
             'emergency_phone': self.emergency_phone,
             'roles': [r.name for r in self.roles]
