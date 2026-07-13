@@ -34,9 +34,23 @@ except Exception as e:
 local_cache = {}
 local_sessions = {}
 
+def ensure_user_columns():
+    with db.engine.begin() as conn:
+        existing_columns = {
+            row[1] for row in conn.exec_driver_sql('PRAGMA table_info("user")').fetchall()
+        }
+
+        if 'state' not in existing_columns:
+            conn.exec_driver_sql('ALTER TABLE "user" ADD COLUMN state VARCHAR(100)')
+        if 'country' not in existing_columns:
+            conn.exec_driver_sql('ALTER TABLE "user" ADD COLUMN country VARCHAR(100)')
+        if 'interest' not in existing_columns:
+            conn.exec_driver_sql('ALTER TABLE "user" ADD COLUMN interest VARCHAR(100)')
+
 # Ensure tables exist
 with app.app_context():
     db.create_all()
+    ensure_user_columns()
 
 @app.route('/api/health', methods=['GET'])
 def health():
