@@ -38,7 +38,7 @@ Ensure Redis is active locally (default `redis://localhost:6379`). Start the Fla
 python app.py
 ```
 
-The server will initialize SQLite database tables and start listening on [http://localhost:5000](http://localhost:5000).
+The server will initialize SQLite database tables and start listening on [http://localhost:5001](http://localhost:5001).
 
 > [!NOTE]
 > If Redis is not running, the application logs a warning and gracefully transitions to process memory cache and session mapping.

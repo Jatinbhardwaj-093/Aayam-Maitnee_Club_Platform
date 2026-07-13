@@ -30,7 +30,7 @@ export default function Landing() {
             </p>
             <div className="flex flex-wrap gap-4">
               <Link 
-                to="/member" 
+                to="/join" 
                 className="bg-[#635f41] text-white px-8 py-4 rounded-full text-xs font-bold uppercase tracking-wider shadow-md hover:bg-[#635f41]/90 active:scale-95 transition-all duration-300 flex items-center gap-2"
               >
                 Join Aayam <ArrowRight className="w-4 h-4" />
@@ -185,9 +185,9 @@ export default function Landing() {
             Step under the spotlight. Become a member of the region's premier theatrical group and support high-contrast stagecraft.
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center relative z-10">
-            <button className="bg-[#635f41] text-white px-10 py-5 rounded-full text-xs font-bold uppercase tracking-wider shadow-md hover:scale-105 transition-all duration-300">
+            <Link to="/join" className="bg-[#635f41] text-white px-10 py-5 rounded-full text-xs font-bold uppercase tracking-wider shadow-md hover:scale-105 transition-all duration-300 inline-block">
               Join the Ensemble
-            </button>
+            </Link>
           </div>
         </div>
       </section>
