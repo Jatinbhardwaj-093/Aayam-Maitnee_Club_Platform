@@ -119,8 +119,9 @@ export default function AppLayout() {
       });
 
       if (!response.ok) {
-        const errData = await response.json();
-        throw new Error(errData.error || "Login request failed");
+        const errData = await response.json().catch(() => ({}));
+        setLoginError(errData.error || "Login request failed");
+        return;
       }
 
       const data = await response.json();
@@ -159,57 +160,12 @@ export default function AppLayout() {
           navigate("/member");
         }
       } else {
-        throw new Error("Invalid response from login endpoint");
+        setLoginError("Invalid response from login endpoint");
+        return;
       }
     } catch (err: any) {
-      console.warn("Using local fallback credentials because backend login failed:", err);
-      let user: any = null;
-      const lowerEmail = email.toLowerCase();
-      
-      if (lowerEmail.includes("maintainer") || lowerEmail.includes("admin")) {
-        user = { name: "Julian Devereux", role: "Core Maintainer", initials: "JD", email: email };
-      } else if (lowerEmail.includes("sponsor") || lowerEmail.includes("patron")) {
-        user = { name: "Lakshya Hari", role: "Grand Patron & Sponsor", initials: "LH", email: email };
-      } else if (lowerEmail.includes("director")) {
-        user = { name: "Sneha Vyas", role: "Director & Coordinator", initials: "SV", email: email };
-      } else if (lowerEmail.includes("coordinator")) {
-        user = { name: "Siddharth Verma", role: "Production Coordinator", initials: "SV", email: email };
-      } else {
-        user = { name: "Jayesh Dave", role: "Lead Actor & Member", initials: "JD", email: email };
-      }
-      
-      setActiveUser(user);
-      setEditName(user.name);
-      setEditRole(user.role);
-      setEditEmail(user.email);
-      setPortalOpen(false);
-      
-      // Sync mocked user states & redirect
-      if (user.role.includes("Maintainer")) {
-        setEditNumber("+91 98765 88888");
-        setHeadshotName("julian_headshot.jpg");
-        setResumeName("julian_resume.pdf");
-        setRolePreference("Core Maintainer");
-        navigate("/maintainer");
-      } else if (user.role.includes("Sponsor")) {
-        setEditNumber("+91 98765 99999");
-        setHeadshotName("lakshya_headshot.jpg");
-        setResumeName("lakshya_resume.pdf");
-        setRolePreference("Creative Designer");
-        navigate("/member");
-      } else if (user.name === "Sneha Vyas") {
-        setEditNumber("+91 98765 33333");
-        setHeadshotName("sneha_headshot.jpg");
-        setResumeName("sneha_resume.pdf");
-        setRolePreference("Director");
-        navigate("/member");
-      } else {
-        setEditNumber("+91 98765 43210");
-        setHeadshotName("jayesh_headshot.jpg");
-        setResumeName("jayesh_resume.pdf");
-        setRolePreference("Performer");
-        navigate("/member");
-      }
+      console.warn("Backend login failed:", err);
+      setLoginError("Unable to login right now. Please try again.");
     }
   };
 
