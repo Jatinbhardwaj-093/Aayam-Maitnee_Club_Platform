@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 interface Member {
@@ -15,104 +15,85 @@ interface Member {
 
 const INITIAL_MEMBERS: Member[] = [
     {
-        id: "#DC-482",
-        name: "Eleanor Vance",
-        email: "e.vance@example.com",
-        role: "Lead Actor",
+        id: "MC-1001",
+        name: "Sneha Vyas",
+        email: "sneha@handle.com",
+        role: "Director Coordinator",
         status: "Active",
-        joinDate: "Oct 2021",
-        productionsCount: 14,
+        joinDate: "Aug 2026",
+        productionsCount: 15,
         avatarUrl: "https://lh3.googleusercontent.com/aida-public/AB6AXuAnKUcfY7TKeCByoapSFAmtQIcIc4MmzLibSjnluJbKUysBTKE9qXxmIV3G3iSB8y0k17HEH1E3cfGc0y9OU2Or4LrSIk1pq6J3Skuvg39T7DXSjvd-iBflpXguYRHkVHdb9BJ_Vun0fgkFKmmlnW29sKRqsWDcvSj1_dMPMnE8aCABiaRJWvEyCIOY5pCj3aSn4u_5noKiiqjdzp1cT19rKnbLW9-s_uAzKe2-bkEKYmTE9qGb13joN8SvuzO34Z8BVa05uhfFubR3"
     },
+
     {
-        id: "#DC-391",
-        name: "Julian Montague",
-        email: "j.montague@example.com",
-        role: "Tech Director",
+        id: "MC-1002",
+        name: "Kabir Mehta",
+        email: "kabir@handle.com",
+        role: "Core Maintainer",
         status: "Active",
-        joinDate: "Jan 2020",
+        joinDate: "Aug 2026",
         productionsCount: 28,
-        initials: "JM"
+        initials: "KM"
     },
     {
-        id: "#DC-102",
-        name: "Arthur Pendelton",
-        email: "art.pendleton@example.com",
-        role: "Ensemble",
-        status: "On Break",
-        joinDate: "Mar 2018",
-        productionsCount: 34,
-        avatarUrl: "https://lh3.googleusercontent.com/aida-public/AB6AXuAYb0UYh56FwHk3uOiZ9VTP0qXd5aXnux-Ed7uqdpVAUCuRoKydLtGHFwvGg1FFXsi3KQlYUiA2Zw1TOmHq-zZKPbMIxGATGM7yvBv65DfkNPKDgK9U8nRTAqwbo2SrCtduDeXso0gOS38ui_qSqO4ZJ3_Pgl5ULzimZw-pSHmoy_Q84WK5GdVdTCriCbcpLyYX5EptqmiyfxtDnNgN7H6V0-p6E-jGglmpS684IfEAPqgtLozcCP1QdpEQkmOQcWov3q_IJlTTAbu2"
-    },
-    {
-        id: "#DC-590",
-        name: "Sarah Chen",
-        email: "s.chen@example.com",
-        role: "Choreographer",
+        id: "MC-1003",
+        name: "Lakshya Hari",
+        email: "lakshya@handle.com",
+        role: "Grand Patron & Sponsor",
         status: "Active",
-        joinDate: "Feb 2023",
-        productionsCount: 3,
-        initials: "SC"
+        joinDate: "Aug 2026",
+        productionsCount: 0,
+        initials: "LH"
     },
     {
-        id: "#DC-202",
-        name: "Marcus Aurelius",
-        email: "m.aurelius@example.com",
-        role: "Ensemble",
+        id: "MC-1004",
+        name: "Siddharth Verma",
+        email: "siddharth@handle.com",
+        role: "Production Coordinator",
         status: "Active",
-        joinDate: "Jun 2019",
-        productionsCount: 19,
-        initials: "MA"
-    },
-    {
-        id: "#DC-931",
-        name: "Sneha Vyas",
-        email: "sneha.v@matinee.club",
-        role: "Lead Actor",
-        status: "Active",
-        joinDate: "Sep 2022",
-        productionsCount: 8,
+        joinDate: "Aug 2026",
+        productionsCount: 12,
         initials: "SV"
     },
     {
-        id: "#DC-842",
+        id: "MC-1005",
         name: "Jayesh Dave",
-        email: "jayesh.d@matinee.club",
-        role: "Lead Actor",
+        email: "jayesh@handle.com",
+        role: "Lead Actor & Member",
         status: "Active",
-        joinDate: "May 2021",
-        productionsCount: 12,
+        joinDate: "Aug 2026",
+        productionsCount: 10,
         initials: "JD"
     },
     {
-        id: "#DC-704",
-        name: "Siddharth Verma",
-        email: "siddharth.v@matinee.club",
-        role: "Tech Director",
+        id: "MC-1006",
+        name: "Amit Sharma",
+        email: "amit@handle.com",
+        role: "Lead Actor & Member",
         status: "Active",
-        joinDate: "Nov 2020",
-        productionsCount: 21,
-        initials: "SV"
-    },
-    {
-        id: "#DC-603",
-        name: "Elena Rostova",
-        email: "e.rostova@example.com",
-        role: "Choreographer",
-        status: "On Break",
-        joinDate: "Jul 2024",
-        productionsCount: 2,
-        initials: "ER"
-    },
-    {
-        id: "#DC-505",
-        name: "David Kim",
-        email: "d.kim@example.com",
-        role: "Tech Director",
-        status: "Active",
-        joinDate: "Dec 2022",
+        joinDate: "Aug 2026",
         productionsCount: 6,
-        initials: "DK"
+        initials: "AS"
+    },
+    {
+        id: "MC-1007",
+        name: "Pooja Patel",
+        email: "pooja@handle.com",
+        role: "Scenic Artist",
+        status: "Active",
+        joinDate: "Aug 2026",
+        productionsCount: 8,
+        initials: "PP"
+    },
+    {
+        id: "MC-1008",
+        name: "Rohan Sen",
+        email: "rohan@handle.com",
+        role: "Choreographer",
+        status: "Active",
+        joinDate: "Aug 2026",
+        productionsCount: 7,
+        initials: "RS"
     }
 ];
 
@@ -121,6 +102,34 @@ export default function AllMembersDirectory() {
     const [members, setMembers] = useState<Member[]>(INITIAL_MEMBERS);
     const [searchQuery, setSearchQuery] = useState("");
     const [roleFilter, setRoleFilter] = useState("All");
+
+    useEffect(() => {
+        fetch("http://localhost:5001/api/members")
+            .then((res) => {
+                if (!res.ok) throw new Error("HTTP error");
+                return res.json();
+            })
+            .then((data) => {
+                if (Array.isArray(data) && data.length > 0) {
+                    const mapped = data.map((m: any) => ({
+                        id: m.member_id || m.id.toString(),
+                        name: m.name,
+                        email: m.email,
+                        role: m.roles && m.roles.length > 0 ? m.roles[0] : "Member",
+                        status: (m.status === "Active" ? "Active" : "On Break") as "Active" | "On Break",
+                        joinDate: "Aug 2026",
+                        productionsCount: m.name === "Kabir Mehta" ? 28 : (m.name === "Sneha Vyas" ? 15 : 5),
+                        avatarUrl: m.avatarUrl || undefined,
+                        initials: m.name.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2)
+                    }));
+                    setMembers(mapped);
+                }
+            })
+            .catch((err) => {
+                console.error("Failed to load members in dashboard:", err);
+            });
+    }, []);
+
     const [statusFilter, setStatusFilter] = useState("All");
 
     // Custom dropdown open flags

@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { BookOpen, Star, Calendar, MapPin, Clock, Ticket } from "lucide-react";
 
 interface Production {
@@ -16,55 +17,133 @@ interface Production {
   price: string;
 }
 
-const productions: Production[] = [
+const fallbackProductions: Production[] = [
   {
-    id: "glass-orchestration",
-    title: "The Glass Orchestration",
+    id: "tughlaq",
+    title: "Tughlaq",
     status: "SELLING FAST",
     statusColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
-    description: "A poignant exploration of memory and melody, following a reclusive composer's final attempt to capture the sound of silence.",
-    director: "Elena Moretti",
-    cast: "Julian Vane, Sarah Chen",
-    season: "Fall 2024 Season",
+    description: "Girish Karnad's classic play exploring the visionary but chaotic reign of Muhammad bin Tughlaq. A timeless political allegory that resonates with modern times.",
+    director: "Sneha Vyas",
+    cast: "Jayesh Dave, Amit Sharma, Pooja Patel",
+    season: "Monsoon 2026 Season",
     image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCAzuMBaCOUMEUXFsi58uX4Sk0JbT72vPkeMf7KwisCYFvuX3Bk8gP1e__uZ8B3G4bYBmYBQjlPftJgABVJuuHuLNh_AIDoUgyAwaSJBouCjuqcQ7quRshTI9hepIQebEmL3pvhyyO6hPnGW2vUGYrayYRqt1rRMyl1OCAIad0kKVUn46ZjCsSI_nQCNnUrcxx_B1Rvmvml5deoCtkUqY61szLjR8uoRvQhIHhNvsCHkKUY4niHP9cI",
-    venue: "Main Stage Gallery",
-    dates: "Oct 12 - Nov 04, 2024",
-    runtime: "105 Mins (No Intermission)",
-    price: "Tickets from $35"
+    venue: "Prithvi Theatre, Mumbai",
+    dates: "Aug 12 - Sep 04, 2026",
+    runtime: "120 Mins (With Intermission)",
+    price: "Tickets from ₹300"
   },
   {
-    id: "blue-horizon",
-    title: "Blue Horizon",
+    id: "andha-yug",
+    title: "Andha Yug",
     status: "LIMITED TICKETS",
     statusColor: "bg-amber-50 text-amber-700 border-amber-200",
-    description: "An experimental black-box production that redefined intimate storytelling through a series of interconnected monologues.",
-    director: "David K. Thorne",
-    cast: "Clara Vance, Marcus Thorne",
-    season: "Fall 2024 Season",
+    description: "Dharamvir Bharati's epic anti-war play set on the final day of the Mahabharata war. It delves into the dark psychology of greed, vengeance, and moral collapse.",
+    director: "Sneha Vyas",
+    cast: "Amit Sharma, Rohan Sen, Jayesh Dave",
+    season: "Monsoon 2026 Season",
     image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCkdj8dZKXd7KCPEfHwJx7d8dv8AVc16bLqx_Fa77OIQmhTqukcXd2WDgJayuivLhn9h2pKeVblOrBnzeH4iZNV2Hc7Ai6WzKPJfD3Kj-Fj9C0R-atVf6NKYU5KIKzH_H_z0B7SCUzFkxoaDIoNvxVUOdezFBpsRK1ok9gn2liDaNoNmK1K2dPMrk5mQIpcFjwBK0DT20azXknFaYzsgretzQcXDgjzpeD_Oa1FDZ_Dmb_ywKKmRkz1",
-    venue: "Studio Gallery (Black Box)",
-    dates: "Nov 15 - Dec 02, 2024",
-    runtime: "90 Mins (No Intermission)",
-    price: "Tickets from $25"
+    venue: "Kamani Auditorium, Delhi",
+    dates: "Sep 15 - Oct 02, 2026",
+    runtime: "110 Mins (No Intermission)",
+    price: "Tickets from ₹250"
   },
   {
-    id: "antigone-reborn",
-    title: "Antigone: Reborn",
+    id: "hayavadana",
+    title: "Hayavadana",
     status: "TICKETS ON SALE",
     statusColor: "bg-blue-50 text-blue-700 border-blue-200",
-    description: "A breathtaking contemporary reimagining of the classic tragedy, set within the glass halls of a modern metropolis.",
-    director: "Aris Papadopoulos",
-    cast: "Lydia Frost, Julian Devereux",
-    season: "Fall 2024 Season",
+    description: "A brilliant play by Girish Karnad exploring identity, completeness, and love through a mythical story of swapped heads. Combines Yakshagana folk performance with modern theatrical dialogue.",
+    director: "Kabir Mehta",
+    cast: "Priya Nair, Arjun Kapoor, Jayesh Dave",
+    season: "Monsoon 2026 Season",
     image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCFhh56JyFyLF08wchxPKsyhHqSdltIyUQmbvnM36afMwPrX-viKot2UF8WixHwwsB6_yr3DY4I7A1H2Zni9qGuPWojUJfSMHi-9ha_m7DCp2zmqpEOOJ2_EuFdjOI2bTlG-i2En3DPM6Q63oDPSTnQ76-vSPlw0GM8brJPhxU_AmlY6YM2w_8eTXnoW6PYDyXhq2RpqzGw48vFSVE6mF-XFPyFl6NPLNchnK-U-RX8YvaKmUEnhcKr",
-    venue: "Main Stage Gallery",
-    dates: "Dec 10 - Dec 28, 2024",
-    runtime: "120 Mins (With Intermission)",
-    price: "Tickets from $30"
+    venue: "Ranga Shankara, Bengaluru",
+    dates: "Oct 10 - Oct 28, 2026",
+    runtime: "100 Mins (With Intermission)",
+    price: "Tickets from ₹350"
+  },
+  {
+    id: "charandas-chor",
+    title: "Charandas Chor",
+    status: "SELLING FAST",
+    statusColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    description: "Habib Tanvir's masterpiece, a delightful folk comedy and satire adapted from a Rajasthani folktale about a thief with a strict vow of truth.",
+    director: "Rohan Sen",
+    cast: "Jayesh Dave, Priya Nair, Arjun Kapoor",
+    season: "Monsoon 2026 Season",
+    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBtdENLvD3N-a9btMoGsPtbSbUQtSPaSBrEeP2Jgfyd3VportsleV-2pAckg6xgekm8mK9FSwhNkL_KQ8p3CMlW6We0Bai8RJB_wXYdN_uTzrFLc7KGbqCrUe53sL52qCIuiqWjHze9pJNKgNETpCUBMn9ceMimt2eXX6zjbAWVKTquXwKQYOAO2CwRSECu9qu2z0c_dqG32E2SNvcfhz2Jsq4-7G-3aPJUBUnLeNoEGkqT7zP5-WJb",
+    venue: "Shree Ram Centre, New Delhi",
+    dates: "Oct 05 - Oct 18, 2026",
+    runtime: "115 Mins (With Intermission)",
+    price: "Tickets from ₹200"
+  },
+  {
+    id: "ebong-indrajit",
+    title: "Ebong Indrajit",
+    status: "LIMITED TICKETS",
+    statusColor: "bg-amber-50 text-amber-700 border-amber-200",
+    description: "Badal Sircar's landmark absurdist play that redefined Indian theatre, capturing the existential angst, dreams, and conformity of post-independence urban youth.",
+    director: "Kabir Mehta",
+    cast: "Arjun Kapoor, Priya Nair, Amit Sharma",
+    season: "Winter 2026 Season",
+    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCkdj8dZKXd7KCPEfHwJx7d8dv8AVc16bLqx_Fa77OIQmhTqukcXd2WDgJayuivLhn9h2pKeVblOrBnzeH4iZNV2Hc7Ai6WzKPJfD3Kj-Fj9C0R-atVf6NKYU5KIKzH_H_z0B7SCUzFkxoaDIoNvxVUOdezFBpsRK1ok9gn2liDaNoNmK1K2dPMrk5mQIpcFjwBK0DT20azXknFaYzsgretzQcXDgjzpeD_Oa1FDZ_Dmb_ywKKmRkz1",
+    venue: "Academy of Fine Arts, Kolkata",
+    dates: "Nov 10 - Nov 25, 2026",
+    runtime: "90 Mins (No Intermission)",
+    price: "Tickets from ₹150"
+  },
+  {
+    id: "sakharam-binder",
+    title: "Sakharam Binder",
+    status: "TICKETS ON SALE",
+    statusColor: "bg-blue-50 text-blue-700 border-blue-200",
+    description: "Vijay Tendulkar's raw and powerful Marathi classic exposing domestic power dynamics, gender roles, and hypocrisy in middle-class society.",
+    director: "Sneha Vyas",
+    cast: "Jayesh Dave, Priya Nair, Rohan Sen",
+    season: "Winter 2026 Season",
+    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCFhh56JyFyLF08wchxPKsyhHqSdltIyUQmbvnM36afMwPrX-viKot2UF8WixHwwsB6_yr3DY4I7A1H2Zni9qGuPWojUJfSMHi-9ha_m7DCp2zmqpEOOJ2_EuFdjOI2bTlG-i2En3DPM6Q63oDPSTnQ76-vSPlw0GM8brJPhxU_AmlY6YM2w_8eTXnoW6PYDyXhq2RpqzGw48vFSVE6mF-XFPyFl6NPLNchnK-U-RX8YvaKmUEnhcKr",
+    venue: "Bal Gandharva Rang Mandir, Pune",
+    dates: "Dec 01 - Dec 15, 2026",
+    runtime: "130 Mins (With Intermission)",
+    price: "Tickets from ₹250"
+  },
+  {
+    id: "karnabhari",
+    title: "Karnabhari",
+    status: "SELLING FAST",
+    statusColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    description: "A highly stylized Sopanam-style physical theatre adaptation of Bhasa's classic Sanskrit play, exploring the tragic nobility, loyalty, and ultimate sacrifice of Karna.",
+    director: "Siddharth Verma",
+    cast: "Amit Sharma, Rohan Sen, Jayesh Dave",
+    season: "Winter 2026 Season",
+    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuATbMC775hHvfLLb9F3mVPtw4K2dw6bGMuAuAuNqBovs8EsF9N3G3_w8RYPIzK24kl4nL3A2DRk0sT2WMSGIR67XDJ7SOl5T5_KuNWq0NeIzlmTVsTRR4TC3aqN2-IxIimwn6aModCBNDR65E1xTAZoR_gM5_7rOL2lpXligIvYygov1cKDqNOK9M9K-IxYwoxrN-btwTvrc9pE9DM1hl-jltrWvaKlcKIkUQJ3C3BLPAG1rjHfjMRy",
+    venue: "Fine Arts Hall, Kochi",
+    dates: "Dec 20 - Dec 30, 2026",
+    runtime: "80 Mins (No Intermission)",
+    price: "Tickets from ₹300"
   }
 ];
 
 export default function Plays() {
+  const [productions, setProductions] = useState<Production[]>(fallbackProductions);
+
+  useEffect(() => {
+    fetch("http://localhost:5001/api/plays")
+      .then((res) => {
+        if (!res.ok) throw new Error("HTTP error");
+        return res.json();
+      })
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setProductions(data);
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to load plays from backend:", err);
+      });
+  }, []);
+
   return (
     <div className="bg-[#fdf9f4] text-[#1c1b19] min-h-screen font-sans selection:bg-[#c6e4f7] py-24">
       <main className="max-w-7xl mx-auto px-6 md:px-12">

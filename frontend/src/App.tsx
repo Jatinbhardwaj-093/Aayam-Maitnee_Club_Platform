@@ -1,12 +1,15 @@
 import { BrowserRouter, Routes, Route, useOutletContext } from "react-router-dom";
 import AppLayout from "./components/AppLayout";
 import MemberDashboard from "./pages/member/MemberDashboard";
+import MySchedule from "./pages/member/MySchedule";
 import ProductionWorkspace from "./pages/ProductionWorkspace";
 import AuditionsCasting from "./pages/member/AuditionsCasting";
 import SponsorDashboard from "./pages/SponsorDashboard";
 import ProductionGallery from "./pages/member/ProductionGallery";
 import ProductionOffice from "./pages/ProductionOffice";
 import BackstagePass from "./pages/BackstagePass";
+import EditProfile from "./pages/member/EditProfile";
+import ViewProfile from "./pages/member/ViewProfile";
 
 // Maintainer pages
 import MaintainerDashboard from "./pages/maintainers/MaintainerDashboard";
@@ -29,7 +32,7 @@ import JoinClub from "./pages/JoinClub";
 function DirectoryWrapper() {
   const context = useOutletContext<{ activeUser: any }>();
   const activeUser = context?.activeUser;
-  if (activeUser?.role.toLowerCase().includes("maintainer")) {
+  if (activeUser?.role.toLowerCase().includes("maintainer") || activeUser?.isAdmin) {
     return <AllMembersDirectory />;
   }
   return <Directory />;
@@ -45,11 +48,14 @@ export default function App() {
           <Route path="events" element={<Events />} />
           <Route path="directory" element={<DirectoryWrapper />} />
           <Route path="profile" element={<Profile />} />
+          <Route path="profile/view" element={<ViewProfile />} />
+          <Route path="profile/edit" element={<EditProfile />} />
           <Route path="profile/:memberId" element={<Profile />} />
           <Route path="join" element={<JoinClub />} />
           
           {/* Portal / Dashboard paths */}
           <Route path="member" element={<MemberDashboard />} />
+          <Route path="schedule" element={<MySchedule />} />
           <Route path="workspace" element={<ProductionWorkspace />} />
           <Route path="auditions" element={<AuditionsCasting />} />
           <Route path="sponsor" element={<SponsorDashboard />} />

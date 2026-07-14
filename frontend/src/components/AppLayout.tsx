@@ -6,34 +6,24 @@ import {
   LayoutDashboard,
   Folder,
   Users,
-  Image as ImageIcon,
   Coins,
-  Menu,
-  Bell,
-  User,
+  Image as ImageIcon,
   ShieldCheck,
   ClipboardList,
-  LogOut,
-  Settings,
-  ShieldAlert,
+  Bell,
+  User,
   LineChart,
   Scale,
   Sliders,
   HardDrive,
-  Calendar
+  Calendar,
+  Menu,
+  ShieldAlert
 } from "lucide-react";
-import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 interface NavItem {
   label: string;
@@ -45,6 +35,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   { label: "Drama Club Home", path: "/", icon: Home, description: "Public landing page" },
   { label: "Member Dashboard", path: "/member", icon: LayoutDashboard, description: "Your rehearsals & schedules" },
+  { label: "My Schedule", path: "/schedule", icon: Calendar, description: "Your production schedule" },
   { label: "Macbeth Workspace", path: "/workspace", icon: Folder, description: "Props transfers & expenses" },
   { label: "Auditions & Casting", path: "/auditions", icon: Users, description: "Casting portal & applications" },
   { label: "Sponsor Dashboard", path: "/sponsor", icon: Coins, description: "VIP lounge & sponsorships" },
@@ -75,39 +66,44 @@ export default function AppLayout() {
   const [hasUnread, setHasUnread] = useState(true);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [portalOpen, setPortalOpen] = useState(false);
-  const [profileSettingsOpen, setProfileSettingsOpen] = useState(false);
 
-  // Active User Profile (starts as null for public guest)
-  const [activeUser, setActiveUser] = useState<any>(null);
+  // Active User Profile (persisted in sessionStorage to survive page refresh and allow multiple sessions across tabs)
+  const [activeUser, setActiveUser] = useState<any>(() => {
+    const saved = sessionStorage.getItem("aayam_active_user");
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  });
   const [loginError, setLoginError] = useState<string | null>(null);
-
-  // Editing Profile states
-  const [editName, setEditName] = useState("");
-  const [editRole, setEditRole] = useState("");
-  const [editEmail, setEditEmail] = useState("");
-  const [editNumber, setEditNumber] = useState("+91 98765 43210");
-  const [headshotName, setHeadshotName] = useState("jayesh_headshot.jpg");
-  const [resumeName, setResumeName] = useState("jayesh_resume.pdf");
-  const [rolePreference, setRolePreference] = useState("Performer");
 
   const isLandingPage = ["/", "/plays", "/events", "/directory"].includes(location.pathname) || location.pathname.startsWith("/profile") || !activeUser;
 
-  const filteredNavItems = activeUser?.role.toLowerCase().includes("maintainer")
+  const isMaintainerPath = ["/maintainer", "/analytics", "/compliance", "/control-panel", "/media-moderation", "/events-admin", "/directory", "/profile-audit"].includes(location.pathname);
+
+  const filteredNavItems = (activeUser?.role.toLowerCase().includes("maintainer") || (activeUser?.isAdmin && isMaintainerPath))
     ? maintainerNavItems
     : navItems.filter((item) => {
-      const isMember = activeUser?.role.toLowerCase().includes("member") || false;
-      if (isMember) {
-        // Display only Home, Member Dashboard, Auditions & Casting, and Gallery.
-        return ["/", "/member", "/auditions", "/gallery"].includes(item.path);
-      }
-      return true;
-    });
+        if (item.path === "/") {
+          return false;
+        }
+        const isNormalMember = !activeUser?.isAdmin && !activeUser?.role.toLowerCase().includes("maintainer");
+        if (isNormalMember) {
+          // Display only Member Dashboard, My Schedule, and Auditions & Casting.
+          return ["/member", "/schedule", "/auditions"].includes(item.path);
+        }
+        return true;
+      });
 
   const activeItem = navItems.find((item) => item.path === location.pathname) ||
     maintainerNavItems.find((item) => item.path === location.pathname) ||
     navItems[0];
 
-  const handleLoginSubmit = async (email: string) => {
+  const handleLoginSubmit = async (email: string, password?: string) => {
     setLoginError(null);
     try {
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5001"}/api/login`, {
@@ -115,7 +111,7 @@ export default function AppLayout() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, password: password || "" }),
       });
 
       if (!response.ok) {
@@ -127,36 +123,19 @@ export default function AppLayout() {
       const data = await response.json();
       if (data.status === "success" && data.user) {
         const user = data.user;
+        sessionStorage.setItem("aayam_active_user", JSON.stringify(user));
+        if (data.token) {
+          sessionStorage.setItem("aayam_session_token", data.token);
+        }
         setActiveUser(user);
-        setEditName(user.name);
-        setEditRole(user.role);
-        setEditEmail(user.email);
         setPortalOpen(false);
 
-        // Sync mocked/stored user details based on role and redirect
+        // Redirect based on role
         if (user.role.includes("Maintainer")) {
-          setEditNumber("+91 98765 88888");
-          setHeadshotName("julian_headshot.jpg");
-          setResumeName("julian_resume.pdf");
-          setRolePreference("Core Maintainer");
           navigate("/maintainer");
-        } else if (user.role.includes("Sponsor")) {
-          setEditNumber("+91 98765 99999");
-          setHeadshotName("lakshya_headshot.jpg");
-          setResumeName("lakshya_resume.pdf");
-          setRolePreference("Creative Designer");
-          navigate("/member");
-        } else if (user.name === "Sneha Vyas") {
-          setEditNumber("+91 98765 33333");
-          setHeadshotName("sneha_headshot.jpg");
-          setResumeName("sneha_resume.pdf");
-          setRolePreference("Director");
-          navigate("/member");
+        } else if (user.isAdmin) {
+          navigate("/admin");
         } else {
-          setEditNumber("+91 98765 43210");
-          setHeadshotName("jayesh_headshot.jpg");
-          setResumeName("jayesh_resume.pdf");
-          setRolePreference("Performer");
           navigate("/member");
         }
       } else {
@@ -169,26 +148,17 @@ export default function AppLayout() {
     }
   };
 
-  const handleSaveProfile = (e: React.FormEvent) => {
-    e.preventDefault();
-    setActiveUser({
-      name: editName,
-      role: editRole,
-      email: editEmail,
-      initials: editName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2)
-    });
-    setProfileSettingsOpen(false);
-  };
-
   const handleLogOut = () => {
+    sessionStorage.removeItem("aayam_active_user");
+    sessionStorage.removeItem("aayam_session_token");
     setActiveUser(null);
-    setProfileSettingsOpen(false);
     navigate("/");
   };
 
-  const isMember = activeUser?.role.toLowerCase().includes("member") || false;
-  const isAllowedPath = ["/", "/member", "/auditions", "/gallery", "/plays", "/events", "/directory"].includes(location.pathname) || location.pathname.startsWith("/profile");
-  const showAccessDenied = activeUser && isMember && !isAllowedPath;
+  const isMaintainer = activeUser?.role.toLowerCase().includes("maintainer") || false;
+  const isMember = activeUser ? (!activeUser.isAdmin && !isMaintainer) : false;
+  const isAllowedPath = ["/", "/member", "/schedule", "/auditions", "/plays", "/events", "/directory"].includes(location.pathname) || location.pathname.startsWith("/profile");
+  const showAccessDenied = activeUser && !activeUser.isAdmin && !isMaintainer && isMember && !isAllowedPath;
 
   const sidebarWidthClass = isCollapsed ? "w-[72px]" : "w-64 xl:w-72";
 
@@ -203,8 +173,8 @@ export default function AppLayout() {
               setIsCollapsed={setIsCollapsed}
               filteredNavItems={filteredNavItems}
               activeUser={activeUser}
-              setProfileSettingsOpen={setProfileSettingsOpen}
               isMobile={false}
+              onLogOut={handleLogOut}
             />
           </div>
         </aside>
@@ -263,13 +233,12 @@ export default function AppLayout() {
               {/* Right Side Actions */}
               <div className="flex items-center gap-4">
                 {activeUser ? (
-                  <button
-                    onClick={() => setProfileSettingsOpen(true)}
-                    className="w-9 h-9 rounded-full bg-[#635f41]/10 border border-[#e6e2dd] flex items-center justify-center text-[#635f41] font-bold text-sm hover:bg-[#635f41]/15 transition-all"
-                    title="User Profile Settings"
+                  <Link
+                    to={activeUser.role.toLowerCase().includes("maintainer") ? "/maintainer" : "/member"}
+                    className="bg-[#635f41] text-white hover:bg-[#635f41]/90 rounded-[8px] h-9 px-4 flex items-center text-xs font-semibold tracking-wider transition-all uppercase"
                   >
-                    {activeUser.initials}
-                  </button>
+                    Dashboard
+                  </Link>
                 ) : (
                   <>
                     <Link
@@ -305,9 +274,9 @@ export default function AppLayout() {
                       setIsCollapsed={setIsCollapsed}
                       filteredNavItems={filteredNavItems}
                       activeUser={activeUser}
-                      setProfileSettingsOpen={setProfileSettingsOpen}
                       setMobileOpen={setMobileOpen}
                       isMobile={true}
+                      onLogOut={handleLogOut}
                     />
                   </SheetContent>
                 </Sheet>
@@ -384,14 +353,6 @@ export default function AppLayout() {
                       </DialogFooter>
                     </DialogContent>
                   </Dialog>
-
-                  <button
-                    onClick={() => setProfileSettingsOpen(true)}
-                    className="w-9 h-9 rounded-full bg-[#635f41]/10 border border-[#e6e2dd] flex items-center justify-center text-[#635f41] font-bold text-sm hover:bg-[#635f41]/15 transition-all"
-                    title="User Profile Settings"
-                  >
-                    {activeUser.initials}
-                  </button>
                 </>
               )}
 
@@ -409,157 +370,8 @@ export default function AppLayout() {
           </header>
         )}
 
-        {/* User Account Settings Sheet */}
-        <Sheet open={profileSettingsOpen} onOpenChange={setProfileSettingsOpen}>
-          <SheetContent side="right" className="bg-[#fdf9f4] border-l border-[#e6e2dd] text-[#466272] w-full sm:max-w-md overflow-y-auto">
-            {activeUser && (
-              <form onSubmit={handleSaveProfile}>
-                <SheetHeader className="pb-6 border-b border-[#e6e2dd]">
-                  <SheetTitle className="font-serif text-[#635f41] text-lg font-bold flex items-center gap-2">
-                    <Settings className="w-5 h-5 text-[#8CC0EB]" /> Account Settings
-                  </SheetTitle>
-                  <SheetDescription className="text-xs text-[#466272]/85">
-                    Update your Matinee Club profile details, preferences, and files.
-                  </SheetDescription>
-                </SheetHeader>
 
-                <div className="py-6">
-                  <Button
-                    type="button"
-                    onClick={() => {
-                      setProfileSettingsOpen(false);
-                      navigate(activeUser?.role.toLowerCase().includes("maintainer") ? "/maintainer" : "/member");
-                    }}
-                    className="bg-[#635f41] text-white hover:bg-[#635f41]/90 rounded-lg w-full mb-6 font-semibold py-3 flex items-center justify-center gap-2"
-                  >
-                    <LayoutDashboard className="w-4 h-4" /> Go to Dashboard
-                  </Button>
 
-                  <div className="space-y-6">
-                    <div className="space-y-1">
-                      <label className="text-xs font-semibold text-[#635f41]">Profile Initials Avatar</label>
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-full bg-[#635f41]/10 border border-[#e6e2dd] flex items-center justify-center text-[#635f41] font-bold text-lg">
-                          {activeUser.initials}
-                        </div>
-                        <span className="text-xs text-[#466272]/65 italic">Autogenerated from your Name.</span>
-                      </div>
-                    </div>
-
-                    <div className="space-y-1">
-                      <label className="text-xs font-semibold text-[#635f41]">Display Name</label>
-                      <Input
-                        placeholder="e.g., Jayesh Dave"
-                        value={editName}
-                        onChange={(e) => setEditName(e.target.value)}
-                        className="border-[#e6e2dd] focus-visible:ring-[#8CC0EB] text-sm h-10 bg-white"
-                        required
-                      />
-                    </div>
-
-                    <div className="space-y-1">
-                      <label className="text-xs font-semibold text-[#635f41]">Phone Number</label>
-                      <Input
-                        placeholder="e.g., +91 98765 43210"
-                        value={editNumber}
-                        onChange={(e) => setEditNumber(e.target.value)}
-                        className="border-[#e6e2dd] focus-visible:ring-[#8CC0EB] text-sm h-10 bg-white"
-                        required
-                      />
-                    </div>
-
-                    <div className="space-y-1">
-                      <label className="text-xs font-semibold text-[#635f41]">Email Address</label>
-                      <Input
-                        type="email"
-                        placeholder="e.g., jayesh.d@matinee.club"
-                        value={editEmail}
-                        onChange={(e) => setEditEmail(e.target.value)}
-                        className="border-[#e6e2dd] focus-visible:ring-[#8CC0EB] text-sm h-10 bg-white"
-                        required
-                      />
-                    </div>
-
-                    {/* File Upload Slots */}
-                    <div className="space-y-4 pt-2">
-                      <div className="flex justify-between items-center bg-[#f7f3ee] border border-[#e6e2dd] rounded-[8px] p-3">
-                        <div className="text-left">
-                          <p className="text-xs font-semibold text-[#635f41]">Headshot Photo</p>
-                          <p className="text-[10px] text-[#466272]/70 truncate max-w-[200px]">{headshotName}</p>
-                        </div>
-                        <label className="bg-[#8CC0EB] text-[#1c1b19] hover:bg-[#8CC0EB]/90 cursor-pointer rounded-[4px] px-2.5 py-1 text-[10px] font-semibold transition-all">
-                          Upload File
-                          <input
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            onChange={(e) => {
-                              if (e.target.files && e.target.files[0]) {
-                                setHeadshotName(e.target.files[0].name);
-                              }
-                            }}
-                          />
-                        </label>
-                      </div>
-
-                      <div className="flex justify-between items-center bg-[#f7f3ee] border border-[#e6e2dd] rounded-[8px] p-3">
-                        <div className="text-left">
-                          <p className="text-xs font-semibold text-[#635f41]">Resume / Bio File</p>
-                          <p className="text-[10px] text-[#466272]/70 truncate max-w-[200px]">{resumeName}</p>
-                        </div>
-                        <label className="bg-[#8CC0EB] text-[#1c1b19] hover:bg-[#8CC0EB]/90 cursor-pointer rounded-[4px] px-2.5 py-1 text-[10px] font-semibold transition-all">
-                          Upload File
-                          <input
-                            type="file"
-                            accept=".pdf"
-                            className="hidden"
-                            onChange={(e) => {
-                              if (e.target.files && e.target.files[0]) {
-                                setResumeName(e.target.files[0].name);
-                              }
-                            }}
-                          />
-                        </label>
-                      </div>
-                    </div>
-
-                    <div className="space-y-1">
-                      <label className="text-xs font-semibold text-[#635f41] block mb-1">Member Classification</label>
-                      <Select value={rolePreference} onValueChange={(val) => setRolePreference(val ?? "")}>
-                        <SelectTrigger className="w-full border-[#e6e2dd] bg-white text-[#466272] hover:bg-gray-50 focus:ring-[#8CC0EB] text-sm h-10 px-3 flex items-center justify-between rounded-lg">
-                          <SelectValue placeholder="Select Classification" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-white border border-[#e6e2dd] text-[#466272] rounded-lg shadow-md mt-1 z-[100] max-h-60 overflow-y-auto">
-                          <SelectGroup>
-                            <SelectItem value="Performer" className="hover:bg-[#8CC0EB]/10 rounded-md py-1.5 px-3 cursor-pointer">Performer</SelectItem>
-                            <SelectItem value="Technical Crew" className="hover:bg-[#8CC0EB]/10 rounded-md py-1.5 px-3 cursor-pointer">Technical Crew</SelectItem>
-                            <SelectItem value="Creative Designer" className="hover:bg-[#8CC0EB]/10 rounded-md py-1.5 px-3 cursor-pointer">Creative Designer</SelectItem>
-                            <SelectItem value="Director" className="hover:bg-[#8CC0EB]/10 rounded-md py-1.5 px-3 cursor-pointer">Director</SelectItem>
-                            <SelectItem value="Core Maintainer" className="hover:bg-[#8CC0EB]/10 rounded-md py-1.5 px-3 cursor-pointer">Core Maintainer</SelectItem>
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-8 pt-4 border-t border-[#e6e2dd] flex flex-col sm:flex-row gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleLogOut}
-                    className="border-2 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 rounded-[8px] flex-1"
-                  >
-                    <LogOut className="w-4 h-4 mr-2" /> Log Out
-                  </Button>
-                  <Button type="submit" className="bg-[#8CC0EB] text-[#1c1b19] hover:bg-[#8CC0EB]/90 rounded-[8px] flex-1">
-                    Save Changes
-                  </Button>
-                </div>
-              </form>
-            )}
-          </SheetContent>
-        </Sheet>
 
         {/* Login Dialog */}
         <Dialog open={portalOpen} onOpenChange={setPortalOpen}>
@@ -573,7 +385,7 @@ export default function AppLayout() {
             <form onSubmit={(e) => {
               e.preventDefault();
               const target = e.target as any;
-              handleLoginSubmit(target.email.value);
+              handleLoginSubmit(target.email.value, target.password.value);
             }} className="py-4 space-y-4 text-left">
               {loginError && (
                 <div className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg p-2.5 text-center font-medium animate-pulse">

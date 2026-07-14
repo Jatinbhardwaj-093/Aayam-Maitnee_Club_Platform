@@ -206,3 +206,38 @@ class Participation(db.Model):
     user = db.relationship("User", back_populates="participations")
     event = db.relationship("Event", back_populates="participations")
     booking = db.relationship("Booking", back_populates="participation")
+
+
+class Play(db.Model):
+    __tablename__ = "play"
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    title = db.Column(db.String(150), nullable=False)
+    status = db.Column(db.String(50)) # e.g. "SELLING FAST", "LIMITED TICKETS"
+    status_color = db.Column(db.String(100)) # CSS classes for color tag
+    description = db.Column(db.Text)
+    director = db.Column(db.String(150))
+    cast = db.Column(db.String(255))
+    season = db.Column(db.String(100))
+    image = db.Column(db.String(255))
+    venue = db.Column(db.String(100))
+    dates = db.Column(db.String(100))
+    runtime = db.Column(db.String(100))
+    price = db.Column(db.String(100))
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'status': self.status,
+            'statusColor': self.status_color,
+            'description': self.description,
+            'director': self.director,
+            'cast': self.cast,
+            'season': self.season,
+            'image': self.image,
+            'venue': self.venue,
+            'dates': self.dates,
+            'runtime': self.runtime,
+            'price': self.price
+        }

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, Clock, CheckCircle2, Calendar as CalendarIcon, MapPin, User, Tag } from "lucide-react";
 
 interface Event {
@@ -19,99 +19,169 @@ interface Event {
   capacity: string;
 }
 
-const initialEvents: Event[] = [
+const getCategoryStyles = (category: string) => {
+  if (category === "Plays") {
+    return { bg: "bg-[#BFDDF0] text-[#2e4a5a]", color: "text-[#2e4a5a]" };
+  } else if (category === "Workshops") {
+    return { bg: "bg-[#FFEBCC] text-[#765d00]", color: "text-[#765d00]" };
+  } else {
+    return { bg: "bg-[#E2FDFF] text-[#324b4d]", color: "text-[#324b4d]" };
+  }
+};
+
+const fallbackEvents: Event[] = [
   {
-    title: "Modern Hamlet",
-    description: "A visceral exploration of legacy and madness set in a contemporary corporate kingdom.",
+    title: "Tughlaq Premiere",
+    description: "The opening night of Tughlaq by Girish Karnad, showcasing under dramatic lighting.",
     category: "Plays",
     categoryBg: "bg-[#BFDDF0] text-[#2e4a5a]",
     categoryColor: "text-[#2e4a5a]",
-    date: "Oct 14, 2024",
-    day: 14,
-    month: "Oct",
+    date: "Aug 12, 2026",
+    day: 12,
+    month: "Aug",
     image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBtdENLvD3N-a9btMoGsPtbSbUQtSPaSBrEeP2Jgfyd3VportsleV-2pAckg6xgekm8mK9FSwhNkL_KQ8p3CMlW6We0Bai8RJB_wXYdN_uTzrFLc7KGbqCrUe53sL52qCIuiqWjHze9pJNKgNETpCUBMn9ceMimt2eXX6zjbAWVKTquXwKQYOAO2CwRSECu9qu2z0c_dqG32E2SNvcfhz2Jsq4-7G-3aPJUBUnLeNoEGkqT7zP5-WJb",
     status: "upcoming",
-    venue: "Main Stage Gallery",
-    timeRange: "19:30 - 21:45",
-    host: "Aayam Ensemble",
-    priceInfo: "Tickets from $30",
-    capacity: "Limited Tickets"
+    venue: "Prithvi Theatre, Mumbai",
+    timeRange: "19:30 - 21:30",
+    host: "Sneha Vyas",
+    priceInfo: "₹300 Tickets",
+    capacity: "200 seats"
   },
   {
-    title: "The Actor's Voice",
-    description: "Unlocking the power of resonance and articulation with Master Coach Elena Rossi.",
+    title: "Natya Shastra Acting Workshop",
+    description: "Unlock standard acting methodologies, resonance, and mudras with veteran coordinator Sneha Vyas.",
     category: "Workshops",
     categoryBg: "bg-[#FFEBCC] text-[#765d00]",
     categoryColor: "text-[#765d00]",
-    date: "Oct 19, 2024",
+    date: "Aug 19, 2026",
     day: 19,
-    month: "Oct",
+    month: "Aug",
     image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAdWUP6RopdqRMW48GJ5lkG-OGGRusLe0GexKuJ9TiXT4XGPICqz7v2KG9L_mG1id42B-WgZLewLqL7Dd63Qz7tWK4ALX14zX6kuV392i6mruLaV7UVbRoBFHmPjcO24On54aXGBZgoS5KdsDqIBgE1kuL0NmuS6yzjrQNN6U9X3XdZ56zuBNTC77mDLHrSAon1yryXGD-erDERjIt19ILq-FKRUNicV1D1-ptPjvnGMEe1mMewddO7",
     status: "upcoming",
-    venue: "Studio Workshop Room",
+    venue: "Studio Workshop Room, Mumbai",
     timeRange: "10:00 - 13:00",
-    host: "Elena Rossi",
-    priceInfo: "$45 Registration",
-    capacity: "12 seats left"
+    host: "Sneha Vyas",
+    priceInfo: "Registration Required",
+    capacity: "20 seats"
   },
   {
-    title: "Community Coffee & Script Read",
-    description: "An informal meetup to discuss play choices, read scripts, and meet Aayam actors.",
+    title: "Chai & Playwriting Meetup",
+    description: "An informal session to read new scripts, enjoy hot masala chai, and connect with regional performers.",
     category: "Meetups",
     categoryBg: "bg-[#E2FDFF] text-[#324b4d]",
     categoryColor: "text-[#324b4d]",
-    date: "Oct 30, 2024",
+    date: "Aug 30, 2026",
     day: 30,
-    month: "Oct",
+    month: "Aug",
     image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBuk8WjtWLoR2TuUYyoLkZfAiEHid8OpAJtGE5o8KgkUUP9SoIVxVCzYPUxOcxUARV5rNNTqimtr-yH4S_al391d2kCLDjx_Q_n58n2hhlaJmVXFjOZ7lPJPF52PuaoLWDCKRIog2WrCYyWULP4S5hLFZtbOb2sSpYvNwaZfeItTA9n7q8k1j2nPyROKOvHzUR0DteXxwfD2g2DY1J_53sJ4wUh7yLnB-RYHHZ9imWiLFOmgvka5l0M",
     status: "upcoming",
-    venue: "Ensemble Lounge",
+    venue: "Ensemble Lounge, Ahmedabad",
     timeRange: "16:00 - 18:00",
-    host: "Julian Thorne",
+    host: "Kabir Mehta",
     priceInfo: "Free Entry",
     capacity: "Open to All"
   },
   {
-    title: "Aayam Autumn Meet & Greet",
-    description: "Opening session for patrons and members to celebrate the announcement of the 2024 season.",
+    title: "Yakshagana Physical Theatre Intensive",
+    description: "Learn the traditional footwork, dramatic expressions, and costume rhythms of Yakshagana with Kabir Mehta.",
+    category: "Workshops",
+    categoryBg: "bg-[#FFEBCC] text-[#765d00]",
+    categoryColor: "text-[#765d00]",
+    date: "Oct 15, 2026",
+    day: 15,
+    month: "Oct",
+    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCFhh56JyFyLF08wchxPKsyhHqSdltIyUQmbvnM36afMwPrX-viKot2UF8WixHwwsB6_yr3DY4I7A1H2Zni9qGuPWojUJfSMHi-9ha_m7DCp2zmqpEOOJ2_EuFdjOI2bTlG-i2En3DPM6Q63oDPSTnQ76-vSPlw0GM8brJPhxU_AmlY6YM2w_8eTXnoW6PYDyXhq2RpqzGw48vFSVE6mF-XFPyFl6NPLNchnK-U-RX8YvaKmUEnhcKr",
+    status: "upcoming",
+    venue: "Ranga Shankara Studio, Bengaluru",
+    timeRange: "09:00 - 12:00",
+    host: "Kabir Mehta",
+    priceInfo: "Registration Required",
+    capacity: "30 seats"
+  },
+  {
+    title: "Habib Tanvir Folk Satire Discussion",
+    description: "A panel discussion exploring the integration of rural Chhattisgarhi folk traditions into urban political satire.",
     category: "Meetups",
     categoryBg: "bg-[#E2FDFF] text-[#324b4d]",
     categoryColor: "text-[#324b4d]",
-    date: "Sep 18, 2024",
-    day: 18,
-    month: "Sep",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuATbMC775hHvfLLb9F3mVPtw4K2dw6bGMuAuAuNqBovs8EsF9N3G3_w8RYPIzK24kl4nL3A2DRk0sT2WMSGIR67XDJ7SOl5T5_KuNWq0NeIzlmTVsTRR4TC3aqN2-IxIimwn6aModCBNDR65E1xTAZoR_gM5_7rOL2lpXligIvYygov1cKDqNOK9M9K-IxYwoxrN-btwTvrc9pE9DM1hl-jltrWvaKlcKIkUQJ3C3BLPAG1rjHfjMRy",
-    status: "concluded",
-    venue: "Matinee Foyer",
-    timeRange: "17:00 - 19:30",
-    host: "Julian Thorne",
-    priceInfo: "Free (Members)",
-    capacity: "Concluded"
+    date: "Oct 08, 2026",
+    day: 8,
+    month: "Oct",
+    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBtdENLvD3N-a9btMoGsPtbSbUQtSPaSBrEeP2Jgfyd3VportsleV-2pAckg6xgekm8mK9FSwhNkL_KQ8p3CMlW6We0Bai8RJB_wXYdN_uTzrFLc7KGbqCrUe53sL52qCIuiqWjHze9pJNKgNETpCUBMn9ceMimt2eXX6zjbAWVKTquXwKQYOAO2CwRSECu9qu2z0c_dqG32E2SNvcfhz2Jsq4-7G-3aPJUBUnLeNoEGkqT7zP5-WJb",
+    status: "upcoming",
+    venue: "Shree Ram Centre, New Delhi",
+    timeRange: "17:30 - 19:30",
+    host: "Siddharth Verma",
+    priceInfo: "Free Entry",
+    capacity: "80 seats"
   },
   {
-    title: "Macbeth Rehearsal Showcase",
-    description: "An open rehearsal allowing members to watch the final blocking run of Macbeth under spotlight.",
-    category: "Plays",
-    categoryBg: "bg-[#BFDDF0] text-[#2e4a5a]",
-    categoryColor: "text-[#2e4a5a]",
-    date: "Sep 22, 2024",
-    day: 22,
-    month: "Sep",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuA3z6pEqHIVmyQdEqbmlRRMXVyiRc1z_kpgOpO51LwjrU9EWYzx-oqIgaPkBOEJZuInPLFJLKXs7KFPD49MQ3XJ6-NRrVAQUleAVxdoFJloZXowNrgindYj7j9ELtSb3VHuC283O1dvae53zV3CtaAgSVnmKY_F5_nzOGdgCM_LYCN8ctkh2VxR-fdPCb7Gdo70zZIxXYQZMTgrZ-xJ92cxlpNUTlbYdTf3_eW9PtjeFHTyEEULqWBk",
-    status: "concluded",
-    venue: "Main Stage Arena",
-    timeRange: "14:00 - 16:30",
-    host: "Marcus Thorne",
-    priceInfo: "Free (Members)",
-    capacity: "Concluded"
+    title: "Badal Sircar Third Theatre Workshop",
+    description: "Understand Sircar's philosophy of Third Theatre: breaking the stage boundary and using open spaces.",
+    category: "Workshops",
+    categoryBg: "bg-[#FFEBCC] text-[#765d00]",
+    categoryColor: "text-[#765d00]",
+    date: "Nov 14, 2026",
+    day: 14,
+    month: "Nov",
+    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCkdj8dZKXd7KCPEfHwJx7d8dv8AVc16bLqx_Fa77OIQmhTqukcXd2WDgJayuivLhn9h2pKeVblOrBnzeH4iZNV2Hc7Ai6WzKPJfD3Kj-Fj9C0R-atVf6NKYU5KIKzH_H_z0B7SCUzFkxoaDIoNvxVUOdezFBpsRK1ok9gn2liDaNoNmK1K2dPMrk5mQIpcFjwBK0DT20azXknFaYzsgretzQcXDgjzpeD_Oa1FDZ_Dmb_ywKKmRkz1",
+    status: "upcoming",
+    venue: "Academy of Fine Arts, Kolkata",
+    timeRange: "14:00 - 17:00",
+    host: "Kabir Mehta",
+    priceInfo: "Registration Required",
+    capacity: "40 seats"
+  },
+  {
+    title: "Marathi Realistic Drama Panel",
+    description: "Deconstructing Vijay Tendulkar's realistic masterpieces and their societal impact with Sneha Vyas.",
+    category: "Meetups",
+    categoryBg: "bg-[#E2FDFF] text-[#324b4d]",
+    categoryColor: "text-[#324b4d]",
+    date: "Dec 05, 2026",
+    day: 5,
+    month: "Dec",
+    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCFhh56JyFyLF08wchxPKsyhHqSdltIyUQmbvnM36afMwPrX-viKot2UF8WixHwwsB6_yr3DY4I7A1H2Zni9qGuPWojUJfSMHi-9ha_m7DCp2zmqpEOOJ2_EuFdjOI2bTlG-i2En3DPM6Q63oDPSTnQ76-vSPlw0GM8brJPhxU_AmlY6YM2w_8eTXnoW6PYDyXhq2RpqzGw48vFSVE6mF-XFPyFl6NPLNchnK-U-RX8YvaKmUEnhcKr",
+    status: "upcoming",
+    venue: "Bal Gandharva Rang Mandir, Pune",
+    timeRange: "18:00 - 20:00",
+    host: "Sneha Vyas",
+    priceInfo: "Free Entry",
+    capacity: "100 seats"
   }
 ];
 
 export default function Events() {
+  const [events, setEvents] = useState<Event[]>(fallbackEvents);
   const [filter, setFilter] = useState<"All" | "Plays" | "Workshops" | "Meetups">("All");
   const [statusFilter, setStatusFilter] = useState<"All" | "Soon to Happen" | "Concluded">("All");
 
-  const filteredEvents = initialEvents.filter(e => {
+  useEffect(() => {
+    fetch("http://localhost:5001/api/events")
+      .then((res) => {
+        if (!res.ok) throw new Error("HTTP error");
+        return res.json();
+      })
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          const mapped = data.map((e: any) => {
+            const styles = getCategoryStyles(e.category);
+            return {
+              ...e,
+              categoryBg: styles.bg,
+              categoryColor: styles.color
+            };
+          });
+          setEvents(mapped);
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to load events from backend:", err);
+      });
+  }, []);
+
+  const filteredEvents = events.filter(e => {
+
     const matchesCategory = filter === "All" || e.category === filter;
     const matchesStatus = statusFilter === "All" ||
       (statusFilter === "Soon to Happen" && e.status === "upcoming") ||

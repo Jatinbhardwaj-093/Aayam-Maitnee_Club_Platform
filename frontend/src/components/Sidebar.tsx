@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -5,10 +6,10 @@ interface SidebarProps {
   isCollapsed: boolean;
   setIsCollapsed: (collapsed: boolean) => void;
   filteredNavItems: any[];
-  activeUser: { name: string; role: string; initials: string };
-  setProfileSettingsOpen: (open: boolean) => void;
+  activeUser: { name: string; role: string; initials: string; email?: string; isAdmin?: boolean };
   setMobileOpen?: (open: boolean) => void;
   isMobile?: boolean;
+  onLogOut?: () => void;
 }
 
 export default function Sidebar({
@@ -16,15 +17,16 @@ export default function Sidebar({
   setIsCollapsed,
   filteredNavItems,
   activeUser,
-  setProfileSettingsOpen,
   setMobileOpen,
   isMobile = false,
+  onLogOut,
 }: SidebarProps) {
   const location = useLocation();
   const collapsed = isCollapsed && !isMobile;
+  const [showPopover, setShowPopover] = useState(false);
 
   return (
-    <div className="flex flex-col h-full bg-[#f7f3ee] border-r border-[#e6e2dd] text-[#466272] font-sans">
+    <div className="flex flex-col h-full bg-[#f7f3ee] border-r border-[#e6e2dd] text-[#466272] font-sans relative">
       {/* Sidebar Brand Header */}
       <div className={`p-6 border-b border-[#e6e2dd] flex ${collapsed ? "flex-col items-center gap-4" : "items-center justify-between"}`}>
         {collapsed ? (
@@ -109,7 +111,7 @@ export default function Sidebar({
 
       {/* Footer Info (Interactive Profile Trigger) */}
       <button 
-        onClick={() => setProfileSettingsOpen(true)}
+        onClick={() => setShowPopover(!showPopover)}
         className={`p-4 border-t border-[#e6e2dd] bg-[#e6e2dd]/40 flex text-left w-full hover:bg-[#e6e2dd]/65 transition-all ${collapsed ? "justify-center" : "items-center gap-3"}`}
         title="User Account Details"
       >
@@ -123,6 +125,70 @@ export default function Sidebar({
           </div>
         )}
       </button>
+
+      {/* Floating Popover Window */}
+      {showPopover && (
+        <div 
+          className={`absolute bottom-20 bg-[#fdf9f4] border border-[#cac6b9]/40 shadow-xl rounded-xl p-4 z-50 text-left ${
+            collapsed ? "left-16 w-60" : "left-4 right-4"
+          }`}
+        >
+          <div className="flex items-start justify-between mb-3">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-[#635f41]/10 border border-[#e6e2dd] flex items-center justify-center text-[#635f41] font-bold text-sm">
+                {activeUser.initials}
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-[#635f41] truncate">{activeUser.name}</p>
+                <p className="text-xs text-[#466272]/70 truncate">{activeUser.role}</p>
+              </div>
+            </div>
+            <button 
+              onClick={() => setShowPopover(false)} 
+              className="text-[#466272]/50 hover:text-[#466272] text-xs font-semibold p-1"
+            >
+              ✕
+            </button>
+          </div>
+          {activeUser.email && (
+            <div className="text-xs text-[#466272]/85 mb-4 border-t border-[#e6e2dd] pt-2 space-y-1">
+              <p className="truncate"><strong>Email:</strong> {activeUser.email}</p>
+            </div>
+          )}
+            {activeUser.isAdmin && (location.pathname === "/admin" || ["/maintainer", "/analytics", "/compliance", "/control-panel", "/media-moderation", "/events-admin", "/directory", "/profile-audit"].includes(location.pathname)) && (
+              <Link
+                to={["/maintainer", "/analytics", "/compliance", "/control-panel", "/media-moderation", "/events-admin", "/directory", "/profile-audit"].includes(location.pathname) ? "/admin" : "/maintainer"}
+                onClick={() => setShowPopover(false)}
+                className="w-full bg-[#635f41] text-white hover:bg-[#635f41]/90 rounded-md text-xs font-semibold py-2 px-3 transition-all text-center block mb-2"
+              >
+                {["/maintainer", "/analytics", "/compliance", "/control-panel", "/media-moderation", "/events-admin", "/directory", "/profile-audit"].includes(location.pathname) ? "Switch to Admin View" : "Switch to Maintainer View"}
+              </Link>
+            )}
+            <Link
+              to="/profile/view"
+              onClick={() => setShowPopover(false)}
+              className="w-full bg-[#8CC0EB] text-[#1c1b19] hover:bg-[#8CC0EB]/90 rounded-md text-xs font-semibold py-2 px-3 transition-all text-center block mb-2"
+            >
+              See Full Profile
+            </Link>
+            <Link
+              to="/profile/edit"
+              onClick={() => setShowPopover(false)}
+              className="w-full bg-[#635f41] text-white hover:bg-[#635f41]/90 rounded-md text-xs font-semibold py-2 px-3 transition-all text-center block mb-2"
+            >
+              Edit Profile
+            </Link>
+            <button
+              onClick={() => {
+                setShowPopover(false);
+                if (onLogOut) onLogOut();
+              }}
+              className="w-full border border-red-200 text-red-600 hover:bg-red-50 rounded-md text-xs font-semibold py-2 px-3 transition-all text-center"
+            >
+              Log Out
+            </button>
+        </div>
+      )}
     </div>
   );
 }

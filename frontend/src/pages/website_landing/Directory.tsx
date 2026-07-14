@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Search, Star } from "lucide-react";
 
@@ -12,47 +12,85 @@ interface Member {
   isFeatured?: boolean;
 }
 
-const members: Member[] = [
+const mapRoleType = (role: string): "Actor" | "Director" | "Design" | "Production" => {
+  const r = role.toLowerCase();
+  if (r.includes("director")) return "Director";
+  if (r.includes("artist") || r.includes("design") || r.includes("choreographer")) return "Design";
+  if (r.includes("maintainer") || r.includes("coordinator") || r.includes("production")) return "Production";
+  return "Actor";
+};
+
+const fallbackMembers: Member[] = [
   {
-    id: "elena-vance",
-    name: "Elena Vance",
-    role: "Lead Actor",
-    roleType: "Actor",
-    description: "Classical performer with over a decade of experience in Shakespearean drama and contemporary avant-garde theatre.",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuDOcdtiEQoy0zh7y5qSW0Em4w87Fz4lYTZmmBHcfyhtbFSceWTs6u9jCaB86rGeiDJkDrywYIgX71l3jt19-0GLz9-vbEQ-9wH6XExEEXWnd-ExlGcaR80XF_2ycyoeJtC9ptjtv9sSbWmZOHsPUPoR-4etUI75RDr-GDf_pEtBNVXP7Dc6V7lxKNmtdTXyiO2m0B-OKU6_dR-PpXk-5toQXim5hfvEU-2yxU896g2mz9Jw3CKPdSJv",
+    id: "MC-1001",
+    name: "Sneha Vyas",
+    role: "Director Coordinator",
+    roleType: "Director",
+    description: "Award-winning director from Mumbai with 15+ years of experience directing modern adaptions of Sanskrit classics.",
+    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAnKUcfY7TKeCByoapSFAmtQIcIc4MmzLibSjnluJbKUysBTKE9qXxmIV3G3iSB8y0k17HEH1E3cfGc0y9OU2Or4LrSIk1pq6J3Skuvg39T7DXSjvd-iBflpXguYRHkVHdb9BJ_Vun0fgkFKmmlnW29sKRqsWDcvSj1_dMPMnE8aCABiaRJWvEyCIOY5pCj3aSn4u_5noKiiqjdzp1cT19rKnbLW9-s_uAzKe2-bkEKYmTE9qGb13joN8SvuzO34Z8BVa05uhfFubR3",
     isFeatured: true
   },
   {
-    id: "marcus-thorne",
-    name: "Marcus Thorne",
-    role: "Director",
-    roleType: "Director",
-    description: "Visionary director known for minimalist stage design and emotionally resonant character-driven narratives.",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuASrF76oyehZoH0Mp6atVLKf1XKX3tY2Q3-v1ZO9_y46IBhoVb597s54MEzoQVZ9ByIRvg5T0utOwDy8G93a0g7JDTLaq75m_dJkTVqR-tz6Ljvhc6MD4cB1NZ-GKU1fdDkMPdQPflf5NTN84uED9M4V3qPGbpaCptepJqWcOetCzmYbC9fAqhr2dFzcblWzWTMv6LICPucZiomxUrFjioKszlnFL2RRBl-p01evg3dOSqdBQX3FSBS"
+    id: "MC-1005",
+    name: "Jayesh Dave",
+    role: "Lead Actor & Member",
+    roleType: "Actor",
+    description: "Method actor specializing in intense protagonist roles. Acted in over 20 stage plays.",
+    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAkD84l9bATTsiV52kbs28_DoHe5f-PFPhB-nnNhuVMs3HgrRA5SWWYHicVET7ryt72YNgtmpyADDdAyM-UziuL4jidI_Uni24HQ1_fqFqT6iaR8ty6GLtE7dKiThcvvU2uOhqsHlIJRuEnhZtJ7Z3-utaWmwkRwcx8efca5RxbgMzf7ztWCU6bYzK3tAIT63YZC8h4zZsX7T8zsxCc1NbgZ4W_b-A_nqNfAWBXbjEPH3d6iKTlACia"
   },
   {
-    id: "sienna-lopez",
-    name: "Sienna Lopez",
+    id: "MC-1007",
+    name: "Pooja Patel",
     role: "Scenic Artist",
     roleType: "Design",
-    description: "Master painter specializing in large-scale murals and photorealistic backdrops that transport audiences across time.",
+    description: "Creating magnificent, detailed set backdrops inspired by Indian heritage and mythology.",
     image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCriANEGDPnpWF8zDsu7mv1efvGVJTz43tLNpo0iKYmMNrXAlqwT8q1YgteTWb_JWv5DDzS00j2JgpuOB65dt5LBR2xvDl_DNzKM9dZ8m6Z5tAmJn0AE2rJmW4OqEZuixxnCVYsnD_CyvaaYxr3x0V4oe-Ind7ffzi9PBm2zQkRlx2v-4XQJe0ouNR5skkT9lf9iA3mya74pOReSx6PmY_Cu5rVySlcZIn8_rw1-AzevATQVpd_zfO1"
   },
   {
-    id: "julian-thorne",
-    name: "Julian Thorne",
-    role: "Club President & Director",
-    roleType: "Director",
-    description: "Refined theater professional specializing in method acting and stage lighting. Leading the Matinee Gallery productions.",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAkD84l9bATTsiV52kbs28_DoHe5f-PFPhB-nnNhuVMs3HgrRA5SWWYHicVET7ryt72YNgtmpyADDdAyM-UziuL4jidI_Uni24HQ1_fqFqT6iaR8ty6GLtE7dKiThcvvU2uOhqsHlIJRuEnhZtJ7Z3-utaWmwkRwcx8efca5RxbgMzf7ztWCU6bYzK3tAIT63YZC8h4zZsX7T8zsxCc1NbgZ4W_b-A_nqNfAWBXbjEPH3d6iKTlACia"
+    id: "MC-1002",
+    name: "Kabir Mehta",
+    role: "Core Maintainer",
+    roleType: "Production",
+    description: "Lead developer and technical coordinator, crafting immersive interactive stages and platform experiences.",
+    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuASrF76oyehZoH0Mp6atVLKf1XKX3tY2Q3-v1ZO9_y46IBhoVb597s54MEzoQVZ9ByIRvg5T0utOwDy8G93a0g7JDTLaq75m_dJkTVqR-tz6Ljvhc6MD4cB1NZ-GKU1fdDkMPdQPflf5NTN84uED9M4V3qPGbpaCptepJqWcOetCzmYbC9fAqhr2dFzcblWzWTMv6LICPucZiomxUrFjioKszlnFL2RRBl-p01evg3dOSqdBQX3FSBS"
   }
 ];
 
 export default function Directory() {
+  const [members, setMembers] = useState<Member[]>(fallbackMembers);
   const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState<"All" | "Actor" | "Director" | "Design" | "Production">("All");
 
+  useEffect(() => {
+    fetch("http://localhost:5001/api/members")
+      .then((res) => {
+        if (!res.ok) throw new Error("HTTP error");
+        return res.json();
+      })
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          const mapped = data.map((m: any) => {
+            const roleName = m.roles && m.roles.length > 0 ? m.roles[0] : "Member";
+            return {
+              id: m.member_id || m.id.toString(),
+              name: m.name,
+              role: roleName,
+              roleType: mapRoleType(roleName),
+              description: m.bio || "",
+              image: m.avatarUrl || "https://lh3.googleusercontent.com/aida-public/AB6AXuAnKUcfY7TKeCByoapSFAmtQIcIc4MmzLibSjnluJbKUysBTKE9qXxmIV3G3iSB8y0k17HEH1E3cfGc0y9OU2Or4LrSIk1pq6J3Skuvg39T7DXSjvd-iBflpXguYRHkVHdb9BJ_Vun0fgkFKmmlnW29sKRqsWDcvSj1_dMPMnE8aCABiaRJWvEyCIOY5pCj3aSn4u_5noKiiqjdzp1cT19rKnbLW9-s_uAzKe2-bkEKYmTE9qGb13joN8SvuzO34Z8BVa05uhfFubR3",
+              isFeatured: m.name === "Sneha Vyas"
+            };
+          });
+          setMembers(mapped);
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to load members from backend:", err);
+      });
+  }, []);
+
   const filteredMembers = members.filter(member => {
+
     const matchesSearch = member.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
                           member.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           member.description.toLowerCase().includes(searchTerm.toLowerCase());
