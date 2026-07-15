@@ -5,7 +5,7 @@ import jwt
 import datetime
 from flask import Blueprint, request, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
-from models import db, User, Role, Admin, Event, Play
+from models import db, User, Role, Membership, Event, Booking, Announcement, Feedback, Gallery, ScheduleSlot, Audition, SharedEvent, Volunteer, Participation, Play, OpenPosition
 import redis
 
 api_bp = Blueprint('api', __name__)
@@ -170,6 +170,18 @@ def get_plays():
     plays = Play.query.all()
     return jsonify([p.to_dict() for p in plays])
 
+@api_bp.route('/plays/<int:play_id>', methods=['GET'])
+def get_play(play_id):
+    play = Play.query.get(play_id)
+    if play:
+        return jsonify(play.to_dict())
+    return jsonify({'error': 'Play not found'}), 404
+
+@api_bp.route('/open-positions', methods=['GET'])
+def get_open_positions():
+    positions = OpenPosition.query.filter_by(status='Open').all()
+    return jsonify([p.to_dict() for p in positions])
+
 @api_bp.route('/events', methods=['GET'])
 def get_events():
     events = Event.query.all()
@@ -211,6 +223,9 @@ def login():
     # Verify password hash or plain
     if not (check_password_hash(db_user.password, password) or db_user.password == password):
         return jsonify({'error': 'Invalid email or password'}), 401
+
+    if db_user.status and db_user.status.lower() == 'pending':
+        return jsonify({'error': 'Application under review. Login restricted.'}), 403
 
     name = db_user.name
     initials = "".join([n[0] for n in name.split()]).upper()[:2]
@@ -360,4 +375,128 @@ def update_profile():
         'status': 'success',
         'member': user.to_dict()
     })
+
+@api_bp.route('/maintainer/dashboard', methods=['GET'])
+def get_dashboard():
+    notifications = Notification.query.filter_by(is_read=False).all()
+    
+    result = []
+    for notif in notifications:
+        data = {
+            'id': notif.id,
+            'type': notif.type,
+            'is_read': notif.is_read,
+            'created_at': notif.created_at.isoformat() if notif.created_at else None,
+            'recipient_id': notif.recipient_id,
+            'reference_id': notif.reference_id
+        }
+        if notif.type == 'new_member':
+            u = User.query.get(notif.reference_id)
+            if u: 
+                data['details'] = {'name': u.name, 'email': u.email, 'status': u.status}
+        elif notif.type == 'new_audition':
+            a = Audition.query.get(notif.reference_id)
+            if a: 
+                data['details'] = {'role_applied': a.role_applied_for, 'date': a.audition_date}
+        elif notif.type == 'new_event_share':
+            e = SharedEvent.query.get(notif.reference_id)
+            if e: 
+                data['details'] = {'title': e.title, 'status': e.status}
+        result.append(data)
+        
+    return jsonify(result)
+
+@api_bp.route('/my-schedule', methods=['GET'])
+def get_my_schedule():
+    email = request.args.get('email')
+    if not email:
+        return jsonify({'error': 'Email is required'}), 400
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+        
+    participations = Participation.query.filter_by(user_id=user.id).all()
+    result = []
+    for p in participations:
+        e = p.event
+        if e:
+            result.append({
+                'id': e.id,
+                'title': e.title,
+                'description': e.description,
+                'category': e.category,
+                'venue': e.venue,
+                'date': e.event_date.strftime('%b %d, %Y') if e.event_date else '',
+                'timeRange': f"{e.start_time.strftime('%H:%M') if e.start_time else ''} - {e.end_time.strftime('%H:%M') if e.end_time else ''}",
+                'status': p.status,
+                'participation_id': p.id
+            })
+    return jsonify(result)
+
+@api_bp.route('/my-schedule/update', methods=['POST'])
+def update_my_schedule():
+    data = request.json
+    p_id = data.get('participation_id')
+    new_status = data.get('status')
+    if not p_id or not new_status:
+        return jsonify({'error': 'Missing fields'}), 400
+        
+    p = Participation.query.get(p_id)
+    if p:
+        p.status = new_status
+        db.session.commit()
+        return jsonify({'success': True})
+    return jsonify({'error': 'Not found'}), 404
+
+@api_bp.route('/my-auditions', methods=['GET'])
+def get_my_auditions():
+    email = request.args.get('email')
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+        
+    auditions = Audition.query.filter_by(user_id=user.id).all()
+    result = []
+    for a in auditions:
+        play = Play.query.get(a.play_id)
+        play_title = play.title if play else "Unknown Play"
+        
+        # map db status to UI status
+        status_map = {
+            'pending': 'Applied',
+            'reviewing': 'Reviewing',
+            'interview': 'Interview/Audition',
+            'decision': 'Casting Decision'
+        }
+        ui_status = status_map.get(a.status.lower(), 'Applied')
+        
+        result.append({
+            'id': f"app{a.id}",
+            'positionId': f"{a.play_id}_{a.role}",
+            'positionTitle': f"{play_title} - {a.role}",
+            'category': a.role,
+            'submittedAt': a.submitted_at.strftime('%b %d, %Y') if a.submitted_at else '',
+            'status': ui_status,
+            'notes': "Application received and logged.",
+            'files': ["application_details.pdf"]
+        })
+    return jsonify(result)
+
+@api_bp.route('/audition/submit', methods=['POST'])
+def submit_audition():
+    data = request.json
+    email = data.get('email')
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+        
+    play_id = data.get('play_id')
+    role = data.get('role')
+    notes = data.get('notes')
+    
+    a = Audition(user_id=user.id, play_id=play_id, role=role, experience_notes=notes, status='pending')
+    db.session.add(a)
+    db.session.commit()
+    
+    return jsonify({'success': True, 'id': a.id})
 

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useOutletContext } from "react-router-dom";
 import { Search, FileText, Video, Upload, ChevronRight, ListChecks, Check, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +15,7 @@ import {
 
 interface OpenPosition {
   id: string;
+  play_id: number;
   title: string;
   category: "Performer" | "Technical Crew" | "Creative Designer" | "Director";
   description: string;
@@ -32,80 +34,41 @@ interface Application {
   files: string[];
 }
 
-const openPositions: OpenPosition[] = [
-  {
-    id: "p1",
-    title: "Macbeth Understudy / Ensemble",
-    category: "Performer",
-    description: "Understudy role for the lead persona of Macbeth. Includes rehearsal attendance, ensemble staging, and backing choruses.",
-    requirements: "Audition Video Monologue (MP4/MOV) & Acting Resume (PDF)",
-    deadline: "July 15, 2026",
-  },
-  {
-    id: "p2",
-    title: "Banquo Understudy / Ensemble",
-    category: "Performer",
-    description: "Prepare and understudy for Banquo's staging, coordinate sword combat staging, and perform in the main ghost sequences.",
-    requirements: "Audition Video Monologue (MP4/MOV) & Acting Resume (PDF)",
-    deadline: "July 18, 2026",
-  },
-  {
-    id: "p3",
-    title: "Assistant Stage Manager (ASM)",
-    category: "Technical Crew",
-    description: "Support backstage prop layout, timing checks, dry ice fog machine calibration, and stage clearance checks.",
-    requirements: "Technical Crew Resume & Production Portfolio (PDF)",
-    deadline: "July 12, 2026",
-  },
-  {
-    id: "p4",
-    title: "Backstage Wardrobe Coordinator",
-    category: "Technical Crew",
-    description: "Maintain Lord Macbeth's banquet robes, assist actors with quick changes, and manage apparel tags backstage.",
-    requirements: "Costume Design Portfolio or Resume",
-    deadline: "July 16, 2026",
-  },
-  {
-    id: "p5",
-    title: "Scenic Backdrop Rendering Designer",
-    category: "Creative Designer",
-    description: "Collaborate with the director to construct atmospheric sketches and set designs for the heath and castle hall.",
-    requirements: "Creative Portfolio Link or Sketches (PDF)",
-    deadline: "July 14, 2026",
-  },
-];
-
-const initialApplications: Application[] = [
-  {
-    id: "app1",
-    positionId: "p1",
-    positionTitle: "Macbeth Understudy / Ensemble",
-    category: "Performer",
-    submittedAt: "July 08, 2026",
-    status: "Interview/Audition",
-    notes: "Your monologue files were successfully logged. Director scheduled a callback for July 12.",
-    files: ["jayesh_monologue.mp4", "jayesh_resume.pdf"],
-  },
-];
-
 export default function AuditionsCasting() {
+  const { activeUser } = useOutletContext<{ activeUser: any }>();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<"All" | "Performer" | "Technical Crew" | "Creative Designer" | "Director">("All");
   
-  // Applications Tracking State
-  const [applications, setApplications] = useState<Application[]>(initialApplications);
-  const [selectedAppId, setSelectedAppId] = useState<string>("app1");
+  const [openPositions, setOpenPositions] = useState<OpenPosition[]>([]);
+  const [applications, setApplications] = useState<Application[]>([]);
+  const [selectedAppId, setSelectedAppId] = useState<string>("");
   
-  // Apply Dialog State
   const [applyOpen, setApplyOpen] = useState(false);
   const [activePosition, setActivePosition] = useState<OpenPosition | null>(null);
   
-  // Form fields
-  const [applicantName, setApplicantName] = useState("Jayesh Dave");
-  const [applicantEmail, setApplicantEmail] = useState("jayesh.d@matinee.club");
+  const [applicantName, setApplicantName] = useState(activeUser?.name || "");
+  const [applicantEmail, setApplicantEmail] = useState(activeUser?.email || "");
   const [fileName1, setFileName1] = useState("");
   const [fileName2, setFileName2] = useState("");
   const [coverNote, setCoverNote] = useState("");
+
+  useEffect(() => {
+    fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5001"}/api/open-positions`)
+      .then(r => r.json())
+      .then(positions => {
+        setOpenPositions(positions);
+      });
+  }, []);
+
+  useEffect(() => {
+    if (!activeUser?.email) return;
+    fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5001"}/api/my-auditions?email=${activeUser.email}`)
+      .then(r => r.json())
+      .then(apps => {
+        setApplications(apps);
+        if (apps.length > 0) setSelectedAppId(apps[0].id);
+      });
+  }, [activeUser]);
 
   const handleApplyClick = (pos: OpenPosition) => {
     setActivePosition(pos);
@@ -115,32 +78,49 @@ export default function AuditionsCasting() {
     setApplyOpen(true);
   };
 
-  const handleFormSubmit = (e: React.FormEvent) => {
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!activePosition) return;
+    if (!activePosition || !activeUser) return;
+    
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5001"}/api/audition/submit`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: activeUser.email,
+          play_id: activePosition.play_id,
+          role: activePosition.category,
+          notes: coverNote
+        })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const filesUploaded = [];
+        if (fileName1) filesUploaded.push(fileName1);
+        if (fileName2) filesUploaded.push(fileName2);
+        if (filesUploaded.length === 0) {
+          filesUploaded.push(activePosition.category === "Performer" ? "audition_monologue.mp4" : "portfolio_materials.pdf");
+        }
 
-    const filesUploaded = [];
-    if (fileName1) filesUploaded.push(fileName1);
-    if (fileName2) filesUploaded.push(fileName2);
-    if (filesUploaded.length === 0) {
-      filesUploaded.push(activePosition.category === "Performer" ? "audition_monologue.mp4" : "portfolio_materials.pdf");
+        const newApp: Application = {
+          id: `app${data.id || Date.now()}`,
+          positionId: activePosition.id,
+          positionTitle: activePosition.title,
+          category: activePosition.category,
+          submittedAt: new Date().toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" }),
+          status: "Applied",
+          notes: "Application received. The creative board is conducting initial review processes.",
+          files: filesUploaded,
+        };
+
+        const updatedApps = [...applications, newApp];
+        setApplications(updatedApps);
+        setSelectedAppId(newApp.id);
+        setApplyOpen(false);
+      }
+    } catch(err) {
+      console.error(err);
     }
-
-    const newApp: Application = {
-      id: `app${applications.length + 1}`,
-      positionId: activePosition.id,
-      positionTitle: activePosition.title,
-      category: activePosition.category,
-      submittedAt: new Date().toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" }),
-      status: "Applied",
-      notes: "Application received. The creative board is conducting initial review processes.",
-      files: filesUploaded,
-    };
-
-    const updatedApps = [...applications, newApp];
-    setApplications(updatedApps);
-    setSelectedAppId(newApp.id);
-    setApplyOpen(false);
   };
 
   const filteredPositions = openPositions.filter((pos) => {
@@ -182,7 +162,7 @@ export default function AuditionsCasting() {
       {/* Filter and Search Bar */}
       <div className="bg-white border border-[#e6e2dd] rounded-[8px] p-4 flex flex-col md:flex-row gap-4 items-center justify-between shadow-xs">
         <div className="flex flex-wrap gap-2 w-full md:w-auto">
-          {(["All", "Performer", "Technical Crew", "Creative Designer"] as const).map((cat) => (
+          {(["All", "Performer", "Technical Crew", "Creative Designer", "Director"] as const).map((cat) => (
             <Button
               key={cat}
               variant={selectedCategory === cat ? "default" : "outline"}

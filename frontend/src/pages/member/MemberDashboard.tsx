@@ -65,6 +65,7 @@ export default function MemberDashboard() {
   const [scriptOpen, setScriptOpen] = useState(false);
   const [attendanceOpen, setAttendanceOpen] = useState(false);
   const [calendarOpen, setCalendarOpen] = useState(false);
+  const [calendarDate, setCalendarDate] = useState<Date>(new Date());
 
   const attendanceLog = [
     { date: "June 15, 2026", event: "Macbeth Table Read (Acts I & II)", status: "Present" },
@@ -76,42 +77,73 @@ export default function MemberDashboard() {
   ];
 
   useEffect(() => {
-    const targetDate = new Date("2026-07-12T14:00:00");
-    const calculateTimeLeft = () => {
-      const difference = +targetDate - +new Date();
-      let newTimeLeft = { days: 0, hours: 0, minutes: 0, seconds: 0 };
-
-      if (difference > 0) {
-        newTimeLeft = {
-          days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-          hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-          minutes: Math.floor((difference / 1000 / 60) % 60),
-          seconds: Math.floor((difference / 1000) % 60),
-        };
-      }
-      setTimeLeft(newTimeLeft);
-    };
-
-    calculateTimeLeft();
-    const timer = setInterval(calculateTimeLeft, 1000);
-
     const fetchEvents = async () => {
+      if (!activeUser?.email) return;
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5001"}/api/events`);
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5001"}/api/my-schedule?email=${activeUser.email}`);
         if (response.ok) {
           const data = await response.json();
-          setEvents(data.events || []);
+          const formatted = data.map((e: any) => ({
+            ...e,
+            date: e.date,
+            time: e.timeRange || e.time,
+            location: e.venue || e.location,
+            status: e.status,
+            roleRequired: e.category,
+            directorNotes: e.description
+          }));
+          setEvents(formatted);
         }
       } catch (err) {
         console.error("Failed to fetch events", err);
       }
     };
     fetchEvents();
+  }, [activeUser]);
 
+  useEffect(() => {
+    const accepted = events.filter(e => e.status === "Accepted");
+    if (accepted.length > 0) {
+      const earliest = [...accepted].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())[0];
+      const d = new Date(earliest.date);
+      if (!isNaN(d.getTime())) setCalendarDate(new Date(d.getFullYear(), d.getMonth(), 1));
+    }
+
+    const upcomingEvents = accepted
+      .map(e => ({ ...e, parsedDate: new Date(e.date + (e.time ? " " + e.time.split('-')[0] : "")) }))
+      .filter(e => e.parsedDate.getTime() > Date.now())
+      .sort((a, b) => a.parsedDate.getTime() - b.parsedDate.getTime());
+      
+    const targetDate = upcomingEvents.length > 0 ? upcomingEvents[0].parsedDate : new Date("2026-07-12T14:00:00");
+
+    const calculateTimeLeft = () => {
+      const difference = +targetDate - +new Date();
+      if (difference > 0) {
+        setTimeLeft({
+          days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+          minutes: Math.floor((difference / 1000 / 60) % 60),
+          seconds: Math.floor((difference / 1000) % 60),
+        });
+      } else {
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+      }
+    };
+
+    calculateTimeLeft();
+    const timer = setInterval(calculateTimeLeft, 1000);
     return () => clearInterval(timer);
-  }, []);
+  }, [events]);
 
   const pendingCount = events.filter(e => e.status === "Pending").length;
+  const displayMonth = calendarDate.getMonth();
+  const displayYear = calendarDate.getFullYear();
+  const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  
+  const daysInMonth = new Date(displayYear, displayMonth + 1, 0).getDate();
+  const firstDayOfMonth = new Date(displayYear, displayMonth, 1).getDay();
+  const calendarEmptyDays = Array(firstDayOfMonth).fill(null);
+  const calendarDays = Array.from({length: daysInMonth}, (_, i) => new Date(displayYear, displayMonth, i + 1));
 
   return (
     <div className="space-y-[32px] font-sans text-[#466272]">
@@ -278,88 +310,43 @@ export default function MemberDashboard() {
 
       {/* Production Calendar Dialog */}
       <Dialog open={calendarOpen} onOpenChange={setCalendarOpen}>
-        <DialogContent className="bg-[#fdf9f4] border border-[#e6e2dd] text-[#466272] max-w-md">
+        <DialogContent className="bg-[#fdf9f4] border border-[#e6e2dd] text-[#466272] max-w-3xl">
           <DialogHeader>
             <DialogTitle className="font-serif text-[#635f41] text-xl font-bold flex items-center gap-2">
               <CalendarIcon className="w-5 h-5 text-[#8CC0EB]" /> Production Calendar
             </DialogTitle>
             <DialogDescription className="text-xs text-[#466272]/85">
-              Matinee schedule & events for July 2026.
+              Scheduled events for {monthNames[displayMonth]} {displayYear}.
             </DialogDescription>
           </DialogHeader>
           <div className="py-4 space-y-4">
-            {/* Calendar Grid */}
-            <div className="border border-[#e6e2dd] rounded-[8px] bg-white p-4 shadow-xs">
-              <div className="flex items-center justify-between border-b border-[#e6e2dd] pb-2 mb-3">
-                <span className="font-serif text-[#635f41] font-bold text-sm">July 2026</span>
-                <span className="text-[10px] uppercase font-semibold text-[#8CC0EB]">Macbeth Season</span>
-              </div>
-              <div className="grid grid-cols-7 gap-1 text-center text-xs font-semibold text-[#635f41] mb-2">
-                <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
-              </div>
-              <div className="grid grid-cols-7 gap-1 text-center text-xs text-[#466272]">
-                {/* Offset for July 2026 starting on Wednesday (Offset: 3 empty cells) */}
-                <div /> <div /> <div />
-                
-                {/* Days */}
-                <span>1</span>
-                <span>2</span>
-                <span>3</span>
-                <span className="bg-[#8CC0EB]/20 text-[#635f41] rounded-full font-bold relative group cursor-pointer p-1" title="Macbeth Act III Rehearsal">
-                  4
-                  <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 bg-[#8CC0EB] rounded-full" />
-                </span>
-                <span>5</span>
-                <span>6</span>
-                <span className="bg-[#8CC0EB]/20 text-[#635f41] rounded-full font-bold relative group cursor-pointer p-1" title="Technical Dress Run">
-                  7
-                  <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 bg-[#8CC0EB] rounded-full" />
-                </span>
-                <span>8</span>
-                <span>9</span>
-                <span className="bg-amber-100 text-amber-800 rounded-full font-bold relative group cursor-pointer p-1" title="Sponsor Gala Pre-Performance Read">
-                  10
-                  <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 bg-amber-500 rounded-full" />
-                </span>
-                <span>11</span>
-                <span className="bg-[#635f41] text-white rounded-full font-bold relative group cursor-pointer p-1" title="Macbeth Opening Night Gala">
-                  12
-                  <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 bg-white rounded-full" />
-                </span>
-                <span>13</span>
-                <span>14</span>
-                <span>15</span>
-                <span>16</span>
-                <span>17</span>
-                <span>18</span>
-                <span>19</span>
-                <span>20</span>
-                <span>21</span>
-                <span>22</span>
-                <span>23</span>
-                <span>24</span>
-                <span>25</span>
-                <span>26</span>
-                <span>27</span>
-                <span>28</span>
-                <span>29</span>
-                <span>30</span>
-                <span>31</span>
-              </div>
-            </div>
-            {/* Legend */}
-            <div className="space-y-1.5 text-xs text-[#466272]/95 border border-[#e6e2dd] rounded-[8px] bg-white p-3">
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#8CC0EB]/40 flex-shrink-0" />
-                <span>Rehearsal Session (July 4, July 7)</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-amber-200 flex-shrink-0" />
-                <span>Sponsor Gala / Online Read (July 10)</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#635f41] flex-shrink-0" />
-                <span>Opening Matinee Performance (July 12)</span>
+            {/* Dynamic Calendar Grid */}
+            <div className="border border-[#e6e2dd] rounded-[8px] bg-white shadow-xs">
+              <div className="grid grid-cols-7 gap-[1px] border-l border-[#e6e2dd] bg-[#e6e2dd]">
+                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => (
+                  <div key={d} className="text-center text-xs font-semibold text-[#635f41] py-2 bg-[#f7f3ee]/50">{d}</div>
+                ))}
+                {calendarEmptyDays.map((_, i) => <div key={`empty-${i}`} className="p-2 bg-[#fcfbfa]" />)}
+                {calendarDays.map(day => {
+                  const dayEvents = events.filter(e => {
+                    if (e.status !== "Accepted") return false;
+                    const d = new Date(e.date);
+                    return !isNaN(d.getTime()) && d.getFullYear() === day.getFullYear() && d.getMonth() === day.getMonth() && d.getDate() === day.getDate();
+                  });
+                  
+                  return (
+                    <div key={day.toISOString()} className="min-h-[80px] p-1 bg-white relative flex flex-col">
+                      <div className="text-right text-[#635f41] text-xs font-medium mb-1 pr-1">{day.getDate()}</div>
+                      <div className="space-y-1 flex-1 overflow-y-auto max-h-[100px]">
+                        {dayEvents.map(e => (
+                          <div key={e.id} className="bg-[#8CC0EB]/20 hover:bg-[#8CC0EB]/40 text-[#466272] text-[10px] px-1 py-0.5 rounded truncate border border-[#8CC0EB]/30 transition-colors" title={`${e.time} - ${e.title}`}>
+                            {e.time.split(' ')[0]} {e.title}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )
+                })}
               </div>
             </div>
           </div>

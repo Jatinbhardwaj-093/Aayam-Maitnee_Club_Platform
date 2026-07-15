@@ -18,7 +18,9 @@ import {
   HardDrive,
   Calendar,
   Menu,
-  ShieldAlert
+  ShieldAlert,
+  PlayCircle,
+  FileText
 } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
@@ -42,6 +44,8 @@ const navItems: NavItem[] = [
   { label: "Gallery", path: "/gallery", icon: ImageIcon, description: "Performances & backstage media" },
   { label: "Production Office", path: "/admin", icon: ShieldCheck, description: "Director availability & admin" },
   { label: "Backstage Pass", path: "/backstage", icon: ClipboardList, description: "Tasks & check-ins" },
+  { label: "Plays & Productions", path: "/member-plays", icon: PlayCircle, description: "Our active & past plays" },
+  { label: "Script Vault", path: "/member-scripts", icon: FileText, description: "Download official scripts" },
 ];
 
 const maintainerNavItems: NavItem[] = [
@@ -93,8 +97,8 @@ export default function AppLayout() {
         }
         const isNormalMember = !activeUser?.isAdmin && !activeUser?.role.toLowerCase().includes("maintainer");
         if (isNormalMember) {
-          // Display only Member Dashboard, My Schedule, and Auditions & Casting.
-          return ["/member", "/schedule", "/auditions"].includes(item.path);
+          // Display only Member Dashboard, My Schedule, Auditions, Plays, and Scripts.
+          return ["/member", "/schedule", "/auditions", "/member-plays", "/member-scripts"].includes(item.path);
         }
         return true;
       });
@@ -157,7 +161,7 @@ export default function AppLayout() {
 
   const isMaintainer = activeUser?.role.toLowerCase().includes("maintainer") || false;
   const isMember = activeUser ? (!activeUser.isAdmin && !isMaintainer) : false;
-  const isAllowedPath = ["/", "/member", "/schedule", "/auditions", "/plays", "/events", "/directory"].includes(location.pathname) || location.pathname.startsWith("/profile");
+  const isAllowedPath = ["/", "/member", "/schedule", "/auditions", "/member-plays", "/member-scripts", "/plays", "/events", "/directory"].includes(location.pathname) || location.pathname.startsWith("/profile");
   const showAccessDenied = activeUser && !activeUser.isAdmin && !isMaintainer && isMember && !isAllowedPath;
 
   const sidebarWidthClass = isCollapsed ? "w-[72px]" : "w-64 xl:w-72";

@@ -10,6 +10,8 @@ import ProductionOffice from "./pages/ProductionOffice";
 import BackstagePass from "./pages/BackstagePass";
 import EditProfile from "./pages/member/EditProfile";
 import ViewProfile from "./pages/member/ViewProfile";
+import MemberPlays from "./pages/member/MemberPlays";
+import MemberScripts from "./pages/member/MemberScripts";
 
 // Maintainer pages
 import MaintainerDashboard from "./pages/maintainers/MaintainerDashboard";
@@ -58,6 +60,8 @@ export default function App() {
           <Route path="schedule" element={<MySchedule />} />
           <Route path="workspace" element={<ProductionWorkspace />} />
           <Route path="auditions" element={<AuditionsCasting />} />
+          <Route path="member-plays" element={<MemberPlays />} />
+          <Route path="member-scripts" element={<MemberScripts />} />
           <Route path="sponsor" element={<SponsorDashboard />} />
           <Route path="gallery" element={<ProductionGallery />} />
           <Route path="admin" element={<ProductionOffice />} />

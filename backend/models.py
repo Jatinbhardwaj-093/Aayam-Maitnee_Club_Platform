@@ -40,9 +40,12 @@ class User(db.Model):
     membership = db.relationship("Membership", back_populates="user", uselist=False, cascade="all, delete-orphan")
     bookings = db.relationship("Booking", back_populates="user", cascade="all, delete-orphan")
     feedbacks = db.relationship("Feedback", back_populates="user", cascade="all, delete-orphan")
-    notifications = db.relationship("Notification", back_populates="user", cascade="all, delete-orphan")
+    notifications = db.relationship("Notification", back_populates="recipient", cascade="all, delete-orphan")
+    auditions = db.relationship("Audition", back_populates="user", cascade="all, delete-orphan")
+    shared_events = db.relationship("SharedEvent", back_populates="submitter", cascade="all, delete-orphan")
     volunteer = db.relationship("Volunteer", back_populates="user", cascade="all, delete-orphan")
     participations = db.relationship("Participation", back_populates="user", cascade="all, delete-orphan")
+    schedule_slots = db.relationship("ScheduleSlot", back_populates="user", cascade="all, delete-orphan")
 
     def to_dict(self):
         return {
@@ -171,15 +174,54 @@ class Gallery(db.Model):
 
     event = db.relationship("Event", back_populates="gallery")
 
+class ScheduleSlot(db.Model):
+    __tablename__ = "schedule_slot"
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    date = db.Column(db.Date, nullable=True)
+    day_of_week = db.Column(db.String(15), nullable=True)
+    start_time = db.Column(db.Time, nullable=False)
+    end_time = db.Column(db.Time, nullable=False)
+    notes = db.Column(db.String(255), nullable=True)
+
+    user = db.relationship("User", back_populates="schedule_slots")
+
+class Audition(db.Model):
+    __tablename__ = "audition"
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    play_id = db.Column(db.Integer, db.ForeignKey("play.id"))
+    audition_date = db.Column(db.DateTime)
+    role_applied_for = db.Column(db.String(100))
+    experience_notes = db.Column(db.Text)
+    status = db.Column(db.String(20), default="pending")
+    submitted_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    user = db.relationship("User", back_populates="auditions")
+
+class SharedEvent(db.Model):
+    __tablename__ = "shared_event"
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    submitted_by = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=True)
+    title = db.Column(db.String(150), nullable=False)
+    description = db.Column(db.Text)
+    event_date = db.Column(db.DateTime)
+    location_or_link = db.Column(db.String(255))
+    status = db.Column(db.String(20), default="pending")
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    submitter = db.relationship("User", back_populates="shared_events")
+
 class Notification(db.Model):
     __tablename__ = "notification"
-
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    message = db.Column(db.Text, nullable=False)
+    recipient_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    type = db.Column(db.String(50), nullable=False)
+    reference_id = db.Column(db.Integer, nullable=False)
+    is_read = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
 
-    user = db.relationship("User", back_populates="notifications")
+    recipient = db.relationship("User", back_populates="notifications")
 
 class Volunteer(db.Model):
     __tablename__ = "volunteer"
@@ -241,3 +283,57 @@ class Play(db.Model):
             'runtime': self.runtime,
             'price': self.price
         }
+
+class OpenPosition(db.Model):
+    __tablename__ = "open_position"
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    play_id = db.Column(db.Integer, db.ForeignKey("play.id"), nullable=False)
+    title = db.Column(db.String(150))
+    category = db.Column(db.String(100))
+    description = db.Column(db.Text)
+    requirements = db.Column(db.String(255))
+    deadline = db.Column(db.Date)
+    status = db.Column(db.String(50), default="Open")
+    
+    play = db.relationship("Play", backref=db.backref("open_positions", cascade="all, delete-orphan"))
+
+    def to_dict(self):
+        return {
+            'id': f"{self.play_id}_{self.category.replace(' ', '')}_{self.id}",
+            'db_id': self.id,
+            'play_id': self.play_id,
+            'title': self.title,
+            'category': self.category,
+            'description': self.description,
+            'requirements': self.requirements,
+            'deadline': self.deadline.strftime('%b %d, %Y') if self.deadline else 'TBA',
+            'status': self.status
+        }
+
+from sqlalchemy import event, text
+
+def create_notification_raw(connection, target_id, n_type):
+    try:
+        admins = connection.execute(text("SELECT user_id FROM admin")).fetchall()
+        for admin in admins:
+            if admin[0]:
+                connection.execute(text(
+                    "INSERT INTO notification (recipient_id, type, reference_id, is_read, created_at) VALUES (:rec_id, :type, :ref_id, 0, CURRENT_TIMESTAMP)"
+                ), {"rec_id": admin[0], "type": n_type, "ref_id": target_id})
+    except Exception as e:
+        pass
+
+def user_after_insert(mapper, connection, target):
+    if target.status and target.status.lower() == 'pending':
+        create_notification_raw(connection, target.id, 'new_member')
+
+def audition_after_insert(mapper, connection, target):
+    create_notification_raw(connection, target.id, 'new_audition')
+
+def sharedevent_after_insert(mapper, connection, target):
+    create_notification_raw(connection, target.id, 'new_event_share')
+
+event.listen(User, 'after_insert', user_after_insert)
+event.listen(Audition, 'after_insert', audition_after_insert)
+event.listen(SharedEvent, 'after_insert', sharedevent_after_insert)
