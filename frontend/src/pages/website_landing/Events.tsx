@@ -157,7 +157,8 @@ export default function Events() {
   const [statusFilter, setStatusFilter] = useState<"All" | "Soon to Happen" | "Concluded">("All");
 
   useEffect(() => {
-    fetch("http://localhost:5001/api/events")
+    const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5001";
+    fetch(`${baseUrl}/api/events`)
       .then((res) => {
         if (!res.ok) throw new Error("HTTP error");
         return res.json();

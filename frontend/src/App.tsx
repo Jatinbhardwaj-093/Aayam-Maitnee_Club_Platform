@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, useOutletContext } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AppLayout from "./components/AppLayout";
 import MemberDashboard from "./pages/member/MemberDashboard";
 import MySchedule from "./pages/member/MySchedule";
@@ -31,15 +31,6 @@ import Directory from "./pages/website_landing/Directory";
 import Profile from "./pages/website_landing/Profile";
 import JoinClub from "./pages/JoinClub";
 
-function DirectoryWrapper() {
-  const context = useOutletContext<{ activeUser: any }>();
-  const activeUser = context?.activeUser;
-  if (activeUser?.role.toLowerCase().includes("maintainer") || activeUser?.isAdmin) {
-    return <AllMembersDirectory />;
-  }
-  return <Directory />;
-}
-
 export default function App() {
   return (
     <BrowserRouter>
@@ -48,7 +39,7 @@ export default function App() {
           <Route index element={<Landing />} />
           <Route path="plays" element={<Plays />} />
           <Route path="events" element={<Events />} />
-          <Route path="directory" element={<DirectoryWrapper />} />
+          <Route path="directory" element={<Directory />} />
           <Route path="profile" element={<Profile />} />
           <Route path="profile/view" element={<ViewProfile />} />
           <Route path="profile/edit" element={<EditProfile />} />
@@ -73,6 +64,7 @@ export default function App() {
           <Route path="profile-audit" element={<MemberProfileAudit />} />
           <Route path="media-moderation" element={<MediaModeration />} />
           <Route path="events-admin" element={<EventsManagement />} />
+          <Route path="directory-admin" element={<AllMembersDirectory />} />
         </Route>
       </Routes>
     </BrowserRouter>

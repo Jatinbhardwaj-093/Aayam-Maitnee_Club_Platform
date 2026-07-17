@@ -9,6 +9,21 @@ user_roles = db.Table(
     db.Column("role_id", db.Integer, db.ForeignKey("role.id"), primary_key=True),
 )
 
+user_labels = db.Table(
+    "user_labels",
+    db.Column("user_id", db.Integer, db.ForeignKey("user.id"), primary_key=True),
+    db.Column("label_id", db.Integer, db.ForeignKey("label.id"), primary_key=True),
+)
+
+class Label(db.Model):
+    __tablename__ = "label"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False, unique=True)
+    color = db.Column(db.String(50), nullable=True) # Optional color coding
+    
+    users = db.relationship("User", secondary=user_labels, back_populates="labels")
+
+
 class User(db.Model):
     __tablename__ = "user"
 
@@ -46,6 +61,7 @@ class User(db.Model):
     volunteer = db.relationship("Volunteer", back_populates="user", cascade="all, delete-orphan")
     participations = db.relationship("Participation", back_populates="user", cascade="all, delete-orphan")
     schedule_slots = db.relationship("ScheduleSlot", back_populates="user", cascade="all, delete-orphan")
+    labels = db.relationship("Label", secondary=user_labels, back_populates="users")
 
     def to_dict(self):
         return {
@@ -69,7 +85,9 @@ class User(db.Model):
             'interest': self.interest,
             'emergency_name': self.emergency_name,
             'emergency_phone': self.emergency_phone,
-            'roles': [r.name for r in self.roles]
+            'roles': [r.name for r in self.roles],
+            'labels': [{'id': l.id, 'name': l.name, 'color': l.color} for l in self.labels],
+            'productionsCount': len(self.participations) if self.participations else 0
         }
 
 class Role(db.Model):
@@ -103,6 +121,24 @@ class Membership(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
 
     user = db.relationship("User", back_populates="membership")
+
+
+class StageBooking(db.Model):
+    __tablename__ = "stage_booking"
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    time = db.Column(db.String(20))
+    period = db.Column(db.String(10))
+    stage = db.Column(db.String(100))
+    details = db.Column(db.String(255))
+    is_secondary = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+class RevenueMetric(db.Model):
+    __tablename__ = "revenue_metric"
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    playbill_sold = db.Column(db.Integer, default=0)
+    corporate_patrons = db.Column(db.Integer, default=0)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 class Event(db.Model):
     __tablename__ = "event"

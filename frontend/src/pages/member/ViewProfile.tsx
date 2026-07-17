@@ -85,6 +85,22 @@ export default function ViewProfile() {
                 <span className="inline-block px-3 py-1 rounded-full bg-[#8CC0EB]/20 text-[#2e4a5a] text-[10px] font-bold uppercase tracking-wider">
                   {profile.roles && profile.roles.length > 0 ? profile.roles[0] : "Member"}
                 </span>
+                
+                {/* Discord-style Labels */}
+                {profile.labels?.map((label: any) => (
+                  <span 
+                    key={label.id} 
+                    className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold"
+                    style={{
+                      backgroundColor: `${label.color}15`, 
+                      border: `1px solid ${label.color}40`,
+                      color: label.color
+                    }}
+                  >
+                    <span className="w-2 h-2 rounded-full" style={{backgroundColor: label.color}}></span>
+                    {label.name}
+                  </span>
+                ))}
               </div>
               <p className="text-sm text-[#466272]">{profile.email}</p>
             </div>

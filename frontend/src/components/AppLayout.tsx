@@ -55,7 +55,7 @@ const maintainerNavItems: NavItem[] = [
   { label: "Production Control", path: "/control-panel", icon: Sliders, description: "Technical & access control panel" },
   { label: "Media Moderation", path: "/media-moderation", icon: HardDrive, description: "Review gallery content & storage" },
   { label: "Events Management", path: "/events-admin", icon: Calendar, description: "Proposal curation & concurrent lock editor" },
-  { label: "Members Directory", path: "/directory", icon: Users, description: "Ensemble & crew directory" },
+  { label: "Members Directory", path: "/directory-admin", icon: Users, description: "Ensemble & crew directory" },
 ];
 
 // personas deleted
@@ -85,17 +85,17 @@ export default function AppLayout() {
   });
   const [loginError, setLoginError] = useState<string | null>(null);
 
+  const isMaintainer = activeUser?.role.toLowerCase().includes("maintainer") || activeUser?.isAdmin || false;
+
   const isLandingPage = ["/", "/plays", "/events", "/directory"].includes(location.pathname) || location.pathname.startsWith("/profile") || !activeUser;
 
-  const isMaintainerPath = ["/maintainer", "/analytics", "/compliance", "/control-panel", "/media-moderation", "/events-admin", "/directory", "/profile-audit"].includes(location.pathname);
-
-  const filteredNavItems = (activeUser?.role.toLowerCase().includes("maintainer") || (activeUser?.isAdmin && isMaintainerPath))
+  const filteredNavItems = isMaintainer
     ? maintainerNavItems
     : navItems.filter((item) => {
         if (item.path === "/") {
           return false;
         }
-        const isNormalMember = !activeUser?.isAdmin && !activeUser?.role.toLowerCase().includes("maintainer");
+        const isNormalMember = !isMaintainer;
         if (isNormalMember) {
           // Display only Member Dashboard, My Schedule, Auditions, Plays, and Scripts.
           return ["/member", "/schedule", "/auditions", "/member-plays", "/member-scripts"].includes(item.path);
@@ -135,10 +135,8 @@ export default function AppLayout() {
         setPortalOpen(false);
 
         // Redirect based on role
-        if (user.role.includes("Maintainer")) {
+        if (user.role.toLowerCase().includes("maintainer") || user.isAdmin) {
           navigate("/maintainer");
-        } else if (user.isAdmin) {
-          navigate("/admin");
         } else {
           navigate("/member");
         }
@@ -159,10 +157,9 @@ export default function AppLayout() {
     navigate("/");
   };
 
-  const isMaintainer = activeUser?.role.toLowerCase().includes("maintainer") || false;
-  const isMember = activeUser ? (!activeUser.isAdmin && !isMaintainer) : false;
+  const isMember = activeUser ? !isMaintainer : false;
   const isAllowedPath = ["/", "/member", "/schedule", "/auditions", "/member-plays", "/member-scripts", "/plays", "/events", "/directory"].includes(location.pathname) || location.pathname.startsWith("/profile");
-  const showAccessDenied = activeUser && !activeUser.isAdmin && !isMaintainer && isMember && !isAllowedPath;
+  const showAccessDenied = activeUser && !isMaintainer && isMember && !isAllowedPath;
 
   const sidebarWidthClass = isCollapsed ? "w-[72px]" : "w-64 xl:w-72";
 
@@ -238,7 +235,7 @@ export default function AppLayout() {
               <div className="flex items-center gap-4">
                 {activeUser ? (
                   <Link
-                    to={activeUser.role.toLowerCase().includes("maintainer") ? "/maintainer" : "/member"}
+                    to={isMaintainer ? "/maintainer" : "/member"}
                     className="bg-[#635f41] text-white hover:bg-[#635f41]/90 rounded-[8px] h-9 px-4 flex items-center text-xs font-semibold tracking-wider transition-all uppercase"
                   >
                     Dashboard
@@ -300,6 +297,12 @@ export default function AppLayout() {
             <div className="flex items-center gap-3">
               {activeUser && (
                 <>
+                  <Link
+                    to="/"
+                    className="border border-[#cac6b9]/40 text-[#635f41] hover:bg-[#e6e2dd]/40 rounded-[8px] h-9 px-4 flex items-center text-xs font-semibold tracking-wider transition-all uppercase"
+                  >
+                    View Website
+                  </Link>
                   {/* Notification Trigger */}
                   <Dialog open={notificationsOpen} onOpenChange={(openState) => {
                     setNotificationsOpen(openState);

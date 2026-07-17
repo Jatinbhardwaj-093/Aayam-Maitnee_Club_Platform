@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
     TrendingUp,
     ArrowRight,
@@ -36,32 +36,24 @@ interface RoomBooking {
 
 export default function MaintainerDashboard() {
     // Bookings State
-    const [bookings, setBookings] = useState<RoomBooking[]>([
-        {
-            id: "B1",
-            time: "09:00",
-            period: "AM",
-            stage: "Main Stage: Macbeth Rehearsal",
-            details: "Director: James Thorne • 3 Hours",
-            isSecondaryStyle: false,
-        },
-        {
-            id: "B2",
-            time: "02:30",
-            period: "PM",
-            stage: "Studio B: Script Workshop",
-            details: "Literary Team • 1.5 Hours",
-            isSecondaryStyle: true,
-        },
-        {
-            id: "B3",
-            time: "07:00",
-            period: "PM",
-            stage: "Main Stage: Technical Load-in",
-            details: "Crew A • Overnight",
-            isSecondaryStyle: false,
-        },
-    ]);
+    const [bookings, setBookings] = useState<RoomBooking[]>([]);
+
+    useEffect(() => {
+        // Fetch bookings
+        fetch("http://localhost:5001/api/stage-bookings")
+            .then(res => res.json())
+            .then(data => setBookings(data))
+            .catch(err => console.error(err));
+
+        // Fetch revenue metrics
+        fetch("http://localhost:5001/api/revenue-metrics")
+            .then(res => res.json())
+            .then(data => {
+                setPlaybillSold(data.playbillSold || 18);
+                setCorporatePatrons(data.corporatePatrons || 12);
+            })
+            .catch(err => console.error(err));
+    }, []);
 
     const [bookingDialogOpen, setBookingDialogOpen] = useState(false);
     // New Booking Form States
@@ -75,12 +67,11 @@ export default function MaintainerDashboard() {
     const [playbillSold, setPlaybillSold] = useState(18);
     const [corporatePatrons, setCorporatePatrons] = useState(12);
 
-    const handleAddBooking = (e: React.FormEvent) => {
+    const handleAddBooking = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!newBookingTitle || !newBookingDetails) return;
 
-        const newBooking: RoomBooking = {
-            id: `B${bookings.length + 1}`,
+        const newBooking = {
             time: newBookingTime,
             period: newBookingPeriod,
             stage: `${newBookingStage}: ${newBookingTitle}`,
@@ -88,10 +79,33 @@ export default function MaintainerDashboard() {
             isSecondaryStyle: newBookingStage.startsWith("Studio"),
         };
 
-        setBookings([...bookings, newBooking]);
-        setNewBookingTitle("");
-        setNewBookingDetails("");
-        setBookingDialogOpen(false);
+        try {
+            const res = await fetch("http://localhost:5001/api/stage-bookings", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(newBooking)
+            });
+            const data = await res.json();
+            
+            setBookings([...bookings, { id: data.id, ...newBooking }]);
+            setNewBookingTitle("");
+            setNewBookingDetails("");
+            setBookingDialogOpen(false);
+        } catch (err) {
+            console.error("Failed to add booking", err);
+        }
+    };
+
+    const updateRevenueMetric = async (metric: string, value: number) => {
+        try {
+            await fetch("http://localhost:5001/api/revenue-metrics", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ [metric]: value })
+            });
+        } catch (err) {
+            console.error("Failed to update metric", err);
+        }
     };
 
     return (
@@ -209,7 +223,11 @@ export default function MaintainerDashboard() {
                                     <div className="flex items-center gap-2">
                                         <span className="text-[#1c1b19] font-bold">{playbillSold}/24 Sold</span>
                                         <button
-                                            onClick={() => setPlaybillSold(prev => Math.min(24, prev + 1))}
+                                            onClick={() => {
+                                                const newVal = Math.min(24, playbillSold + 1);
+                                                setPlaybillSold(newVal);
+                                                updateRevenueMetric('playbillSold', newVal);
+                                            }}
                                             className="px-1 bg-[#8CC0EB]/20 text-[#001e2c] border border-[#8CC0EB]/40 rounded hover:bg-[#8CC0EB]/40 text-[10px]"
                                             title="Sell Slot"
                                         >
@@ -231,7 +249,11 @@ export default function MaintainerDashboard() {
                                     <div className="flex items-center gap-2">
                                         <span className="text-[#1c1b19] font-bold">{corporatePatrons} Active</span>
                                         <button
-                                            onClick={() => setCorporatePatrons(prev => prev + 1)}
+                                            onClick={() => {
+                                                const newVal = corporatePatrons + 1;
+                                                setCorporatePatrons(newVal);
+                                                updateRevenueMetric('corporatePatrons', newVal);
+                                            }}
                                             className="px-1 bg-[#635f41]/20 text-[#635f41] border border-[#635f41]/40 rounded hover:bg-[#635f41]/30 text-[10px]"
                                             title="Add Patron"
                                         >

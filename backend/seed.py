@@ -365,6 +365,32 @@ def seed_database():
             "poster": "https://lh3.googleusercontent.com/aida-public/AB6AXuCFhh56JyFyLF08wchxPKsyhHqSdltIyUQmbvnM36afMwPrX-viKot2UF8WixHwwsB6_yr3DY4I7A1H2Zni9qGuPWojUJfSMHi-9ha_m7DCp2zmqpEOOJ2_EuFdjOI2bTlG-i2En3DPM6Q63oDPSTnQ76-vSPlw0GM8brJPhxU_AmlY6YM2w_8eTXnoW6PYDyXhq2RpqzGw48vFSVE6mF-XFPyFl6NPLNchnK-U-RX8YvaKmUEnhcKr",
             "status": "Upcoming",
             "admin": admin_sneha
+        },
+        {
+            "title": "Sanskrit Drama Reading Session",
+            "description": "An evening dedicated to reciting and analyzing classical Sanskrit theatrical scripts with our literary committee.",
+            "category": "Meetups",
+            "venue": "Ensemble Lounge, Ahmedabad",
+            "event_date": date(2026, 8, 18),
+            "start_time": time(18, 0),
+            "end_time": time(20, 30),
+            "max_participants": 30,
+            "poster": "https://lh3.googleusercontent.com/aida-public/AB6AXuBuk8WjtWLoR2TuUYyoLkZfAiEHid8OpAJtGE5o8KgkUUP9SoIVxVCzYPUxOcxUARV5rNNTqimtr-yH4S_al391d2kCLDjx_Q_n58n2hhlaJmVXFjOZ7lPJPF52PuaoLWDCKRIog2WrCYyWULP4S5hLFZtbOb2sSpYvNwaZfeItTA9n7q8k1j2nPyROKOvHzUR0DteXxwfD2g2DY1J_53sJ4wUh7yLnB-RYHHZ9imWiLFOmgvka5l0M",
+            "status": "Upcoming",
+            "admin": admin_kabir
+        },
+        {
+            "title": "Modern Lighting Synchronization Workshop",
+            "description": "A technical hands-on masterclass detailing contemporary DMX controls, spotlights, and software configuration.",
+            "category": "Workshops",
+            "venue": "Studio Workshop Room, Mumbai",
+            "event_date": date(2026, 9, 10),
+            "start_time": time(11, 0),
+            "end_time": time(15, 0),
+            "max_participants": 15,
+            "poster": "https://lh3.googleusercontent.com/aida-public/AB6AXuAdWUP6RopdqRMW48GJ5lkG-OGGRusLe0GexKuJ9TiXT4XGPICqz7v2KG9L_mG1id42B-WgZLewLqL7Dd63Qz7tWK4ALX14zX6kuV392i6mruLaV7UVbRoBFHmPjcO24On54aXGBZgoS5KdsDqIBgE1kuL0NmuS6yzjrQNN6U9X3XdZ56zuBNTC77mDLHrSAon1yryXGD-erDERjIt19ILq-FKRUNicV1D1-ptPjvnGMEe1mMewddO7",
+            "status": "Upcoming",
+            "admin": admin_siddharth
         }
     ]
     
@@ -385,6 +411,48 @@ def seed_database():
         db.session.add(e)
     db.session.commit()
     print("Events seeded.")
+
+    # Seed Shared Events (Proposals)
+    from models import SharedEvent
+    from datetime import datetime
+    shared_events_data = [
+        {
+            "title": "Summer Gala Exhibition",
+            "description": "An exclusive evening showcasing contemporary minimalist sculptures. The event aims to bring together local patrons and emerging artists.",
+            "event_date": datetime(2026, 8, 15, 14, 0),
+            "location_or_link": "Main Atrium, West Wing",
+            "status": "pending",
+            "submitter": created_users['priya']
+        },
+        {
+            "title": "Abstract Art Symposium",
+            "description": "A panel discussion exploring the roots and future of abstract art. Local and regional art critics discuss modern movements.",
+            "event_date": datetime(2026, 9, 2, 10, 0),
+            "location_or_link": "Workshop Flat 3B",
+            "status": "approved",
+            "submitter": created_users['jayesh']
+        },
+        {
+            "title": "Local Sculptors Meetup",
+            "description": "Informal gather for local sculptors to share methods, materials, and updates on community public art spaces.",
+            "event_date": datetime(2026, 10, 10, 18, 30),
+            "location_or_link": "Sculpture Studio",
+            "status": "pending",
+            "submitter": created_users['amit']
+        }
+    ]
+    for se in shared_events_data:
+        s = SharedEvent(
+            title=se["title"],
+            description=se["description"],
+            event_date=se["event_date"],
+            location_or_link=se["location_or_link"],
+            status=se["status"],
+            submitter=se["submitter"]
+        )
+        db.session.add(s)
+    db.session.commit()
+    print("Shared events seeded.")
     print("Database seeding completed successfully!")
 
 if __name__ == "__main__":

@@ -131,38 +131,9 @@ def join_club():
 
 @api_bp.route('/members', methods=['GET'])
 def get_members():
-    members_data = None
-
-    # Try loading from Redis cache
-    if r:
-        try:
-            cached = r.get('aayam:members_list')
-            if cached:
-                members_data = json.loads(cached)
-                print("Cache HIT: members loaded from Redis.")
-        except Exception:
-            pass
-    else:
-        # Fallback local cache
-        if 'aayam:members_list' in local_cache:
-            members_data = local_cache['aayam:members_list']
-            print("Cache HIT: members loaded from local memory.")
-
-    if not members_data:
-        # Query database
-        print("Cache MISS: querying SQLite database.")
-        users = User.query.all()
-        members_data = [u.to_dict() for u in users]
-
-        # Save back to cache (60 seconds expiration)
-        if r:
-            try:
-                r.setex('aayam:members_list', 60, json.dumps(members_data))
-            except Exception:
-                pass
-        else:
-            local_cache['aayam:members_list'] = members_data
-
+    from models import User
+    users = User.query.all()
+    members_data = [u.to_dict() for u in users]
     return jsonify(members_data)
 
 @api_bp.route('/plays', methods=['GET'])
@@ -500,3 +471,228 @@ def submit_audition():
     
     return jsonify({'success': True, 'id': a.id})
 
+
+@api_bp.route('/labels', methods=['GET'])
+def get_labels():
+    from models import Label
+    labels = Label.query.all()
+    return jsonify([{'id': l.id, 'name': l.name, 'color': l.color} for l in labels])
+
+@api_bp.route('/labels', methods=['POST'])
+def add_label():
+    from models import Label, db
+    data = request.json
+    name = data.get('name')
+    color = data.get('color', '#635f41')
+    if not name:
+        return jsonify({'error': 'Name is required'}), 400
+    
+    label = Label.query.filter_by(name=name).first()
+    if not label:
+        label = Label(name=name, color=color)
+        db.session.add(label)
+        db.session.commit()
+    
+    return jsonify({'id': label.id, 'name': label.name, 'color': label.color})
+
+@api_bp.route('/users/<int:user_id>/labels', methods=['POST'])
+def assign_label_to_user(user_id):
+    from models import User, Label, db
+    data = request.json
+    label_id = data.get('label_id')
+    user = User.query.get(user_id)
+    label = Label.query.get(label_id)
+    
+    if not user or not label:
+        return jsonify({'error': 'User or label not found'}), 404
+        
+    if label not in user.labels:
+        user.labels.append(label)
+        db.session.commit()
+        
+    return jsonify({'status': 'success'})
+
+@api_bp.route('/users/<int:user_id>/labels/<int:label_id>', methods=['DELETE'])
+def remove_label_from_user(user_id, label_id):
+    from models import User, Label, db
+    user = User.query.get(user_id)
+    label = Label.query.get(label_id)
+    
+    if not user or not label:
+        return jsonify({'error': 'User or label not found'}), 404
+        
+    if label in user.labels:
+        user.labels.remove(label)
+        db.session.commit()
+        
+    return jsonify({'status': 'success'})
+
+
+@api_bp.route('/stage-bookings', methods=['GET'])
+def get_stage_bookings():
+    from models import StageBooking
+    bookings = StageBooking.query.order_by(StageBooking.id).all()
+    return jsonify([{
+        'id': f"B{b.id}",
+        'time': b.time,
+        'period': b.period,
+        'stage': b.stage,
+        'details': b.details,
+        'isSecondaryStyle': b.is_secondary
+    } for b in bookings])
+
+@api_bp.route('/stage-bookings', methods=['POST'])
+def add_stage_booking():
+    from models import StageBooking
+    from models import db
+    data = request.json
+    new_booking = StageBooking(
+        time=data.get('time'),
+        period=data.get('period'),
+        stage=data.get('stage'),
+        details=data.get('details'),
+        is_secondary=data.get('isSecondaryStyle', False)
+    )
+    db.session.add(new_booking)
+    db.session.commit()
+    return jsonify({'status': 'success', 'id': f"B{new_booking.id}"}), 201
+
+@api_bp.route('/revenue-metrics', methods=['GET'])
+def get_revenue_metrics():
+    from models import RevenueMetric
+    from models import db
+    metric = RevenueMetric.query.first()
+    if not metric:
+        metric = RevenueMetric(playbill_sold=18, corporate_patrons=12)
+        db.session.add(metric)
+        db.session.commit()
+    return jsonify({
+        'playbillSold': metric.playbill_sold,
+        'corporatePatrons': metric.corporate_patrons
+    })
+
+@api_bp.route('/revenue-metrics', methods=['POST'])
+def update_revenue_metrics():
+    from models import RevenueMetric
+    from models import db
+    data = request.json
+    metric = RevenueMetric.query.first()
+    if not metric:
+        metric = RevenueMetric()
+        db.session.add(metric)
+    if 'playbillSold' in data:
+        metric.playbill_sold = data['playbillSold']
+    if 'corporatePatrons' in data:
+        metric.corporate_patrons = data['corporatePatrons']
+    db.session.commit()
+    return jsonify({'status': 'success'})
+
+@api_bp.route('/proposals', methods=['GET'])
+def get_proposals():
+    from models import SharedEvent
+    proposals = SharedEvent.query.all()
+    out = []
+    for p in proposals:
+        submitter_name = p.submitter.name if p.submitter else "Ensemble Member"
+        submitter_initials = "".join([x[0] for x in submitter_name.split()]).upper()[:2] if submitter_name else "EM"
+        out.append({
+            'id': p.id,
+            'name': p.title,
+            'description': p.description,
+            'date': p.event_date.strftime('%b %d, %Y') if p.event_date else '',
+            'venue': p.location_or_link or 'Studio Lounge',
+            'status': p.status.capitalize() if p.status else 'Reviewing',
+            'urgency': 'Normal',
+            'startTime': '18:00',
+            'endTime': '20:00',
+            'submitter': {
+                'name': submitter_name,
+                'initials': submitter_initials,
+                'avatarUrl': None
+            },
+            'assignedRoles': [
+                { 'roleName': 'Host', 'memberName': submitter_name, 'icon': 'user' }
+            ]
+        })
+    return jsonify(out)
+
+@api_bp.route('/proposals/<int:prop_id>/approve', methods=['POST'])
+def approve_proposal(prop_id):
+    from models import SharedEvent, Event, db
+    p = SharedEvent.query.get(prop_id)
+    if not p:
+        return jsonify({'error': 'Proposal not found'}), 404
+    p.status = 'approved'
+    
+    from datetime import time, date
+    new_event = Event(
+        title=p.title,
+        description=p.description,
+        category='Meetups',
+        venue=p.location_or_link or 'Studio Lounge',
+        event_date=p.event_date.date() if p.event_date else date.today(),
+        start_time=time(18, 0),
+        end_time=time(20, 0),
+        status='Upcoming'
+    )
+    db.session.add(new_event)
+    db.session.commit()
+    return jsonify({'status': 'success'})
+
+@api_bp.route('/proposals/<int:prop_id>/reject', methods=['POST'])
+def reject_proposal(prop_id):
+    from models import SharedEvent, db
+    p = SharedEvent.query.get(prop_id)
+    if not p:
+        return jsonify({'error': 'Proposal not found'}), 404
+    p.status = 'rejected'
+    db.session.commit()
+    return jsonify({'status': 'success'})
+
+@api_bp.route('/proposals/<int:prop_id>/update', methods=['POST'])
+def update_proposal(prop_id):
+    from models import SharedEvent, db
+    data = request.json
+    p = SharedEvent.query.get(prop_id)
+    if not p:
+        return jsonify({'error': 'Proposal not found'}), 404
+    if 'description' in data:
+        p.description = data['description']
+    if 'venue' in data:
+        p.location_or_link = data['venue']
+    db.session.commit()
+    return jsonify({'status': 'success'})
+
+@api_bp.route('/events/create', methods=['POST'])
+def create_event_backend():
+    from models import Event, db
+    from datetime import datetime, time
+    data = request.json
+    
+    new_event = Event(
+        title=data.get('name', 'Untitled Event'),
+        description=data.get('description', ''),
+        category=data.get('category', 'Meetups'),
+        venue=data.get('venue', 'Studio Lounge'),
+        event_date=datetime.strptime(data['date'], '%Y-%m-%d').date() if data.get('date') else None,
+        start_time=time(18, 0),
+        end_time=time(20, 0),
+        status='Upcoming'
+    )
+    db.session.add(new_event)
+    db.session.commit()
+    return jsonify({'status': 'success', 'id': new_event.id})
+
+@api_bp.route('/events/<int:event_id>/update', methods=['POST'])
+def update_event_backend(event_id):
+    from models import Event, db
+    data = request.json
+    e = Event.query.get(event_id)
+    if not e:
+        return jsonify({'error': 'Event not found'}), 404
+    if 'description' in data:
+        e.description = data['description']
+    if 'venue' in data:
+        e.venue = data['venue']
+    db.session.commit()
+    return jsonify({'status': 'success'})

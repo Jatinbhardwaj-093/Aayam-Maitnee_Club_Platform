@@ -1,374 +1,296 @@
-import { useState } from "react";
-import {
-    ShieldCheck,
-    CheckCircle2,
-    History,
-    Download,
-    Star,
-    Edit2,
-    LogIn,
-    AlertTriangle,
-    UserPlus,
-    ChevronRight
-} from "lucide-react";
-
-interface AuditEntry {
-    id: number;
-    event: string;
-    time: string;
-    descriptionPre: string;
-    badge: string | null;
-    descriptionPost?: string;
-    icon: 'edit' | 'download' | 'login' | 'warning' | 'person_add';
-    warning?: boolean;
-}
+// @ts-nocheck
+import { useState, useEffect } from "react";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
+import { Phone, MapPin, ShieldAlert, Award, FileText, ArrowLeft, Edit3, Globe, Shield, Tag, Plus, X } from "lucide-react";
 
 export default function MemberProfileAudit() {
-    // Member Info State
-    const [notes, setNotes] = useState(
-        "Marcus has demonstrated exceptional commitment during the Fall rehearsal schedule. Recommended for consideration in next semester's mainstage production. Requires tech briefing for the new lighting rig."
-    );
-    const [accountActive, setAccountActive] = useState(true);
-    const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const targetEmail = searchParams.get("email");
 
-    // Selected Roles
-    const [roles, setRoles] = useState({
-        leadActor: true,
-        stageManager: false,
-        techCrew: false,
-        director: false
-    });
+  // Profile data from database
+  const [profile, setProfile] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-    // Immutable (but locally filterable/renderable if needed) Audit Logs
-    const [auditLogs] = useState<AuditEntry[]>([
-        {
-            id: 1,
-            event: "Role Modified",
-            time: "2023-10-24 14:32:01 UTC",
-            descriptionPre: "Admin 'StageDoor Admin' granted role ",
-            badge: "Lead Actor",
-            descriptionPost: ".",
-            icon: "edit"
-        },
-        {
-            id: 2,
-            event: "Script Download",
-            time: "2023-10-22 09:15:44 UTC",
-            descriptionPre: "Downloaded digital asset ",
-            badge: "Hamlet_Draft_V3.pdf",
-            descriptionPost: " from the secure vault.",
-            icon: "download"
-        },
-        {
-            id: 3,
-            event: "System Login",
-            time: "2023-10-22 09:10:12 UTC",
-            descriptionPre: "Successful authentication via SSO. IP: 192.168.1.45",
-            badge: null,
-            icon: "login"
-        },
-        {
-            id: 4,
-            event: "Failed Access Attempt",
-            time: "2023-10-20 18:45:00 UTC",
-            descriptionPre: "Attempted to access restricted resource ",
-            badge: "/admin/finances",
-            descriptionPost: ". Access denied.",
-            icon: "warning",
-            warning: true
-        },
-        {
-            id: 5,
-            event: "Profile Created",
-            time: "2021-10-05 11:00:00 UTC",
-            descriptionPre: "Initial system provisioning completed.",
-            badge: null,
-            icon: "person_add"
-        }
-    ]);
+  const [allLabels, setAllLabels] = useState<any[]>([]);
+  const [showLabelDropdown, setShowLabelDropdown] = useState(false);
 
-    const triggerToast = (msg: string) => {
-        setToastMessage(msg);
-        setTimeout(() => {
-            setToastMessage(null);
-        }, 3000);
-    };
+  useEffect(() => {
+    if (!targetEmail) {
+      navigate("/directory");
+      return;
+    }
 
-    const handleSave = () => {
-        triggerToast("Changes saved successfully!");
-    };
+    // Fetch user details from database
+    fetch(`http://localhost:5001/api/profile/get?email=${encodeURIComponent(targetEmail)}`)
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to retrieve profile");
+        return res.json();
+      })
+      .then((data) => {
+        setProfile(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Failed to load profile:", err);
+        setLoading(false);
+      });
+      
+    // Fetch all available labels
+    fetch("http://localhost:5001/api/labels")
+      .then(res => res.json())
+      .then(data => setAllLabels(data))
+      .catch(err => console.error(err));
+  }, [targetEmail, navigate]);
+  
+  const handleAssignLabel = async (labelId: number) => {
+    if (!profile) return;
+    try {
+      await fetch(`http://localhost:5001/api/users/${profile.id}/labels`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ label_id: labelId })
+      });
+      // Refresh profile
+      const res = await fetch(`http://localhost:5001/api/profile/get?email=${encodeURIComponent(targetEmail!)}`);
+      const data = await res.json();
+      setProfile(data);
+      setShowLabelDropdown(false);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  
+  const handleRemoveLabel = async (labelId: number) => {
+    if (!profile) return;
+    try {
+      await fetch(`http://localhost:5001/api/users/${profile.id}/labels/${labelId}`, {
+        method: 'DELETE'
+      });
+      // Refresh profile
+      const res = await fetch(`http://localhost:5001/api/profile/get?email=${encodeURIComponent(targetEmail!)}`);
+      const data = await res.json();
+      setProfile(data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
-    const handleMessage = () => {
-        triggerToast("Outgoing message interface initialized for Marcus Kane");
-    };
-
-    const handleStatusToggle = () => {
-        const nextState = !accountActive;
-        setAccountActive(nextState);
-        if (nextState) {
-            triggerToast("Marcus Kane's user account activated.");
-        } else {
-            triggerToast("WARNING: Marcus Kane's user account suspended.");
-        }
-    };
-
-    const handleRoleToggle = (roleKey: keyof typeof roles, roleLabel: string) => {
-        setRoles(prev => {
-            const nextVal = !prev[roleKey];
-            triggerToast(`Role '${roleLabel}' ${nextVal ? 'assigned' : 'removed'}.`);
-            return { ...prev, [roleKey]: nextVal };
-        });
-    };
-
-    const handleExport = () => {
-        triggerToast("Audit logs exported to stagesoor_audit_profile_marcus_kane.json");
-    };
-
+  if (loading || !profile) {
     return (
-        <div className="profile-audit-page flex-1 min-h-screen bg-[#fdf9f4] text-[#1c1b19] font-sans pb-24">
-            {/* Main Canvas Area */}
-            <div className="max-w-[1280px] mx-auto px-4 md:px-[64px] pt-[96px]">
+      <div className="flex-1 flex items-center justify-center p-8 bg-[#fdf9f4] min-h-[70vh]">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-[#8CC0EB] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-sm text-[#466272]/80">Loading database profile details...</p>
+        </div>
+      </div>
+    );
+  }
 
-                {/* Page Header */}
-                <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
-                    <div>
-                        <nav className="flex items-center gap-2 text-[#49473d] opacity-70 mb-2 font-sans text-[14px] leading-5 tracking-[0.05em] font-semibold text-xs tracking-wider uppercase">
-                            <span className="cursor-pointer hover:text-[#635f41]">Members</span>
-                            <ChevronRight className="w-3.5 h-3.5" />
-                            <span className="text-[#635f41]">Profile Audit</span>
-                        </nav>
-                        <h2 className="font-serif text-[32px] md:text-[40px] leading-[40px] md:leading-[48px] font-semibold text-[#1c1b19] tracking-tight">Member Profile</h2>
-                    </div>
-                    <div className="flex gap-4">
+  return (
+    <div className="flex-1 bg-[#fdf9f4] text-[#1c1b19] font-sans py-12 md:py-16 selection:bg-[#c6e4f7]">
+      <div className="max-w-5xl mx-auto px-6">
+        
+        {/* Back header */}
+        <div className="mb-6 flex justify-between items-center">
+          <button
+            onClick={() => navigate("/directory")}
+            className="flex items-center gap-2 text-xs font-semibold text-[#635f41] hover:text-[#635f41]/80 transition-all"
+          >
+            <ArrowLeft className="w-4 h-4" /> Back to Directory
+          </button>
+        </div>
+
+        {/* Profile Card Header */}
+        <div className="bg-white border border-[#cac6b9]/30 rounded-3xl shadow-sm overflow-hidden mb-8">
+          <div className="bg-[#635f41]/10 border-b border-[#e6e2dd]/60 p-8 flex flex-col md:flex-row items-center gap-6 relative overflow-visible">
+            <div className="w-20 h-20 rounded-full bg-[#635f41]/20 border-2 border-white flex items-center justify-center text-[#635f41] font-bold text-2xl shadow-sm">
+              {profile.name?.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2)}
+            </div>
+            
+            <div className="text-center md:text-left flex-1 space-y-1.5">
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
+                <h1 className="font-serif text-3xl font-bold text-[#635f41] tracking-tight">{profile.name}</h1>
+                <span className="inline-block px-3 py-1 rounded-full bg-[#8CC0EB]/20 text-[#2e4a5a] text-[10px] font-bold uppercase tracking-wider">
+                  {profile.roles && profile.roles.length > 0 ? profile.roles[0] : "Member"}
+                </span>
+                
+                {/* Discord-style Labels */}
+                {profile.labels?.map((label: any) => (
+                  <span 
+                    key={label.id} 
+                    className="group relative inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold"
+                    style={{
+                      backgroundColor: `${label.color}15`, 
+                      border: `1px solid ${label.color}40`,
+                      color: label.color
+                    }}
+                  >
+                    <span className="w-2 h-2 rounded-full" style={{backgroundColor: label.color}}></span>
+                    {label.name}
+                    <button 
+                      onClick={() => handleRemoveLabel(label.id)}
+                      className="opacity-0 group-hover:opacity-100 transition-opacity ml-1 hover:text-black"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                ))}
+                
+                {/* Add Label Button */}
+                <div className="relative">
+                  <button 
+                    onClick={() => setShowLabelDropdown(!showLabelDropdown)}
+                    className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-white border border-gray-300 text-gray-600 hover:bg-gray-50"
+                  >
+                    <Plus className="w-3 h-3" /> Add
+                  </button>
+                  
+                  {showLabelDropdown && (
+                    <div className="absolute top-full mt-2 left-0 w-48 bg-white rounded-xl shadow-lg border border-gray-100 p-2 z-50 flex flex-col gap-1 max-h-48 overflow-y-auto">
+                      <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider px-2 py-1 mb-1 border-b border-gray-100">Assign Label</div>
+                      {allLabels.filter(l => !profile.labels?.find((pl: any) => pl.id === l.id)).map(label => (
                         <button
-                            onClick={handleMessage}
-                            className="px-6 py-2 border border-[#8CC0EB] text-[#466272] hover:bg-[#8CC0EB]/10 rounded-[4px] font-sans text-[14px] leading-5 tracking-[0.05em] font-semibold transition-colors uppercase tracking-wider"
+                          key={label.id}
+                          onClick={() => handleAssignLabel(label.id)}
+                          className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-gray-50 text-left text-xs font-semibold"
+                          style={{color: label.color}}
                         >
-                            Message
+                          <span className="w-2 h-2 rounded-full" style={{backgroundColor: label.color}}></span>
+                          {label.name}
                         </button>
-                        <button
-                            onClick={handleSave}
-                            className="px-6 py-2 bg-[#8CC0EB] text-[#041f21] hover:bg-[#7AB0DB] rounded-[4px] ambient-shadow font-sans text-[14px] leading-5 tracking-[0.05em] font-semibold transition-colors focus:ring-2 focus:ring-offset-2 focus:ring-[#8CC0EB] uppercase tracking-wider"
-                        >
-                            Save Changes
-                        </button>
+                      ))}
+                      {allLabels.filter(l => !profile.labels?.find((pl: any) => pl.id === l.id)).length === 0 && (
+                        <div className="text-xs text-gray-400 px-2 py-2">All labels assigned!</div>
+                      )}
                     </div>
+                  )}
                 </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Left Column: Profile & Privileges */}
-                    <div className="lg:col-span-1 flex flex-col gap-8">
-                        {/* 1. Core Profile Card */}
-                        <div className="glass-card rounded-[8px] p-8 ambient-shadow relative overflow-hidden group">
-                            {/* Decorative bg accent */}
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-[#8CC0EB]/10 rounded-bl-full -mr-16 -mt-16 transition-transform group-hover:scale-110"></div>
-
-                            <div className="flex flex-col items-center text-center relative z-10">
-                                <div className="relative mb-6">
-                                    <img
-                                        alt="Marcus Kane portrait"
-                                        className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-sm"
-                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBYJlRlAR2zNZRgSaoPoqB9RHSxADEWhmsX8xH7Dum3GyoGepl5TbFbWLw_FZvHXK21Y_sJd0HBKcrLZxNSNHdHY3yyLEQPVHkl9EVLn_c4pRxyatgGKyUIFOexxP_bnoY3Ohp6xFA-DIJUHB7kbdib9ggrmgqnvgYe113P0h70w0KwOVqP_NQkKafyUdQR8wnKJIbiYKvsfzmlxfKyKsBWrwpHzao54gXvRbMXhEtWifLFFocXVn5V7jK8hj6T6Sfr8RrfzGlyeDF8"
-                                    />
-                                    <div className="absolute bottom-1 right-1 bg-white rounded-full p-1 shadow-sm border border-[#E1E2E6]" title="Verified Member">
-                                        <CheckCircle2 className="w-4 h-4 text-[#8CC0EB] fill-current" />
-                                    </div>
-                                </div>
-                                <h3 className="font-serif text-[28px] leading-[36px] font-semibold text-[#1c1b19] mb-1">Marcus Kane</h3>
-                                <p className="font-sans text-[16px] leading-[24px] text-[#49473d] opacity-80 mb-4">marcus.kane@stagedoor.edu</p>
-
-                                <div className="inline-flex items-center gap-2 bg-[#FFEBCC] px-4 py-1.5 rounded-[12px] mb-6 border border-[#F5E1C3]">
-                                    <Star className="w-3.5 h-3.5 text-[#A67C00] fill-current" />
-                                    <span className="font-sans text-[14px] leading-5 tracking-[0.05em] font-semibold text-[#A67C00] uppercase tracking-wider">Senior Member</span>
-                                </div>
-
-                                <div className="w-full grid grid-cols-2 gap-4 border-t border-[#E1E2E6] pt-6 text-left">
-                                    <div>
-                                        <p className="font-sans text-[14px] leading-5 tracking-[0.05em] font-semibold text-[#49473d] opacity-60 uppercase mb-1">Joined</p>
-                                        <p className="font-sans text-[16px] leading-[24px] text-[#1c1b19]">Oct 2021</p>
-                                    </div>
-                                    <div>
-                                        <p className="font-sans text-[14px] leading-5 tracking-[0.05em] font-semibold text-[#49473d] opacity-60 uppercase mb-1">Productions</p>
-                                        <p className="font-sans text-[16px] leading-[24px] text-[#1c1b19]">14</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* 2. Privilege Management */}
-                        <div className="bg-white rounded-[8px] p-6 border border-[#FFB4A2] shadow-sm relative overflow-hidden">
-                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#FFB4A2] to-[#FFD8CD] rounded-t-[8px]"></div>
-
-                            <div className="flex items-center gap-3 mb-6">
-                                <ShieldCheck className="w-5 h-5 text-[#D95D39]" />
-                                <h3 className="font-serif text-[20px] font-semibold text-[#1c1b19]">Access Privileges</h3>
-                            </div>
-
-                            {/* Status Switch */}
-                            <div className="flex items-center justify-between mb-8 pb-6 border-b border-[#E1E2E6]">
-                                <div>
-                                    <p className="font-sans text-[14px] leading-5 tracking-[0.05em] font-semibold text-[#1c1b19] mb-1">Account Status</p>
-                                    <p className="font-sans text-[14px] leading-5 text-[#49473d] opacity-70">Toggle to suspend member access.</p>
-                                </div>
-                                <div className="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
-                                    <input
-                                        type="checkbox"
-                                        id="status-toggle"
-                                        name="toggle"
-                                        checked={accountActive}
-                                        onChange={handleStatusToggle}
-                                        className="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 transition-transform duration-200 ease-in-out"
-                                        style={{
-                                            transform: accountActive ? "translateX(24px)" : "translateX(0px)",
-                                            borderColor: accountActive ? "#8CC0EB" : "#e6e2dd"
-                                        }}
-                                    />
-                                    <label
-                                        htmlFor="status-toggle"
-                                        className={`toggle-label block overflow-hidden h-6 rounded-full cursor-pointer transition-colors duration-200 ease-in-out ${accountActive ? "bg-[#8CC0EB]" : "bg-gray-300"
-                                            }`}
-                                    ></label>
-                                </div>
-                            </div>
-
-                            {/* Role Assignment */}
-                            <div>
-                                <p className="font-sans text-[14px] leading-5 tracking-[0.05em] font-semibold text-[#1c1b19] mb-4">Assigned Roles</p>
-                                <div className="flex flex-wrap gap-3">
-                                    <label className="cursor-pointer">
-                                        <input
-                                            type="checkbox"
-                                            checked={roles.leadActor}
-                                            onChange={() => handleRoleToggle("leadActor", "Lead Actor")}
-                                            className="peer sr-only"
-                                        />
-                                        <div className="px-4 py-2 rounded-full border border-[#8CC0EB] bg-[#8CC0EB]/10 text-[#466272] font-sans text-[14px] leading-5 tracking-[0.05em] font-semibold uppercase transition-colors peer-checked:bg-[#8CC0EB] peer-checked:text-[#041f21] hover:bg-[#8CC0EB]/20">
-                                            Lead Actor
-                                        </div>
-                                    </label>
-
-                                    <label className="cursor-pointer">
-                                        <input
-                                            type="checkbox"
-                                            checked={roles.stageManager}
-                                            onChange={() => handleRoleToggle("stageManager", "Stage Manager")}
-                                            className="peer sr-only"
-                                        />
-                                        <div className="px-4 py-2 rounded-full border border-[#E1E2E6] text-[#49473d] font-sans text-[14px] leading-5 tracking-[0.05em] font-semibold uppercase hover:bg-[#e6e2dd] transition-colors peer-checked:border-[#8CC0EB] peer-checked:bg-[#8CC0EB] peer-checked:text-[#041f21]">
-                                            Stage Manager
-                                        </div>
-                                    </label>
-
-                                    <label className="cursor-pointer">
-                                        <input
-                                            type="checkbox"
-                                            checked={roles.techCrew}
-                                            onChange={() => handleRoleToggle("techCrew", "Tech Crew")}
-                                            className="peer sr-only"
-                                        />
-                                        <div className="px-4 py-2 rounded-full border border-[#E1E2E6] text-[#49473d] font-sans text-[14px] leading-5 tracking-[0.05em] font-semibold uppercase hover:bg-[#e6e2dd] transition-colors peer-checked:border-[#8CC0EB] peer-checked:bg-[#8CC0EB] peer-checked:text-[#041f21]">
-                                            Tech Crew
-                                        </div>
-                                    </label>
-
-                                    <label className="cursor-pointer">
-                                        <input
-                                            type="checkbox"
-                                            checked={roles.director}
-                                            onChange={() => handleRoleToggle("director", "Director")}
-                                            className="peer sr-only"
-                                        />
-                                        <div className="px-4 py-2 rounded-full border border-[#E1E2E6] text-[#49473d] font-sans text-[14px] leading-5 tracking-[0.05em] font-semibold uppercase hover:bg-[#e6e2dd] transition-colors peer-checked:border-[#8CC0EB] peer-checked:bg-[#8CC0EB] peer-checked:text-[#041f21]">
-                                            Director
-                                        </div>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Right Column: Notes & Audit Trail */}
-                    <div className="lg:col-span-2 flex flex-col gap-8">
-                        {/* Director's Notes */}
-                        <div className="bg-white rounded-[8px] p-8 border border-[#E1E2E6] shadow-sm">
-                            <h3 className="font-serif text-[24px] text-[#1c1b19] mb-4 border-b border-[#E1E2E6] pb-4 font-semibold">Director's Notes</h3>
-                            <div className="bg-[#F8F9FA] p-6 rounded border-b-2 border-[#cac6b9] focus-within:border-[#635f41] transition-colors">
-                                <textarea
-                                    className="w-full bg-transparent border-none focus:ring-0 resize-none font-sans text-[18px] leading-[28px] text-[#49473d] min-h-[120px] outline-none"
-                                    placeholder="Add confidential notes here..."
-                                    value={notes}
-                                    onChange={(e) => setNotes(e.target.value)}
-                                />
-                            </div>
-                        </div>
-
-                        {/* 3. Immutable System Audit Log */}
-                        <div className="bg-white rounded-[8px] border border-[#E1E2E6] shadow-sm flex flex-col h-[400px]">
-                            <div className="p-6 border-b border-[#E1E2E6] flex justify-between items-center bg-[#fdf9f4]/50 rounded-t-[8px]">
-                                <div className="flex items-center gap-3">
-                                    <History className="w-5 h-5 text-[#49473d]" />
-                                    <h3 className="font-serif text-[20px] font-semibold text-[#1c1b19]">System Audit Log</h3>
-                                </div>
-                                <button
-                                    onClick={handleExport}
-                                    className="text-[#8CC0EB] hover:text-[#7AB0DB] transition-colors flex items-center gap-1.5 font-sans text-[14px] leading-5 tracking-[0.05em] font-semibold"
-                                >
-                                    <Download className="w-4 h-4" /> Export
-                                </button>
-                            </div>
-
-                            <div className="p-6 overflow-y-auto audit-scroll bg-[#FAFAFA] flex-grow">
-                                <ul className="relative border-l border-[#cac6b9]/40 ml-3 space-y-6">
-                                    {auditLogs.map((entry) => {
-                                        return (
-                                            <li key={entry.id} className="ml-6 relative">
-                                                <span className={`absolute flex items-center justify-center w-6 h-6 rounded-full -left-9 ring-4 ring-[#FAFAFA] ${entry.warning ? 'bg-[#FFF4E5]' : 'bg-[#E8F0F8]'
-                                                    }`}>
-                                                    {entry.icon === 'edit' && <Edit2 className="w-3 h-3 text-[#cbdcf8] text-[#8CC0EB]" />}
-                                                    {entry.icon === 'download' && <Download className="w-3 h-3 text-[#cceaea] text-[#8CC0EB]" />}
-                                                    {entry.icon === 'login' && <LogIn className="w-3 h-3 text-[#8CC0EB]" />}
-                                                    {entry.icon === 'warning' && <AlertTriangle className="w-3 h-3 text-[#D95D39]" />}
-                                                    {entry.icon === 'person_add' && <UserPlus className="w-3 h-3 text-[#8CC0EB]" />}
-                                                </span>
-                                                <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 mb-1">
-                                                    <h4 className="font-sans text-[15px] leading-5 font-semibold text-[#1c1b19] uppercase tracking-wide">{entry.event}</h4>
-                                                    <time className="font-mono text-sm text-[#49473d] opacity-60">{entry.time}</time>
-                                                </div>
-                                                <p className="font-sans text-[16px] leading-[24px] text-[#49473d]">
-                                                    {entry.descriptionPre}
-                                                    {entry.badge && (
-                                                        <span className={`px-2 py-0.5 rounded text-xs font-mono font-semibold ${entry.warning
-                                                            ? 'bg-[#ffdad6] text-[#93000a]'
-                                                            : entry.badge === 'Hamlet_Draft_V3.pdf'
-                                                                ? 'bg-[#e6e2dd] text-[#49473d]'
-                                                                : 'bg-[#8CC0EB]/20 text-[#2e4a5a]'
-                                                            }`}>
-                                                            {entry.badge}
-                                                        </span>
-                                                    )}
-                                                    {entry.descriptionPost}
-                                                </p>
-                                            </li>
-                                        );
-                                    })}
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+              </div>
+              <p className="text-sm text-[#466272]">{profile.email}</p>
             </div>
 
-            {/* Dynamic Toast Notification */}
-            {toastMessage && (
-                <div className={`fixed bottom-6 right-6 border rounded-xl px-5 py-3.5 shadow-xl z-50 flex items-center gap-3 animate-slide-in max-w-sm ${toastMessage.includes("WARNING")
-                    ? "bg-[#ffdad6] border-[#ffdad6] text-[#93000a]"
-                    : "bg-[#31302d] border-[#cac6b9]/30 text-white"
-                    }`}>
-                    <CheckCircle2 className={`w-5 h-5 flex-shrink-0 ${toastMessage.includes("WARNING") ? "text-[#ba1a1a]" : "text-emerald-400"
-                        }`} />
-                    <span className="text-xs font-semibold leading-normal">{toastMessage}</span>
+            <div className="flex gap-4 items-center bg-white/60 backdrop-blur-xs border border-[#e6e2dd]/80 px-4 py-3 rounded-2xl">
+              <div className="text-right">
+                <p className="text-[10px] uppercase font-bold text-[#635f41]/75 tracking-wider">Member ID</p>
+                <p className="text-xs font-bold text-[#466272]">{profile.member_id || "AAY-PEND"}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="p-8 md:p-10 grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12">
+            
+            {/* Left Column: Personal info & contacts */}
+            <div className="lg:col-span-5 space-y-6">
+              
+              {/* Contact Info */}
+              <div className="space-y-4">
+                <h2 className="text-xs font-bold uppercase tracking-widest text-[#635f41] flex items-center gap-2 border-b border-[#e6e2dd]/60 pb-2">
+                  <Phone className="w-4 h-4 text-[#8CC0EB]" /> Contact Information
+                </h2>
+                <div className="space-y-3 text-sm text-[#466272]/95">
+                  <p><strong>Phone:</strong> {profile.phone || "Not specified"}</p>
+                  <p><strong>Pronouns:</strong> {profile.pronouns || "Not specified"}</p>
+                  <p><strong>Age:</strong> {profile.age || "Not specified"}</p>
                 </div>
-            )}
+              </div>
+
+              {/* Address */}
+              <div className="space-y-4">
+                <h2 className="text-xs font-bold uppercase tracking-widest text-[#635f41] flex items-center gap-2 border-b border-[#e6e2dd]/60 pb-2">
+                  <MapPin className="w-4 h-4 text-[#8CC0EB]" /> Address & Location
+                </h2>
+                <div className="space-y-2 text-sm text-[#466272]/95">
+                  <p><strong>Street:</strong> {profile.address || "Not specified"}</p>
+                  <p><strong>City:</strong> {profile.city || "Not specified"}</p>
+                  <p><strong>State:</strong> {profile.state || "Not specified"}</p>
+                  <p><strong>Country:</strong> {profile.country || "India"}</p>
+                </div>
+              </div>
+
+              {/* Emergency Contacts */}
+              <div className="space-y-4 bg-red-50/30 border border-red-100 p-5 rounded-2xl">
+                <h2 className="text-xs font-bold uppercase tracking-widest text-red-800 flex items-center gap-2 border-b border-red-100 pb-2">
+                  <ShieldAlert className="w-4 h-4 text-red-600" /> Emergency Details
+                </h2>
+                <div className="space-y-2.5 text-sm text-[#466272]/95">
+                  <p><strong>Contact Name:</strong> {profile.emergency_name || "Not specified"}</p>
+                  <p><strong>Contact Phone:</strong> {profile.emergency_phone || "Not specified"}</p>
+                </div>
+              </div>
+
+            </div>
+
+            {/* Right Column: Bio & Skills */}
+            <div className="lg:col-span-7 space-y-8">
+              
+              {/* Bio block */}
+              <div className="space-y-3 text-left">
+                <h2 className="text-xs font-bold uppercase tracking-widest text-[#635f41] flex items-center gap-2 border-b border-[#e6e2dd]/60 pb-2">
+                  <FileText className="w-4 h-4 text-[#8CC0EB]" /> Artistic Biography
+                </h2>
+                {profile.bio ? (
+                  <blockquote className="border-l-4 border-[#8CC0EB] pl-4 italic text-sm leading-relaxed text-[#466272]/90 my-4 bg-gray-50 py-3 pr-3 rounded-r-xl">
+                    "{profile.bio}"
+                  </blockquote>
+                ) : (
+                  <p className="text-xs text-gray-400 italic">No biography listed. Edit profile to add.</p>
+                )}
+              </div>
+
+              {/* Theatrical Profile details */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                
+                {/* Interest & Avail */}
+                <div className="space-y-3">
+                  <h3 className="text-xs font-bold uppercase tracking-widest text-[#635f41] flex items-center gap-2 border-b border-[#e6e2dd]/40 pb-1.5">
+                    <Award className="w-4 h-4 text-[#8CC0EB]" /> Theatrical Profile
+                  </h3>
+                  <div className="space-y-2 text-sm text-[#466272]/95">
+                    <p><strong>Primary Interest:</strong> {profile.interest || "Acting"}</p>
+                    <p><strong>Availability:</strong> {profile.availability || "Weekends"}</p>
+                  </div>
+                </div>
+
+                {/* Portfolio */}
+                <div className="space-y-3">
+                  <h3 className="text-xs font-bold uppercase tracking-widest text-[#635f41] flex items-center gap-2 border-b border-[#e6e2dd]/40 pb-1.5">
+                    <Globe className="w-4 h-4 text-[#8CC0EB]" /> Portfolio Details
+                  </h3>
+                  <div className="space-y-2 text-sm text-[#466272]/95">
+                    <p><strong>Link:</strong> {profile.portfolio ? (
+                      <a href={profile.portfolio} target="_blank" rel="noreferrer" className="text-[#8CC0EB] hover:underline font-medium break-all">{profile.portfolio}</a>
+                    ) : (
+                      <span className="text-gray-400 italic">None listed</span>
+                    )}</p>
+                  </div>
+                </div>
+
+              </div>
+
+              {/* System Account Stats */}
+              <div className="bg-[#f7f3ee]/60 border border-[#cac6b9]/40 p-5 rounded-2xl space-y-3">
+                <h3 className="text-xs font-bold uppercase tracking-widest text-[#635f41] flex items-center gap-2">
+                  <Shield className="w-4 h-4 text-[#8CC0EB]" /> System Privileges
+                </h3>
+                <div className="grid grid-cols-2 gap-4 text-xs">
+                  <div>
+                    <span className="text-gray-500">Account status:</span>
+                    <p className="font-bold text-[#635f41]">{profile.status || "Active"}</p>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Experience level:</span>
+                    <p className="font-bold text-[#635f41]">{profile.level || "Intermediate"}</p>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
         </div>
-    );
+
+      </div>
+    </div>
+  );
 }
