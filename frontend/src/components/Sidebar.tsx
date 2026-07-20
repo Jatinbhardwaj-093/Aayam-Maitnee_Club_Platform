@@ -155,17 +155,8 @@ export default function Sidebar({
               <p className="truncate"><strong>Email:</strong> {activeUser.email}</p>
             </div>
           )}
-            {activeUser.isAdmin && (location.pathname === "/admin" || ["/maintainer", "/analytics", "/compliance", "/control-panel", "/media-moderation", "/events-admin", "/directory", "/profile-audit"].includes(location.pathname)) && (
-              <Link
-                to={["/maintainer", "/analytics", "/compliance", "/control-panel", "/media-moderation", "/events-admin", "/directory", "/profile-audit"].includes(location.pathname) ? "/admin" : "/maintainer"}
-                onClick={() => setShowPopover(false)}
-                className="w-full bg-[#635f41] text-white hover:bg-[#635f41]/90 rounded-md text-xs font-semibold py-2 px-3 transition-all text-center block mb-2"
-              >
-                {["/maintainer", "/analytics", "/compliance", "/control-panel", "/media-moderation", "/events-admin", "/directory", "/profile-audit"].includes(location.pathname) ? "Switch to Admin View" : "Switch to Maintainer View"}
-              </Link>
-            )}
-            <Link
-              to="/profile/view"
+          <Link
+            to="/profile/view"
               onClick={() => setShowPopover(false)}
               className="w-full bg-[#8CC0EB] text-[#1c1b19] hover:bg-[#8CC0EB]/90 rounded-md text-xs font-semibold py-2 px-3 transition-all text-center block mb-2"
             >

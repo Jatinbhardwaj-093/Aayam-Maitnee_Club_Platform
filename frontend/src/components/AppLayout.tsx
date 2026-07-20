@@ -1,14 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import {
   Home,
   LayoutDashboard,
-  Folder,
   Users,
-  Coins,
-  Image as ImageIcon,
-  ShieldCheck,
   ClipboardList,
   Bell,
   User,
@@ -24,6 +20,7 @@ import {
 } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 
@@ -38,38 +35,26 @@ const navItems: NavItem[] = [
   { label: "Drama Club Home", path: "/", icon: Home, description: "Public landing page" },
   { label: "Member Dashboard", path: "/member", icon: LayoutDashboard, description: "Your rehearsals & schedules" },
   { label: "My Schedule", path: "/schedule", icon: Calendar, description: "Your production schedule" },
-  { label: "Macbeth Workspace", path: "/workspace", icon: Folder, description: "Props transfers & expenses" },
-  { label: "Auditions & Casting", path: "/auditions", icon: Users, description: "Casting portal & applications" },
-  { label: "Sponsor Dashboard", path: "/sponsor", icon: Coins, description: "VIP lounge & sponsorships" },
-  { label: "Gallery", path: "/gallery", icon: ImageIcon, description: "Performances & backstage media" },
-  { label: "Production Office", path: "/admin", icon: ShieldCheck, description: "Director availability & admin" },
-  { label: "Backstage Pass", path: "/backstage", icon: ClipboardList, description: "Tasks & check-ins" },
-  { label: "Plays & Productions", path: "/member-plays", icon: PlayCircle, description: "Our active & past plays" },
-  { label: "Script Vault", path: "/member-scripts", icon: FileText, description: "Download official scripts" },
+  { label: "Auditions", path: "/auditions", icon: ClipboardList, description: "Apply for play casting" },
+  { label: "Plays & Productions", path: "/member-plays", icon: PlayCircle, description: "Production lineup & scripts" },
+  { label: "Script Vault", path: "/member-scripts", icon: FileText, description: "Confidential play scripts" },
 ];
 
 const maintainerNavItems: NavItem[] = [
   { label: "Maintainer Dashboard", path: "/maintainer", icon: LayoutDashboard, description: "System & Core Maintenance" },
-  { label: "Platform Analytics", path: "/analytics", icon: LineChart, description: "Forecasting & system health" },
-  { label: "Compliance Ledger", path: "/compliance", icon: Scale, description: "Financial audit & ledger" },
   { label: "Production Control", path: "/control-panel", icon: Sliders, description: "Technical & access control panel" },
-  { label: "Media Moderation", path: "/media-moderation", icon: HardDrive, description: "Review gallery content & storage" },
   { label: "Events Management", path: "/events-admin", icon: Calendar, description: "Proposal curation & concurrent lock editor" },
   { label: "Members Directory", path: "/directory-admin", icon: Users, description: "Ensemble & crew directory" },
+  { label: "Media Moderation", path: "/media-moderation", icon: HardDrive, description: "Review gallery content & storage" },
+  { label: "Platform Analytics", path: "/analytics", icon: LineChart, description: "Forecasting & system health" },
+  { label: "Compliance Ledger", path: "/compliance", icon: Scale, description: "Financial audit & ledger" },
 ];
-
-// personas deleted
 
 export default function AppLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
-
-  // Interactive States
-  const [hasUnread, setHasUnread] = useState(true);
-  const [notificationsOpen, setNotificationsOpen] = useState(false);
-  const [portalOpen, setPortalOpen] = useState(false);
 
   // Active User Profile (persisted in sessionStorage to survive page refresh and allow multiple sessions across tabs)
   const [activeUser, setActiveUser] = useState<any>(() => {
@@ -85,9 +70,52 @@ export default function AppLayout() {
   });
   const [loginError, setLoginError] = useState<string | null>(null);
 
+  // Interactive States
+  const [hasUnread, setHasUnread] = useState(true);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [portalOpen, setPortalOpen] = useState(false);
+
+  // Notifications from Backend
+  const [dbNotifications, setDbNotifications] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (!activeUser?.email) return;
+    const fetchNotifications = async () => {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5001"}/api/notifications?email=${encodeURIComponent(activeUser.email)}`);
+        if (res.ok) {
+          const data = await res.json();
+          setDbNotifications(data);
+          const unread = data.some((n: any) => !n.is_read);
+          setHasUnread(unread);
+        }
+      } catch (err) {
+        console.error("Error fetching notifications:", err);
+      }
+    };
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 10000);
+    return () => clearInterval(interval);
+  }, [activeUser]);
+
+  const handleMarkAllRead = async () => {
+    if (!activeUser?.email) return;
+    try {
+      await fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5001"}/api/notifications/mark-read`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: activeUser.email })
+      });
+      setHasUnread(false);
+      setDbNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const isMaintainer = activeUser?.role.toLowerCase().includes("maintainer") || activeUser?.isAdmin || false;
 
-  const isLandingPage = ["/", "/plays", "/events", "/directory"].includes(location.pathname) || location.pathname.startsWith("/profile") || !activeUser;
+  const isLandingPage = ["/", "/about", "/manifesto", "/plays", "/events", "/directory", "/gallery", "/public-gallery"].includes(location.pathname) || location.pathname.startsWith("/profile") || !activeUser;
 
   const filteredNavItems = isMaintainer
     ? maintainerNavItems
@@ -158,7 +186,7 @@ export default function AppLayout() {
   };
 
   const isMember = activeUser ? !isMaintainer : false;
-  const isAllowedPath = ["/", "/member", "/schedule", "/auditions", "/member-plays", "/member-scripts", "/plays", "/events", "/directory"].includes(location.pathname) || location.pathname.startsWith("/profile");
+  const isAllowedPath = ["/", "/member", "/schedule", "/auditions", "/member-plays", "/member-scripts", "/plays", "/events", "/directory", "/gallery", "/public-gallery"].includes(location.pathname) || location.pathname.startsWith("/profile");
   const showAccessDenied = activeUser && !isMaintainer && isMember && !isAllowedPath;
 
   const sidebarWidthClass = isCollapsed ? "w-[72px]" : "w-64 xl:w-72";
@@ -199,6 +227,16 @@ export default function AppLayout() {
                 {/* Desktop Nav Links */}
                 <nav className="hidden md:flex items-center gap-8">
                   <Link
+                    to="/about"
+                    className={`text-sm font-semibold tracking-wide transition-all ${
+                      location.pathname === "/about" || location.pathname === "/manifesto"
+                        ? "text-[#635f41] border-b-2 border-[#635f41] pb-1"
+                        : "text-[#466272] hover:text-[#635f41]"
+                    }`}
+                  >
+                    About / Manifesto
+                  </Link>
+                  <Link
                     to="/plays"
                     className={`text-sm font-semibold tracking-wide transition-all ${
                       location.pathname === "/plays"
@@ -227,6 +265,16 @@ export default function AppLayout() {
                     }`}
                   >
                     Member Directory
+                  </Link>
+                  <Link
+                    to="/gallery"
+                    className={`text-sm font-semibold tracking-wide transition-all ${
+                      location.pathname === "/gallery" || location.pathname === "/public-gallery"
+                        ? "text-[#635f41] border-b-2 border-[#635f41] pb-1"
+                        : "text-[#466272] hover:text-[#635f41]"
+                    }`}
+                  >
+                    Gallery
                   </Link>
                 </nav>
               </div>
@@ -301,12 +349,14 @@ export default function AppLayout() {
                     to="/"
                     className="border border-[#cac6b9]/40 text-[#635f41] hover:bg-[#e6e2dd]/40 rounded-[8px] h-9 px-4 flex items-center text-xs font-semibold tracking-wider transition-all uppercase"
                   >
-                    View Website
+                    Landing Page
                   </Link>
                   {/* Notification Trigger */}
                   <Dialog open={notificationsOpen} onOpenChange={(openState) => {
                     setNotificationsOpen(openState);
-                    if (openState) setHasUnread(false);
+                    if (openState) {
+                      handleMarkAllRead();
+                    }
                   }}>
                     <DialogTrigger render={<Button variant="ghost" size="icon" className="relative text-[#466272] hover:bg-[#f7f3ee] rounded-full" />}>
                       <Bell className="w-5 h-5" />
@@ -316,47 +366,59 @@ export default function AppLayout() {
                     </DialogTrigger>
                     <DialogContent className="bg-[#fdf9f4] border border-[#e6e2dd] text-[#466272] max-w-md">
                       <DialogHeader>
-                        <DialogTitle className="font-serif text-[#635f41] flex items-center gap-2">
-                          <Bell className="w-5 h-5 text-[#8CC0EB]" /> Notifications Inbox
+                        <DialogTitle className="font-serif text-[#635f41] flex items-center justify-between gap-2">
+                          <span className="flex items-center gap-2">
+                            <Bell className="w-5 h-5 text-[#8CC0EB]" /> Notifications Inbox
+                          </span>
+                          {hasUnread && (
+                            <Badge className="bg-red-100 text-red-700 text-[10px] font-bold">New Updates</Badge>
+                          )}
                         </DialogTitle>
                         <DialogDescription className="text-xs text-[#466272]/85">
-                          Recent backstage dispatches and production updates.
+                          Live dispatches and production updates for <strong>{activeUser.name}</strong>.
                         </DialogDescription>
                       </DialogHeader>
-                      <div className="py-4 space-y-3">
-                        <div className="p-3 bg-white border border-[#e6e2dd] rounded-[8px] space-y-1">
-                          <div className="flex justify-between items-center">
-                            <span className="text-xs font-bold text-[#635f41]">Macbeth Rehearsal Update</span>
-                            <span className="text-[10px] text-[#466272]/60">10m ago</span>
+
+                      <div className="py-4 space-y-3 max-h-[60vh] overflow-y-auto pr-1">
+                        {dbNotifications.length === 0 ? (
+                          <div className="p-6 text-center text-xs text-[#466272]/70 italic">
+                            No notifications in your inbox.
                           </div>
-                          <p className="text-xs text-[#466272]/90">
-                            Dress run and stage lighting sync confirmed for July 07 at 4:00 PM. Presence required.
-                          </p>
-                        </div>
-                        <div className="p-3 bg-white border border-[#e6e2dd] rounded-[8px] space-y-1">
-                          <div className="flex justify-between items-center">
-                            <span className="text-xs font-bold text-[#635f41]">Prop Transfer Registered</span>
-                            <span className="text-[10px] text-[#466272]/60">2h ago</span>
-                          </div>
-                          <p className="text-xs text-[#466272]/90">
-                            Jayesh Dave checked out <strong>Banquet Goblet (Gold)</strong>. Return window is 2 days.
-                          </p>
-                        </div>
-                        <div className="p-3 bg-white border border-[#e6e2dd] rounded-[8px] space-y-1">
-                          <div className="flex justify-between items-center">
-                            <span className="text-xs font-bold text-[#635f41]">Budget Claim Approved</span>
-                            <span className="text-[10px] text-[#466272]/60">1d ago</span>
-                          </div>
-                          <p className="text-xs text-[#466272]/90">
-                            Velvet curtains fabric claim ($350.00) signed off by sponsor committee.
-                          </p>
-                        </div>
+                        ) : (
+                          dbNotifications.map((notif) => (
+                            <div 
+                              key={notif.id} 
+                              className={`p-3.5 border rounded-[10px] space-y-1 transition-all ${
+                                notif.is_read ? "bg-white/70 border-[#e6e2dd]" : "bg-white border-[#8CC0EB] shadow-xs"
+                              }`}
+                            >
+                              <div className="flex justify-between items-center gap-2">
+                                <span className="text-xs font-bold text-[#635f41] flex items-center gap-1.5">
+                                  {!notif.is_read && <span className="w-2 h-2 rounded-full bg-[#8CC0EB] inline-block"></span>}
+                                  {notif.title || "Production Notice"}
+                                </span>
+                                <span className="text-[10px] text-[#466272]/60 font-mono flex-shrink-0">
+                                  {notif.created_at || "Recent"}
+                                </span>
+                              </div>
+                              <p className="text-xs text-[#466272]/90 leading-relaxed font-light">
+                                {notif.message}
+                              </p>
+                            </div>
+                          ))
+                        )}
                       </div>
-                      <DialogFooter className="sm:justify-between items-center gap-4">
-                        <span className="text-[11px] text-[#466272]/60 italic">Authenticated via Aayam Hub</span>
-                        <Button onClick={() => setNotificationsOpen(false)} className="bg-[#8CC0EB] text-[#1c1b19] hover:bg-[#8CC0EB]/90 rounded-[8px]">
-                          Dismiss
-                        </Button>
+
+                      <DialogFooter className="sm:justify-between items-center gap-4 border-t border-[#e6e2dd] pt-3">
+                        <span className="text-[11px] text-[#466272]/60 italic">Live SQLite DB Feed</span>
+                        <div className="flex gap-2">
+                          <Button onClick={handleMarkAllRead} variant="outline" className="text-xs font-bold border-[#e6e2dd] text-[#635f41]">
+                            Mark All Read
+                          </Button>
+                          <Button onClick={() => setNotificationsOpen(false)} className="bg-[#8CC0EB] text-[#001e2c] font-bold hover:bg-[#8CC0EB]/90 rounded-[8px]">
+                            Dismiss
+                          </Button>
+                        </div>
                       </DialogFooter>
                     </DialogContent>
                   </Dialog>
@@ -467,12 +529,13 @@ export default function AppLayout() {
                   <Link className="text-[#466272]/85 hover:text-[#635f41] transition-colors" to="/plays">Our Plays</Link>
                   <Link className="text-[#466272]/85 hover:text-[#635f41] transition-colors" to="/events">Upcoming Events</Link>
                   <Link className="text-[#466272]/85 hover:text-[#635f41] transition-colors" to="/directory">Member Directory</Link>
+                  <Link className="text-[#466272]/85 hover:text-[#635f41] transition-colors" to="/public-gallery">Gallery</Link>
                 </nav>
               </div>
             </footer>
           </>
         ) : (
-          <main className="flex-1 px-4 md:px-[64px] py-8 md:py-[48px] max-w-[1280px] mx-auto w-full">
+          <main className="flex-1 px-4 md:px-8 py-4 md:py-6 max-w-[1280px] mx-auto w-full">
             {showAccessDenied ? (
               <div className="flex flex-col items-center justify-center text-center py-12 px-4 bg-white border border-[#e6e2dd] rounded-[8px] space-y-6 shadow-xs max-w-md mx-auto mt-8">
                 <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center text-red-500 border border-red-100">

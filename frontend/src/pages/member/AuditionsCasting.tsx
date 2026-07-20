@@ -53,21 +53,79 @@ export default function AuditionsCasting() {
   const [coverNote, setCoverNote] = useState("");
 
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5001"}/api/open-positions`)
-      .then(r => r.json())
-      .then(positions => {
-        setOpenPositions(positions);
-      });
+    if (activeUser) {
+      setApplicantName(activeUser.name || "");
+      setApplicantEmail(activeUser.email || "");
+    }
+  }, [activeUser]);
+
+  const fetchOpenPositions = async () => {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5001"}/api/open-positions`);
+      if (res.ok) {
+        const positions = await res.json();
+        if (Array.isArray(positions) && positions.length > 0) {
+          setOpenPositions(positions);
+          return;
+        }
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    // Fallback Positions
+    setOpenPositions([
+      {
+        id: "1_Performer_1",
+        play_id: 1,
+        title: "Tamashbin Kathputliya - Lead Street Performer",
+        category: "Performer",
+        description: "Seeking energetic street theatre actor with strong vocal projection and rhythmic dialogue delivery.",
+        requirements: "Audition monologue video clip & theatrical resume",
+        deadline: "Aug 15, 2026"
+      },
+      {
+        id: "2_TechnicalCrew_2",
+        play_id: 2,
+        title: "DDDJ Showcase - Technical Stage Director",
+        category: "Technical Crew",
+        description: "Overseeing stage cues, sound mix balancing, and lighting transitions for the annual showcase.",
+        requirements: "Technical staging portfolio PDF & work resume",
+        deadline: "Aug 20, 2026"
+      },
+      {
+        id: "3_CreativeDesigner_3",
+        play_id: 3,
+        title: "Karn Ki Yachika - Classical Costume Designer",
+        category: "Creative Designer",
+        description: "Designing period-accurate Indian classical drama costumes and headpieces.",
+        requirements: "Design portfolio PDF & sketch samples",
+        deadline: "Sep 01, 2026"
+      }
+    ]);
+  };
+
+  const fetchMyAuditions = async () => {
+    if (!activeUser?.email) return;
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5001"}/api/my-auditions?email=${encodeURIComponent(activeUser.email)}`);
+      if (res.ok) {
+        const apps = await res.json();
+        setApplications(apps);
+        if (apps.length > 0 && !selectedAppId) {
+          setSelectedAppId(apps[0].id);
+        }
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  useEffect(() => {
+    fetchOpenPositions();
   }, []);
 
   useEffect(() => {
-    if (!activeUser?.email) return;
-    fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5001"}/api/my-auditions?email=${activeUser.email}`)
-      .then(r => r.json())
-      .then(apps => {
-        setApplications(apps);
-        if (apps.length > 0) setSelectedAppId(apps[0].id);
-      });
+    fetchMyAuditions();
   }, [activeUser]);
 
   const handleApplyClick = (pos: OpenPosition) => {
@@ -89,7 +147,7 @@ export default function AuditionsCasting() {
         body: JSON.stringify({
           email: activeUser.email,
           play_id: activePosition.play_id,
-          role: activePosition.category,
+          role: activePosition.title,
           notes: coverNote
         })
       });
@@ -109,14 +167,15 @@ export default function AuditionsCasting() {
           category: activePosition.category,
           submittedAt: new Date().toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" }),
           status: "Applied",
-          notes: "Application received. The creative board is conducting initial review processes.",
+          notes: "Application received and logged. Creative board is reviewing your materials.",
           files: filesUploaded,
         };
 
-        const updatedApps = [...applications, newApp];
+        const updatedApps = [newApp, ...applications];
         setApplications(updatedApps);
         setSelectedAppId(newApp.id);
         setApplyOpen(false);
+        fetchMyAuditions();
       }
     } catch(err) {
       console.error(err);

@@ -1,6 +1,6 @@
 # AAYAM Hub — Database Schema & Data Dictionary
 
-This document outlines the SQLite database structure (`aayam.db`) powering the AAYAM Hub and Matinee Club backend. It includes the schema design, table definitions, relationships, and a summary of the seeded data.
+This document outlines the SQLite database structure (`aayam.db`) powering the AAYAM Hub and Matinee Club backend. It includes the complete schema design, table definitions, relationships, and a summary of the authentic seeded data from the Aayam Drama Society (IIT Madras BS).
 
 ---
 
@@ -36,9 +36,18 @@ erDiagram
         int id PK
         string name
     }
+    label {
+        int id PK
+        string name
+        string color
+    }
     user_roles {
         int user_id FK
         int role_id FK
+    }
+    user_labels {
+        int user_id FK
+        int label_id FK
     }
     admin {
         int id PK
@@ -68,6 +77,16 @@ erDiagram
         string dates
         string runtime
         string price
+    }
+    open_position {
+        int id PK
+        int play_id FK
+        string title
+        string category
+        text description
+        string requirements
+        date deadline
+        string status
     }
     event {
         int id PK
@@ -111,10 +130,51 @@ erDiagram
         string media_type
         datetime upload_date
     }
-    notification {
+    gallery_item {
+        int id PK
+        string title
+        string category
+        text image_url
+        text caption
+        datetime uploaded_at
+        string status
+        string uploader_name
+    }
+    schedule_slot {
         int id PK
         int user_id FK
-        text message
+        date date
+        string day_of_week
+        time start_time
+        time end_time
+        string notes
+    }
+    audition {
+        int id PK
+        int user_id FK
+        int play_id FK
+        datetime audition_date
+        string role_applied_for
+        text experience_notes
+        string status
+        datetime submitted_at
+    }
+    shared_event {
+        int id PK
+        int submitted_by FK
+        string title
+        text description
+        datetime event_date
+        string location_or_link
+        string status
+        datetime created_at
+    }
+    notification {
+        int id PK
+        int recipient_id FK
+        string type
+        int reference_id
+        boolean is_read
         datetime created_at
     }
     volunteer {
@@ -132,9 +192,26 @@ erDiagram
         string status
         string remarks
     }
+    stage_booking {
+        int id PK
+        string time
+        string period
+        string stage
+        string details
+        boolean is_secondary
+        datetime created_at
+    }
+    revenue_metric {
+        int id PK
+        int playbill_sold
+        int corporate_patrons
+        datetime updated_at
+    }
 
     user ||--o{ user_roles : "has"
     role ||--o{ user_roles : "has"
+    user ||--o{ user_labels : "tagged with"
+    label ||--o{ user_labels : "applied to"
     user ||--o| admin : "acts as"
     user ||--o| membership : "holds"
     user ||--o{ booking : "makes"
@@ -142,6 +219,12 @@ erDiagram
     user ||--o{ notification : "receives"
     user ||--o{ volunteer : "offers to help"
     user ||--o{ participation : "joins"
+    user ||--o{ schedule_slot : "has rehearsal slots"
+    user ||--o{ audition : "applies for"
+    user ||--o{ shared_event : "proposes"
+    
+    play ||--o{ open_position : "offers casting positions"
+    play ||--o{ audition : "receives auditions"
     
     admin ||--o{ event : "moderates"
     admin ||--o{ announcement : "posts"
@@ -160,90 +243,90 @@ erDiagram
 ## 🗂️ Data Dictionary
 
 ### 1. `user`
-Stores member profiles, contact info, emergency details, and login credentials.
+Stores member profiles, contact info, emergency details, local profile images, and login credentials.
 
 | Column | Type | Constraints | Description |
 | :--- | :--- | :--- | :--- |
 | `id` | INTEGER | PRIMARY KEY | Unique user record identifier. |
 | `member_id` | VARCHAR(50) | UNIQUE, NULLABLE | Public club membership token (e.g. `MC-1001`). |
 | `name` | VARCHAR(150) | NOT NULL | User's full name. |
-| `email` | VARCHAR(255) | UNIQUE, NOT NULL, INDEX | Primary email (auto-generated as `name@handle.com`). |
+| `email` | VARCHAR(255) | UNIQUE, NOT NULL, INDEX | Primary email (e.g., `23f2000668@ds.study.iitm.ac.in`). |
 | `password` | VARCHAR(512) | NOT NULL | Securely hashed password credential. |
 | `phone` | VARCHAR(20) | NULLABLE | Primary phone number (with country code). |
-| `age` | VARCHAR(20) | NULLABLE | Age bracket or age. |
-| `address` | VARCHAR(255) | NULLABLE | Local residential address. |
-| `city` | VARCHAR(100) | NULLABLE | City. |
-| `state` | VARCHAR(100) | NULLABLE | State (e.g. Maharashtra, Karnataka). |
+| `age` | VARCHAR(20) | NULLABLE | Age. |
+| `address` | VARCHAR(255) | NULLABLE | Residential or campus address. |
+| `city` | VARCHAR(100) | NULLABLE | City (e.g. Chennai, Mumbai, Pune). |
+| `state` | VARCHAR(100) | NULLABLE | State. |
 | `country` | VARCHAR(100) | NULLABLE | Country (default: India). |
-| `pronouns` | VARCHAR(50) | NULLABLE | Pronouns preference (e.g. he/him). |
-| `availability`| VARCHAR(100) | NULLABLE | Rehearsal/performance slots. |
+| `pronouns` | VARCHAR(50) | NULLABLE | Pronouns preference. |
+| `availability`| VARCHAR(100) | NULLABLE | Rehearsal/performance availability. |
 | `bio` | TEXT | NULLABLE | Professional summary or theatrical journey. |
-| `portfolio` | VARCHAR(200) | NULLABLE | Links to external works/resumes. |
+| `portfolio` | VARCHAR(200) | NULLABLE | Links to external portfolio or Google site. |
 | `interest` | VARCHAR(100) | NULLABLE | Theatrical areas of interest. |
-| `level` | VARCHAR(50) | NULLABLE | Experience level classification (e.g., Ensemble). |
-| `status` | VARCHAR(20) | DEFAULT 'Pending' | Member status (Active, On Break, Pending). |
+| `level` | VARCHAR(50) | NULLABLE | Experience level classification (e.g., Ensemble Leader). |
+| `status` | VARCHAR(20) | DEFAULT 'Active' | Member status (Active, On Break, Pending). |
 | `emergency_name` | VARCHAR(100)| NULLABLE | Emergency contact person name. |
 | `emergency_phone`| VARCHAR(20) | NULLABLE | Emergency contact phone number. |
 
 ### 2. `role` & `user_roles`
-Defines permission tags in the Matinee Club.
+Defines permission tags in the Aayam Drama Society.
 
 * **`role` Table:**
   * `id` (INTEGER, PK)
-  * `name` (VARCHAR(100), NOT NULL) — e.g. `Core Maintainer`, `Director Coordinator`, `Lead Actor & Member`.
+  * `name` (VARCHAR(100), NOT NULL) — e.g. `Core Maintainer`, `Production Coordinator`, `Outreach & Sponsorship Head`, `Mentor (Directing)`, `Design Head`.
 * **`user_roles` Table (Association):**
   * `user_id` (INTEGER, FK -> `user.id`, PK)
   * `role_id` (INTEGER, FK -> `role.id`, PK)
 
-### 3. `play`
-Details the theatrical productions staged by the club.
+### 3. `play` & `open_position`
+Details the active theatrical productions staged by Aayam.
+
+* **`play` Table:**
+  * `id` (INTEGER, PK)
+  * `title` (VARCHAR(150), NOT NULL) — e.g. *Tamashbin Kathputliya*, *DDDJ*, *Karn Ki Yachika*, *Samatvam*, *Speak Up Tara*.
+  * `status` (VARCHAR(50)) — Ticket status (e.g. `FEATURED MATINEE`, `SELLING FAST`).
+  * `status_color` (VARCHAR(100)) — Color utility badge style.
+  * `description` (TEXT) — Detailed play synopsis.
+  * `director` (VARCHAR(150)) — Lead director.
+  * `cast` (VARCHAR(255)) — Featured ensemble performers.
+  * `season` (VARCHAR(100)) — Season name (e.g. `2024-2025 Lineage`).
+  * `image` (VARCHAR(255)) — Authentic photo path under `/aayam_assets/`.
+  * `venue` (VARCHAR(100)) — Performance venue (e.g., `OAT IIT Madras`).
+
+* **`open_position` Table:**
+  * `id` (INTEGER, PK)
+  * `play_id` (INTEGER, FK -> `play.id`) — Associated play.
+  * `title` (VARCHAR(150)) — Position title (e.g., `Female Lead - Tara`).
+  * `category` (VARCHAR(100)) — Category (`Acting`, `Crew`, `Directing`).
+  * `requirements` (VARCHAR(255)) — Casting requirements.
+
+### 4. `gallery_item`
+Maintains the authentic production photo library (60+ items).
 
 | Column | Type | Constraints | Description |
 | :--- | :--- | :--- | :--- |
-| `id` | INTEGER | PRIMARY KEY | Unique play identifier. |
-| `title` | VARCHAR(150) | NOT NULL | Title of the play (e.g. Tughlaq). |
-| `status` | VARCHAR(50) | NULLABLE | Ticket status (e.g. SELLING FAST). |
-| `status_color` | VARCHAR(100) | NULLABLE | Style class string for color rendering. |
-| `description` | TEXT | NULLABLE | Detailed play synopsis. |
-| `director` | VARCHAR(150) | NULLABLE | Name of the director. |
-| `cast` | VARCHAR(255) | NULLABLE | Comma-separated list of lead performers. |
-| `season` | VARCHAR(100) | NULLABLE | The staging season (e.g. Monsoon 2026 Season). |
-| `image` | VARCHAR(255) | NULLABLE | Image URL for the playbill poster. |
-| `venue` | VARCHAR(100) | NULLABLE | Primary theatre venue (e.g. Prithvi Theatre). |
-| `dates` | VARCHAR(100) | NULLABLE | Date range of playruns. |
-| `runtime` | VARCHAR(100) | NULLABLE | Total play run time. |
-| `price` | VARCHAR(100) | NULLABLE | Staging price info (e.g. Tickets from ₹300). |
-
-### 4. `event`
-Tracks scheduled events, rehearsals, workshops, and meetups.
-
-| Column | Type | Constraints | Description |
-| :--- | :--- | :--- | :--- |
-| `id` | INTEGER | PRIMARY KEY | Unique event identifier. |
-| `title` | VARCHAR(150) | NOT NULL | Title of the event. |
-| `description` | TEXT | NULLABLE | Event details. |
-| `category` | VARCHAR(50) | NULLABLE | Category (Plays, Workshops, Meetups). |
-| `venue` | VARCHAR(100) | NULLABLE | Staging hall or studio room. |
-| `event_date` | DATE | NULLABLE | Calendar date. |
-| `start_time` | TIME | NULLABLE | Starting time. |
-| `end_time` | TIME | NULLABLE | Finishing time. |
-| `max_participants`| INTEGER | NULLABLE | Capacity cap. |
-| `poster` | VARCHAR(255) | NULLABLE | Media URL for the event graphic. |
-| `status` | VARCHAR(20) | DEFAULT 'Upcoming' | Lifecycle stage (Upcoming, Concluded). |
-| `admin_id` | INTEGER | FK -> `admin.id` | Coordinator responsible for scheduling. |
+| `id` | INTEGER | PRIMARY KEY | Unique media record identifier. |
+| `title` | VARCHAR(200) | NOT NULL | Descriptive theatrical title. |
+| `category` | VARCHAR(100) | DEFAULT 'Stage Plays' | Play folder category (Tamashbin Kathputliya, DDDJ, KKY, Samatvam, Speak Up Tara). |
+| `image_url` | TEXT | NOT NULL | Path to image (e.g. `/aayam_assets/tamashbin_user_1.jpg`). |
+| `caption` | TEXT | NULLABLE | Production scene caption. |
+| `uploaded_at` | DATETIME | DEFAULT UTC | Upload timestamp. |
+| `status` | VARCHAR(50) | DEFAULT 'approved' | Approval status. |
+| `uploader_name`| VARCHAR(100)| DEFAULT 'Aayam Media Team' | Credit attribution. |
 
 ---
 
 ## 🗃️ Seeding Statistics (Current Status)
 
-The database has been seeded with a rich, regional, and gender-diverse set of Indian data:
+The database is seeded with authentic data from the **Aayam (IIT Madras BS Drama Society)** 2024-2025 ensemble:
 
 | Metric | Count | Highlighted Data |
 | :--- | :---: | :--- |
-| **Ensemble Members** | 10 | Sneha Vyas, Kabir Mehta, Jayesh Dave, Pooja Patel, Priya Nair, Amit Sharma |
-| **Admins** | 6 | Sneha Vyas (Director), Kabir Mehta (Tech), Siddharth Verma (Backstage), Amit Sharma (Casting), Rohan Sen (Choreography), Pooja Patel (Art) |
-| **Active Plays** | 7 | *Tughlaq* (Mumbai), *Andha Yug* (Delhi), *Hayavadana* (Bengaluru), *Charandas Chor* (New Delhi), *Ebong Indrajit* (Kolkata), *Sakharam Binder* (Pune), *Karnabhari* (Kochi). |
-| **Events** | 9 | *Tughlaq Premiere*, *Natya Shastra acting workshop*, *Marathi Realistic Drama Panel*, *Badal Sircar Third Theatre Workshop*, *Yakshagana Physical Intensive*. |
+| **Ensemble Members** | 21 | Abay Nandhiga (Secretary), Yuuhi (Deputy Secretary), Samarth Shrivastava (Chief Coordinator), Krishna Subramanian (Dept. Chief Coordinator), Harsh Aryan (Tech Lead), Swati Singh (Content Head), Sneha Das (Design Head), Tanu Kurade, S. Sri Vaishnavi, Akanksha Kadam, Anshi Jain, Kaushal Raj, Esha Hinde, Kanishk Mishra, Aditi. |
+| **Maintainers / Admins** | 4 | Abay Nandhiga, Yuuhi, Samarth Shrivastava, Swati Singh. |
+| **Active Staged Plays** | 5 | *Tamashbin Kathputliya* (Street Play), *DDDJ* (Dramatic Showcase), *Karn Ki Yachika* (Classical Drama), *Samatvam* (Physical Movement), *Speak Up Tara* (Social Drama). |
+| **Events & Workshops** | 6 | *Tamashbin Premiere*, *Natya Shastra Acting Intensive*, *Acoustic Sound & Lighting Workshop*, *Street Theatre Courtyard Showcase*. |
+| **Authentic Gallery Items** | 60 | Real production performance photos imported from user media folders with descriptive theatrical titles. |
 
 ---
 
@@ -252,16 +335,16 @@ The database has been seeded with a rich, regional, and gender-diverse set of In
 ### Using Python Shell (`app.app_context`):
 ```python
 from app import app
-from models import db, User, Play, Event
+from models import db, User, Play, Event, GalleryItem
 
 with app.app_context():
-    # Count all plays
-    plays_count = Play.query.count()
-    print(f"Total plays in DB: {plays_count}")
+    # Count all authentic gallery items
+    gallery_count = GalleryItem.query.count()
+    print(f"Total media items in DB: {gallery_count}")
     
-    # Retrieve a specific user
-    user = User.query.filter_by(email="sneha@handle.com").first()
-    print(f"User: {user.name}, Role: {user.roles[0].name if user.roles else 'None'}")
+    # Retrieve Secretary profile
+    user = User.query.filter_by(name="Abay Nandhiga").first()
+    print(f"User: {user.name}, Email: {user.email}, Role: {user.roles[0].name if user.roles else 'None'}")
 ```
 
 ### Using SQLite3 CLI:
@@ -269,6 +352,6 @@ with app.app_context():
 sqlite3 backend/aayam.db
 # Within sqlite3 terminal:
 .tables
-SELECT title, director, venue FROM play;
-SELECT name, email FROM user WHERE status='Active';
+SELECT title, category, image_url FROM gallery_item LIMIT 10;
+SELECT name, email, city FROM user WHERE status='Active';
 ```

@@ -64,11 +64,40 @@ class User(db.Model):
     labels = db.relationship("Label", secondary=user_labels, back_populates="users")
 
     def to_dict(self):
+        avatar_map = {
+            "Abay Nandhiga": "/aayam_assets/profiles/utkarsh_yuuhi.jpg",
+            "Yuuhi": "/aayam_assets/profiles/abay_nandhiga.jpg",
+            "Utkarsh / Yuuhi": "/aayam_assets/profiles/abay_nandhiga.jpg",
+            "Utkarsh (Yuuhi)": "/aayam_assets/profiles/abay_nandhiga.jpg",
+            "Samarth Shrivastava": "/aayam_assets/profiles/samarth_shrivastava.jpg",
+            "Krishna Subramanian": "/aayam_assets/profiles/krishna_subramanian.jpg",
+            "Harsh Aryan": "/aayam_assets/profiles/harsh_aryan.jpg",
+            "Swati Singh": "/aayam_assets/profiles/swati_singh.jpg",
+            "Sneha Das": "/aayam_assets/profiles/sylene_bansal.jpg",
+            "Tanu Kurade": "/aayam_assets/profiles/tanu_kurade.jpg",
+            "S. Sri Vaishnavi": "/aayam_assets/profiles/vaishnavi_srivastava.jpg",
+            "Akanksha Kadam": "/aayam_assets/profiles/akanksha_kadam.jpg",
+            "Anshi Jain": "/aayam_assets/profiles/chirag_kumar.jpg",
+            "Kaushal Raj": "/aayam_assets/profiles/sneha_das.jpg",
+            "Vaishnavi Srivastava": "/aayam_assets/profiles/vaishnavi_srivastava.jpg",
+            "Gaurav": "/aayam_assets/profiles/chirag_kumar.jpg",
+            "Shrit": "/aayam_assets/profiles/harsh_aryan.jpg",
+            "Dipanshu Bist": "/aayam_assets/profiles/utkarsh_yuuhi.jpg",
+            "Neelotpala": "/aayam_assets/profiles/tanu_kurade.jpg",
+            "Kanishk Mishra": "/aayam_assets/profiles/kanishk_mishra.jpg",
+            "Chirag Kumar": "/aayam_assets/profiles/chirag_kumar.jpg",
+            "Sylene Bansal": "/aayam_assets/profiles/sylene_bansal.jpg",
+            "Esha Hinde": "/aayam_assets/profiles/esha_hinde.jpg",
+            "Aditi": "/aayam_assets/profiles/aditi_drama.jpg"
+        }
+        avatar_url = avatar_map.get(self.name, "/aayam_assets/profiles/abay_nandhiga.jpg")
+
         return {
             'id': self.id,
             'member_id': self.member_id,
             'name': self.name,
             'email': self.email,
+            'avatarUrl': avatar_url,
             'age': self.age,
             'address': self.address,
             'city': self.city,
@@ -253,11 +282,25 @@ class Notification(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     recipient_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     type = db.Column(db.String(50), nullable=False)
-    reference_id = db.Column(db.Integer, nullable=False)
+    title = db.Column(db.String(200), nullable=True)
+    message = db.Column(db.Text, nullable=True)
+    reference_id = db.Column(db.Integer, nullable=True)
     is_read = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     recipient = db.relationship("User", back_populates="notifications")
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'recipient_id': self.recipient_id,
+            'type': self.type,
+            'title': self.title or 'Production Notice',
+            'message': self.message or 'You have a new backstage notification.',
+            'reference_id': self.reference_id,
+            'is_read': self.is_read,
+            'created_at': self.created_at.strftime('%b %d, %Y • %I:%M %p') if self.created_at else ''
+        }
 
 class Volunteer(db.Model):
     __tablename__ = "volunteer"
@@ -345,6 +388,30 @@ class OpenPosition(db.Model):
             'requirements': self.requirements,
             'deadline': self.deadline.strftime('%b %d, %Y') if self.deadline else 'TBA',
             'status': self.status
+        }
+
+class GalleryItem(db.Model):
+    __tablename__ = "gallery_item"
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    title = db.Column(db.String(200), nullable=False)
+    category = db.Column(db.String(100), nullable=False, default="Stage Plays")
+    image_url = db.Column(db.Text, nullable=False)
+    caption = db.Column(db.Text, nullable=True)
+    uploaded_at = db.Column(db.DateTime, default=datetime.utcnow)
+    status = db.Column(db.String(50), default="approved")
+    uploader_name = db.Column(db.String(100), default="Aayam Media Team")
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'category': self.category,
+            'imageUrl': self.image_url,
+            'caption': self.caption or "",
+            'uploadedAt': self.uploaded_at.strftime('%b %d, %Y') if self.uploaded_at else "",
+            'status': self.status,
+            'uploaderName': self.uploader_name or "Aayam Media Team"
         }
 
 from sqlalchemy import event, text

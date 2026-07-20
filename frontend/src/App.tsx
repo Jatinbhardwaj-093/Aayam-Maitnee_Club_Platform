@@ -28,7 +28,9 @@ import Landing from "./pages/website_landing/Landing";
 import Plays from "./pages/website_landing/Plays";
 import Events from "./pages/website_landing/Events";
 import Directory from "./pages/website_landing/Directory";
+import Gallery from "./pages/website_landing/Gallery";
 import Profile from "./pages/website_landing/Profile";
+import About from "./pages/website_landing/About";
 import JoinClub from "./pages/JoinClub";
 
 export default function App() {
@@ -37,9 +39,13 @@ export default function App() {
       <Routes>
         <Route path="/" element={<AppLayout />}>
           <Route index element={<Landing />} />
+          <Route path="about" element={<About />} />
+          <Route path="manifesto" element={<About />} />
           <Route path="plays" element={<Plays />} />
           <Route path="events" element={<Events />} />
           <Route path="directory" element={<Directory />} />
+          <Route path="gallery" element={<Gallery />} />
+          <Route path="public-gallery" element={<Gallery />} />
           <Route path="profile" element={<Profile />} />
           <Route path="profile/view" element={<ViewProfile />} />
           <Route path="profile/edit" element={<EditProfile />} />
@@ -54,7 +60,7 @@ export default function App() {
           <Route path="member-plays" element={<MemberPlays />} />
           <Route path="member-scripts" element={<MemberScripts />} />
           <Route path="sponsor" element={<SponsorDashboard />} />
-          <Route path="gallery" element={<ProductionGallery />} />
+          <Route path="member-gallery" element={<ProductionGallery />} />
           <Route path="admin" element={<ProductionOffice />} />
           <Route path="backstage" element={<BackstagePass />} />
           <Route path="maintainer" element={<MaintainerDashboard />} />

@@ -5,7 +5,7 @@ from app import app
 from models import db, User, Role, Admin, Event, Play
 
 def seed_database():
-    print("Starting database seeding...")
+    print("Starting database seeding with scraped Aayam (IIT Madras BS) data...")
     
     # 1. Recreate tables
     db.drop_all()
@@ -16,11 +16,10 @@ def seed_database():
     roles = {
         'maintainer': Role(name="Core Maintainer"),
         'director': Role(name="Director Coordinator"),
-        'sponsor': Role(name="Grand Patron & Sponsor"),
+        'sponsor': Role(name="Sponsorship & Outreach Lead"),
         'coordinator': Role(name="Production Coordinator"),
         'actor': Role(name="Lead Actor & Member"),
-        'artist': Role(name="Scenic Artist"),
-        'choreographer': Role(name="Choreographer"),
+        'artist': Role(name="Design Head"),
         'member': Role(name="Member")
     }
     
@@ -29,54 +28,78 @@ def seed_database():
     db.session.commit()
     print("Roles seeded.")
     
-    # 3. Add Users
-    # Structure: (name, email_prefix, password_prefix, role_key, age, address, city, state, country, phone, bio, interest, emergency_name, emergency_phone)
+    # 3. Add Real Aayam IITM Members (Executive Committee & Mentors)
     users_data = [
-        ("Sneha Vyas", "sneha", "sneha123", "director", "34", "Flat 402, Sea Breeze, Juhu", "Mumbai", "Maharashtra", "India", "+91 98765 33333", 
-         "Award-winning director from Mumbai with 15+ years of experience directing modern adaptions of Sanskrit classics.", 
-         "Directing, Playwriting, Art Direction", "Vijay Vyas", "+91 98765 33334"),
+        ("Abay Nandhiga", "23f2000668", "abay123", "maintainer", "22", "IIT Madras BS Campus", "Chennai", "Tamil Nadu", "India", "+91 98765 23001",
+         "Secretary of Aayam - IIT Madras BS Drama Society. Directing society operations, stagecraft productions, and national festival representations.",
+         "Directing, Playwriting, Society Leadership", "Nandhiga", "+91 98765 23002",
+         "/aayam_assets/profiles/abay_nandhiga.jpg"),
          
-        ("Kabir Mehta", "kabir", "kabir123", "maintainer", "29", "House 12, Block C, Vasant Kunj", "New Delhi", "Delhi", "India", "+91 98765 88888", 
-         "Lead developer and technical coordinator, crafting immersive interactive stages and platform experiences.", 
-         "Tech, lighting, web design, soundscapes", "Sanjay Mehta", "+91 98765 88889"),
+        ("Yuuhi", "21f1005042", "utkarsh123", "maintainer", "23", "IIT Madras BS Campus", "Chennai", "Tamil Nadu", "India", "+91 98765 21005",
+         "Deputy Secretary of Aayam. Lead performer in Nukkad Natak street plays and stage productions.",
+         "Street Play, Acting, Script Supervision", "Yuuhi Family", "+91 98765 21006",
+         "/aayam_assets/profiles/abay_nandhiga.jpg"),
          
-        ("Lakshya Hari", "lakshya", "lakshya123", "sponsor", "45", "102 Villa, Indiranagar", "Bengaluru", "Karnataka", "India", "+91 98765 99999", 
-         "Philanthropist and art lover based in Bangalore supporting classical drama and community art hubs.", 
-         "Sponsorship, Patron Circle, Theatre Space Funding", "Meera Hari", "+91 98765 99998"),
-         
-        ("Siddharth Verma", "siddharth", "siddharth123", "coordinator", "27", "Row House 3, Baner Road", "Pune", "Maharashtra", "India", "+91 98765 77777", 
-         "Ensuring backstage precision, from custom prop design to flawless lighting choreography.", 
-         "Production coordination, Props, Lighting Crew", "Asha Verma", "+91 98765 77776"),
-         
-        ("Jayesh Dave", "jayesh", "jayesh123", "actor", "26", "A-305, Shanti Nagar", "Ahmedabad", "Gujarat", "India", "+91 98765 43210", 
-         "Method actor specializing in intense protagonist roles. Acted in over 20 stage plays.", 
-         "Acting, Voice Resonance, Script Reading", "Kiran Dave", "+91 98765 43211"),
-         
-        ("Amit Sharma", "amit", "amit123", "actor", "25", "21/5, Gomti Nagar", "Lucknow", "Uttar Pradesh", "India", "+91 98765 22222", 
-         "Theatre enthusiast and classical vocalist. Bringing music and expression together on stage.", 
-         "Acting, Classical Vocal Performance, Music Direction", "Ramesh Sharma", "+91 98765 22221"),
-         
-        ("Pooja Patel", "pooja", "pooja123", "artist", "28", "C-12, Vaishali Nagar", "Jaipur", "Rajasthan", "India", "+91 98765 11111", 
-         "Creating magnificent, detailed set backdrops inspired by Indian heritage and mythology.", 
-         "Scenic painting, Set Design, Costume Styling", "Rajesh Patel", "+91 98765 11112"),
-         
-        ("Rohan Sen", "rohan", "rohan123", "choreographer", "30", "4B, Southern Avenue", "Kolkata", "West Bengal", "India", "+91 98765 00000", 
-         "Blending traditional mudras with modern physical theatre to tell stories through movement.", 
-         "Choreography, Physical Theatre, Kathak Integration", "Debasish Sen", "+91 98765 00001"),
-         
-        ("Priya Nair", "priya", "priya123", "member", "24", "Flat 101, Palms Heights, Kochi", "Kochi", "Kerala", "India", "+91 98765 55555", 
-         "Ensemble performer and expression artist focusing on classical dance and dramatic delivery.", 
-         "Performer, Classical Dance, Modern Plays", "Unni Nair", "+91 98765 5554"),
-         
-        ("Arjun Kapoor", "arjun", "arjun123", "member", "28", "Sector 15, Vashi", "Navi Mumbai", "Maharashtra", "India", "+91 98765 66666", 
-         "Stagewriter and dialogue writer with a strong focus on narrative pacing and local regional folklore.", 
-         "Writing, Screenplay, Dramaturgy", "Deepika Kapoor", "+91 98765 66667")
+        ("Samarth Shrivastava", "21f1002840", "samarth123", "coordinator", "22", "Aayam Hub, IITM BS", "Chennai", "Tamil Nadu", "India", "+91 98765 21002",
+         "Chief Coordinator of Aayam. Overseeing production logistics, stage design, and inter-collegiate drama fests.",
+         "Production Logistics, Stage Lighting, Auditions", "Shrivastava", "+91 98765 21003",
+         "/aayam_assets/profiles/samarth_shrivastava.jpg"),
+
+        ("Krishna Subramanian", "23f1000655", "krishna123", "coordinator", "21", "IITM BS Campus", "Chennai", "Tamil Nadu", "India", "+91 98765 23006",
+         "Dept. Chief Coordinator. Coordinating technical lighting boards, acoustic soundscapes, and live cue management.",
+         "Technical Crew, DMX Lighting, Sound Design", "Subramanian", "+91 98765 23007",
+         "/aayam_assets/profiles/krishna_subramanian.jpg"),
+
+        ("Kaushal Raj", "22f3003301", "kaushal123", "sponsor", "23", "Aayam Outreach Cell", "Bengaluru", "Karnataka", "India", "+91 98765 22003",
+         "Outreach & Sponsorship Head. Building partnerships with corporate sponsors and patron circles for Aayam plays.",
+         "Sponsorship, Corporate Partnerships, Brand Events", "Raj", "+91 98765 22004",
+         "/aayam_assets/profiles/sneha_das.jpg"),
+
+        ("Sneha Das", "23f1000100", "sneha123", "artist", "22", "IITM Art Studio", "Kolkata", "West Bengal", "India", "+91 98765 23010",
+         "Design Head at Aayam. Painting scenic backdrops, prop design, and visual brand identity for productions.",
+         "Scenic Design, Set Painting, Poster Design", "Das", "+91 98765 23011",
+         "/aayam_assets/profiles/sylene_bansal.jpg"),
+
+        ("Anshi Jain", "23f1000200", "anshi123", "artist", "21", "Aayam PR Wing", "Jaipur", "Rajasthan", "India", "+91 98765 23020",
+         "PR Head. Leading public relations, media engagement, and community audience growth across campuses.",
+         "Public Relations, Social Media, Audience Curation", "Jain", "+91 98765 23021",
+         "/aayam_assets/profiles/chirag_kumar.jpg"),
+
+        ("Swati Singh", "23f1000300", "swati123", "maintainer", "22", "Aayam Tech Team", "New Delhi", "Delhi", "India", "+91 98765 23030",
+         "Web Admin & Tech Lead. Maintaining digital member roster, booking engines, and online portal infrastructure.",
+         "Full-Stack Web Dev, Database Management, UI Design", "Singh", "+91 98765 23031",
+         "/aayam_assets/profiles/swati_singh.jpg"),
+
+        ("Tanu Kurade", "21f1005637", "tanu123", "director", "24", "Aayam Acting Wing", "Mumbai", "Maharashtra", "India", "+91 98765 21056",
+         "Mentor (Acting). Conducting method acting workshops, dialogue modulation, and character breakdown sessions.",
+         "Method Acting, Voice Modulation, Character Work", "Kurade", "+91 98765 21057",
+         "/aayam_assets/profiles/tanu_kurade.jpg"),
+
+        ("S. Sri Vaishnavi", "21f3001698", "vaishnavi123", "director", "24", "Aayam Direction Cell", "Hyderabad", "Telangana", "India", "+91 98765 21016",
+         "Mentor (Directing). Directing multi-act stage plays, script adaptation, and classical blocking design.",
+         "Directing, Script Adaptation, Blocking", "Vaishnavi", "+91 98765 21017",
+         "/aayam_assets/profiles/vaishnavi_srivastava.jpg"),
+
+        ("Esha Hinde", "esha.hinde", "esha123", "artist", "23", "Aayam Styling & Props", "Pune", "Maharashtra", "India", "+91 98765 21018",
+         "Costume & Production Coordinator. Specializing in period costume design, prop curation, and backstage styling.",
+         "Costume Design, Props Curation, Stage Styling", "Hinde", "+91 98765 21019",
+         "/aayam_assets/profiles/esha_hinde.jpg"),
+
+        ("Kanishk Mishra", "kanishk.mishra", "kanishk123", "director", "24", "Aayam Technical Cell", "Delhi", "Delhi", "India", "+91 98765 21020",
+         "Stage & Technical Director. Managing auditorium acoustics, lighting rigs, and acoustic set construction.",
+         "Stage Direction, Acoustic Rigs, Technical Cues", "Mishra", "+91 98765 21021",
+         "/aayam_assets/profiles/kanishk_mishra.jpg"),
+
+        ("Aditi", "aditi.drama", "aditi123", "actor", "22", "Aayam Acting Wing", "Bengaluru", "Karnataka", "India", "+91 98765 21022",
+         "Principal Dramatic Actress. Featured in contemporary stage adaptations and street play ensembles.",
+         "Method Acting, Character Portrayal, Monologue Performance", "Aditi", "+91 98765 21023",
+         "/aayam_assets/profiles/aditi_drama.jpg")
     ]
     
     created_users = {}
     for i, data in enumerate(users_data):
-        name, email_prefix, password_plain, role_key, age, address, city, state, country, phone, bio, interest, emg_name, emg_phone = data
-        email = f"{email_prefix}@handle.com"
+        name, email_prefix, password_plain, role_key, age, address, city, state, country, phone, bio, interest, emg_name, emg_phone, avatar = data
+        email = f"{email_prefix}@ds.study.iitm.ac.in" if email_prefix.startswith("2") else f"{email_prefix}@handle.com"
         password_hashed = generate_password_hash(password_plain)
         
         user = User(
@@ -91,140 +114,121 @@ def seed_database():
             country=country,
             phone=phone,
             pronouns="he/him" if i % 2 == 0 else "she/her",
-            availability="Weekday evenings & weekends",
+            availability="Weekday evenings & weekend rehearsals",
             bio=bio,
-            portfolio="https://portfolio.matinee.club/" + email_prefix,
+            portfolio="https://sites.google.com/study.iitm.ac.in/aayam/about",
             interest=interest,
             status="Active",
             emergency_name=emg_name,
             emergency_phone=emg_phone,
-            level="Ensemble"
+            level="Ensemble Leader"
         )
-        # Associate Role
         user.roles.append(roles[role_key])
         
         db.session.add(user)
         created_users[email_prefix] = user
         
     db.session.commit()
-    print("Users and role associations seeded.")
+    print("Users seeded.")
     
     # 4. Add Admins
-    admin_sneha = Admin(user=created_users['sneha'], designation="Director Coordinator", permissions="All")
-    admin_kabir = Admin(user=created_users['kabir'], designation="Core Maintainer", permissions="All")
-    admin_siddharth = Admin(user=created_users['siddharth'], designation="Production Coordinator", permissions="Backstage, Lights, Props")
-    admin_amit = Admin(user=created_users['amit'], designation="Lead Actor & Casting Director", permissions="Casting, Auditions")
-    admin_rohan = Admin(user=created_users['rohan'], designation="Choreographer & Stage Manager", permissions="Backstage, Choreography")
-    admin_pooja = Admin(user=created_users['pooja'], designation="Scenic Art Lead", permissions="Props, Design")
+    admin_abay = Admin(user=created_users['23f2000668'], designation="Secretary Aayam", permissions="All")
+    admin_utkarsh = Admin(user=created_users['21f1005042'], designation="Deputy Secretary", permissions="All")
+    admin_samarth = Admin(user=created_users['21f1002840'], designation="Chief Coordinator", permissions="Logistics, Stage")
+    admin_swati = Admin(user=created_users['23f1000300'], designation="Web Admin & Tech Lead", permissions="Portal, DB")
     
-    db.session.add(admin_sneha)
-    db.session.add(admin_kabir)
-    db.session.add(admin_siddharth)
-    db.session.add(admin_amit)
-    db.session.add(admin_rohan)
-    db.session.add(admin_pooja)
+    db.session.add(admin_abay)
+    db.session.add(admin_utkarsh)
+    db.session.add(admin_samarth)
+    db.session.add(admin_swati)
     db.session.commit()
     print("Admins seeded.")
     
-    # 5. Seed Plays (incorporating regional, stylistic, and genre diversity)
+    # 5. Seed Real Aayam IITM Plays
     plays_data = [
         {
-            "title": "Tughlaq",
+            "title": "Karn Ki Yachika",
             "status": "SELLING FAST",
             "status_color": "bg-emerald-50 text-emerald-700 border-emerald-200",
-            "description": "Girish Karnad's classic play exploring the visionary but chaotic reign of Muhammad bin Tughlaq. A timeless political allegory that resonates with modern times.",
-            "director": "Sneha Vyas",
-            "cast": "Jayesh Dave, Amit Sharma, Pooja Patel",
-            "season": "Monsoon 2026 Season",
-            "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuCAzuMBaCOUMEUXFsi58uX4Sk0JbT72vPkeMf7KwisCYFvuX3Bk8gP1e__uZ8B3G4bYBmYBQjlPftJgABVJuuHuLNh_AIDoUgyAwaSJBouCjuqcQ7quRshTI9hepIQebEmL3pvhyyO6hPnGW2vUGYrayYRqt1rRMyl1OCAIad0kKVUn46ZjCsSI_nQCNnUrcxx_B1Rvmvml5deoCtkUqY61szLjR8uoRvQhIHhNvsCHkKUY4niHP9cI",
-            "venue": "Prithvi Theatre, Mumbai",
+            "description": "A monumental classical drama exploring Karn's moral dilemma, honor, and destiny on the battleground of Kurukshetra.",
+            "director": "S. Sri Vaishnavi",
+            "cast": "Abay Nandhiga, Utkarsh (Yuuhi), Samarth Shrivastava",
+            "season": "2026 Production Season",
+            "image": "/aayam_assets/kky_user_1.jpg",
+            "venue": "Kashiyatra Stage, IIT BHU / OAT IIT Madras",
             "dates": "Aug 12 - Sep 04, 2026",
-            "runtime": "120 Mins (With Intermission)",
-            "price": "Tickets from ₹300"
+            "runtime": "75 Mins (No Intermission)",
+            "price": "Free Admission"
         },
         {
-            "title": "Andha Yug",
+            "title": "Tamashbin Kathputliya",
             "status": "LIMITED TICKETS",
             "status_color": "bg-amber-50 text-amber-700 border-amber-200",
-            "description": "Dharamvir Bharati's epic anti-war play set on the final day of the Mahabharata war. It delves into the dark psychology of greed, vengeance, and moral collapse.",
-            "director": "Sneha Vyas",
-            "cast": "Amit Sharma, Rohan Sen, Jayesh Dave",
-            "season": "Monsoon 2026 Season",
-            "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuCkdj8dZKXd7KCPEfHwJx7d8dv8AVc16bLqx_Fa77OIQmhTqukcXd2WDgJayuivLhn9h2pKeVblOrBnzeH4iZNV2Hc7Ai6WzKPJfD3Kj-Fj9C0R-atVf6NKYU5KIKzH_H_z0B7SCUzFkxoaDIoNvxVUOdezFBpsRK1ok9gn2liDaNoNmK1K2dPMrk5mQIpcFjwBK0DT20azXknFaYzsgretzQcXDgjzpeD_Oa1FDZ_Dmb_ywKKmRkz1",
-            "venue": "Kamani Auditorium, Delhi",
-            "dates": "Sep 15 - Oct 02, 2026",
-            "runtime": "110 Mins (No Intermission)",
-            "price": "Tickets from ₹250"
+            "description": "A high-energy street play (Nukkad Natak) combining puppetry motifs, live dholak rhythms, and political satire.",
+            "director": "Utkarsh (Yuuhi)",
+            "cast": "Samarth Shrivastava, Krishna Subramanian, Swati Singh",
+            "season": "2026 Production Season",
+            "image": "/aayam_assets/tamashbin_user_1.jpg",
+            "venue": "Open Air Theatre (OAT), IIT Madras",
+            "dates": "Sep 12 - Sep 25, 2026",
+            "runtime": "45 Mins (No Intermission)",
+            "price": "Free Open Stage"
         },
         {
-            "title": "Hayavadana",
+            "title": "DDDJ - Stage Production",
+            "status": "TICKETS ON SALE",
+            "status_color": "bg-purple-50 text-purple-700 border-purple-200",
+            "description": "An intense proscenium drama exploring relationship dynamics, ambition, and modern societal pressures.",
+            "director": "S. Sri Vaishnavi",
+            "cast": "Abay Nandhiga, Krishna Subramanian, Sneha Das",
+            "season": "2026 Production Season",
+            "image": "/aayam_assets/dddj_user_1.jpg",
+            "venue": "CLT Auditorium, IIT Madras",
+            "dates": "Sep 28 - Oct 10, 2026",
+            "runtime": "85 Mins (With Intermission)",
+            "price": "Registration Required"
+        },
+        {
+            "title": "Samatvam",
             "status": "TICKETS ON SALE",
             "status_color": "bg-blue-50 text-blue-700 border-blue-200",
-            "description": "A brilliant play by Girish Karnad exploring identity, completeness, and love through a mythical story of swapped heads. Combines Yakshagana folk performance with modern theatrical dialogue.",
-            "director": "Kabir Mehta",
-            "cast": "Priya Nair, Arjun Kapoor, Jayesh Dave",
-            "season": "Monsoon 2026 Season",
-            "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuCFhh56JyFyLF08wchxPKsyhHqSdltIyUQmbvnM36afMwPrX-viKot2UF8WixHwwsB6_yr3DY4I7A1H2Zni9qGuPWojUJfSMHi-9ha_m7DCp2zmqpEOOJ2_EuFdjOI2bTlG-i2En3DPM6Q63oDPSTnQ76-vSPlw0GM8brJPhxU_AmlY6YM2w_8eTXnoW6PYDyXhq2RpqzGw48vFSVE6mF-XFPyFl6NPLNchnK-U-RX8YvaKmUEnhcKr",
-            "venue": "Ranga Shankara, Bengaluru",
-            "dates": "Oct 10 - Oct 28, 2026",
-            "runtime": "100 Mins (With Intermission)",
-            "price": "Tickets from ₹350"
+            "description": "An intense ensemble drama exploring inner conflict, balance, and human empathy in modern high-pressure academic society.",
+            "director": "Tanu Kurade",
+            "cast": "Abay Nandhiga, Sneha Das, Anshi Jain",
+            "season": "2026 Production Season",
+            "image": "/aayam_assets/samatvam_user_1.jpg",
+            "venue": "CLT Auditorium, IIT Madras",
+            "dates": "Oct 05 - Oct 20, 2026",
+            "runtime": "90 Mins (With Intermission)",
+            "price": "Free Entry"
         },
         {
-            "title": "Charandas Chor",
+            "title": "Speak Up Tara",
             "status": "SELLING FAST",
             "status_color": "bg-emerald-50 text-emerald-700 border-emerald-200",
-            "description": "Habib Tanvir's masterpiece, a delightful folk comedy and satire adapted from a Rajasthani folktale about a thief with a strict vow of truth.",
-            "director": "Rohan Sen",
-            "cast": "Jayesh Dave, Priya Nair, Arjun Kapoor",
-            "season": "Monsoon 2026 Season",
-            "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuBtdENLvD3N-a9btMoGsPtbSbUQtSPaSBrEeP2Jgfyd3VportsleV-2pAckg6xgekm8mK9FSwhNkL_KQ8p3CMlW6We0Bai8RJB_wXYdN_uTzrFLc7KGbqCrUe53sL52qCIuiqWjHze9pJNKgNETpCUBMn9ceMimt2eXX6zjbAWVKTquXwKQYOAO2CwRSECu9qu2z0c_dqG32E2SNvcfhz2Jsq4-7G-3aPJUBUnLeNoEGkqT7zP5-WJb",
-            "venue": "Shree Ram Centre, New Delhi",
-            "dates": "Oct 05 - Oct 18, 2026",
-            "runtime": "115 Mins (With Intermission)",
-            "price": "Tickets from ₹200"
+            "description": "A powerful social awareness play highlighting gender equality, courage, and standing up against societal silence.",
+            "director": "S. Sri Vaishnavi",
+            "cast": "Anshi Jain, Sneha Das, Swati Singh",
+            "season": "2026 Production Season",
+            "image": "/aayam_assets/speak_up_tara_user_1.webp",
+            "venue": "Kashiyatra Festival Stage, IIT BHU",
+            "dates": "Nov 02 - Nov 15, 2026",
+            "runtime": "60 Mins (No Intermission)",
+            "price": "Festival Pass Required"
         },
         {
-            "title": "Ebong Indrajit",
-            "status": "LIMITED TICKETS",
-            "status_color": "bg-amber-50 text-amber-700 border-amber-200",
-            "description": "Badal Sircar's landmark absurdist play that redefined Indian theatre, capturing the existential angst, dreams, and conformity of post-independence urban youth.",
-            "director": "Kabir Mehta",
-            "cast": "Arjun Kapoor, Priya Nair, Amit Sharma",
-            "season": "Winter 2026 Season",
-            "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuCkdj8dZKXd7KCPEfHwJx7d8dv8AVc16bLqx_Fa77OIQmhTqukcXd2WDgJayuivLhn9h2pKeVblOrBnzeH4iZNV2Hc7Ai6WzKPJfD3Kj-Fj9C0R-atVf6NKYU5KIKzH_H_z0B7SCUzFkxoaDIoNvxVUOdezFBpsRK1ok9gn2liDaNoNmK1K2dPMrk5mQIpcFjwBK0DT20azXknFaYzsgretzQcXDgjzpeD_Oa1FDZ_Dmb_ywKKmRkz1",
-            "venue": "Academy of Fine Arts, Kolkata",
-            "dates": "Nov 10 - Nov 25, 2026",
-            "runtime": "90 Mins (No Intermission)",
-            "price": "Tickets from ₹150"
-        },
-        {
-            "title": "Sakharam Binder",
-            "status": "TICKETS ON SALE",
-            "status_color": "bg-blue-50 text-blue-700 border-blue-200",
-            "description": "Vijay Tendulkar's raw and powerful Marathi classic exposing domestic power dynamics, gender roles, and hypocrisy in middle-class society.",
-            "director": "Sneha Vyas",
-            "cast": "Jayesh Dave, Priya Nair, Rohan Sen",
-            "season": "Winter 2026 Season",
-            "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuCFhh56JyFyLF08wchxPKsyhHqSdltIyUQmbvnM36afMwPrX-viKot2UF8WixHwwsB6_yr3DY4I7A1H2Zni9qGuPWojUJfSMHi-9ha_m7DCp2zmqpEOOJ2_EuFdjOI2bTlG-i2En3DPM6Q63oDPSTnQ76-vSPlw0GM8brJPhxU_AmlY6YM2w_8eTXnoW6PYDyXhq2RpqzGw48vFSVE6mF-XFPyFl6NPLNchnK-U-RX8YvaKmUEnhcKr",
-            "venue": "Bal Gandharva Rang Mandir, Pune",
-            "dates": "Dec 01 - Dec 15, 2026",
-            "runtime": "130 Mins (With Intermission)",
-            "price": "Tickets from ₹250"
-        },
-        {
-            "title": "Karnabhari",
-            "status": "SELLING FAST",
-            "status_color": "bg-emerald-50 text-emerald-700 border-emerald-200",
-            "description": "A highly stylized Sopanam-style physical theatre adaptation of Bhasa's classic Sanskrit play, exploring the tragic nobility, loyalty, and ultimate sacrifice of Karna.",
-            "director": "Siddharth Verma",
-            "cast": "Amit Sharma, Rohan Sen, Jayesh Dave",
-            "season": "Winter 2026 Season",
-            "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuATbMC775hHvfLLb9F3mVPtw4K2dw6bGMuAuAuNqBovs8EsF9N3G3_w8RYPIzK24kl4nL3A2DRk0sT2WMSGIR67XDJ7SOl5T5_KuNWq0NeIzlmTVsTRR4TC3aqN2-IxIimwn6aModCBNDR65E1xTAZoR_gM5_7rOL2lpXligIvYygov1cKDqNOK9M9K-IxYwoxrN-btwTvrc9pE9DM1hl-jltrWvaKlcKIkUQJ3C3BLPAG1rjHfjMRy",
-            "venue": "Fine Arts Hall, Kochi",
-            "dates": "Dec 20 - Dec 30, 2026",
-            "runtime": "80 Mins (No Intermission)",
-            "price": "Tickets from ₹300"
+            "title": "SNHJ - Virtual Play",
+            "status": "ARCHIVED PLAY",
+            "status_color": "bg-purple-50 text-purple-700 border-purple-200",
+            "description": "Aayam's groundbreaking virtual play exploring online connections, remote storytelling, and digital human drama.",
+            "director": "Abay Nandhiga",
+            "cast": "Aayam Core Ensemble",
+            "season": "Virtual Series 2024",
+            "image": "/aayam_assets/kky_user_5.jpg",
+            "venue": "Aayam YouTube Channel & Portal",
+            "dates": "Available Online",
+            "runtime": "50 Mins",
+            "price": "Free Stream"
         }
     ]
     
@@ -247,150 +251,72 @@ def seed_database():
     db.session.commit()
     print("Plays seeded.")
     
-    # 6. Seed Events (Plays, Workshops, Meetups)
+    # 6. Seed Real Aayam IITM Events
     events_data = [
         {
-            "title": "Tughlaq Premiere",
-            "description": "The opening night of Tughlaq by Girish Karnad, showcasing under dramatic lighting.",
-            "category": "Plays",
-            "venue": "Prithvi Theatre, Mumbai",
-            "event_date": date(2026, 8, 12),
-            "start_time": time(19, 30),
-            "end_time": time(21, 30),
-            "max_participants": 200,
-            "poster": "https://lh3.googleusercontent.com/aida-public/AB6AXuBtdENLvD3N-a9btMoGsPtbSbUQtSPaSBrEeP2Jgfyd3VportsleV-2pAckg6xgekm8mK9FSwhNkL_KQ8p3CMlW6We0Bai8RJB_wXYdN_uTzrFLc7KGbqCrUe53sL52qCIuiqWjHze9pJNKgNETpCUBMn9ceMimt2eXX6zjbAWVKTquXwKQYOAO2CwRSECu9qu2z0c_dqG32E2SNvcfhz2Jsq4-7G-3aPJUBUnLeNoEGkqT7zP5-WJb",
-            "status": "Upcoming",
-            "admin": admin_sneha
-        },
-        {
-            "title": "Natya Shastra Acting Workshop",
-            "description": "Unlock standard acting methodologies, resonance, and mudras with veteran coordinator Sneha Vyas.",
+            "title": "Musimprov (with Akord) - Musical Improv Session",
+            "description": "A vibrant joint session with Akord music club blending spontaneous theatrical improv with live vocal rhythms.",
             "category": "Workshops",
-            "venue": "Studio Workshop Room, Mumbai",
-            "event_date": date(2026, 8, 19),
-            "start_time": time(10, 0),
-            "end_time": time(13, 0),
-            "max_participants": 20,
-            "poster": "https://lh3.googleusercontent.com/aida-public/AB6AXuAdWUP6RopdqRMW48GJ5lkG-OGGRusLe0GexKuJ9TiXT4XGPICqz7v2KG9L_mG1id42B-WgZLewLqL7Dd63Qz7tWK4ALX14zX6kuV392i6mruLaV7UVbRoBFHmPjcO24On54aXGBZgoS5KdsDqIBgE1kuL0NmuS6yzjrQNN6U9X3XdZ56zuBNTC77mDLHrSAon1yryXGD-erDERjIt19ILq-FKRUNicV1D1-ptPjvnGMEe1mMewddO7",
-            "status": "Upcoming",
-            "admin": admin_sneha
-        },
-        {
-            "title": "Chai & Playwriting Meetup",
-            "description": "An informal session to read new scripts, enjoy hot masala chai, and connect with regional performers.",
-            "category": "Meetups",
-            "venue": "Ensemble Lounge, Ahmedabad",
-            "event_date": date(2026, 8, 30),
-            "start_time": time(16, 0),
-            "end_time": time(18, 0),
-            "max_participants": 50,
-            "poster": "https://lh3.googleusercontent.com/aida-public/AB6AXuBuk8WjtWLoR2TuUYyoLkZfAiEHid8OpAJtGE5o8KgkUUP9SoIVxVCzYPUxOcxUARV5rNNTqimtr-yH4S_al391d2kCLDjx_Q_n58n2hhlaJmVXFjOZ7lPJPF52PuaoLWDCKRIog2WrCYyWULP4S5hLFZtbOb2sSpYvNwaZfeItTA9n7q8k1j2nPyROKOvHzUR0DteXxwfD2g2DY1J_53sJ4wUh7yLnB-RYHHZ9imWiLFOmgvka5l0M",
-            "status": "Upcoming",
-            "admin": admin_kabir
-        },
-        {
-            "title": "Andha Yug Rehearsal Showcase",
-            "description": "An open technical rehearsal enabling members to witness spotlight settings and block configurations.",
-            "category": "Plays",
-            "venue": "Kamani Auditorium, Delhi",
-            "event_date": date(2026, 7, 1),
+            "venue": "Student Activity Centre (SAC), IIT Madras",
+            "event_date": date(2026, 8, 15),
             "start_time": time(17, 0),
             "end_time": time(19, 30),
-            "max_participants": 150,
-            "poster": "https://lh3.googleusercontent.com/aida-public/AB6AXuA3z6pEqHIVmyQdEqbmlRRMXVyiRc1z_kpgOpO51LwjrU9EWYzx-oqIgaPkBOEJZuInPLFJLKXs7KFPD49MQ3XJ6-NRrVAQUleAVxdoFJloZXowNrgindYj7j9ELtSb3VHuC283O1dvae53zV3CtaAgSVnmKY_F5_nzOGdgCM_LYCN8ctkh2VxR-fdPCb7Gdo70zZIxXYQZMTgrZ-xJ92cxlpNUTlbYdTf3_eW9PtjeFHTyEEULqWBk",
-            "status": "Concluded",
-            "admin": admin_sneha
-        },
-        {
-            "title": "Sufi Music & Movement Masterclass",
-            "description": "Integrate Sufi movements and rhythms into modern physical drama with Rohan Sen.",
-            "category": "Workshops",
-            "venue": "Ranga Shankara Studio, Bengaluru",
-            "event_date": date(2026, 9, 5),
-            "start_time": time(14, 0),
-            "end_time": time(17, 0),
-            "max_participants": 25,
-            "poster": "https://lh3.googleusercontent.com/aida-public/AB6AXuATbMC775hHvfLLb9F3mVPtw4K2dw6bGMuAuAuNqBovs8EsF9N3G3_w8RYPIzK24kl4nL3A2DRk0sT2WMSGIR67XDJ7SOl5T5_KuNWq0NeIzlmTVsTRR4TC3aqN2-IxIimwn6aModCBNDR65E1xTAZoR_gM5_7rOL2lpXligIvYygov1cKDqNOK9M9K-IxYwoxrN-btwTvrc9pE9DM1hl-jltrWvaKlcKIkUQJ3C3BLPAG1rjHfjMRy",
+            "max_participants": 60,
+            "poster": "/aayam_assets/tamashbin_user_3.jpg",
             "status": "Upcoming",
-            "admin": admin_siddharth
+            "admin": admin_abay
         },
         {
-            "title": "Yakshagana Physical Theatre Intensive",
-            "description": "Learn the traditional footwork, dramatic expressions, and costume rhythms of Yakshagana with Kabir Mehta.",
-            "category": "Workshops",
-            "venue": "Ranga Shankara Studio, Bengaluru",
-            "event_date": date(2026, 10, 15),
-            "start_time": time(9, 0),
-            "end_time": time(12, 0),
-            "max_participants": 30,
-            "poster": "https://lh3.googleusercontent.com/aida-public/AB6AXuCFhh56JyFyLF08wchxPKsyhHqSdltIyUQmbvnM36afMwPrX-viKot2UF8WixHwwsB6_yr3DY4I7A1H2Zni9qGuPWojUJfSMHi-9ha_m7DCp2zmqpEOOJ2_EuFdjOI2bTlG-i2En3DPM6Q63oDPSTnQ76-vSPlw0GM8brJPhxU_AmlY6YM2w_8eTXnoW6PYDyXhq2RpqzGw48vFSVE6mF-XFPyFl6NPLNchnK-U-RX8YvaKmUEnhcKr",
-            "status": "Upcoming",
-            "admin": admin_kabir
-        },
-        {
-            "title": "Habib Tanvir Folk Satire Discussion",
-            "description": "A panel discussion exploring the integration of rural Chhattisgarhi folk traditions into urban political satire.",
+            "title": "Sahitya Sabha - Chit-Chat & Jamming Session",
+            "description": "Casual script reading, poetry jamming, and creative discussion over hot chai.",
             "category": "Meetups",
-            "venue": "Shree Ram Centre, New Delhi",
-            "event_date": date(2026, 10, 8),
-            "start_time": time(17, 30),
-            "end_time": time(19, 30),
-            "max_participants": 80,
-            "poster": "https://lh3.googleusercontent.com/aida-public/AB6AXuBtdENLvD3N-a9btMoGsPtbSbUQtSPaSBrEeP2Jgfyd3VportsleV-2pAckg6xgekm8mK9FSwhNkL_KQ8p3CMlW6We0Bai8RJB_wXYdN_uTzrFLc7KGbqCrUe53sL52qCIuiqWjHze9pJNKgNETpCUBMn9ceMimt2eXX6zjbAWVKTquXwKQYOAO2CwRSECu9qu2z0c_dqG32E2SNvcfhz2Jsq4-7G-3aPJUBUnLeNoEGkqT7zP5-WJb",
-            "status": "Upcoming",
-            "admin": admin_siddharth
-        },
-        {
-            "title": "Badal Sircar Third Theatre Workshop",
-            "description": "Understand Sircar's philosophy of Third Theatre: breaking the stage boundary and using open spaces.",
-            "category": "Workshops",
-            "venue": "Academy of Fine Arts, Kolkata",
-            "event_date": date(2026, 11, 14),
-            "start_time": time(14, 0),
-            "end_time": time(17, 0),
-            "max_participants": 40,
-            "poster": "https://lh3.googleusercontent.com/aida-public/AB6AXuCkdj8dZKXd7KCPEfHwJx7d8dv8AVc16bLqx_Fa77OIQmhTqukcXd2WDgJayuivLhn9h2pKeVblOrBnzeH4iZNV2Hc7Ai6WzKPJfD3Kj-Fj9C0R-atVf6NKYU5KIKzH_H_z0B7SCUzFkxoaDIoNvxVUOdezFBpsRK1ok9gn2liDaNoNmK1K2dPMrk5mQIpcFjwBK0DT20azXknFaYzsgretzQcXDgjzpeD_Oa1FDZ_Dmb_ywKKmRkz1",
-            "status": "Upcoming",
-            "admin": admin_kabir
-        },
-        {
-            "title": "Marathi Realistic Drama Panel",
-            "description": "Deconstructing Vijay Tendulkar's realistic masterpieces and their societal impact with Sneha Vyas.",
-            "category": "Meetups",
-            "venue": "Bal Gandharva Rang Mandir, Pune",
-            "event_date": date(2026, 12, 5),
+            "venue": "Aayam Lounge, IITM Campus",
+            "event_date": date(2026, 8, 22),
             "start_time": time(18, 0),
             "end_time": time(20, 0),
-            "max_participants": 100,
-            "poster": "https://lh3.googleusercontent.com/aida-public/AB6AXuCFhh56JyFyLF08wchxPKsyhHqSdltIyUQmbvnM36afMwPrX-viKot2UF8WixHwwsB6_yr3DY4I7A1H2Zni9qGuPWojUJfSMHi-9ha_m7DCp2zmqpEOOJ2_EuFdjOI2bTlG-i2En3DPM6Q63oDPSTnQ76-vSPlw0GM8brJPhxU_AmlY6YM2w_8eTXnoW6PYDyXhq2RpqzGw48vFSVE6mF-XFPyFl6NPLNchnK-U-RX8YvaKmUEnhcKr",
+            "max_participants": 50,
+            "poster": "/aayam_assets/samatvam_user_4.jpg",
             "status": "Upcoming",
-            "admin": admin_sneha
+            "admin": admin_utkarsh
         },
         {
-            "title": "Sanskrit Drama Reading Session",
-            "description": "An evening dedicated to reciting and analyzing classical Sanskrit theatrical scripts with our literary committee.",
-            "category": "Meetups",
-            "venue": "Ensemble Lounge, Ahmedabad",
-            "event_date": date(2026, 8, 18),
-            "start_time": time(18, 0),
-            "end_time": time(20, 30),
-            "max_participants": 30,
-            "poster": "https://lh3.googleusercontent.com/aida-public/AB6AXuBuk8WjtWLoR2TuUYyoLkZfAiEHid8OpAJtGE5o8KgkUUP9SoIVxVCzYPUxOcxUARV5rNNTqimtr-yH4S_al391d2kCLDjx_Q_n58n2hhlaJmVXFjOZ7lPJPF52PuaoLWDCKRIog2WrCYyWULP4S5hLFZtbOb2sSpYvNwaZfeItTA9n7q8k1j2nPyROKOvHzUR0DteXxwfD2g2DY1J_53sJ4wUh7yLnB-RYHHZ9imWiLFOmgvka5l0M",
-            "status": "Upcoming",
-            "admin": admin_kabir
-        },
-        {
-            "title": "Modern Lighting Synchronization Workshop",
-            "description": "A technical hands-on masterclass detailing contemporary DMX controls, spotlights, and software configuration.",
+            "title": "Theatre Masterclass with Gyaneshwar Mishra",
+            "description": "Exclusive masterclass on voice modulation, spatial awareness, and classical stage blocking.",
             "category": "Workshops",
-            "venue": "Studio Workshop Room, Mumbai",
+            "venue": "CLT Seminar Room, IIT Madras",
             "event_date": date(2026, 9, 10),
-            "start_time": time(11, 0),
-            "end_time": time(15, 0),
-            "max_participants": 15,
-            "poster": "https://lh3.googleusercontent.com/aida-public/AB6AXuAdWUP6RopdqRMW48GJ5lkG-OGGRusLe0GexKuJ9TiXT4XGPICqz7v2KG9L_mG1id42B-WgZLewLqL7Dd63Qz7tWK4ALX14zX6kuV392i6mruLaV7UVbRoBFHmPjcO24On54aXGBZgoS5KdsDqIBgE1kuL0NmuS6yzjrQNN6U9X3XdZ56zuBNTC77mDLHrSAon1yryXGD-erDERjIt19ILq-FKRUNicV1D1-ptPjvnGMEe1mMewddO7",
+            "start_time": time(10, 0),
+            "end_time": time(14, 0),
+            "max_participants": 40,
+            "poster": "/aayam_assets/kky_user_2.jpg",
             "status": "Upcoming",
-            "admin": admin_siddharth
+            "admin": admin_samarth
+        },
+        {
+            "title": "Darpan 2026 Annual Drama Festival",
+            "description": "Aayam's signature annual festival featuring Abhinaya Mono-acting, Envisage Directorial, and ScreenKraft Script Writing competitions.",
+            "category": "Plays",
+            "venue": "Open Air Theatre & CLT, IIT Madras",
+            "event_date": date(2026, 10, 5),
+            "start_time": time(0, 0),
+            "end_time": time(22, 0),
+            "max_participants": 300,
+            "poster": "/aayam_assets/dddj_user_3.jpg",
+            "status": "Upcoming",
+            "admin": admin_abay
+        },
+        {
+            "title": "Nukkad Natak Guidance Session with Om Bhope",
+            "description": "Hands-on street play rehearsal covering crowd engagement, vocal projection, and formation changes.",
+            "category": "Workshops",
+            "venue": "OAT Stage Grounds, IIT Madras",
+            "event_date": date(2026, 9, 28),
+            "start_time": time(16, 0),
+            "end_time": time(18, 30),
+            "max_participants": 45,
+            "poster": "/aayam_assets/tamashbin_user_4.jpg",
+            "status": "Upcoming",
+            "admin": admin_utkarsh
         }
     ]
     
@@ -412,48 +338,39 @@ def seed_database():
     db.session.commit()
     print("Events seeded.")
 
-    # Seed Shared Events (Proposals)
-    from models import SharedEvent
-    from datetime import datetime
-    shared_events_data = [
-        {
-            "title": "Summer Gala Exhibition",
-            "description": "An exclusive evening showcasing contemporary minimalist sculptures. The event aims to bring together local patrons and emerging artists.",
-            "event_date": datetime(2026, 8, 15, 14, 0),
-            "location_or_link": "Main Atrium, West Wing",
-            "status": "pending",
-            "submitter": created_users['priya']
-        },
-        {
-            "title": "Abstract Art Symposium",
-            "description": "A panel discussion exploring the roots and future of abstract art. Local and regional art critics discuss modern movements.",
-            "event_date": datetime(2026, 9, 2, 10, 0),
-            "location_or_link": "Workshop Flat 3B",
-            "status": "approved",
-            "submitter": created_users['jayesh']
-        },
-        {
-            "title": "Local Sculptors Meetup",
-            "description": "Informal gather for local sculptors to share methods, materials, and updates on community public art spaces.",
-            "event_date": datetime(2026, 10, 10, 18, 30),
-            "location_or_link": "Sculpture Studio",
-            "status": "pending",
-            "submitter": created_users['amit']
-        }
-    ]
-    for se in shared_events_data:
-        s = SharedEvent(
-            title=se["title"],
-            description=se["description"],
-            event_date=se["event_date"],
-            location_or_link=se["location_or_link"],
-            status=se["status"],
-            submitter=se["submitter"]
+    # 7. Seed Gallery Items (60 Authentic High-Res Play Photos matching website)
+    from models import GalleryItem
+    from seed_gallery_data import gallery_data
+
+    for gi in gallery_data:
+        item = GalleryItem(
+            title=gi["title"],
+            category=gi["category"],
+            image_url=gi["image_url"],
+            caption=gi["caption"],
+            status=gi["status"],
+            uploader_name=gi["uploader_name"]
         )
-        db.session.add(s)
+        db.session.add(item)
     db.session.commit()
-    print("Shared events seeded.")
-    print("Database seeding completed successfully!")
+    print("60 Gallery items seeded successfully.")
+
+    # 8. Seed Notifications for All Users
+    from models import Notification
+    all_users = User.query.all()
+    sample_notifications = [
+        ("rehearsal", "Macbeth Dress Rehearsal Sync", "Technical dress run confirmed for July 07 at 4:00 PM in Rehearsal Hall B. Lighting cues and full costume required.", False),
+        ("script", "Tamashbin Director's Script Released", "The updated Hindustani Street Play script with modified courtyard cues is available in the Script Vault.", False),
+        ("logistics", "Stage Prop Checked Out", "Logistics lead confirmed checkout of gold banquet goblets and throne props for upcoming showcase.", True),
+        ("workshop", "Natya Shastra Masterclass Pass", "Your registration for the upcoming physical theatre masterclass has been confirmed by the executive committee.", True)
+    ]
+    for u in all_users:
+        for n_type, n_title, n_msg, n_read in sample_notifications:
+            notif = Notification(recipient_id=u.id, type=n_type, title=n_title, message=n_msg, is_read=n_read)
+            db.session.add(notif)
+    db.session.commit()
+    print("User notifications seeded successfully.")
+    print("Database seeding with authentic Aayam IITM data completed successfully!")
 
 if __name__ == "__main__":
     with app.app_context():

@@ -359,7 +359,9 @@ def get_dashboard():
             'is_read': notif.is_read,
             'created_at': notif.created_at.isoformat() if notif.created_at else None,
             'recipient_id': notif.recipient_id,
-            'reference_id': notif.reference_id
+            'reference_id': notif.reference_id,
+            'title': notif.title or 'Production Notice',
+            'message': notif.message or 'New update available.'
         }
         if notif.type == 'new_member':
             u = User.query.get(notif.reference_id)
@@ -376,6 +378,61 @@ def get_dashboard():
         result.append(data)
         
     return jsonify(result)
+
+@api_bp.route('/notifications', methods=['GET'])
+def get_user_notifications():
+    email = request.args.get('email')
+    user_id = request.args.get('user_id')
+    
+    user = None
+    if email:
+        user = User.query.filter_by(email=email).first()
+    elif user_id:
+        user = User.query.get(user_id)
+        
+    if not user:
+        # Fallback to returning default active unread notifications
+        notifs = Notification.query.order_by(Notification.created_at.desc()).limit(10).all()
+        return jsonify([n.to_dict() for n in notifs])
+        
+    notifs = Notification.query.filter_by(recipient_id=user.id).order_by(Notification.created_at.desc()).all()
+    if not notifs:
+        # If user has no notifications yet, generate initial notifications
+        default_notifs = [
+            Notification(recipient_id=user.id, type="rehearsal", title="Macbeth Rehearsal Confirmed", message="Dress run and stage lighting sync scheduled for July 07 at 4:00 PM in Rehearsal Hall B.", is_read=False),
+            Notification(recipient_id=user.id, type="script", title="Annotated Script Released", message="The director's cut script for Tamashbin Kathputliya has been uploaded to the Script Vault.", is_read=False),
+            Notification(recipient_id=user.id, type="logistics", title="Prop Check-out Recorded", message="Stage logistics team confirmed check-out of performance props for upcoming showcase.", is_read=True),
+        ]
+        db.session.add_all(default_notifs)
+        db.session.commit()
+        notifs = default_notifs
+
+    return jsonify([n.to_dict() for n in notifs])
+
+@api_bp.route('/notifications/mark-read', methods=['POST'])
+def mark_notifications_read():
+    data = request.get_json() or {}
+    email = data.get('email')
+    notif_id = data.get('id')
+    
+    if notif_id:
+        n = Notification.query.get(notif_id)
+        if n:
+            n.is_read = True
+            db.session.commit()
+            return jsonify({'success': True, 'message': 'Notification marked as read'})
+            
+    if email:
+        user = User.query.filter_by(email=email).first()
+        if user:
+            Notification.query.filter_by(recipient_id=user.id, is_read=False).update({Notification.is_read: True})
+            db.session.commit()
+            return jsonify({'success': True, 'message': 'All notifications marked as read'})
+
+    # If no email provided, mark all unread as read
+    Notification.query.filter_by(is_read=False).update({Notification.is_read: True})
+    db.session.commit()
+    return jsonify({'success': True, 'message': 'Notifications updated'})
 
 @api_bp.route('/my-schedule', methods=['GET'])
 def get_my_schedule():
@@ -441,31 +498,32 @@ def get_my_auditions():
         }
         ui_status = status_map.get(a.status.lower(), 'Applied')
         
+        role_val = a.role_applied_for or "Ensemble"
         result.append({
             'id': f"app{a.id}",
-            'positionId': f"{a.play_id}_{a.role}",
-            'positionTitle': f"{play_title} - {a.role}",
-            'category': a.role,
+            'positionId': f"{a.play_id}_{role_val}",
+            'positionTitle': f"{play_title} - {role_val}",
+            'category': role_val,
             'submittedAt': a.submitted_at.strftime('%b %d, %Y') if a.submitted_at else '',
             'status': ui_status,
-            'notes': "Application received and logged.",
+            'notes': "Application received and logged. Creative board is reviewing your materials.",
             'files': ["application_details.pdf"]
         })
     return jsonify(result)
 
 @api_bp.route('/audition/submit', methods=['POST'])
 def submit_audition():
-    data = request.json
+    data = request.json or {}
     email = data.get('email')
     user = User.query.filter_by(email=email).first()
     if not user:
         return jsonify({'error': 'User not found'}), 404
         
     play_id = data.get('play_id')
-    role = data.get('role')
+    role = data.get('role') or data.get('category') or 'Ensemble'
     notes = data.get('notes')
     
-    a = Audition(user_id=user.id, play_id=play_id, role=role, experience_notes=notes, status='pending')
+    a = Audition(user_id=user.id, play_id=play_id, role_applied_for=role, experience_notes=notes, status='pending')
     db.session.add(a)
     db.session.commit()
     
@@ -586,6 +644,84 @@ def update_revenue_metrics():
         metric.corporate_patrons = data['corporatePatrons']
     db.session.commit()
     return jsonify({'status': 'success'})
+
+@api_bp.route('/proposals', methods=['POST'])
+def create_proposal():
+    from models import SharedEvent, db
+    data = request.json or {}
+    title = data.get('title') or data.get('name') or 'Untitled Proposal'
+    description = data.get('description', '')
+    venue = data.get('venue') or data.get('location') or 'Studio Lounge'
+    
+    new_proposal = SharedEvent(
+        title=title,
+        description=description,
+        location_or_link=venue,
+        status='pending'
+    )
+    db.session.add(new_proposal)
+    db.session.commit()
+    return jsonify({'status': 'success', 'proposal': new_proposal.to_dict()}), 201
+
+# Gallery API Endpoints
+@api_bp.route('/gallery', methods=['GET'])
+def get_gallery():
+    from models import GalleryItem
+    status_filter = request.args.get('status', 'approved')
+    if status_filter == 'all':
+        items = GalleryItem.query.order_by(GalleryItem.uploaded_at.desc()).all()
+    else:
+        items = GalleryItem.query.filter_by(status=status_filter).order_by(GalleryItem.uploaded_at.desc()).all()
+    return jsonify([i.to_dict() for i in items])
+
+@api_bp.route('/gallery', methods=['POST'])
+def create_gallery_item():
+    from models import GalleryItem, db
+    data = request.json or {}
+    title = data.get('title') or 'Untitled Photo'
+    category = data.get('category') or 'Stage Plays'
+    image_url = data.get('imageUrl') or data.get('image_url')
+    caption = data.get('caption', '')
+    uploader_name = data.get('uploaderName') or 'Aayam Media Team'
+    status = data.get('status') or 'approved'
+
+    if not image_url:
+        return jsonify({'error': 'Image URL is required'}), 400
+
+    item = GalleryItem(
+        title=title,
+        category=category,
+        image_url=image_url,
+        caption=caption,
+        status=status,
+        uploader_name=uploader_name
+    )
+    db.session.add(item)
+    db.session.commit()
+    return jsonify({'status': 'success', 'item': item.to_dict()}), 201
+
+@api_bp.route('/gallery/<int:item_id>', methods=['DELETE'])
+def delete_gallery_item(item_id):
+    from models import GalleryItem, db
+    item = GalleryItem.query.get(item_id)
+    if not item:
+        return jsonify({'error': 'Gallery item not found'}), 404
+    db.session.delete(item)
+    db.session.commit()
+    return jsonify({'status': 'deleted', 'id': item_id})
+
+@api_bp.route('/gallery/<int:item_id>/status', methods=['POST'])
+def update_gallery_status(item_id):
+    from models import GalleryItem, db
+    data = request.json or {}
+    new_status = data.get('status', 'approved')
+    item = GalleryItem.query.get(item_id)
+    if not item:
+        return jsonify({'error': 'Gallery item not found'}), 404
+    item.status = new_status
+    db.session.commit()
+    return jsonify({'status': 'updated', 'item': item.to_dict()})
+    return jsonify({'status': 'success', 'id': new_proposal.id}), 201
 
 @api_bp.route('/proposals', methods=['GET'])
 def get_proposals():

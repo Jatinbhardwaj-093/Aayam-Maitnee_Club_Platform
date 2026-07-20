@@ -1,7 +1,7 @@
 // @ts-nocheck
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { FileText, PlayCircle, Star, ArrowRight } from "lucide-react";
+import { FileText, PlayCircle, Users, MapPin, Calendar, Clock, Award, ArrowRight, BookOpen, Layers, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
@@ -10,8 +10,57 @@ interface Play {
   title: string;
   description: string;
   director: string;
-  genre: string;
+  cast?: string;
+  venue?: string;
+  season?: string;
+  runtime?: string;
+  dates?: string;
+  price?: string;
+  status?: string;
 }
+
+const detailedPlayInfo: Record<string, any> = {
+  "Tamashbin Kathputliya": {
+    tagline: "A Satirical Street Play on Modern Society & Puppetry of Fate",
+    acts: "1 Act • Continuous Open Street Performance",
+    castCount: "15 Ensemble Performers",
+    theme: "Social Satire, Street Theatre, Folk Rhythms",
+    rehearsalSchedule: "Tuesdays & Thursdays (Courtyard Stage)",
+    scriptUrl: "/scripts/tamashbin_script.pdf"
+  },
+  "DDDJ": {
+    tagline: "High-Tension Dramatic Spotlight Showcase & Monologue Series",
+    acts: "2 Acts • 8 Dramatic Sequences",
+    castCount: "12 Ensemble Performers",
+    theme: "Psychological Drama, Character Monologues",
+    rehearsalSchedule: "Wednesdays & Saturdays (CLT Hall)",
+    scriptUrl: "/scripts/dddj_script.pdf"
+  },
+  "Karn Ki Yachika": {
+    tagline: "Classical Hindi Tragedy on Duty, Honor, and Moral Dilemmas",
+    acts: "3 Acts • Classical Stage Drama",
+    castCount: "18 Performers & Chorus",
+    theme: "Epic Tragedy, Classical Verse, Moral Philosophy",
+    rehearsalSchedule: "Mondays & Fridays (SAC Amphitheatre)",
+    scriptUrl: "/scripts/kky_script.pdf"
+  },
+  "Samatvam": {
+    tagline: "Physical Theatre & Contemporary Rhythmic Movement Exploration",
+    acts: "1 Act • Rhythmic Sequence",
+    castCount: "10 Movement Performers",
+    theme: "Physical Theatre, Group Balance, Expression",
+    rehearsalSchedule: "Sundays (Studio Hall 2)",
+    scriptUrl: "/scripts/samatvam_script.pdf"
+  },
+  "Speak Up Tara": {
+    tagline: "Empowering Social Drama on Identity, Courage, and Voice",
+    acts: "2 Acts • 6 Scenes",
+    castCount: "10 Lead & Supporting Performers",
+    theme: "Social Expression, Contemporary Realism",
+    rehearsalSchedule: "Tuesdays & Saturdays (Open Stage)",
+    scriptUrl: "/scripts/speak_up_tara_script.pdf"
+  }
+};
 
 export default function MemberPlays() {
   const [plays, setPlays] = useState<Play[]>([]);
@@ -32,57 +81,141 @@ export default function MemberPlays() {
 
   return (
     <div className="space-y-[32px] font-sans text-[#466272]">
-      {/* Header */}
-      <div className="bg-[#f7f3ee] border border-[#e6e2dd] rounded-[8px] p-[24px] md:p-[32px] flex flex-col md:flex-row justify-between items-start md:items-center gap-[24px]">
+      {/* Header Banner - Clean Text Style without Image Overlay */}
+      <div className="bg-[#f7f3ee] border border-[#e6e2dd] rounded-[16px] p-[28px] md:p-[36px] flex flex-col md:flex-row justify-between items-start md:items-center gap-[24px] shadow-xs">
         <div className="space-y-[12px] flex-1">
-          <Badge className="bg-[#635f41]/10 text-[#635f41] border-[#e6e2dd] rounded-[4px] uppercase tracking-wider text-[10px]">Repertoire</Badge>
-          <h2 className="text-[32px] font-bold font-serif text-[#635f41]">Production Plays</h2>
-          <p className="text-[14px] text-[#466272] max-w-2xl">
-            Explore the sophisticated collection of theatrical productions staged by Aayam. Dive into the thematic depths of our active and past plays, and access the official scripts for study and rehearsal.
+          <Badge className="bg-[#635f41] text-white border-0 rounded-[4px] uppercase tracking-wider text-[10px] font-bold">
+            Repertoire & Production Vault
+          </Badge>
+          <h2 className="text-[32px] font-bold font-serif text-[#635f41] tracking-tight">Production Plays</h2>
+          <p className="text-[14px] text-[#466272] max-w-3xl leading-relaxed font-light">
+            Comprehensive production guides, staging details, cast rosters, and rehearsal specifications for Aayam theatrical works. Clean, bannerless cards detailed for directors, performers, and technical crew.
           </p>
         </div>
         <div className="flex-shrink-0">
           <Link to="/member-scripts">
-            <Button className="bg-[#8CC0EB] hover:bg-[#8CC0EB]/90 text-[#1c1b19] font-bold rounded-[8px] py-[10px] px-[20px] gap-2 shadow-sm transition-all">
-              <FileText className="w-4 h-4" /> Script Library
+            <Button className="bg-[#8CC0EB] hover:bg-[#8CC0EB]/90 text-[#001e2c] font-bold rounded-[8px] py-[12px] px-[22px] gap-2 shadow-sm transition-all active:scale-95">
+              <FileText className="w-4.5 h-4.5 text-[#001e2c]" /> Open Script Library
             </Button>
           </Link>
         </div>
       </div>
 
-      {/* Plays Grid */}
+      {/* Plays Grid - Clean Bannerless Informative Cards */}
       {loading ? (
-        <div className="text-center py-12 text-[#466272]/70 font-semibold italic">Loading productions...</div>
+        <div className="text-center py-16 text-[#466272]/70 font-semibold italic">Loading production details...</div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-[24px]">
-          {plays.map((play) => (
-            <div key={play.id} className="group bg-white border border-[#e6e2dd] rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col">
-              {/* Abstract Artwork Placeholder */}
-              <div className="h-48 bg-gradient-to-br from-[#8CC0EB]/20 to-[#635f41]/20 relative overflow-hidden flex items-center justify-center">
-                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
-                <PlayCircle className="w-16 h-16 text-[#635f41]/40 group-hover:scale-110 transition-transform duration-500" />
-                <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end">
-                  <Badge className="bg-white/90 text-[#635f41] shadow-sm backdrop-blur-sm border-0 font-semibold">{play.genre}</Badge>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-[24px]">
+          {plays.map((play) => {
+            const extra = detailedPlayInfo[play.title] || {
+              tagline: "Aayam Stage Production & Rehearsal Guide",
+              acts: "Full Length Production",
+              castCount: "Ensemble Cast",
+              theme: "Theatrical Performance",
+              rehearsalSchedule: "Weekly Rehearsal Slots"
+            };
+
+            return (
+              <div 
+                key={play.id} 
+                className="bg-white border border-[#e6e2dd] rounded-2xl p-6 md:p-8 hover:border-[#635f41] hover:shadow-lg transition-all duration-300 flex flex-col justify-between space-y-6"
+              >
+                {/* Header Info */}
+                <div className="space-y-4">
+                  <div className="flex items-start justify-between gap-4 border-b border-[#e6e2dd]/60 pb-4">
+                    <div>
+                      <span className="text-[10px] font-bold text-[#635f41] uppercase tracking-[0.2em] block mb-1">
+                        {play.season || "2024-2025 Lineage"}
+                      </span>
+                      <h3 className="text-2xl font-bold font-serif text-[#1c1b19] tracking-tight">{play.title}</h3>
+                      <p className="text-xs text-[#635f41] font-semibold italic mt-1">{extra.tagline}</p>
+                    </div>
+                    <Badge className="bg-[#635f41]/10 text-[#635f41] border border-[#635f41]/20 font-bold text-[10px] uppercase tracking-wider px-3 py-1 flex-shrink-0">
+                      {play.status || "Active Repertoire"}
+                    </Badge>
+                  </div>
+
+                  {/* Key Specifications Grid */}
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 bg-[#fdf9f4] p-4 rounded-xl border border-[#e6e2dd]/80 text-xs">
+                    <div className="space-y-1">
+                      <span className="text-[10px] uppercase font-bold text-[#466272]/70 block flex items-center gap-1">
+                        <Award className="w-3.5 h-3.5 text-[#635f41]" /> Director
+                      </span>
+                      <span className="font-bold text-[#1c1b19] truncate block">{play.director || "Ensemble Lead"}</span>
+                    </div>
+
+                    <div className="space-y-1">
+                      <span className="text-[10px] uppercase font-bold text-[#466272]/70 block flex items-center gap-1">
+                        <MapPin className="w-3.5 h-3.5 text-[#635f41]" /> Venue
+                      </span>
+                      <span className="font-bold text-[#1c1b19] truncate block">{play.venue || "OAT IIT Madras"}</span>
+                    </div>
+
+                    <div className="space-y-1">
+                      <span className="text-[10px] uppercase font-bold text-[#466272]/70 block flex items-center gap-1">
+                        <Clock className="w-3.5 h-3.5 text-[#635f41]" /> Runtime
+                      </span>
+                      <span className="font-bold text-[#1c1b19] truncate block">{play.runtime || "90 Mins"}</span>
+                    </div>
+
+                    <div className="space-y-1">
+                      <span className="text-[10px] uppercase font-bold text-[#466272]/70 block flex items-center gap-1">
+                        <Layers className="w-3.5 h-3.5 text-[#635f41]" /> Structure
+                      </span>
+                      <span className="font-bold text-[#1c1b19] truncate block">{extra.acts}</span>
+                    </div>
+
+                    <div className="space-y-1">
+                      <span className="text-[10px] uppercase font-bold text-[#466272]/70 block flex items-center gap-1">
+                        <Users className="w-3.5 h-3.5 text-[#635f41]" /> Cast Size
+                      </span>
+                      <span className="font-bold text-[#1c1b19] truncate block">{extra.castCount}</span>
+                    </div>
+
+                    <div className="space-y-1">
+                      <span className="text-[10px] uppercase font-bold text-[#466272]/70 block flex items-center gap-1">
+                        <Calendar className="w-3.5 h-3.5 text-[#635f41]" /> Rehearsals
+                      </span>
+                      <span className="font-bold text-[#1c1b19] truncate block">{extra.rehearsalSchedule}</span>
+                    </div>
+                  </div>
+
+                  {/* Synopsis Description */}
+                  <div className="space-y-2">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-[#635f41]">Production Synopsis & Themes</h4>
+                    <p className="text-xs text-[#466272] leading-relaxed font-light">
+                      {play.description}
+                    </p>
+                  </div>
+
+                  {/* Featured Cast Roster */}
+                  {play.cast && (
+                    <div className="space-y-1.5 pt-2">
+                      <span className="text-[10px] font-bold text-[#635f41] uppercase tracking-wider block">Featured Performers:</span>
+                      <p className="text-xs font-medium text-[#1c1b19] bg-gray-50 p-2.5 rounded-lg border border-gray-200/60">
+                        {play.cast}
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Footer Action Buttons */}
+                <div className="pt-4 border-t border-[#e6e2dd] flex flex-col sm:flex-row items-center justify-between gap-3">
+                  <div className="flex items-center gap-2 text-[11px] text-[#466272] font-semibold">
+                    <Tag className="w-3.5 h-3.5 text-[#8CC0EB]" /> {extra.theme}
+                  </div>
+                  <div className="flex items-center gap-2 w-full sm:w-auto">
+                    <Link 
+                      to="/member-scripts" 
+                      className="flex-1 sm:flex-initial bg-[#8CC0EB] text-[#001e2c] hover:bg-[#8CC0EB]/90 px-4 py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all"
+                    >
+                      <FileText className="w-3.5 h-3.5" /> Download Script
+                    </Link>
+                  </div>
                 </div>
               </div>
-              
-              <div className="p-6 flex flex-col flex-1">
-                <h3 className="text-2xl font-bold font-serif text-[#635f41] mb-2 group-hover:text-[#8CC0EB] transition-colors">{play.title}</h3>
-                <p className="text-sm font-semibold text-[#466272]/80 uppercase tracking-widest mb-4 flex items-center gap-2">
-                  <Star className="w-3.5 h-3.5 text-amber-500" /> Directed by {play.director}
-                </p>
-                <p className="text-sm text-[#466272] leading-relaxed mb-6 line-clamp-3 flex-1">
-                  {play.description}
-                </p>
-                
-                <div className="pt-4 border-t border-[#e6e2dd] flex items-center justify-between">
-                  <Link to="/member-scripts" className="flex items-center gap-2 text-sm font-bold text-[#8CC0EB] hover:text-[#466272] transition-colors">
-                    Download Script <ArrowRight className="w-4 h-4" />
-                  </Link>
-                </div>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

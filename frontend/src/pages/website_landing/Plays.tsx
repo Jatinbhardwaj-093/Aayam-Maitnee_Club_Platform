@@ -19,109 +19,79 @@ interface Production {
 
 const fallbackProductions: Production[] = [
   {
-    id: "tughlaq",
-    title: "Tughlaq",
+    id: "kky",
+    title: "Karn Ki Yachika",
     status: "SELLING FAST",
     statusColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
-    description: "Girish Karnad's classic play exploring the visionary but chaotic reign of Muhammad bin Tughlaq. A timeless political allegory that resonates with modern times.",
-    director: "Sneha Vyas",
-    cast: "Jayesh Dave, Amit Sharma, Pooja Patel",
-    season: "Monsoon 2026 Season",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCAzuMBaCOUMEUXFsi58uX4Sk0JbT72vPkeMf7KwisCYFvuX3Bk8gP1e__uZ8B3G4bYBmYBQjlPftJgABVJuuHuLNh_AIDoUgyAwaSJBouCjuqcQ7quRshTI9hepIQebEmL3pvhyyO6hPnGW2vUGYrayYRqt1rRMyl1OCAIad0kKVUn46ZjCsSI_nQCNnUrcxx_B1Rvmvml5deoCtkUqY61szLjR8uoRvQhIHhNvsCHkKUY4niHP9cI",
-    venue: "Prithvi Theatre, Mumbai",
+    description: "A monumental classical Malayalam/Hindi tragedy exploring Karn's moral dilemma, honor, and destiny on the battleground of Kurukshetra.",
+    director: "S. Sri Vaishnavi",
+    cast: "Abay Nandhiga, Utkarsh (Yuuhi), Samarth Shrivastava",
+    season: "2026 Production Season",
+    image: "/aayam_assets/kky_user_1.jpg",
+    venue: "Kashiyatra Stage, IIT BHU / OAT IIT Madras",
     dates: "Aug 12 - Sep 04, 2026",
-    runtime: "120 Mins (With Intermission)",
-    price: "Tickets from ₹300"
+    runtime: "75 Mins (No Intermission)",
+    price: "Free Admission"
   },
   {
-    id: "andha-yug",
-    title: "Andha Yug",
+    id: "tamashbin-kathputliya",
+    title: "Tamashbin Kathputliya",
     status: "LIMITED TICKETS",
     statusColor: "bg-amber-50 text-amber-700 border-amber-200",
-    description: "Dharamvir Bharati's epic anti-war play set on the final day of the Mahabharata war. It delves into the dark psychology of greed, vengeance, and moral collapse.",
-    director: "Sneha Vyas",
-    cast: "Amit Sharma, Rohan Sen, Jayesh Dave",
-    season: "Monsoon 2026 Season",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCkdj8dZKXd7KCPEfHwJx7d8dv8AVc16bLqx_Fa77OIQmhTqukcXd2WDgJayuivLhn9h2pKeVblOrBnzeH4iZNV2Hc7Ai6WzKPJfD3Kj-Fj9C0R-atVf6NKYU5KIKzH_H_z0B7SCUzFkxoaDIoNvxVUOdezFBpsRK1ok9gn2liDaNoNmK1K2dPMrk5mQIpcFjwBK0DT20azXknFaYzsgretzQcXDgjzpeD_Oa1FDZ_Dmb_ywKKmRkz1",
-    venue: "Kamani Auditorium, Delhi",
-    dates: "Sep 15 - Oct 02, 2026",
-    runtime: "110 Mins (No Intermission)",
-    price: "Tickets from ₹250"
+    description: "A high-energy street play (Nukkad Natak) combining puppetry motifs, live dholak rhythms, and political satire.",
+    director: "Utkarsh (Yuuhi)",
+    cast: "Samarth Shrivastava, Krishna Subramanian, Swati Singh",
+    season: "2026 Production Season",
+    image: "/aayam_assets/tamashbin_user_1.jpg",
+    venue: "Open Air Theatre (OAT), IIT Madras",
+    dates: "Sep 12 - Sep 25, 2026",
+    runtime: "45 Mins (No Intermission)",
+    price: "Free Open Stage"
   },
   {
-    id: "hayavadana",
-    title: "Hayavadana",
+    id: "dddj",
+    title: "DDDJ - Stage Production",
+    status: "TICKETS ON SALE",
+    statusColor: "bg-purple-50 text-purple-700 border-purple-200",
+    description: "An intense proscenium drama exploring relationship dynamics, ambition, and modern societal pressures.",
+    director: "S. Sri Vaishnavi",
+    cast: "Abay Nandhiga, Krishna Subramanian, Sneha Das",
+    season: "2026 Production Season",
+    image: "/aayam_assets/dddj_user_1.jpg",
+    venue: "CLT Auditorium, IIT Madras",
+    dates: "Sep 28 - Oct 10, 2026",
+    runtime: "85 Mins (With Intermission)",
+    price: "Registration Required"
+  },
+  {
+    id: "samatvam",
+    title: "Samatvam",
     status: "TICKETS ON SALE",
     statusColor: "bg-blue-50 text-blue-700 border-blue-200",
-    description: "A brilliant play by Girish Karnad exploring identity, completeness, and love through a mythical story of swapped heads. Combines Yakshagana folk performance with modern theatrical dialogue.",
-    director: "Kabir Mehta",
-    cast: "Priya Nair, Arjun Kapoor, Jayesh Dave",
-    season: "Monsoon 2026 Season",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCFhh56JyFyLF08wchxPKsyhHqSdltIyUQmbvnM36afMwPrX-viKot2UF8WixHwwsB6_yr3DY4I7A1H2Zni9qGuPWojUJfSMHi-9ha_m7DCp2zmqpEOOJ2_EuFdjOI2bTlG-i2En3DPM6Q63oDPSTnQ76-vSPlw0GM8brJPhxU_AmlY6YM2w_8eTXnoW6PYDyXhq2RpqzGw48vFSVE6mF-XFPyFl6NPLNchnK-U-RX8YvaKmUEnhcKr",
-    venue: "Ranga Shankara, Bengaluru",
-    dates: "Oct 10 - Oct 28, 2026",
-    runtime: "100 Mins (With Intermission)",
-    price: "Tickets from ₹350"
+    description: "An intense ensemble drama exploring inner conflict, balance, and human empathy in modern high-pressure academic society.",
+    director: "Tanu Kurade",
+    cast: "Abay Nandhiga, Sneha Das, Anshi Jain",
+    season: "2026 Production Season",
+    image: "/aayam_assets/samatvam_user_1.jpg",
+    venue: "CLT Auditorium, IIT Madras",
+    dates: "Oct 05 - Oct 20, 2026",
+    runtime: "90 Mins (With Intermission)",
+    price: "Free Entry"
   },
   {
-    id: "charandas-chor",
-    title: "Charandas Chor",
+    id: "speak-up-tara",
+    title: "Speak Up Tara",
     status: "SELLING FAST",
     statusColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
-    description: "Habib Tanvir's masterpiece, a delightful folk comedy and satire adapted from a Rajasthani folktale about a thief with a strict vow of truth.",
-    director: "Rohan Sen",
-    cast: "Jayesh Dave, Priya Nair, Arjun Kapoor",
-    season: "Monsoon 2026 Season",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBtdENLvD3N-a9btMoGsPtbSbUQtSPaSBrEeP2Jgfyd3VportsleV-2pAckg6xgekm8mK9FSwhNkL_KQ8p3CMlW6We0Bai8RJB_wXYdN_uTzrFLc7KGbqCrUe53sL52qCIuiqWjHze9pJNKgNETpCUBMn9ceMimt2eXX6zjbAWVKTquXwKQYOAO2CwRSECu9qu2z0c_dqG32E2SNvcfhz2Jsq4-7G-3aPJUBUnLeNoEGkqT7zP5-WJb",
-    venue: "Shree Ram Centre, New Delhi",
-    dates: "Oct 05 - Oct 18, 2026",
-    runtime: "115 Mins (With Intermission)",
-    price: "Tickets from ₹200"
-  },
-  {
-    id: "ebong-indrajit",
-    title: "Ebong Indrajit",
-    status: "LIMITED TICKETS",
-    statusColor: "bg-amber-50 text-amber-700 border-amber-200",
-    description: "Badal Sircar's landmark absurdist play that redefined Indian theatre, capturing the existential angst, dreams, and conformity of post-independence urban youth.",
-    director: "Kabir Mehta",
-    cast: "Arjun Kapoor, Priya Nair, Amit Sharma",
-    season: "Winter 2026 Season",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCkdj8dZKXd7KCPEfHwJx7d8dv8AVc16bLqx_Fa77OIQmhTqukcXd2WDgJayuivLhn9h2pKeVblOrBnzeH4iZNV2Hc7Ai6WzKPJfD3Kj-Fj9C0R-atVf6NKYU5KIKzH_H_z0B7SCUzFkxoaDIoNvxVUOdezFBpsRK1ok9gn2liDaNoNmK1K2dPMrk5mQIpcFjwBK0DT20azXknFaYzsgretzQcXDgjzpeD_Oa1FDZ_Dmb_ywKKmRkz1",
-    venue: "Academy of Fine Arts, Kolkata",
-    dates: "Nov 10 - Nov 25, 2026",
-    runtime: "90 Mins (No Intermission)",
-    price: "Tickets from ₹150"
-  },
-  {
-    id: "sakharam-binder",
-    title: "Sakharam Binder",
-    status: "TICKETS ON SALE",
-    statusColor: "bg-blue-50 text-blue-700 border-blue-200",
-    description: "Vijay Tendulkar's raw and powerful Marathi classic exposing domestic power dynamics, gender roles, and hypocrisy in middle-class society.",
-    director: "Sneha Vyas",
-    cast: "Jayesh Dave, Priya Nair, Rohan Sen",
-    season: "Winter 2026 Season",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCFhh56JyFyLF08wchxPKsyhHqSdltIyUQmbvnM36afMwPrX-viKot2UF8WixHwwsB6_yr3DY4I7A1H2Zni9qGuPWojUJfSMHi-9ha_m7DCp2zmqpEOOJ2_EuFdjOI2bTlG-i2En3DPM6Q63oDPSTnQ76-vSPlw0GM8brJPhxU_AmlY6YM2w_8eTXnoW6PYDyXhq2RpqzGw48vFSVE6mF-XFPyFl6NPLNchnK-U-RX8YvaKmUEnhcKr",
-    venue: "Bal Gandharva Rang Mandir, Pune",
-    dates: "Dec 01 - Dec 15, 2026",
-    runtime: "130 Mins (With Intermission)",
-    price: "Tickets from ₹250"
-  },
-  {
-    id: "karnabhari",
-    title: "Karnabhari",
-    status: "SELLING FAST",
-    statusColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
-    description: "A highly stylized Sopanam-style physical theatre adaptation of Bhasa's classic Sanskrit play, exploring the tragic nobility, loyalty, and ultimate sacrifice of Karna.",
-    director: "Siddharth Verma",
-    cast: "Amit Sharma, Rohan Sen, Jayesh Dave",
-    season: "Winter 2026 Season",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuATbMC775hHvfLLb9F3mVPtw4K2dw6bGMuAuAuNqBovs8EsF9N3G3_w8RYPIzK24kl4nL3A2DRk0sT2WMSGIR67XDJ7SOl5T5_KuNWq0NeIzlmTVsTRR4TC3aqN2-IxIimwn6aModCBNDR65E1xTAZoR_gM5_7rOL2lpXligIvYygov1cKDqNOK9M9K-IxYwoxrN-btwTvrc9pE9DM1hl-jltrWvaKlcKIkUQJ3C3BLPAG1rjHfjMRy",
-    venue: "Fine Arts Hall, Kochi",
-    dates: "Dec 20 - Dec 30, 2026",
-    runtime: "80 Mins (No Intermission)",
-    price: "Tickets from ₹300"
+    description: "A powerful social awareness play highlighting gender equality, courage, and standing up against societal silence.",
+    director: "S. Sri Vaishnavi",
+    cast: "Anshi Jain, Sneha Das, Swati Singh",
+    season: "2026 Production Season",
+    image: "/aayam_assets/speak_up_tara_user_1.webp",
+    venue: "Kashiyatra Festival Stage, IIT BHU",
+    dates: "Nov 02 - Nov 15, 2026",
+    runtime: "60 Mins (No Intermission)",
+    price: "Festival Pass Required"
   }
 ];
 
@@ -145,17 +115,23 @@ export default function Plays() {
   }, []);
 
   return (
-    <div className="bg-[#fdf9f4] text-[#1c1b19] min-h-screen font-sans selection:bg-[#c6e4f7] py-24">
+    <div className="bg-[#fdf9f4] text-[#1c1b19] min-h-screen font-sans selection:bg-[#c6e4f7] pt-8 pb-16">
       <main className="max-w-7xl mx-auto px-6 md:px-12">
         {/* Header Section */}
-        <section className="mb-20 text-center md:text-left">
-          <span className="text-xs font-semibold text-[#635f41] uppercase tracking-[0.25em] bg-[#c6e4f7]/30 px-3.5 py-1.5 rounded-full">
-            Our Plays
-          </span>
-          <h1 className="font-serif text-5xl md:text-7xl text-[#635f41] mt-8 mb-4 font-bold tracking-tight">The 2024 Season</h1>
-          <p className="text-lg text-[#49473d] max-w-2xl leading-relaxed font-light">
-            Discover the stories defining our seasonal calendar. Aayam showcases classical and contemporary stagecraft crafted with spatial depth, raw light, and dramatic resonance.
-          </p>
+        <section className="mb-8 border-b border-[#cac6b9]/25 pb-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <span className="text-[10px] font-bold text-[#635f41] uppercase tracking-[0.25em] bg-[#c6e4f7]/30 px-3 py-1 rounded-full inline-block mb-2">
+                Our Stage Plays
+              </span>
+              <h1 className="font-serif text-3xl md:text-5xl text-[#635f41] font-bold tracking-tight">
+                The 2026 Production Season
+              </h1>
+              <p className="text-xs md:text-sm text-[#49473d] max-w-2xl leading-relaxed font-light mt-2">
+                Discover the stories defining our seasonal calendar. Aayam showcases classical and contemporary stagecraft crafted with spatial depth, raw light, and dramatic resonance.
+              </p>
+            </div>
+          </div>
         </section>
 
         {/* 3-Column Play Cards Grid */}

@@ -165,24 +165,34 @@ export default function MemberDashboard() {
 
   return (
     <div className="space-y-[32px] font-sans text-[#466272]">
-      {/* Header and Welcome */}
-      <div className="bg-[#f7f3ee] border border-[#e6e2dd] rounded-[8px] p-[24px] md:p-[32px] flex flex-col md:flex-row justify-between items-start md:items-center gap-[24px] mb-[32px] md:mb-[48px]">
-        <div className="space-y-[12px] flex-1">
+      {/* Header and Welcome Banner */}
+      <div className="relative border border-[#e6e2dd] rounded-[16px] overflow-hidden p-[24px] md:p-[36px] flex flex-col md:flex-row justify-between items-start md:items-center gap-[24px] shadow-sm">
+        {/* Background Production Banner Image */}
+        <div className="absolute inset-0 z-0">
+          <img
+            src="/aayam_assets/tamashbin_user_1.jpg"
+            alt="Production Banner"
+            className="w-full h-full object-cover object-center"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#1c1b19]/95 via-[#1c1b19]/85 to-[#1c1b19]/50 backdrop-blur-[2px]"></div>
+        </div>
+
+        <div className="relative z-10 space-y-[12px] flex-1 text-white">
           <div className="space-y-[8px]">
-            <Badge className="bg-[#635f41]/10 text-[#635f41] border-[#e6e2dd] rounded-[4px]">Active Production Member</Badge>
-            <h2 className="text-[32px] font-bold font-serif text-[#635f41]">Welcome Back, {activeUser?.name?.split(' ')[0] || "Member"}</h2>
-            <p className="text-[14px] text-[#466272]">
-              You have <span className="font-semibold text-[#635f41]">{pendingCount} pending rehearsal invites</span> for Macbeth this week.
+            <Badge className="bg-[#8CC0EB] text-[#001e2c] font-bold border-0 rounded-[4px] uppercase tracking-wider text-[10px]">Active Production Member</Badge>
+            <h2 className="text-[32px] font-bold font-serif text-white tracking-tight">Welcome Back, {activeUser?.name?.split(' ')[0] || "Member"}</h2>
+            <p className="text-[14px] text-white/90 font-light">
+              You have <span className="font-semibold text-[#8CC0EB]">{pendingCount} pending rehearsal invites</span> for Tamashbin Kathputliya & Macbeth this week.
             </p>
           </div>
           
           {/* Elegant countdown container */}
-          <div className="inline-flex items-center gap-[12px] bg-white/80 border border-[#e6e2dd] rounded-[6px] px-[16px] py-[8px] text-xs shadow-sm">
-            <div className="flex items-center gap-1.5 text-[#635f41] font-semibold uppercase tracking-wider text-[10px]">
+          <div className="inline-flex items-center gap-[12px] bg-black/40 border border-white/20 backdrop-blur-md rounded-[8px] px-[16px] py-[8px] text-xs shadow-sm">
+            <div className="flex items-center gap-1.5 text-[#8CC0EB] font-bold uppercase tracking-wider text-[10px]">
               <Clock className="w-3.5 h-3.5 text-[#8CC0EB]" />
               <span>Next Performance:</span>
             </div>
-            <div className="flex items-center gap-1 font-mono text-[#635f41] font-bold text-sm">
+            <div className="flex items-center gap-1 font-mono text-white font-bold text-sm">
               <span>{String(timeLeft.days).padStart(2, '0')}d</span>
               <span>:</span>
               <span>{String(timeLeft.hours).padStart(2, '0')}h</span>
@@ -193,10 +203,11 @@ export default function MemberDashboard() {
             </div>
           </div>
         </div>
-        <div className="flex gap-[12px] flex-shrink-0">
+
+        <div className="relative z-10 flex gap-[12px] flex-shrink-0">
           <Button 
             onClick={() => setCalendarOpen(true)}
-            className="bg-[#8CC0EB] hover:bg-[#8CC0EB]/90 text-[#1c1b19] font-semibold rounded-[8px] py-[10px] px-[20px] gap-2 shadow-sm transition-all active:scale-95"
+            className="bg-[#8CC0EB] hover:bg-[#8CC0EB]/90 text-[#001e2c] font-bold rounded-[8px] py-[10px] px-[20px] gap-2 shadow-sm transition-all active:scale-95"
           >
             <CalendarIcon className="w-4 h-4" /> View Calendar
           </Button>
