@@ -1,3 +1,5 @@
+// @ts-nocheck
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Mail, Share2, Calendar, Award, BookOpen, Quote, Shield, Tag } from "lucide-react";
 
@@ -13,6 +15,7 @@ interface MemberProfile {
   id: string;
   name: string;
   role: string;
+  email?: string;
   activeSince: number;
   tier: string;
   image: string;
@@ -24,141 +27,390 @@ interface MemberProfile {
   portfolio: PortfolioItem[];
 }
 
-const profilesData: Record<string, MemberProfile> = {
-  "elena-vance": {
-    id: "elena-vance",
-    name: "Elena Vance",
-    role: "Lead Actor",
-    activeSince: 2018,
-    tier: "Principal Ensemble",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuDOcdtiEQoy0zh7y5qSW0Em4w87Fz4lYTZmmBHcfyhtbFSceWTs6u9jCaB86rGeiDJkDrywYIgX71l3jt19-0GLz9-vbEQ-9wH6XExEEXWnd-ExlGcaR80XF_2ycyoeJtC9ptjtv9sSbWmZOHsPUPoR-4etUI75RDr-GDf_pEtBNVXP7Dc6V7lxKNmtdTXyiO2m0B-OKU6_dR-PpXk-5toQXim5hfvEU-2yxU896g2mz9Jw3CKPdSJv",
-    statementTitle: "Finding the Human Core",
-    statementBody: "Elena is a classical performer who believes stage acting is a high-contrast study of raw human vulnerability. Every posture, sigh, and silence on stage must tell an authentic truth.",
-    statementSecondary: "Over her years at Aayam, she has taken on the most challenging dramatic roles, bringing depth and intellectual weight to classical and contemporary interpretations.",
-    specializations: ["METHOD ACTING", "CLASSICAL DRAMA", "SHAKESPEAREAN VERSE", "IMPROVISATION"],
-    quote: "Acting is not about being someone else; it's about finding the likeness of another human in yourself.",
-    portfolio: [
-      {
-        title: "The Glass Orchestration",
-        role: "Lead Cast (Violinist)",
-        year: 2024,
-        image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCAzuMBaCOUMEUXFsi58uX4Sk0JbT72vPkeMf7KwisCYFvuX3Bk8gP1e__uZ8B3G4bYBmYBQjlPftJgABVJuuHuLNh_AIDoUgyAwaSJBouCjuqcQ7quRshTI9hepIQebEmL3pvhyyO6hPnGW2vUGYrayYRqt1rRMyl1OCAIad0kKVUn46ZjCsSI_nQCNnUrcxx_B1Rvmvml5deoCtkUqY61szLjR8uoRvQhIHhNvsCHkKUY4niHP9cI",
-        description: "Played a reclusive virtuoso facing the loss of her hearing. A highly physical, silent performance."
-      },
-      {
-        title: "Blue Horizon",
-        role: "Monologue Performer",
-        year: 2023,
-        image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCkdj8dZKXd7KCPEfHwJx7d8dv8AVc16bLqx_Fa77OIQmhTqukcXd2WDgJayuivLhn9h2pKeVblOrBnzeH4iZNV2Hc7Ai6WzKPJfD3Kj-Fj9C0R-atVf6NKYU5KIKzH_H_z0B7SCUzFkxoaDIoNvxVUOdezFBpsRK1ok9gn2liDaNoNmK1K2dPMrk5mQIpcFjwBK0DT20azXknFaYzsgretzQcXDgjzpeD_Oa1FDZ_Dmb_ywKKmRkz1",
-        description: "Engaged in an experimental series of interconnected monologues exploring isolation."
-      }
-    ]
-  },
-  "marcus-thorne": {
-    id: "marcus-thorne",
-    name: "Marcus Thorne",
-    role: "Director",
-    activeSince: 2017,
-    tier: "Master Director",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuASrF76oyehZoH0Mp6atVLKf1XKX3tY2Q3-v1ZO9_y46IBhoVb597s54MEzoQVZ9ByIRvg5T0utOwDy8G93a0g7JDTLaq75m_dJkTVqR-tz6Ljvhc6MD4cB1NZ-GKU1fdDkMPdQPflf5NTN84uED9M4V3qPGbpaCptepJqWcOetCzmYbC9fAqhr2dFzcblWzWTMv6LICPucZiomxUrFjioKszlnFL2RRBl-p01evg3dOSqdBQX3FSBS",
-    statementTitle: "Silence and Light",
-    statementBody: "Marcus Thorne focuses on minimalist stage architectures, using stark lighting shadows and spatial geometry to enhance dialogue. He strips away set pieces to amplify the actor.",
-    statementSecondary: "His directorial vision has brought critical acclaim to Aayam's modern black-box experimental initiatives.",
-    specializations: ["SET DIRECTION", "MINIMALIST STAGING", "LIGHTING DESIGN", "TEXT ANALYSIS"],
-    quote: "A good stage layout doesn't hide the actors behind scenery; it forces them to be fully seen.",
-    portfolio: [
-      {
-        title: "Blue Horizon",
-        role: "Director",
-        year: 2023,
-        image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCkdj8dZKXd7KCPEfHwJx7d8dv8AVc16bLqx_Fa77OIQmhTqukcXd2WDgJayuivLhn9h2pKeVblOrBnzeH4iZNV2Hc7Ai6WzKPJfD3Kj-Fj9C0R-atVf6NKYU5KIKzH_H_z0B7SCUzFkxoaDIoNvxVUOdezFBpsRK1ok9gn2liDaNoNmK1K2dPMrk5mQIpcFjwBK0DT20azXknFaYzsgretzQcXDgjzpeD_Oa1FDZ_Dmb_ywKKmRkz1",
-        description: "Directed the award-winning experimental monologue series utilizing spotlight staging."
-      },
-      {
-        title: "Antigone: Reborn",
-        role: "Lighting Consult",
-        year: 2024,
-        image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCFhh56JyFyLF08wchxPKsyhHqSdltIyUQmbvnM36afMwPrX-viKot2UF8WixHwwsB6_yr3DY4I7A1H2Zni9qGuPWojUJfSMHi-9ha_m7DCp2zmqpEOOJ2_EuFdjOI2bTlG-i2En3DPM6Q63oDPSTnQ76-vSPlw0GM8brJPhxU_AmlY6YM2w_8eTXnoW6PYDyXhq2RpqzGw48vFSVE6mF-XFPyFl6NPLNchnK-U-RX8YvaKmUEnhcKr",
-        description: "Created high-contrast shadow casting for the glass-metropolis themed classical adaptation."
-      }
-    ]
-  },
-  "sienna-lopez": {
-    id: "sienna-lopez",
-    name: "Sienna Lopez",
-    role: "Scenic Artist",
-    activeSince: 2019,
-    tier: "Master Craftsman",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCriANEGDPnpWF8zDsu7mv1efvGVJTz43tLNpo0iKYmMNrXAlqwT8q1YgteTWb_JWv5DDzS00j2JgpuOB65dt5LBR2xvDl_DNzKM9dZ8m6Z5tAmJn0AE2rJmW4OqEZuixxnCVYsnD_CyvaaYxr3x0V4oe-Ind7ffzi9PBm2zQkRlx2v-4XQJe0ouNR5skkT9lf9iA3mya74pOReSx6PmY_Cu5rVySlcZIn8_rw1-AzevATQVpd_zfO1",
-    statementTitle: "Painting the Narrative",
-    statementBody: "Sienna transforms raw stage platforms into historical environments. Her scenic design philosophy is focused on rich textures, using custom pigment mixes and shadow gradients.",
-    statementSecondary: "She leads the stagecraft workshop series at Aayam, training members in classical set design.",
-    specializations: ["SCENIC PAINTING", "TEXTURE MURAL", "BACKSTAGE STAGECRAFT", "MODEL MAKING"],
-    quote: "The background is not passive; it sets the key of the entire dramatic melody.",
-    portfolio: [
-      {
-        title: "The Glass Orchestration",
-        role: "Lead Scenic Painter",
-        year: 2024,
-        image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCAzuMBaCOUMEUXFsi58uX4Sk0JbT72vPkeMf7KwisCYFvuX3Bk8gP1e__uZ8B3G4bYBmYBQjlPftJgABVJuuHuLNh_AIDoUgyAwaSJBouCjuqcQ7quRshTI9hepIQebEmL3pvhyyO6hPnGW2vUGYrayYRqt1rRMyl1OCAIad0kKVUn46ZjCsSI_nQCNnUrcxx_B1Rvmvml5deoCtkUqY61szLjR8uoRvQhIHhNvsCHkKUY4niHP9cI",
-        description: "Created the dust-kissed vintage attic texture that served as the primary set."
-      },
-      {
-        title: "Antigone: Reborn",
-        role: "Mural Artist",
-        year: 2024,
-        image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCFhh56JyFyLF08wchxPKsyhHqSdltIyUQmbvnM36afMwPrX-viKot2UF8WixHwwsB6_yr3DY4I7A1H2Zni9qGuPWojUJfSMHi-9ha_m7DCp2zmqpEOOJ2_EuFdjOI2bTlG-i2En3DPM6Q63oDPSTnQ76-vSPlw0GM8brJPhxU_AmlY6YM2w_8eTXnoW6PYDyXhq2RpqzGw48vFSVE6mF-XFPyFl6NPLNchnK-U-RX8YvaKmUEnhcKr",
-        description: "Painted a 30-foot monochromatic cityscape backdrop that altered with lighting."
-      }
-    ]
-  },
-  "julian-thorne": {
-    id: "julian-thorne",
-    name: "Julian Thorne",
-    role: "Club President & Director",
-    activeSince: 2016,
-    tier: "Gold Patron",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAkD84l9bATTsiV52kbs28_DoHe5f-PFPhB-nnNhuVMs3HgrRA5SWWYHicVET7ryt72YNgtmpyADDdAyM-UziuL4jidI_Uni24HQ1_fqFqT6iaR8ty6GLtE7dKiThcvvU2uOhqsHlIJRuEnhZtJ7Z3-utaWmwkRwcx8efca5RxbgMzf7ztWCU6bYzK3tAIT63YZC8h4zZsX7T8zsxCc1NbgZ4W_b-A_nqNfAWBXbjEPH3d6iKTlACia",
-    statementTitle: "Refined Authentic Stagecraft",
-    statementBody: "Julian Thorne’s work is characterized by a relentless pursuit of emotional authenticity and architectural staging. He believes the stage is not a mirror to reflect reality, but a prism to refract the truth of the human condition.",
-    statementSecondary: "As Club President, Julian focuses on the Aayam gallery philosophy—treating every production as a highly curated work of art.",
-    specializations: ["METHOD ACTING", "SHAKESPEAREAN VERSE", "LIGHTING DESIGN", "AVANT-GARDE"],
-    quote: "The space surrounding a performance is as vital as the performance itself. Art needs room to breathe.",
-    portfolio: [
-      {
-        title: "Hamlet",
-        role: "Director & Creative Lead",
-        year: 2023,
-        image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBwnnZye0KPP3r94Z29TetFlhF1LLpPlPyypffGxSP0iUB2-BTIS0q2m3ETBdeSzVuerW9_cCjxEzdVkopIprrgAJT35wVngEJZiOrASQVkve4PUPJ8kKL3nerDAXbnl5C8_ad-YceCL69xD5eHfyWMi4AHc1LXu2gqeHgj6d2W9eh4AgOfNHkALswL2eDtZxF3vKydFBfCVsFfgugh3aUs8DqTFvgY-BIoPdVDSPUhuycwfjvF-ZnZ",
-        description: "A minimalist staging using high-contrast lighting and stark architectural set designs."
-      },
-      {
-        title: "Macbeth",
-        role: "Lead Actor (Macbeth)",
-        year: 2022,
-        image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBubACyxVb-RtxTv5FTf38GrUKNTvw2ymFVu45WsGKenO-yXW7ppBRbpQpwSUJeUmu1jC6BEiXpcPAaNRYyRUGW0p5Scxos4p1wnL5CmO-nFqLSReX9xjG5UWCZsVjRvWq3uJf5FQ2lwWwPg3YLQ9Jjwzo2EWLynDBHgjO2Oi6ySQ_BbeASJjWxQ0czBK3E2whutymwTAMIFFYapve1DhzUrlbmKDE_6zM9zC_DrFLQD8c1BqrHWMYT",
-        description: "Immersive representation of Macbeth's fall, exploring physical drama and psychological breakdown."
-      },
-      {
-        title: "The Seagull",
-        role: "Director",
-        year: 2021,
-        image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBsJC8Pbq3-tVA2qUFFEs7Zm1gP8bXhxTk-LVkYewm3ZewL6tdA1xkC_KE4R4ALkEE_qvKFwZlVwRebCKRdHyuyX72-Wk7apIQIg6p8td3IwTXReDKdolE6OGy-ladRynLN2O4T3e3k8iMx4JUUUhY4hlzCfDiMiG9eIRHTZPb4hclRlrvm2rEG1fhb3t4k8qJRtMjzuTNtSk5nzkAxeRuV909vwuj2jVkEXAj-PqVjf5ekKdLvxnhE",
-        description: "A light, airy production focusing on realism, natural light, and the subtlety of human interaction."
-      }
-    ]
-  }
-};
-
 export default function Profile() {
   const { memberId } = useParams<{ memberId: string }>();
-  
-  // Default to Julian Thorne if no ID is specified or match not found
-  const activeId = memberId && profilesData[memberId] ? memberId : "julian-thorne";
-  const profile = profilesData[activeId];
+  const [profile, setProfile] = useState<MemberProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5001";
+    
+    fetch(`${baseUrl}/api/members`)
+      .then((res) => {
+        if (!res.ok) throw new Error("HTTP error");
+        return res.json();
+      })
+      .then((membersData) => {
+        if (Array.isArray(membersData)) {
+          // Find matching member by ID, member_id, or email
+          const found = membersData.find(
+            (m: any) =>
+              (m.member_id && m.member_id.toLowerCase() === memberId?.toLowerCase()) ||
+              (m.id && m.id.toString() === memberId) ||
+              (m.email && m.email.toLowerCase() === memberId?.toLowerCase()) ||
+              (m.name && m.name.toLowerCase().replace(/\s+/g, "-") === memberId?.toLowerCase())
+          );
+
+          if (found) {
+            const roleName = found.roles && found.roles.length > 0 ? found.roles[0] : "Ensemble Member";
+            const nameLower = (found.name || "").toLowerCase();
+
+            // Personalized profiles per member
+            let personalizedData = {
+              activeSince: 2023,
+              tier: roleName.includes("Maintainer") || roleName.includes("Secretary") || roleName.includes("Chief") ? "Core Executive Committee" : "Principal Performer",
+              statementTitle: "Artistic Vision & Stagecraft",
+              statementBody: found.bio || `${found.name} is a dedicated leader and performer at Aayam - IIT Madras BS Drama Society.`,
+              statementSecondary: `Active in ${found.city || "IIT Madras BS"} chapter. Specializing in ${found.interest || "Stagecraft and Theatrical Expression"}.`,
+              specializations: (found.interest || "Method Acting, Script Analysis, Stagecraft, Direction").split(",").map((s: string) => s.trim().toUpperCase()),
+              quote: "The stage is not a mirror to reflect reality, but a prism to refract human truth.",
+              portfolio: [
+                {
+                  title: "Tamashbin Kathputliya",
+                  role: roleName,
+                  year: 2024,
+                  image: "/aayam_assets/tamashbin_user_1.jpg",
+                  description: "Lead involvement in satirical street play performance and stage direction at open courtyard."
+                },
+                {
+                  title: "DDDJ Stage Showcase",
+                  role: "Ensemble Lead",
+                  year: 2024,
+                  image: "/aayam_assets/dddj_user_1.jpg",
+                  description: "Featured in full-length stage drama with dynamic spotlight choreography."
+                }
+              ]
+            };
+
+            if (nameLower.includes("abay")) {
+              personalizedData = {
+                activeSince: 2023,
+                tier: "Secretary & Executive Leader",
+                statementTitle: "Society Governance & Stage Direction",
+                statementBody: "Abay leads the overall strategic vision, inter-collegiate partnerships, and theatrical productions of Aayam - IIT Madras BS Drama Society.",
+                statementSecondary: "Pioneered society expansion, festival participation, and collaborative playwriting workshops across campuses.",
+                specializations: ["SOCIETY GOVERNANCE", "STAGE DIRECTION", "PRODUCTION MANAGEMENT", "NUKKAD NATAK"],
+                quote: "Theatre is not just performance; it is a movement that connects hearts across campuses.",
+                portfolio: [
+                  {
+                    title: "Tamashbin Kathputliya",
+                    role: "Executive Producer & Coordinator",
+                    year: 2024,
+                    image: "/aayam_assets/tamashbin_user_1.jpg",
+                    description: "Spearheaded the satirical street play production, securing top honors in inter-collegiate drama competitions."
+                  },
+                  {
+                    title: "DDDJ Stage Production",
+                    role: "Production Director",
+                    year: 2024,
+                    image: "/aayam_assets/dddj_user_2.jpg",
+                    description: "Directed stage cue timing, lighting shifts, and ensemble cast positioning for the annual theatrical showcase."
+                  }
+                ]
+              };
+            } else if (nameLower.includes("yuuhi") || nameLower.includes("utkarsh")) {
+              personalizedData = {
+                activeSince: 2023,
+                tier: "Deputy Secretary & Director",
+                statementTitle: "Street Play Creation & Actor Development",
+                statementBody: "Yuuhi specializes in high-energy street theatre, character work, and scriptwriting for competitive Nukkad Natak plays.",
+                statementSecondary: "Conducts acting masterclasses and physical theatre drills for incoming ensemble members.",
+                specializations: ["STREET THEATRE", "ACTING WORKSHOPS", "PLAYWRITING", "PHYSICAL DRAMA"],
+                quote: "When the drum beats in the open courtyard, truth needs no amplification.",
+                portfolio: [
+                  {
+                    title: "Tamashbin Kathputliya",
+                    role: "Director & Lead Actor",
+                    year: 2024,
+                    image: "/aayam_assets/tamashbin_user_2.jpg",
+                    description: "Designed the central satirical monologue and performed as the lead street-play narrator."
+                  },
+                  {
+                    title: "Karn Ki Yachika",
+                    role: "Dramatic Lead",
+                    year: 2024,
+                    image: "/aayam_assets/kky_user_1.jpg",
+                    description: "Delivered intense tragic monologues in classical Hindi theatrical drama."
+                  }
+                ]
+              };
+            } else if (nameLower.includes("samarth")) {
+              personalizedData = {
+                activeSince: 2023,
+                tier: "Chief Coordinator",
+                statementTitle: "Technical Stagecraft & Production Operations",
+                statementBody: "Samarth oversees stage logistics, venue arrangements, equipment procurement, and backstage crew coordination.",
+                statementSecondary: "Ensures technical perfection across all acoustic soundscapes, prop transfers, and lighting boards.",
+                specializations: ["PRODUCTION LOGISTICS", "PROPS MANAGEMENT", "SOUND DESIGN", "VENUE CURATION"],
+                quote: "Behind every seamless curtain call lies hours of invisible precision.",
+                portfolio: [
+                  {
+                    title: "Samatvam Physical Theatre",
+                    role: "Chief Production Coordinator",
+                    year: 2024,
+                    image: "/aayam_assets/samatvam_user_1.jpg",
+                    description: "Coordinated complex group movement timing, props placement, and stage lighting transitions."
+                  },
+                  {
+                    title: "Speak Up Tara",
+                    role: "Stage Operations Director",
+                    year: 2024,
+                    image: "/aayam_assets/speak_up_tara_user_1.webp",
+                    description: "Managed acoustic sound mixing and auditorium stage set construction."
+                  }
+                ]
+              };
+            } else if (nameLower.includes("krishna")) {
+              personalizedData = {
+                activeSince: 2023,
+                tier: "Dept. Chief Coordinator",
+                statementTitle: "Lighting Engineering & Live Acoustics",
+                statementBody: "Krishna specializes in lighting board programming, acoustic soundscapes, and live cue execution during major stage plays.",
+                statementSecondary: "Oversees technical crew training and sound-check protocols for external auditoriums.",
+                specializations: ["LIGHTING DESIGN", "ACOUSTIC ENGINEERING", "LIVE SOUND MIXING", "TECHNICAL CUES"],
+                quote: "Light creates shadow, and shadow creates drama.",
+                portfolio: [
+                  {
+                    title: "DDDJ Stage Production",
+                    role: "Technical Lighting Director",
+                    year: 2024,
+                    image: "/aayam_assets/dddj_user_3.jpg",
+                    description: "Programmed high-contrast spotlight shifts and dramatic color saturations."
+                  },
+                  {
+                    title: "Speak Up Tara",
+                    role: "Soundboard Lead",
+                    year: 2024,
+                    image: "/aayam_assets/speak_up_tara_user_3.webp",
+                    description: "Designed live audio cues and background scoring for social drama performance."
+                  }
+                ]
+              };
+            } else if (nameLower.includes("swati")) {
+              personalizedData = {
+                activeSince: 2023,
+                tier: "Content & Copywriting Head",
+                statementTitle: "Dramatic Writing & Promotional Narrative",
+                statementBody: "Swati heads content creation, promotional scriptwriting, press releases, and dramatic literature for Aayam.",
+                statementSecondary: "Crafts compelling play synopses, social media narratives, and archival documentation.",
+                specializations: ["PLAYWRITING", "DRAMATIC COPYWRITING", "PUBLIC RELATIONS", "CONTENT STRATEGY"],
+                quote: "A single spoken word on stage can ripple through an entire auditorium.",
+                portfolio: [
+                  {
+                    title: "Speak Up Tara",
+                    role: "Script Editor & Publicist",
+                    year: 2024,
+                    image: "/aayam_assets/speak_up_tara_user_2.webp",
+                    description: "Authored promotional narratives and refined dialogue for high emotional impact."
+                  },
+                  {
+                    title: "Tamashbin Kathputliya",
+                    role: "Street Play Scriptwriter",
+                    year: 2024,
+                    image: "/aayam_assets/tamashbin_user_4.jpg",
+                    description: "Co-wrote satirical rhymes and rhythmic chants for street play chorus."
+                  }
+                ]
+              };
+            } else if (nameLower.includes("harsh")) {
+              personalizedData = {
+                activeSince: 2023,
+                tier: "Web Operations & Tech Lead",
+                statementTitle: "Digital Platform Architecture & Archival",
+                statementBody: "Harsh leads digital platform development, online audition portals, media databases, and web maintenance for Aayam.",
+                statementSecondary: "Maintains smooth digital operations for ensemble members, maintainers, and public patrons.",
+                specializations: ["WEB OPERATIONS", "MEDIA ARCHIVAL", "UI/UX DESIGN", "PLATFORM ARCHITECTURE"],
+                quote: "Bridging the timeless art of the stage with modern digital innovation.",
+                portfolio: [
+                  {
+                    title: "Aayam Digital Platform",
+                    role: "Lead Web Architect",
+                    year: 2024,
+                    image: "/aayam_assets/speak_up_tara_user_5.webp",
+                    description: "Built and deployed the digital member directory, gallery database, and maintainer control panel."
+                  },
+                  {
+                    title: "Karn Ki Yachika Digital Archival",
+                    role: "Media Manager",
+                    year: 2024,
+                    image: "/aayam_assets/kky_user_5.jpg",
+                    description: "Curated high-resolution photo archives and video press kits."
+                  }
+                ]
+              };
+            } else if (nameLower.includes("tanu")) {
+              personalizedData = {
+                activeSince: 2023,
+                tier: "Social Media & Brand Head",
+                statementTitle: "Visual Branding & Multimedia Storytelling",
+                statementBody: "Tanu manages visual identity, reel production, performance teasers, and social media campaigns for Aayam.",
+                statementSecondary: "Drives visual engagement across digital channels before every major theatrical premiere.",
+                specializations: ["SOCIAL MEDIA", "VISUAL DESIGN", "VIDEO PRODUCTION", "BRAND AESTHETICS"],
+                quote: "Capturing the fleeting magic of live theater in everlasting visuals.",
+                portfolio: [
+                  {
+                    title: "Karn Ki Yachika Teaser Campaign",
+                    role: "Social Media Director",
+                    year: 2024,
+                    image: "/aayam_assets/kky_user_3.jpg",
+                    description: "Produced behind-the-scenes teasers and promotional photo showcases."
+                  },
+                  {
+                    title: "DDDJ Promo Reels",
+                    role: "Creative Media Editor",
+                    year: 2024,
+                    image: "/aayam_assets/dddj_user_5.jpg",
+                    description: "Edited dynamic trailer reels capturing highlight moments of the play."
+                  }
+                ]
+              };
+            } else if (nameLower.includes("esha")) {
+              personalizedData = {
+                activeSince: 2023,
+                tier: "Costume & Styling Coordinator",
+                statementTitle: "Scenic Art & Costume Design",
+                statementBody: "Esha leads period costume styling, character wardrobe selection, prop curation, and backstage quick-change coordination for Aayam.",
+                statementSecondary: "Crafts hand-embroidered theatrical garments and prop sets for historical and contemporary stage plays.",
+                specializations: ["COSTUME DESIGN", "PROP CURATION", "STAGE STYLING", "PERIOD WARDROBE"],
+                quote: "Every costume tells a story before a single word is spoken.",
+                portfolio: [
+                  {
+                    title: "Karn Ki Yachika Costumes",
+                    role: "Lead Costume Designer",
+                    year: 2024,
+                    image: "/aayam_assets/kky_user_2.jpg",
+                    description: "Designed authentic classical costumes and traditional stage drapes."
+                  },
+                  {
+                    title: "Speak Up Tara Styling",
+                    role: "Backstage Stylist",
+                    year: 2024,
+                    image: "/aayam_assets/speak_up_tara_user_4.webp",
+                    description: "Managed contemporary wardrobe coordination and quick-change backstage queues."
+                  }
+                ]
+              };
+            } else if (nameLower.includes("kanishk")) {
+              personalizedData = {
+                activeSince: 2023,
+                tier: "Stage & Technical Director",
+                statementTitle: "Acoustic Engineering & Technical Direction",
+                statementBody: "Kanishk manages auditorium acoustics, lighting rigs, set construction, and live technical cue sync during major stage performances.",
+                statementSecondary: "Coordinates inter-collegiate venue setups and soundboard soundscapes.",
+                specializations: ["STAGE DIRECTION", "ACOUSTIC RIGS", "TECHNICAL CUES", "SET CONSTRUCTION"],
+                quote: "Precision in technical cues elevates pure performance into magic.",
+                portfolio: [
+                  {
+                    title: "DDDJ Technical Direction",
+                    role: "Stage Technical Director",
+                    year: 2024,
+                    image: "/aayam_assets/dddj_user_3.jpg",
+                    description: "Engineered stage light saturation and multi-channel sound mixing."
+                  },
+                  {
+                    title: "Tamashbin Courtyard Setup",
+                    role: "Technical Operations",
+                    year: 2024,
+                    image: "/aayam_assets/tamashbin_user_3.jpg",
+                    description: "Designed outdoor courtyard acoustic sound amplification."
+                  }
+                ]
+              };
+            } else if (nameLower.includes("aditi")) {
+              personalizedData = {
+                activeSince: 2023,
+                tier: "Principal Dramatic Performer",
+                statementTitle: "Character Portrayal & Dramatic Expression",
+                statementBody: "Aditi is a lead dramatic actress featured in contemporary stage plays, emotional monologues, and street play chorus roles.",
+                statementSecondary: "Specializes in voice modulation, emotional realism, and high-energy ensemble performance.",
+                specializations: ["METHOD ACTING", "CHARACTER PORTRAYAL", "DRAMATIC MONOLOGUES", "STREET THEATRE"],
+                quote: "Acting is living truthfully under imaginary circumstances.",
+                portfolio: [
+                  {
+                    title: "Speak Up Tara",
+                    role: "Lead Dramatic Actress",
+                    year: 2024,
+                    image: "/aayam_assets/speak_up_tara_user_1.webp",
+                    description: "Portrayed the central character in the social drama production."
+                  },
+                  {
+                    title: "Tamashbin Kathputliya Chorus",
+                    role: "Ensemble Performer",
+                    year: 2024,
+                    image: "/aayam_assets/tamashbin_user_5.jpg",
+                    description: "Performed in high-energy street play chorus and crowd engagement scenes."
+                  }
+                ]
+              };
+            }
+
+            setProfile({
+              id: found.member_id || found.id.toString(),
+              name: found.name,
+              role: roleName,
+              email: found.email,
+              activeSince: personalizedData.activeSince,
+              tier: personalizedData.tier,
+              image: found.avatarUrl || "/aayam_assets/profiles/abay_nandhiga.jpg",
+              statementTitle: personalizedData.statementTitle,
+              statementBody: personalizedData.statementBody,
+              statementSecondary: personalizedData.statementSecondary,
+              specializations: personalizedData.specializations,
+              quote: personalizedData.quote,
+              portfolio: personalizedData.portfolio
+            });
+            setLoading(false);
+            return;
+          }
+        }
+
+        // Default Fallback profile if member ID is not matched
+        setProfile({
+          id: "MC-1001",
+          name: "Sneha Vyas",
+          role: "Director Coordinator",
+          email: "sneha@handle.com",
+          activeSince: 2018,
+          tier: "Core Ensemble Leader",
+          image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=600&auto=format&fit=crop",
+          statementTitle: "Finding the Human Core",
+          statementBody: "Sneha is a classical performer and director who believes stage acting is a high-contrast study of raw human vulnerability.",
+          statementSecondary: "Over her years at Aayam, she has taken on the most challenging dramatic roles and directed multiple award-winning plays.",
+          specializations: ["METHOD ACTING", "CLASSICAL DRAMA", "DIRECTION", "STAGE MANAGEMENT"],
+          quote: "Acting is not about being someone else; it's about finding the likeness of another human in yourself.",
+          portfolio: [
+            {
+              title: "Tughlaq Premiere",
+              role: "Director",
+              year: 2024,
+              image: "https://images.unsplash.com/photo-1507676184212-d0330a151f15?q=80&w=600&auto=format&fit=crop",
+              description: "Directed opening night of Girish Karnad's Tughlaq under dramatic lighting."
+            }
+          ]
+        });
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Failed to load profile:", err);
+        setLoading(false);
+      });
+  }, [memberId]);
+
+  if (loading || !profile) {
+    return (
+      <div className="bg-[#fdf9f4] text-[#1c1b19] min-h-screen font-sans py-32 text-center">
+        <div className="max-w-md mx-auto space-y-4">
+          <div className="w-12 h-12 rounded-full bg-[#635f41]/10 text-[#635f41] flex items-center justify-center mx-auto animate-spin">
+            🎭
+          </div>
+          <p className="text-sm font-bold text-[#635f41]">Loading Ensemble Profile...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="bg-[#fdf9f4] text-[#1c1b19] min-h-screen font-sans selection:bg-[#c6e4f7] py-24">
+    <div className="bg-[#fdf9f4] text-[#1c1b19] min-h-screen font-sans selection:bg-[#c6e4f7] pt-8 pb-16">
       <main className="max-w-7xl mx-auto px-6 md:px-12">
         {/* Page Header */}
         <header className="mb-16 border-b border-[#cac6b9]/30 pb-6 flex flex-col md:flex-row md:items-end justify-between">
@@ -173,7 +425,7 @@ export default function Profile() {
           </p>
         </header>
 
-        {/* 3-Column Community Hub Inspired Layout */}
+        {/* 3-Column Community Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
           
           {/* Left Sidebar - Profile Summary */}
@@ -190,35 +442,35 @@ export default function Profile() {
               <p className="text-xs font-bold text-[#466272] uppercase tracking-wider mb-4">{profile.role}</p>
               
               <div className="w-full border-t border-[#cac6b9]/25 pt-4 space-y-3 text-left">
-                <div className="flex items-center gap-3 text-sm text-[#49473d]">
-                  <Calendar className="w-4 h-4 text-[#635f41]" />
+                {profile.email && (
+                  <div className="flex items-center gap-3 text-xs text-[#49473d] truncate">
+                    <Mail className="w-4 h-4 text-[#635f41] flex-shrink-0" />
+                    <span className="truncate"><strong>Email:</strong> {profile.email}</span>
+                  </div>
+                )}
+                <div className="flex items-center gap-3 text-xs text-[#49473d]">
+                  <Calendar className="w-4 h-4 text-[#635f41] flex-shrink-0" />
                   <span><strong>Active Since:</strong> {profile.activeSince}</span>
                 </div>
-                <div className="flex items-center gap-3 text-sm text-[#49473d]">
-                  <Shield className="w-4 h-4 text-[#635f41]" />
+                <div className="flex items-center gap-3 text-xs text-[#49473d]">
+                  <Shield className="w-4 h-4 text-[#635f41] flex-shrink-0" />
                   <span><strong>Ensemble Tier:</strong> {profile.tier}</span>
                 </div>
               </div>
 
               <div className="flex gap-3 mt-6 w-full">
-                <button className="flex-1 py-2.5 bg-[#635f41] text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 hover:bg-[#635f41]/90 shadow-md transition-all active:scale-95">
+                <a
+                  href={`mailto:${profile.email || "ensemble@matinee.club"}`}
+                  className="flex-1 py-2.5 bg-[#635f41] text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 hover:bg-[#635f41]/90 shadow-xs transition-all active:scale-95"
+                >
                   <Mail className="w-3.5 h-3.5" /> Email
-                </button>
-                <button className="p-2.5 border border-[#cac6b9] rounded-xl hover:bg-white/5 transition-all text-[#49473d]">
-                  <Share2 className="w-4 h-4" />
-                </button>
+                </a>
               </div>
             </div>
             
-            {/* Quick Links / Navigation */}
+            {/* Navigation Link */}
             <div className="hidden lg:flex flex-col bg-white rounded-2xl border border-[#cac6b9]/30 p-4 space-y-1">
-              <a href="#statement" className="px-4 py-2.5 rounded-lg text-[#49473d] hover:bg-white/5 text-sm font-semibold flex items-center gap-2 transition-all">
-                <Quote className="w-4 h-4 text-[#635f41]" /> Artistic Statement
-              </a>
-              <a href="#portfolio" className="px-4 py-2.5 rounded-lg text-[#49473d] hover:bg-white/5 text-sm font-semibold flex items-center gap-2 transition-all">
-                <BookOpen className="w-4 h-4 text-[#635f41]" /> Curated Portfolio
-              </a>
-              <Link to="/directory" className="px-4 py-2.5 rounded-lg text-[#635f41] hover:bg-[#635f41]/5 text-sm font-bold flex items-center gap-2 transition-all mt-4 border-t border-[#cac6b9]/20 pt-4">
+              <Link to="/directory" className="px-4 py-2.5 rounded-lg text-[#635f41] hover:bg-[#635f41]/5 text-xs font-bold flex items-center gap-2 transition-all">
                 ← Back to Directory
               </Link>
             </div>
@@ -231,7 +483,7 @@ export default function Profile() {
             </h2>
             
             {profile.portfolio.map((item, index) => (
-              <article key={index} className="bg-white rounded-2xl overflow-hidden border border-[#cac6b9]/25 shadow-sm hover:shadow-md transition-all duration-300">
+              <article key={index} className="bg-white rounded-2xl overflow-hidden border border-[#cac6b9]/25 shadow-xs hover:shadow-md transition-all duration-300">
                 <div className="p-6">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
@@ -265,7 +517,7 @@ export default function Profile() {
           {/* Right Sidebar - Artistic Statement & Skills */}
           <aside className="lg:col-span-3 space-y-8">
             {/* Artistic Statement Card */}
-            <section className="bg-white p-6 rounded-2xl border border-[#cac6b9]/30 shadow-sm" id="statement">
+            <section className="bg-white p-6 rounded-2xl border border-[#cac6b9]/30 shadow-xs" id="statement">
               <h3 className="text-xs font-bold text-[#635f41] uppercase tracking-wider mb-4 pb-2 border-b border-[#cac6b9]/10 flex items-center justify-between">
                 <span>{profile.statementTitle}</span>
                 <BookOpen className="w-4 h-4" />
@@ -279,7 +531,7 @@ export default function Profile() {
             </section>
 
             {/* Specializations & Skills */}
-            <section className="bg-white p-6 rounded-2xl border border-[#cac6b9]/30 shadow-sm">
+            <section className="bg-white p-6 rounded-2xl border border-[#cac6b9]/30 shadow-xs">
               <h3 className="text-xs font-bold text-[#635f41] uppercase tracking-wider mb-4 pb-2 border-b border-[#cac6b9]/10 flex items-center justify-between">
                 <span>Specializations</span>
                 <Tag className="w-4 h-4" />

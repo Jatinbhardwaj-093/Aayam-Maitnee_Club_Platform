@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { PlusCircle, Search, Shield, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,16 +15,36 @@ interface RosterMember {
   isAvailable: boolean;
 }
 
-const initialRoster: RosterMember[] = [
-  { id: "R01", name: "Ishita Sen", role: "Actor (Lady Macbeth)", phone: "+91 98765 00001", email: "ishita.s@matinee.club", isAvailable: true },
-  { id: "R02", name: "Jayesh Dave", role: "Actor (Macbeth)", phone: "+91 98765 43210", email: "jayesh.d@matinee.club", isAvailable: true },
-  { id: "R03", name: "Sneha Vyas", role: "Director Coordinator", phone: "+91 98765 00003", email: "sneha.v@matinee.club", isAvailable: false },
-  { id: "R04", name: "Manish Chaudhari", role: "Lead Stagehand", phone: "+91 98765 00004", email: "manish.c@matinee.club", isAvailable: true },
+const fallbackRoster: RosterMember[] = [
+  { id: "MC-1001", name: "Sneha Vyas", role: "Director Coordinator", phone: "+91 98765 33333", email: "sneha@handle.com", isAvailable: true },
+  { id: "MC-1005", name: "Jayesh Dave", role: "Lead Actor & Member", phone: "+91 98765 43210", email: "jayesh@handle.com", isAvailable: true },
+  { id: "MC-1004", name: "Siddharth Verma", role: "Production Coordinator", phone: "+91 98765 77777", email: "siddharth@handle.com", isAvailable: true },
+  { id: "MC-1002", name: "Kabir Mehta", role: "Core Maintainer", phone: "+91 98765 88888", email: "kabir@handle.com", isAvailable: true },
 ];
 
 export default function ProductionOffice() {
-  const [roster, setRoster] = useState<RosterMember[]>(initialRoster);
+  const [roster, setRoster] = useState<RosterMember[]>(fallbackRoster);
   const [searchTerm, setSearchTerm] = useState("");
+
+  useEffect(() => {
+    fetch("http://localhost:5001/api/members")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          const mapped = data.map((m: any) => ({
+            id: m.member_id || m.id.toString(),
+            name: m.name,
+            role: m.roles && m.roles.length > 0 ? m.roles[0] : "Member",
+            phone: m.phone || "+91 98765 00000",
+            email: m.email,
+            isAvailable: m.status === "Active"
+          }));
+          setRoster(mapped);
+        }
+      })
+      .catch((err) => console.error("Failed to load roster:", err));
+  }, []);
+
   const [open, setOpen] = useState(false);
 
   // Form states

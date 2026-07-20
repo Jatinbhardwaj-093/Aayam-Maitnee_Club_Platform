@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Search, Star } from "lucide-react";
 
@@ -12,47 +12,215 @@ interface Member {
   isFeatured?: boolean;
 }
 
-const members: Member[] = [
+const mapRoleType = (role: string): "Actor" | "Director" | "Design" | "Production" => {
+  const r = role.toLowerCase();
+  if (r.includes("director")) return "Director";
+  if (r.includes("artist") || r.includes("design") || r.includes("choreographer")) return "Design";
+  if (r.includes("maintainer") || r.includes("coordinator") || r.includes("production")) return "Production";
+  return "Actor";
+};
+
+const fallbackMembers: Member[] = [
   {
-    id: "elena-vance",
-    name: "Elena Vance",
-    role: "Lead Actor",
-    roleType: "Actor",
-    description: "Classical performer with over a decade of experience in Shakespearean drama and contemporary avant-garde theatre.",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuDOcdtiEQoy0zh7y5qSW0Em4w87Fz4lYTZmmBHcfyhtbFSceWTs6u9jCaB86rGeiDJkDrywYIgX71l3jt19-0GLz9-vbEQ-9wH6XExEEXWnd-ExlGcaR80XF_2ycyoeJtC9ptjtv9sSbWmZOHsPUPoR-4etUI75RDr-GDf_pEtBNVXP7Dc6V7lxKNmtdTXyiO2m0B-OKU6_dR-PpXk-5toQXim5hfvEU-2yxU896g2mz9Jw3CKPdSJv",
+    id: "MC-1001",
+    name: "Abay Nandhiga",
+    role: "Secretary (2024-2025)",
+    roleType: "Production",
+    description: "Secretary of Aayam - IIT Madras BS Drama Society. Directing society operations and stagecraft productions.",
+    image: "/aayam_assets/profiles/utkarsh_yuuhi.jpg",
     isFeatured: true
   },
   {
-    id: "marcus-thorne",
-    name: "Marcus Thorne",
-    role: "Director",
-    roleType: "Director",
-    description: "Visionary director known for minimalist stage design and emotionally resonant character-driven narratives.",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuASrF76oyehZoH0Mp6atVLKf1XKX3tY2Q3-v1ZO9_y46IBhoVb597s54MEzoQVZ9ByIRvg5T0utOwDy8G93a0g7JDTLaq75m_dJkTVqR-tz6Ljvhc6MD4cB1NZ-GKU1fdDkMPdQPflf5NTN84uED9M4V3qPGbpaCptepJqWcOetCzmYbC9fAqhr2dFzcblWzWTMv6LICPucZiomxUrFjioKszlnFL2RRBl-p01evg3dOSqdBQX3FSBS"
+    id: "MC-1002",
+    name: "Yuuhi",
+    role: "Deputy Secretary",
+    roleType: "Production",
+    description: "Deputy Secretary of Aayam. Lead performer in Nukkad Natak street plays and stage productions.",
+    image: "/aayam_assets/profiles/abay_nandhiga.jpg",
+    isFeatured: true
   },
   {
-    id: "sienna-lopez",
-    name: "Sienna Lopez",
-    role: "Scenic Artist",
+    id: "MC-1003",
+    name: "Samarth Shrivastava",
+    role: "Chief Coordinator",
+    roleType: "Production",
+    description: "Chief Coordinator of Aayam. Overseeing production logistics, stage design, and inter-collegiate drama fests.",
+    image: "/aayam_assets/profiles/samarth_shrivastava.jpg",
+    isFeatured: true
+  },
+  {
+    id: "MC-1004",
+    name: "Krishna Subramanian",
+    role: "Dept. Chief Coordinator",
+    roleType: "Production",
+    description: "Dept. Chief Coordinator. Coordinating technical lighting boards, acoustic soundscapes, and live cues.",
+    image: "/aayam_assets/profiles/krishna_subramanian.jpg"
+  },
+  {
+    id: "MC-1005",
+    name: "Harsh Aryan",
+    role: "PR & Media Member",
     roleType: "Design",
-    description: "Master painter specializing in large-scale murals and photorealistic backdrops that transport audiences across time.",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCriANEGDPnpWF8zDsu7mv1efvGVJTz43tLNpo0iKYmMNrXAlqwT8q1YgteTWb_JWv5DDzS00j2JgpuOB65dt5LBR2xvDl_DNzKM9dZ8m6Z5tAmJn0AE2rJmW4OqEZuixxnCVYsnD_CyvaaYxr3x0V4oe-Ind7ffzi9PBm2zQkRlx2v-4XQJe0ouNR5skkT9lf9iA3mya74pOReSx6PmY_Cu5rVySlcZIn8_rw1-AzevATQVpd_zfO1"
+    description: "PR & Media Member managing digital presence, event photography, and press releases.",
+    image: "/aayam_assets/profiles/harsh_aryan.jpg"
   },
   {
-    id: "julian-thorne",
-    name: "Julian Thorne",
-    role: "Club President & Director",
+    id: "MC-1006",
+    name: "Swati Singh",
+    role: "Web Admin & Tech Lead",
+    roleType: "Production",
+    description: "Web Admin & Tech Lead. Maintaining digital member roster, booking engines, and online portal infrastructure.",
+    image: "/aayam_assets/profiles/swati_singh.jpg"
+  },
+  {
+    id: "MC-1007",
+    name: "Sneha Das",
+    role: "Design Head",
+    roleType: "Design",
+    description: "Design Head at Aayam. Painting scenic backdrops, prop design, and visual brand identity.",
+    image: "/aayam_assets/profiles/sylene_bansal.jpg"
+  },
+  {
+    id: "MC-1008",
+    name: "Tanu Kurade",
+    role: "Mentor (Directing)",
     roleType: "Director",
-    description: "Refined theater professional specializing in method acting and stage lighting. Leading the Matinee Gallery productions.",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAkD84l9bATTsiV52kbs28_DoHe5f-PFPhB-nnNhuVMs3HgrRA5SWWYHicVET7ryt72YNgtmpyADDdAyM-UziuL4jidI_Uni24HQ1_fqFqT6iaR8ty6GLtE7dKiThcvvU2uOhqsHlIJRuEnhZtJ7Z3-utaWmwkRwcx8efca5RxbgMzf7ztWCU6bYzK3tAIT63YZC8h4zZsX7T8zsxCc1NbgZ4W_b-A_nqNfAWBXbjEPH3d6iKTlACia"
+    description: "Mentor (Directing). Directing multi-act stage plays, script adaptation, and classical blocking design.",
+    image: "/aayam_assets/profiles/tanu_kurade.jpg"
+  },
+  {
+    id: "MC-1009",
+    name: "S. Sri Vaishnavi",
+    role: "Mentor (Directing)",
+    roleType: "Director",
+    description: "Mentor (Directing). Guiding theatrical blocking, dialogue delivery, and stage direction.",
+    image: "/aayam_assets/profiles/vaishnavi_srivastava.jpg"
+  },
+  {
+    id: "MC-1010",
+    name: "Akanksha Kadam",
+    role: "Logistics Head",
+    roleType: "Production",
+    description: "Logistics Head overseeing stage props, auditorium venue booking, and travel transport.",
+    image: "/aayam_assets/profiles/akanksha_kadam.jpg"
+  },
+  {
+    id: "MC-1011",
+    name: "Anshi Jain",
+    role: "PR Head",
+    roleType: "Design",
+    description: "PR Head leading public relations, social media outreach, and audience engagement.",
+    image: "/aayam_assets/profiles/chirag_kumar.jpg"
+  },
+  {
+    id: "MC-1012",
+    name: "Kaushal Raj",
+    role: "Outreach Head",
+    roleType: "Production",
+    description: "Outreach Head building partnerships with corporate sponsors and festival patron circles.",
+    image: "/aayam_assets/profiles/sneha_das.jpg"
+  },
+  {
+    id: "MC-1013",
+    name: "Vaishnavi Srivastava",
+    role: "Volunteer Coordinator",
+    roleType: "Actor",
+    description: "Volunteer Coordinator - Order behind the art. Managing backstage crew and festival ushering.",
+    image: "/aayam_assets/profiles/vaishnavi_srivastava.jpg"
+  },
+  {
+    id: "MC-1014",
+    name: "Gaurav",
+    role: "Members' Coordinator",
+    roleType: "Actor",
+    description: "Members' Coordinator managing onboarding, rehearsal attendance, and internal communication.",
+    image: "/aayam_assets/profiles/chirag_kumar.jpg"
+  },
+  {
+    id: "MC-1015",
+    name: "Shrit",
+    role: "Members' Coordinator",
+    roleType: "Actor",
+    description: "Members' Coordinator supporting rehearsal scheduling, script distribution, and auditions.",
+    image: "/aayam_assets/profiles/harsh_aryan.jpg"
+  },
+  {
+    id: "MC-1016",
+    name: "Dipanshu Bist",
+    role: "Meet Host",
+    roleType: "Actor",
+    description: "Meet Host for Aayam interactive sessions, Sahitya Sabha discussions, and orientation events.",
+    image: "/aayam_assets/profiles/utkarsh_yuuhi.jpg"
+  },
+  {
+    id: "MC-1017",
+    name: "Neelotpala",
+    role: "Mentor",
+    roleType: "Director",
+    description: "Ensemble Mentor providing creative direction and theatrical dramaturgy.",
+    image: "/aayam_assets/profiles/tanu_kurade.jpg"
+  },
+  {
+    id: "MC-1018",
+    name: "Kanishk Mishra",
+    role: "Stage & Technical Director",
+    roleType: "Director",
+    description: "Stage & Technical Director managing auditorium acoustics, lighting rigs, and set construction.",
+    image: "/aayam_assets/profiles/kanishk_mishra.jpg"
+  },
+  {
+    id: "MC-1019",
+    name: "Esha Hinde",
+    role: "Costume & Production Coordinator",
+    roleType: "Design",
+    description: "Costume & Production Coordinator specializing in period costume design, prop curation, and backstage styling.",
+    image: "/aayam_assets/profiles/esha_hinde.jpg"
+  },
+  {
+    id: "MC-1020",
+    name: "Aditi",
+    role: "Principal Dramatic Actress",
+    roleType: "Actor",
+    description: "Principal Dramatic Actress featured in contemporary stage adaptations and street play ensembles.",
+    image: "/aayam_assets/profiles/aditi_drama.jpg"
   }
 ];
 
 export default function Directory() {
+  const [members, setMembers] = useState<Member[]>(fallbackMembers);
   const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState<"All" | "Actor" | "Director" | "Design" | "Production">("All");
 
+  useEffect(() => {
+    fetch("http://localhost:5001/api/members")
+      .then((res) => {
+        if (!res.ok) throw new Error("HTTP error");
+        return res.json();
+      })
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          const mapped = data.map((m: any) => {
+            const roleName = m.roles && m.roles.length > 0 ? m.roles[0] : "Member";
+            return {
+              id: m.member_id || m.id.toString(),
+              name: m.name,
+              role: roleName,
+              roleType: mapRoleType(roleName),
+              description: m.bio || "",
+              image: m.avatarUrl || "https://lh3.googleusercontent.com/aida-public/AB6AXuAnKUcfY7TKeCByoapSFAmtQIcIc4MmzLibSjnluJbKUysBTKE9qXxmIV3G3iSB8y0k17HEH1E3cfGc0y9OU2Or4LrSIk1pq6J3Skuvg39T7DXSjvd-iBflpXguYRHkVHdb9BJ_Vun0fgkFKmmlnW29sKRqsWDcvSj1_dMPMnE8aCABiaRJWvEyCIOY5pCj3aSn4u_5noKiiqjdzp1cT19rKnbLW9-s_uAzKe2-bkEKYmTE9qGb13joN8SvuzO34Z8BVa05uhfFubR3",
+              isFeatured: m.name === "Sneha Vyas"
+            };
+          });
+          setMembers(mapped);
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to load members from backend:", err);
+      });
+  }, []);
+
   const filteredMembers = members.filter(member => {
+
     const matchesSearch = member.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
                           member.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           member.description.toLowerCase().includes(searchTerm.toLowerCase());
@@ -61,7 +229,7 @@ export default function Directory() {
   });
 
   return (
-    <div className="bg-[#fdf9f4] text-[#1c1b19] min-h-screen font-sans selection:bg-[#c6e4f7] py-24">
+    <div className="bg-[#fdf9f4] text-[#1c1b19] min-h-screen font-sans selection:bg-[#c6e4f7] pt-8 pb-16">
       <main className="max-w-7xl mx-auto px-6 md:px-12">
         {/* Hero Section */}
         <section className="mb-16">

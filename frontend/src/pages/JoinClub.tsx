@@ -14,6 +14,7 @@ export default function JoinClub() {
   const [memberId, setMemberId] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [generatedCredentials, setGeneratedCredentials] = useState<{email: string, password: string} | null>(null);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -75,6 +76,9 @@ export default function JoinClub() {
       const resData = await response.json();
       if (resData.status === "success" && resData.member) {
         setMemberId(resData.member.member_id);
+        if (resData.generated_credentials) {
+          setGeneratedCredentials(resData.generated_credentials);
+        }
         const backendMember = resData.member;
         let backendTag: "member" | "maintainer" | "developer" = "member";
         if (backendMember.portfolio && (backendMember.portfolio.toLowerCase().includes("github.com") || backendMember.portfolio.toLowerCase().includes("dev") || backendMember.portfolio.toLowerCase().includes("code"))) {
@@ -144,7 +148,7 @@ export default function JoinClub() {
   };
 
   return (
-    <div className="bg-[#fdf9f4] text-[#1c1b19] min-h-screen font-sans selection:bg-[#c6e4f7] py-16 md:py-24">
+    <div className="bg-[#fdf9f4] text-[#1c1b19] min-h-screen font-sans selection:bg-[#c6e4f7] pt-8 pb-16">
       <div className="max-w-4xl mx-auto px-6">
         {!isSubmitted ? (
           <div className="space-y-8 bg-white border border-[#cac6b9]/30 p-8 md:p-12 rounded-3xl shadow-sm">
@@ -427,6 +431,25 @@ export default function JoinClub() {
                 <span>Card Ref: Matinee-2026</span>
               </div>
             </div>
+
+            {generatedCredentials && (
+              <div className="bg-[#fff9d2] border border-[#cac6b9] rounded-2xl p-6 text-left space-y-3 shadow-sm">
+                <p className="text-xs font-bold text-[#635f41] uppercase tracking-wider">Access Credentials Generated</p>
+                <p className="text-xs text-[#49473d] leading-relaxed font-light">
+                  An ensemble portal account has been auto-created for you. Use these credentials to sign in:
+                </p>
+                <div className="space-y-2 pt-1">
+                  <div className="flex items-center justify-between text-xs border-b border-[#cac6b9]/25 pb-1">
+                    <span className="font-bold text-[#466272]">ID / Email:</span>
+                    <span className="font-mono bg-white px-2 py-0.5 rounded border border-[#cac6b9]/30 text-[#635f41] select-all">{generatedCredentials.email}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-bold text-[#466272]">Password:</span>
+                    <span className="font-mono bg-white px-2 py-0.5 rounded border border-[#cac6b9]/30 text-[#635f41] select-all">{generatedCredentials.password}</span>
+                  </div>
+                </div>
+              </div>
+            )}
 
             <div className="pt-4 flex flex-col sm:flex-row gap-3 justify-center">
               <Button onClick={handleReset} variant="outline" className="border-[#cac6b9] text-[#466272] hover:bg-[#f7f3ee] font-bold text-xs uppercase tracking-wider px-8 py-3 rounded-xl shadow-sm transition-all">

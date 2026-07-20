@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { BookOpen, Star, Calendar, MapPin, Clock, Ticket } from "lucide-react";
 
 interface Production {
@@ -16,67 +17,121 @@ interface Production {
   price: string;
 }
 
-const productions: Production[] = [
+const fallbackProductions: Production[] = [
   {
-    id: "glass-orchestration",
-    title: "The Glass Orchestration",
+    id: "kky",
+    title: "Karn Ki Yachika",
     status: "SELLING FAST",
     statusColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
-    description: "A poignant exploration of memory and melody, following a reclusive composer's final attempt to capture the sound of silence.",
-    director: "Elena Moretti",
-    cast: "Julian Vane, Sarah Chen",
-    season: "Fall 2024 Season",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCAzuMBaCOUMEUXFsi58uX4Sk0JbT72vPkeMf7KwisCYFvuX3Bk8gP1e__uZ8B3G4bYBmYBQjlPftJgABVJuuHuLNh_AIDoUgyAwaSJBouCjuqcQ7quRshTI9hepIQebEmL3pvhyyO6hPnGW2vUGYrayYRqt1rRMyl1OCAIad0kKVUn46ZjCsSI_nQCNnUrcxx_B1Rvmvml5deoCtkUqY61szLjR8uoRvQhIHhNvsCHkKUY4niHP9cI",
-    venue: "Main Stage Gallery",
-    dates: "Oct 12 - Nov 04, 2024",
-    runtime: "105 Mins (No Intermission)",
-    price: "Tickets from $35"
+    description: "A monumental classical Malayalam/Hindi tragedy exploring Karn's moral dilemma, honor, and destiny on the battleground of Kurukshetra.",
+    director: "S. Sri Vaishnavi",
+    cast: "Abay Nandhiga, Utkarsh (Yuuhi), Samarth Shrivastava",
+    season: "2026 Production Season",
+    image: "/aayam_assets/kky_user_1.jpg",
+    venue: "Kashiyatra Stage, IIT BHU / OAT IIT Madras",
+    dates: "Aug 12 - Sep 04, 2026",
+    runtime: "75 Mins (No Intermission)",
+    price: "Free Admission"
   },
   {
-    id: "blue-horizon",
-    title: "Blue Horizon",
+    id: "tamashbin-kathputliya",
+    title: "Tamashbin Kathputliya",
     status: "LIMITED TICKETS",
     statusColor: "bg-amber-50 text-amber-700 border-amber-200",
-    description: "An experimental black-box production that redefined intimate storytelling through a series of interconnected monologues.",
-    director: "David K. Thorne",
-    cast: "Clara Vance, Marcus Thorne",
-    season: "Fall 2024 Season",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCkdj8dZKXd7KCPEfHwJx7d8dv8AVc16bLqx_Fa77OIQmhTqukcXd2WDgJayuivLhn9h2pKeVblOrBnzeH4iZNV2Hc7Ai6WzKPJfD3Kj-Fj9C0R-atVf6NKYU5KIKzH_H_z0B7SCUzFkxoaDIoNvxVUOdezFBpsRK1ok9gn2liDaNoNmK1K2dPMrk5mQIpcFjwBK0DT20azXknFaYzsgretzQcXDgjzpeD_Oa1FDZ_Dmb_ywKKmRkz1",
-    venue: "Studio Gallery (Black Box)",
-    dates: "Nov 15 - Dec 02, 2024",
-    runtime: "90 Mins (No Intermission)",
-    price: "Tickets from $25"
+    description: "A high-energy street play (Nukkad Natak) combining puppetry motifs, live dholak rhythms, and political satire.",
+    director: "Utkarsh (Yuuhi)",
+    cast: "Samarth Shrivastava, Krishna Subramanian, Swati Singh",
+    season: "2026 Production Season",
+    image: "/aayam_assets/tamashbin_user_1.jpg",
+    venue: "Open Air Theatre (OAT), IIT Madras",
+    dates: "Sep 12 - Sep 25, 2026",
+    runtime: "45 Mins (No Intermission)",
+    price: "Free Open Stage"
   },
   {
-    id: "antigone-reborn",
-    title: "Antigone: Reborn",
+    id: "dddj",
+    title: "DDDJ - Stage Production",
+    status: "TICKETS ON SALE",
+    statusColor: "bg-purple-50 text-purple-700 border-purple-200",
+    description: "An intense proscenium drama exploring relationship dynamics, ambition, and modern societal pressures.",
+    director: "S. Sri Vaishnavi",
+    cast: "Abay Nandhiga, Krishna Subramanian, Sneha Das",
+    season: "2026 Production Season",
+    image: "/aayam_assets/dddj_user_1.jpg",
+    venue: "CLT Auditorium, IIT Madras",
+    dates: "Sep 28 - Oct 10, 2026",
+    runtime: "85 Mins (With Intermission)",
+    price: "Registration Required"
+  },
+  {
+    id: "samatvam",
+    title: "Samatvam",
     status: "TICKETS ON SALE",
     statusColor: "bg-blue-50 text-blue-700 border-blue-200",
-    description: "A breathtaking contemporary reimagining of the classic tragedy, set within the glass halls of a modern metropolis.",
-    director: "Aris Papadopoulos",
-    cast: "Lydia Frost, Julian Devereux",
-    season: "Fall 2024 Season",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCFhh56JyFyLF08wchxPKsyhHqSdltIyUQmbvnM36afMwPrX-viKot2UF8WixHwwsB6_yr3DY4I7A1H2Zni9qGuPWojUJfSMHi-9ha_m7DCp2zmqpEOOJ2_EuFdjOI2bTlG-i2En3DPM6Q63oDPSTnQ76-vSPlw0GM8brJPhxU_AmlY6YM2w_8eTXnoW6PYDyXhq2RpqzGw48vFSVE6mF-XFPyFl6NPLNchnK-U-RX8YvaKmUEnhcKr",
-    venue: "Main Stage Gallery",
-    dates: "Dec 10 - Dec 28, 2024",
-    runtime: "120 Mins (With Intermission)",
-    price: "Tickets from $30"
+    description: "An intense ensemble drama exploring inner conflict, balance, and human empathy in modern high-pressure academic society.",
+    director: "Tanu Kurade",
+    cast: "Abay Nandhiga, Sneha Das, Anshi Jain",
+    season: "2026 Production Season",
+    image: "/aayam_assets/samatvam_user_1.jpg",
+    venue: "CLT Auditorium, IIT Madras",
+    dates: "Oct 05 - Oct 20, 2026",
+    runtime: "90 Mins (With Intermission)",
+    price: "Free Entry"
+  },
+  {
+    id: "speak-up-tara",
+    title: "Speak Up Tara",
+    status: "SELLING FAST",
+    statusColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    description: "A powerful social awareness play highlighting gender equality, courage, and standing up against societal silence.",
+    director: "S. Sri Vaishnavi",
+    cast: "Anshi Jain, Sneha Das, Swati Singh",
+    season: "2026 Production Season",
+    image: "/aayam_assets/speak_up_tara_user_1.webp",
+    venue: "Kashiyatra Festival Stage, IIT BHU",
+    dates: "Nov 02 - Nov 15, 2026",
+    runtime: "60 Mins (No Intermission)",
+    price: "Festival Pass Required"
   }
 ];
 
 export default function Plays() {
+  const [productions, setProductions] = useState<Production[]>(fallbackProductions);
+
+  useEffect(() => {
+    fetch("http://localhost:5001/api/plays")
+      .then((res) => {
+        if (!res.ok) throw new Error("HTTP error");
+        return res.json();
+      })
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setProductions(data);
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to load plays from backend:", err);
+      });
+  }, []);
+
   return (
-    <div className="bg-[#fdf9f4] text-[#1c1b19] min-h-screen font-sans selection:bg-[#c6e4f7] py-24">
+    <div className="bg-[#fdf9f4] text-[#1c1b19] min-h-screen font-sans selection:bg-[#c6e4f7] pt-8 pb-16">
       <main className="max-w-7xl mx-auto px-6 md:px-12">
         {/* Header Section */}
-        <section className="mb-20 text-center md:text-left">
-          <span className="text-xs font-semibold text-[#635f41] uppercase tracking-[0.25em] bg-[#c6e4f7]/30 px-3.5 py-1.5 rounded-full">
-            Our Plays
-          </span>
-          <h1 className="font-serif text-5xl md:text-7xl text-[#635f41] mt-8 mb-4 font-bold tracking-tight">The 2024 Season</h1>
-          <p className="text-lg text-[#49473d] max-w-2xl leading-relaxed font-light">
-            Discover the stories defining our seasonal calendar. Aayam showcases classical and contemporary stagecraft crafted with spatial depth, raw light, and dramatic resonance.
-          </p>
+        <section className="mb-8 border-b border-[#cac6b9]/25 pb-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <span className="text-[10px] font-bold text-[#635f41] uppercase tracking-[0.25em] bg-[#c6e4f7]/30 px-3 py-1 rounded-full inline-block mb-2">
+                Our Stage Plays
+              </span>
+              <h1 className="font-serif text-3xl md:text-5xl text-[#635f41] font-bold tracking-tight">
+                The 2026 Production Season
+              </h1>
+              <p className="text-xs md:text-sm text-[#49473d] max-w-2xl leading-relaxed font-light mt-2">
+                Discover the stories defining our seasonal calendar. Aayam showcases classical and contemporary stagecraft crafted with spatial depth, raw light, and dramatic resonance.
+              </p>
+            </div>
+          </div>
         </section>
 
         {/* 3-Column Play Cards Grid */}

@@ -1,39 +1,28 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import {
   Home,
   LayoutDashboard,
-  Folder,
   Users,
-  Image as ImageIcon,
-  Coins,
-  Menu,
+  ClipboardList,
   Bell,
   User,
-  ShieldCheck,
-  ClipboardList,
-  LogOut,
-  Settings,
-  ShieldAlert,
   LineChart,
   Scale,
   Sliders,
   HardDrive,
-  Calendar
+  Calendar,
+  Menu,
+  ShieldAlert,
+  PlayCircle,
+  FileText
 } from "lucide-react";
-import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 interface NavItem {
   label: string;
@@ -45,25 +34,21 @@ interface NavItem {
 const navItems: NavItem[] = [
   { label: "Drama Club Home", path: "/", icon: Home, description: "Public landing page" },
   { label: "Member Dashboard", path: "/member", icon: LayoutDashboard, description: "Your rehearsals & schedules" },
-  { label: "Macbeth Workspace", path: "/workspace", icon: Folder, description: "Props transfers & expenses" },
-  { label: "Auditions & Casting", path: "/auditions", icon: Users, description: "Casting portal & applications" },
-  { label: "Sponsor Dashboard", path: "/sponsor", icon: Coins, description: "VIP lounge & sponsorships" },
-  { label: "Gallery", path: "/gallery", icon: ImageIcon, description: "Performances & backstage media" },
-  { label: "Production Office", path: "/admin", icon: ShieldCheck, description: "Director availability & admin" },
-  { label: "Backstage Pass", path: "/backstage", icon: ClipboardList, description: "Tasks & check-ins" },
+  { label: "My Schedule", path: "/schedule", icon: Calendar, description: "Your production schedule" },
+  { label: "Auditions", path: "/auditions", icon: ClipboardList, description: "Apply for play casting" },
+  { label: "Plays & Productions", path: "/member-plays", icon: PlayCircle, description: "Production lineup & scripts" },
+  { label: "Script Vault", path: "/member-scripts", icon: FileText, description: "Confidential play scripts" },
 ];
 
 const maintainerNavItems: NavItem[] = [
   { label: "Maintainer Dashboard", path: "/maintainer", icon: LayoutDashboard, description: "System & Core Maintenance" },
+  { label: "Production Control", path: "/control-panel", icon: Sliders, description: "Technical & access control panel" },
+  { label: "Events Management", path: "/events-admin", icon: Calendar, description: "Proposal curation & concurrent lock editor" },
+  { label: "Members Directory", path: "/directory-admin", icon: Users, description: "Ensemble & crew directory" },
+  { label: "Media Moderation", path: "/media-moderation", icon: HardDrive, description: "Review gallery content & storage" },
   { label: "Platform Analytics", path: "/analytics", icon: LineChart, description: "Forecasting & system health" },
   { label: "Compliance Ledger", path: "/compliance", icon: Scale, description: "Financial audit & ledger" },
-  { label: "Production Control", path: "/control-panel", icon: Sliders, description: "Technical & access control panel" },
-  { label: "Media Moderation", path: "/media-moderation", icon: HardDrive, description: "Review gallery content & storage" },
-  { label: "Events Management", path: "/events-admin", icon: Calendar, description: "Proposal curation & concurrent lock editor" },
-  { label: "Members Directory", path: "/directory", icon: Users, description: "Ensemble & crew directory" },
 ];
-
-// personas deleted
 
 export default function AppLayout() {
   const location = useLocation();
@@ -71,43 +56,86 @@ export default function AppLayout() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
+  // Active User Profile (persisted in sessionStorage to survive page refresh and allow multiple sessions across tabs)
+  const [activeUser, setActiveUser] = useState<any>(() => {
+    const saved = sessionStorage.getItem("aayam_active_user");
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  });
+  const [loginError, setLoginError] = useState<string | null>(null);
+
   // Interactive States
   const [hasUnread, setHasUnread] = useState(true);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [portalOpen, setPortalOpen] = useState(false);
-  const [profileSettingsOpen, setProfileSettingsOpen] = useState(false);
 
-  // Active User Profile (starts as null for public guest)
-  const [activeUser, setActiveUser] = useState<any>(null);
-  const [loginError, setLoginError] = useState<string | null>(null);
+  // Notifications from Backend
+  const [dbNotifications, setDbNotifications] = useState<any[]>([]);
 
-  // Editing Profile states
-  const [editName, setEditName] = useState("");
-  const [editRole, setEditRole] = useState("");
-  const [editEmail, setEditEmail] = useState("");
-  const [editNumber, setEditNumber] = useState("+91 98765 43210");
-  const [headshotName, setHeadshotName] = useState("jayesh_headshot.jpg");
-  const [resumeName, setResumeName] = useState("jayesh_resume.pdf");
-  const [rolePreference, setRolePreference] = useState("Performer");
+  useEffect(() => {
+    if (!activeUser?.email) return;
+    const fetchNotifications = async () => {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5001"}/api/notifications?email=${encodeURIComponent(activeUser.email)}`);
+        if (res.ok) {
+          const data = await res.json();
+          setDbNotifications(data);
+          const unread = data.some((n: any) => !n.is_read);
+          setHasUnread(unread);
+        }
+      } catch (err) {
+        console.error("Error fetching notifications:", err);
+      }
+    };
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 10000);
+    return () => clearInterval(interval);
+  }, [activeUser]);
 
-  const isLandingPage = ["/", "/plays", "/events", "/directory"].includes(location.pathname) || location.pathname.startsWith("/profile") || !activeUser;
+  const handleMarkAllRead = async () => {
+    if (!activeUser?.email) return;
+    try {
+      await fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5001"}/api/notifications/mark-read`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: activeUser.email })
+      });
+      setHasUnread(false);
+      setDbNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
-  const filteredNavItems = activeUser?.role.toLowerCase().includes("maintainer")
+  const isMaintainer = activeUser?.role.toLowerCase().includes("maintainer") || activeUser?.isAdmin || false;
+
+  const isLandingPage = ["/", "/about", "/manifesto", "/plays", "/events", "/directory", "/gallery", "/public-gallery"].includes(location.pathname) || location.pathname.startsWith("/profile") || !activeUser;
+
+  const filteredNavItems = isMaintainer
     ? maintainerNavItems
     : navItems.filter((item) => {
-      const isMember = activeUser?.role.toLowerCase().includes("member") || false;
-      if (isMember) {
-        // Display only Home, Member Dashboard, Auditions & Casting, and Gallery.
-        return ["/", "/member", "/auditions", "/gallery"].includes(item.path);
-      }
-      return true;
-    });
+        if (item.path === "/") {
+          return false;
+        }
+        const isNormalMember = !isMaintainer;
+        if (isNormalMember) {
+          // Display only Member Dashboard, My Schedule, Auditions, Plays, and Scripts.
+          return ["/member", "/schedule", "/auditions", "/member-plays", "/member-scripts"].includes(item.path);
+        }
+        return true;
+      });
 
   const activeItem = navItems.find((item) => item.path === location.pathname) ||
     maintainerNavItems.find((item) => item.path === location.pathname) ||
     navItems[0];
 
-  const handleLoginSubmit = async (email: string) => {
+  const handleLoginSubmit = async (email: string, password?: string) => {
     setLoginError(null);
     try {
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5001"}/api/login`, {
@@ -115,7 +143,7 @@ export default function AppLayout() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, password: password || "" }),
       });
 
       if (!response.ok) {
@@ -127,36 +155,17 @@ export default function AppLayout() {
       const data = await response.json();
       if (data.status === "success" && data.user) {
         const user = data.user;
+        sessionStorage.setItem("aayam_active_user", JSON.stringify(user));
+        if (data.token) {
+          sessionStorage.setItem("aayam_session_token", data.token);
+        }
         setActiveUser(user);
-        setEditName(user.name);
-        setEditRole(user.role);
-        setEditEmail(user.email);
         setPortalOpen(false);
 
-        // Sync mocked/stored user details based on role and redirect
-        if (user.role.includes("Maintainer")) {
-          setEditNumber("+91 98765 88888");
-          setHeadshotName("julian_headshot.jpg");
-          setResumeName("julian_resume.pdf");
-          setRolePreference("Core Maintainer");
+        // Redirect based on role
+        if (user.role.toLowerCase().includes("maintainer") || user.isAdmin) {
           navigate("/maintainer");
-        } else if (user.role.includes("Sponsor")) {
-          setEditNumber("+91 98765 99999");
-          setHeadshotName("lakshya_headshot.jpg");
-          setResumeName("lakshya_resume.pdf");
-          setRolePreference("Creative Designer");
-          navigate("/member");
-        } else if (user.name === "Sneha Vyas") {
-          setEditNumber("+91 98765 33333");
-          setHeadshotName("sneha_headshot.jpg");
-          setResumeName("sneha_resume.pdf");
-          setRolePreference("Director");
-          navigate("/member");
         } else {
-          setEditNumber("+91 98765 43210");
-          setHeadshotName("jayesh_headshot.jpg");
-          setResumeName("jayesh_resume.pdf");
-          setRolePreference("Performer");
           navigate("/member");
         }
       } else {
@@ -169,26 +178,16 @@ export default function AppLayout() {
     }
   };
 
-  const handleSaveProfile = (e: React.FormEvent) => {
-    e.preventDefault();
-    setActiveUser({
-      name: editName,
-      role: editRole,
-      email: editEmail,
-      initials: editName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2)
-    });
-    setProfileSettingsOpen(false);
-  };
-
   const handleLogOut = () => {
+    sessionStorage.removeItem("aayam_active_user");
+    sessionStorage.removeItem("aayam_session_token");
     setActiveUser(null);
-    setProfileSettingsOpen(false);
     navigate("/");
   };
 
-  const isMember = activeUser?.role.toLowerCase().includes("member") || false;
-  const isAllowedPath = ["/", "/member", "/auditions", "/gallery", "/plays", "/events", "/directory"].includes(location.pathname) || location.pathname.startsWith("/profile");
-  const showAccessDenied = activeUser && isMember && !isAllowedPath;
+  const isMember = activeUser ? !isMaintainer : false;
+  const isAllowedPath = ["/", "/member", "/schedule", "/auditions", "/member-plays", "/member-scripts", "/plays", "/events", "/directory", "/gallery", "/public-gallery"].includes(location.pathname) || location.pathname.startsWith("/profile");
+  const showAccessDenied = activeUser && !isMaintainer && isMember && !isAllowedPath;
 
   const sidebarWidthClass = isCollapsed ? "w-[72px]" : "w-64 xl:w-72";
 
@@ -203,8 +202,8 @@ export default function AppLayout() {
               setIsCollapsed={setIsCollapsed}
               filteredNavItems={filteredNavItems}
               activeUser={activeUser}
-              setProfileSettingsOpen={setProfileSettingsOpen}
               isMobile={false}
+              onLogOut={handleLogOut}
             />
           </div>
         </aside>
@@ -227,6 +226,16 @@ export default function AppLayout() {
 
                 {/* Desktop Nav Links */}
                 <nav className="hidden md:flex items-center gap-8">
+                  <Link
+                    to="/about"
+                    className={`text-sm font-semibold tracking-wide transition-all ${
+                      location.pathname === "/about" || location.pathname === "/manifesto"
+                        ? "text-[#635f41] border-b-2 border-[#635f41] pb-1"
+                        : "text-[#466272] hover:text-[#635f41]"
+                    }`}
+                  >
+                    About / Manifesto
+                  </Link>
                   <Link
                     to="/plays"
                     className={`text-sm font-semibold tracking-wide transition-all ${
@@ -257,19 +266,28 @@ export default function AppLayout() {
                   >
                     Member Directory
                   </Link>
+                  <Link
+                    to="/gallery"
+                    className={`text-sm font-semibold tracking-wide transition-all ${
+                      location.pathname === "/gallery" || location.pathname === "/public-gallery"
+                        ? "text-[#635f41] border-b-2 border-[#635f41] pb-1"
+                        : "text-[#466272] hover:text-[#635f41]"
+                    }`}
+                  >
+                    Gallery
+                  </Link>
                 </nav>
               </div>
 
               {/* Right Side Actions */}
               <div className="flex items-center gap-4">
                 {activeUser ? (
-                  <button
-                    onClick={() => setProfileSettingsOpen(true)}
-                    className="w-9 h-9 rounded-full bg-[#635f41]/10 border border-[#e6e2dd] flex items-center justify-center text-[#635f41] font-bold text-sm hover:bg-[#635f41]/15 transition-all"
-                    title="User Profile Settings"
+                  <Link
+                    to={isMaintainer ? "/maintainer" : "/member"}
+                    className="bg-[#635f41] text-white hover:bg-[#635f41]/90 rounded-[8px] h-9 px-4 flex items-center text-xs font-semibold tracking-wider transition-all uppercase"
                   >
-                    {activeUser.initials}
-                  </button>
+                    Dashboard
+                  </Link>
                 ) : (
                   <>
                     <Link
@@ -305,9 +323,9 @@ export default function AppLayout() {
                       setIsCollapsed={setIsCollapsed}
                       filteredNavItems={filteredNavItems}
                       activeUser={activeUser}
-                      setProfileSettingsOpen={setProfileSettingsOpen}
                       setMobileOpen={setMobileOpen}
                       isMobile={true}
+                      onLogOut={handleLogOut}
                     />
                   </SheetContent>
                 </Sheet>
@@ -327,10 +345,18 @@ export default function AppLayout() {
             <div className="flex items-center gap-3">
               {activeUser && (
                 <>
+                  <Link
+                    to="/"
+                    className="border border-[#cac6b9]/40 text-[#635f41] hover:bg-[#e6e2dd]/40 rounded-[8px] h-9 px-4 flex items-center text-xs font-semibold tracking-wider transition-all uppercase"
+                  >
+                    Landing Page
+                  </Link>
                   {/* Notification Trigger */}
                   <Dialog open={notificationsOpen} onOpenChange={(openState) => {
                     setNotificationsOpen(openState);
-                    if (openState) setHasUnread(false);
+                    if (openState) {
+                      handleMarkAllRead();
+                    }
                   }}>
                     <DialogTrigger render={<Button variant="ghost" size="icon" className="relative text-[#466272] hover:bg-[#f7f3ee] rounded-full" />}>
                       <Bell className="w-5 h-5" />
@@ -340,58 +366,62 @@ export default function AppLayout() {
                     </DialogTrigger>
                     <DialogContent className="bg-[#fdf9f4] border border-[#e6e2dd] text-[#466272] max-w-md">
                       <DialogHeader>
-                        <DialogTitle className="font-serif text-[#635f41] flex items-center gap-2">
-                          <Bell className="w-5 h-5 text-[#8CC0EB]" /> Notifications Inbox
+                        <DialogTitle className="font-serif text-[#635f41] flex items-center justify-between gap-2">
+                          <span className="flex items-center gap-2">
+                            <Bell className="w-5 h-5 text-[#8CC0EB]" /> Notifications Inbox
+                          </span>
+                          {hasUnread && (
+                            <Badge className="bg-red-100 text-red-700 text-[10px] font-bold">New Updates</Badge>
+                          )}
                         </DialogTitle>
                         <DialogDescription className="text-xs text-[#466272]/85">
-                          Recent backstage dispatches and production updates.
+                          Live dispatches and production updates for <strong>{activeUser.name}</strong>.
                         </DialogDescription>
                       </DialogHeader>
-                      <div className="py-4 space-y-3">
-                        <div className="p-3 bg-white border border-[#e6e2dd] rounded-[8px] space-y-1">
-                          <div className="flex justify-between items-center">
-                            <span className="text-xs font-bold text-[#635f41]">Macbeth Rehearsal Update</span>
-                            <span className="text-[10px] text-[#466272]/60">10m ago</span>
+
+                      <div className="py-4 space-y-3 max-h-[60vh] overflow-y-auto pr-1">
+                        {dbNotifications.length === 0 ? (
+                          <div className="p-6 text-center text-xs text-[#466272]/70 italic">
+                            No notifications in your inbox.
                           </div>
-                          <p className="text-xs text-[#466272]/90">
-                            Dress run and stage lighting sync confirmed for July 07 at 4:00 PM. Presence required.
-                          </p>
-                        </div>
-                        <div className="p-3 bg-white border border-[#e6e2dd] rounded-[8px] space-y-1">
-                          <div className="flex justify-between items-center">
-                            <span className="text-xs font-bold text-[#635f41]">Prop Transfer Registered</span>
-                            <span className="text-[10px] text-[#466272]/60">2h ago</span>
-                          </div>
-                          <p className="text-xs text-[#466272]/90">
-                            Jayesh Dave checked out <strong>Banquet Goblet (Gold)</strong>. Return window is 2 days.
-                          </p>
-                        </div>
-                        <div className="p-3 bg-white border border-[#e6e2dd] rounded-[8px] space-y-1">
-                          <div className="flex justify-between items-center">
-                            <span className="text-xs font-bold text-[#635f41]">Budget Claim Approved</span>
-                            <span className="text-[10px] text-[#466272]/60">1d ago</span>
-                          </div>
-                          <p className="text-xs text-[#466272]/90">
-                            Velvet curtains fabric claim ($350.00) signed off by sponsor committee.
-                          </p>
-                        </div>
+                        ) : (
+                          dbNotifications.map((notif) => (
+                            <div 
+                              key={notif.id} 
+                              className={`p-3.5 border rounded-[10px] space-y-1 transition-all ${
+                                notif.is_read ? "bg-white/70 border-[#e6e2dd]" : "bg-white border-[#8CC0EB] shadow-xs"
+                              }`}
+                            >
+                              <div className="flex justify-between items-center gap-2">
+                                <span className="text-xs font-bold text-[#635f41] flex items-center gap-1.5">
+                                  {!notif.is_read && <span className="w-2 h-2 rounded-full bg-[#8CC0EB] inline-block"></span>}
+                                  {notif.title || "Production Notice"}
+                                </span>
+                                <span className="text-[10px] text-[#466272]/60 font-mono flex-shrink-0">
+                                  {notif.created_at || "Recent"}
+                                </span>
+                              </div>
+                              <p className="text-xs text-[#466272]/90 leading-relaxed font-light">
+                                {notif.message}
+                              </p>
+                            </div>
+                          ))
+                        )}
                       </div>
-                      <DialogFooter className="sm:justify-between items-center gap-4">
-                        <span className="text-[11px] text-[#466272]/60 italic">Authenticated via Aayam Hub</span>
-                        <Button onClick={() => setNotificationsOpen(false)} className="bg-[#8CC0EB] text-[#1c1b19] hover:bg-[#8CC0EB]/90 rounded-[8px]">
-                          Dismiss
-                        </Button>
+
+                      <DialogFooter className="sm:justify-between items-center gap-4 border-t border-[#e6e2dd] pt-3">
+                        <span className="text-[11px] text-[#466272]/60 italic">Live SQLite DB Feed</span>
+                        <div className="flex gap-2">
+                          <Button onClick={handleMarkAllRead} variant="outline" className="text-xs font-bold border-[#e6e2dd] text-[#635f41]">
+                            Mark All Read
+                          </Button>
+                          <Button onClick={() => setNotificationsOpen(false)} className="bg-[#8CC0EB] text-[#001e2c] font-bold hover:bg-[#8CC0EB]/90 rounded-[8px]">
+                            Dismiss
+                          </Button>
+                        </div>
                       </DialogFooter>
                     </DialogContent>
                   </Dialog>
-
-                  <button
-                    onClick={() => setProfileSettingsOpen(true)}
-                    className="w-9 h-9 rounded-full bg-[#635f41]/10 border border-[#e6e2dd] flex items-center justify-center text-[#635f41] font-bold text-sm hover:bg-[#635f41]/15 transition-all"
-                    title="User Profile Settings"
-                  >
-                    {activeUser.initials}
-                  </button>
                 </>
               )}
 
@@ -409,157 +439,8 @@ export default function AppLayout() {
           </header>
         )}
 
-        {/* User Account Settings Sheet */}
-        <Sheet open={profileSettingsOpen} onOpenChange={setProfileSettingsOpen}>
-          <SheetContent side="right" className="bg-[#fdf9f4] border-l border-[#e6e2dd] text-[#466272] w-full sm:max-w-md overflow-y-auto">
-            {activeUser && (
-              <form onSubmit={handleSaveProfile}>
-                <SheetHeader className="pb-6 border-b border-[#e6e2dd]">
-                  <SheetTitle className="font-serif text-[#635f41] text-lg font-bold flex items-center gap-2">
-                    <Settings className="w-5 h-5 text-[#8CC0EB]" /> Account Settings
-                  </SheetTitle>
-                  <SheetDescription className="text-xs text-[#466272]/85">
-                    Update your Matinee Club profile details, preferences, and files.
-                  </SheetDescription>
-                </SheetHeader>
 
-                <div className="py-6">
-                  <Button
-                    type="button"
-                    onClick={() => {
-                      setProfileSettingsOpen(false);
-                      navigate(activeUser?.role.toLowerCase().includes("maintainer") ? "/maintainer" : "/member");
-                    }}
-                    className="bg-[#635f41] text-white hover:bg-[#635f41]/90 rounded-lg w-full mb-6 font-semibold py-3 flex items-center justify-center gap-2"
-                  >
-                    <LayoutDashboard className="w-4 h-4" /> Go to Dashboard
-                  </Button>
 
-                  <div className="space-y-6">
-                    <div className="space-y-1">
-                      <label className="text-xs font-semibold text-[#635f41]">Profile Initials Avatar</label>
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-full bg-[#635f41]/10 border border-[#e6e2dd] flex items-center justify-center text-[#635f41] font-bold text-lg">
-                          {activeUser.initials}
-                        </div>
-                        <span className="text-xs text-[#466272]/65 italic">Autogenerated from your Name.</span>
-                      </div>
-                    </div>
-
-                    <div className="space-y-1">
-                      <label className="text-xs font-semibold text-[#635f41]">Display Name</label>
-                      <Input
-                        placeholder="e.g., Jayesh Dave"
-                        value={editName}
-                        onChange={(e) => setEditName(e.target.value)}
-                        className="border-[#e6e2dd] focus-visible:ring-[#8CC0EB] text-sm h-10 bg-white"
-                        required
-                      />
-                    </div>
-
-                    <div className="space-y-1">
-                      <label className="text-xs font-semibold text-[#635f41]">Phone Number</label>
-                      <Input
-                        placeholder="e.g., +91 98765 43210"
-                        value={editNumber}
-                        onChange={(e) => setEditNumber(e.target.value)}
-                        className="border-[#e6e2dd] focus-visible:ring-[#8CC0EB] text-sm h-10 bg-white"
-                        required
-                      />
-                    </div>
-
-                    <div className="space-y-1">
-                      <label className="text-xs font-semibold text-[#635f41]">Email Address</label>
-                      <Input
-                        type="email"
-                        placeholder="e.g., jayesh.d@matinee.club"
-                        value={editEmail}
-                        onChange={(e) => setEditEmail(e.target.value)}
-                        className="border-[#e6e2dd] focus-visible:ring-[#8CC0EB] text-sm h-10 bg-white"
-                        required
-                      />
-                    </div>
-
-                    {/* File Upload Slots */}
-                    <div className="space-y-4 pt-2">
-                      <div className="flex justify-between items-center bg-[#f7f3ee] border border-[#e6e2dd] rounded-[8px] p-3">
-                        <div className="text-left">
-                          <p className="text-xs font-semibold text-[#635f41]">Headshot Photo</p>
-                          <p className="text-[10px] text-[#466272]/70 truncate max-w-[200px]">{headshotName}</p>
-                        </div>
-                        <label className="bg-[#8CC0EB] text-[#1c1b19] hover:bg-[#8CC0EB]/90 cursor-pointer rounded-[4px] px-2.5 py-1 text-[10px] font-semibold transition-all">
-                          Upload File
-                          <input
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            onChange={(e) => {
-                              if (e.target.files && e.target.files[0]) {
-                                setHeadshotName(e.target.files[0].name);
-                              }
-                            }}
-                          />
-                        </label>
-                      </div>
-
-                      <div className="flex justify-between items-center bg-[#f7f3ee] border border-[#e6e2dd] rounded-[8px] p-3">
-                        <div className="text-left">
-                          <p className="text-xs font-semibold text-[#635f41]">Resume / Bio File</p>
-                          <p className="text-[10px] text-[#466272]/70 truncate max-w-[200px]">{resumeName}</p>
-                        </div>
-                        <label className="bg-[#8CC0EB] text-[#1c1b19] hover:bg-[#8CC0EB]/90 cursor-pointer rounded-[4px] px-2.5 py-1 text-[10px] font-semibold transition-all">
-                          Upload File
-                          <input
-                            type="file"
-                            accept=".pdf"
-                            className="hidden"
-                            onChange={(e) => {
-                              if (e.target.files && e.target.files[0]) {
-                                setResumeName(e.target.files[0].name);
-                              }
-                            }}
-                          />
-                        </label>
-                      </div>
-                    </div>
-
-                    <div className="space-y-1">
-                      <label className="text-xs font-semibold text-[#635f41] block mb-1">Member Classification</label>
-                      <Select value={rolePreference} onValueChange={(val) => setRolePreference(val ?? "")}>
-                        <SelectTrigger className="w-full border-[#e6e2dd] bg-white text-[#466272] hover:bg-gray-50 focus:ring-[#8CC0EB] text-sm h-10 px-3 flex items-center justify-between rounded-lg">
-                          <SelectValue placeholder="Select Classification" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-white border border-[#e6e2dd] text-[#466272] rounded-lg shadow-md mt-1 z-[100] max-h-60 overflow-y-auto">
-                          <SelectGroup>
-                            <SelectItem value="Performer" className="hover:bg-[#8CC0EB]/10 rounded-md py-1.5 px-3 cursor-pointer">Performer</SelectItem>
-                            <SelectItem value="Technical Crew" className="hover:bg-[#8CC0EB]/10 rounded-md py-1.5 px-3 cursor-pointer">Technical Crew</SelectItem>
-                            <SelectItem value="Creative Designer" className="hover:bg-[#8CC0EB]/10 rounded-md py-1.5 px-3 cursor-pointer">Creative Designer</SelectItem>
-                            <SelectItem value="Director" className="hover:bg-[#8CC0EB]/10 rounded-md py-1.5 px-3 cursor-pointer">Director</SelectItem>
-                            <SelectItem value="Core Maintainer" className="hover:bg-[#8CC0EB]/10 rounded-md py-1.5 px-3 cursor-pointer">Core Maintainer</SelectItem>
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-8 pt-4 border-t border-[#e6e2dd] flex flex-col sm:flex-row gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleLogOut}
-                    className="border-2 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 rounded-[8px] flex-1"
-                  >
-                    <LogOut className="w-4 h-4 mr-2" /> Log Out
-                  </Button>
-                  <Button type="submit" className="bg-[#8CC0EB] text-[#1c1b19] hover:bg-[#8CC0EB]/90 rounded-[8px] flex-1">
-                    Save Changes
-                  </Button>
-                </div>
-              </form>
-            )}
-          </SheetContent>
-        </Sheet>
 
         {/* Login Dialog */}
         <Dialog open={portalOpen} onOpenChange={setPortalOpen}>
@@ -573,7 +454,7 @@ export default function AppLayout() {
             <form onSubmit={(e) => {
               e.preventDefault();
               const target = e.target as any;
-              handleLoginSubmit(target.email.value);
+              handleLoginSubmit(target.email.value, target.password.value);
             }} className="py-4 space-y-4 text-left">
               {loginError && (
                 <div className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg p-2.5 text-center font-medium animate-pulse">
@@ -648,12 +529,13 @@ export default function AppLayout() {
                   <Link className="text-[#466272]/85 hover:text-[#635f41] transition-colors" to="/plays">Our Plays</Link>
                   <Link className="text-[#466272]/85 hover:text-[#635f41] transition-colors" to="/events">Upcoming Events</Link>
                   <Link className="text-[#466272]/85 hover:text-[#635f41] transition-colors" to="/directory">Member Directory</Link>
+                  <Link className="text-[#466272]/85 hover:text-[#635f41] transition-colors" to="/public-gallery">Gallery</Link>
                 </nav>
               </div>
             </footer>
           </>
         ) : (
-          <main className="flex-1 px-4 md:px-[64px] py-8 md:py-[48px] max-w-[1280px] mx-auto w-full">
+          <main className="flex-1 px-4 md:px-8 py-4 md:py-6 max-w-[1280px] mx-auto w-full">
             {showAccessDenied ? (
               <div className="flex flex-col items-center justify-center text-center py-12 px-4 bg-white border border-[#e6e2dd] rounded-[8px] space-y-6 shadow-xs max-w-md mx-auto mt-8">
                 <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center text-red-500 border border-red-100">

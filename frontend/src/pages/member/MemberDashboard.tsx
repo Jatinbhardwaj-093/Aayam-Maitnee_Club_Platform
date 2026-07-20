@@ -1,4 +1,6 @@
+// @ts-nocheck
 import { useState, useEffect } from "react";
+import { useOutletContext } from "react-router-dom";
 import { Calendar as CalendarIcon, Clock, MapPin, Check, X, BookOpen, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -58,11 +60,13 @@ const initialEvents: Event[] = [
 ];
 
 export default function MemberDashboard() {
-  const [events, setEvents] = useState<Event[]>(initialEvents);
+  const { activeUser } = useOutletContext<{ activeUser: any }>();
+  const [events, setEvents] = useState<Event[]>([]);
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const [scriptOpen, setScriptOpen] = useState(false);
   const [attendanceOpen, setAttendanceOpen] = useState(false);
   const [calendarOpen, setCalendarOpen] = useState(false);
+  const [calendarDate, setCalendarDate] = useState<Date>(new Date());
 
   const attendanceLog = [
     { date: "June 15, 2026", event: "Macbeth Table Read (Acts I & II)", status: "Present" },
@@ -74,52 +78,121 @@ export default function MemberDashboard() {
   ];
 
   useEffect(() => {
-    const targetDate = new Date("2026-07-12T14:00:00");
+    const fetchEvents = async () => {
+      if (!activeUser?.email) return;
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5001"}/api/my-schedule?email=${activeUser.email}`);
+        if (response.ok) {
+          const data = await response.json();
+          const formatted = data.map((e: any) => ({
+            id: e.id,
+            participation_id: e.participation_id,
+            title: e.title,
+            date: e.date,
+            time: e.timeRange || e.time,
+            location: e.venue || e.location,
+            status: e.status,
+            roleRequired: e.category,
+            directorNotes: e.description
+          }));
+          setEvents(formatted);
+        }
+      } catch (err) {
+        console.error("Failed to fetch events", err);
+      }
+    };
+    fetchEvents();
+  }, [activeUser]);
+
+  const handleStatusChange = async (id: string, newStatus: "Accepted" | "Declined") => {
+    const event = events.find(e => e.id === id);
+    if (!event) return;
+    
+    setEvents(prev => prev.map(e => e.id === id ? { ...e, status: newStatus } : e));
+    
+    try {
+      await fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5001"}/api/my-schedule/update`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ participation_id: event.participation_id, status: newStatus })
+      });
+    } catch(e) {}
+  };
+
+  useEffect(() => {
+    const accepted = events.filter(e => e.status === "Accepted");
+    if (accepted.length > 0) {
+      const earliest = [...accepted].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())[0];
+      const d = new Date(earliest.date);
+      if (!isNaN(d.getTime())) setCalendarDate(new Date(d.getFullYear(), d.getMonth(), 1));
+    }
+
+    const upcomingEvents = accepted
+      .map(e => ({ ...e, parsedDate: new Date(e.date + (e.time ? " " + e.time.split('-')[0] : "")) }))
+      .filter(e => e.parsedDate.getTime() > Date.now())
+      .sort((a, b) => a.parsedDate.getTime() - b.parsedDate.getTime());
+      
+    const targetDate = upcomingEvents.length > 0 ? upcomingEvents[0].parsedDate : new Date("2026-07-12T14:00:00");
+
     const calculateTimeLeft = () => {
       const difference = +targetDate - +new Date();
-      let newTimeLeft = { days: 0, hours: 0, minutes: 0, seconds: 0 };
-
       if (difference > 0) {
-        newTimeLeft = {
+        setTimeLeft({
           days: Math.floor(difference / (1000 * 60 * 60 * 24)),
           hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
           minutes: Math.floor((difference / 1000 / 60) % 60),
           seconds: Math.floor((difference / 1000) % 60),
-        };
+        });
+      } else {
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
       }
-      setTimeLeft(newTimeLeft);
     };
 
     calculateTimeLeft();
     const timer = setInterval(calculateTimeLeft, 1000);
-
     return () => clearInterval(timer);
-  }, []);
+  }, [events]);
 
-  const handleStatusChange = (id: string, newStatus: "Accepted" | "Declined") => {
-    setEvents(prev => prev.map(e => e.id === id ? { ...e, status: newStatus } : e));
-  };
+  const pendingCount = events.filter(e => e.status === "Pending").length;
+  const displayMonth = calendarDate.getMonth();
+  const displayYear = calendarDate.getFullYear();
+  const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  
+  const daysInMonth = new Date(displayYear, displayMonth + 1, 0).getDate();
+  const firstDayOfMonth = new Date(displayYear, displayMonth, 1).getDay();
+  const calendarEmptyDays = Array(firstDayOfMonth).fill(null);
+  const calendarDays = Array.from({length: daysInMonth}, (_, i) => new Date(displayYear, displayMonth, i + 1));
 
   return (
     <div className="space-y-[32px] font-sans text-[#466272]">
-      {/* Header and Welcome */}
-      <div className="bg-[#f7f3ee] border border-[#e6e2dd] rounded-[8px] p-[24px] md:p-[32px] flex flex-col md:flex-row justify-between items-start md:items-center gap-[24px] mb-[32px] md:mb-[48px]">
-        <div className="space-y-[12px] flex-1">
+      {/* Header and Welcome Banner */}
+      <div className="relative border border-[#e6e2dd] rounded-[16px] overflow-hidden p-[24px] md:p-[36px] flex flex-col md:flex-row justify-between items-start md:items-center gap-[24px] shadow-sm">
+        {/* Background Production Banner Image */}
+        <div className="absolute inset-0 z-0">
+          <img
+            src="/aayam_assets/tamashbin_user_1.jpg"
+            alt="Production Banner"
+            className="w-full h-full object-cover object-center"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#1c1b19]/95 via-[#1c1b19]/85 to-[#1c1b19]/50 backdrop-blur-[2px]"></div>
+        </div>
+
+        <div className="relative z-10 space-y-[12px] flex-1 text-white">
           <div className="space-y-[8px]">
-            <Badge className="bg-[#635f41]/10 text-[#635f41] border-[#e6e2dd] rounded-[4px]">Active Production Member</Badge>
-            <h2 className="text-[32px] font-bold font-serif text-[#635f41]">Welcome Back, Jayesh</h2>
-            <p className="text-[14px] text-[#466272]">
-              You have <span className="font-semibold text-[#635f41]">2 pending rehearsal invites</span> for Macbeth this week.
+            <Badge className="bg-[#8CC0EB] text-[#001e2c] font-bold border-0 rounded-[4px] uppercase tracking-wider text-[10px]">Active Production Member</Badge>
+            <h2 className="text-[32px] font-bold font-serif text-white tracking-tight">Welcome Back, {activeUser?.name?.split(' ')[0] || "Member"}</h2>
+            <p className="text-[14px] text-white/90 font-light">
+              You have <span className="font-semibold text-[#8CC0EB]">{pendingCount} pending rehearsal invites</span> for Tamashbin Kathputliya & Macbeth this week.
             </p>
           </div>
           
           {/* Elegant countdown container */}
-          <div className="inline-flex items-center gap-[12px] bg-white/80 border border-[#e6e2dd] rounded-[6px] px-[16px] py-[8px] text-xs shadow-sm">
-            <div className="flex items-center gap-1.5 text-[#635f41] font-semibold uppercase tracking-wider text-[10px]">
+          <div className="inline-flex items-center gap-[12px] bg-black/40 border border-white/20 backdrop-blur-md rounded-[8px] px-[16px] py-[8px] text-xs shadow-sm">
+            <div className="flex items-center gap-1.5 text-[#8CC0EB] font-bold uppercase tracking-wider text-[10px]">
               <Clock className="w-3.5 h-3.5 text-[#8CC0EB]" />
               <span>Next Performance:</span>
             </div>
-            <div className="flex items-center gap-1 font-mono text-[#635f41] font-bold text-sm">
+            <div className="flex items-center gap-1 font-mono text-white font-bold text-sm">
               <span>{String(timeLeft.days).padStart(2, '0')}d</span>
               <span>:</span>
               <span>{String(timeLeft.hours).padStart(2, '0')}h</span>
@@ -130,100 +203,17 @@ export default function MemberDashboard() {
             </div>
           </div>
         </div>
-        <div className="flex gap-[12px] flex-shrink-0">
+
+        <div className="relative z-10 flex gap-[12px] flex-shrink-0">
           <Button 
             onClick={() => setCalendarOpen(true)}
-            className="bg-[#8CC0EB] hover:bg-[#8CC0EB]/90 text-[#1c1b19] font-semibold rounded-[8px] py-[10px] px-[20px] gap-2 shadow-sm transition-all active:scale-95"
+            className="bg-[#8CC0EB] hover:bg-[#8CC0EB]/90 text-[#001e2c] font-bold rounded-[8px] py-[10px] px-[20px] gap-2 shadow-sm transition-all active:scale-95"
           >
             <CalendarIcon className="w-4 h-4" /> View Calendar
           </Button>
         </div>
       </div>
 
-      {/* Main Schedule Panel */}
-      <section className="bg-white border border-[#e6e2dd] rounded-[8px] overflow-hidden shadow-sm">
-        <div className="px-[24px] py-[20px] border-b border-[#e6e2dd] bg-[#f7f3ee]/50 flex justify-between items-center">
-          <div>
-            <h3 className="font-bold text-[18px] text-[#635f41] font-serif">My Production Schedule</h3>
-            <p className="text-xs text-[#466272]/70">Confirm your attendance for upcoming acts, rehearsals, and scenes</p>
-          </div>
-        </div>
-
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow className="border-b border-[#e6e2dd] hover:bg-transparent">
-                <TableHead className="text-[#635f41] font-semibold">Event Detail</TableHead>
-                <TableHead className="text-[#635f41] font-semibold">Date &amp; Time</TableHead>
-                <TableHead className="text-[#635f41] font-semibold">Location</TableHead>
-                <TableHead className="text-[#635f41] font-semibold">Attendance State</TableHead>
-                <TableHead className="text-[#635f41] font-semibold text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {events.map((event) => (
-                <TableRow key={event.id} className="border-b border-[#e6e2dd]/60 hover:bg-[#fdf9f4]/45">
-                  <TableCell className="font-medium text-[#635f41] py-[16px]">
-                    <div className="flex flex-col">
-                      <span className="font-semibold text-[14px]">{event.title}</span>
-                      <span className="text-xs text-[#466272]/60 mt-0.5">{event.roleRequired}</span>
-                      <div className="text-[12px] text-[#466272]/70 mt-2 bg-[#f7f3ee]/40 border-l-2 border-[#8CC0EB] pl-2 italic">
-                        <strong>Director Notes:</strong> "{event.directorNotes}"
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell className="py-[16px]">
-                    <div className="flex flex-col text-xs text-[#466272]">
-                      <span className="font-medium">{event.date}</span>
-                      <span className="text-[#466272]/70 flex items-center gap-1 mt-0.5">
-                        <Clock className="w-3.5 h-3.5 text-[#8CC0EB]" /> {event.time}
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="py-[16px]">
-                    <div className="flex items-center gap-1.5 text-xs text-[#466272]">
-                      <MapPin className="w-3.5 h-3.5 text-[#8CC0EB]" />
-                      <span>{event.location}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="py-[16px]">
-                    <Badge className={`rounded-[4px] ${
-                      event.status === "Accepted" ? "bg-emerald-600/10 text-emerald-700 border-emerald-600/20" :
-                      event.status === "Declined" ? "bg-red-600/10 text-red-700 border-red-600/20" :
-                      "bg-amber-600/10 text-amber-700 border-amber-600/20"
-                    }`}>
-                      {event.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="py-[16px] text-right">
-                    {event.status === "Pending" ? (
-                      <div className="flex justify-end gap-2">
-                        <Button
-                          size="sm"
-                          className="bg-emerald-600 hover:bg-emerald-700 text-white h-[32px] w-[32px] p-0 rounded-[4px]"
-                          onClick={() => handleStatusChange(event.id, "Accepted")}
-                        >
-                          <Check className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 h-[32px] w-[32px] p-0 rounded-[4px]"
-                          onClick={() => handleStatusChange(event.id, "Declined")}
-                        >
-                          <X className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    ) : (
-                      <span className="text-xs text-[#466272]/50 italic">Decision Made</span>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      </section>
 
       {/* Script & Role Resources */}
       <section className="grid grid-cols-1 md:grid-cols-2 gap-[24px]">
@@ -347,90 +337,146 @@ export default function MemberDashboard() {
         </div>
       </section>
 
+      {/* Upcoming Rehearsals and Invites Schedule */}
+      <section className="bg-white border border-[#cac6b9]/30 rounded-2xl overflow-hidden shadow-sm">
+        <div className="px-6 py-5 border-b border-[#cac6b9]/20 bg-[#f7f3ee]/30 flex justify-between items-center">
+          <div>
+            <h3 className="font-bold text-[18px] text-[#635f41] font-serif">My Upcoming Rehearsals &amp; Schedule</h3>
+            <p className="text-xs text-[#466272]/70">Accept pending invitations or view your rehearsal roadmap</p>
+          </div>
+        </div>
+
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader className="bg-gray-50/50">
+              <TableRow className="border-b border-[#e6e2dd] hover:bg-transparent">
+                <TableHead className="text-[#635f41] font-semibold w-[250px] md:w-[30%]">Event Detail</TableHead>
+                <TableHead className="text-[#635f41] font-semibold">Date &amp; Time</TableHead>
+                <TableHead className="text-[#635f41] font-semibold">Location</TableHead>
+                <TableHead className="text-[#635f41] font-semibold">Attendance State</TableHead>
+                <TableHead className="text-[#635f41] font-semibold text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {events.length > 0 ? (
+                [...events]
+                  .sort((a, b) => {
+                    if (a.status === "Pending" && b.status !== "Pending") return -1;
+                    if (a.status !== "Pending" && b.status === "Pending") return 1;
+                    return 0;
+                  })
+                  .map((event) => (
+                    <TableRow key={event.id} className="border-b border-[#e6e2dd]/60 hover:bg-[#fdf9f4]/45 transition-colors">
+                      <TableCell className="font-medium text-[#635f41] py-4 w-[250px] md:w-[30%] align-top">
+                        <div className="flex flex-col">
+                          <span className="font-semibold text-sm whitespace-normal break-words">{event.title}</span>
+                          <span className="text-xs text-[#466272]/60 mt-0.5">{event.roleRequired}</span>
+                          {event.directorNotes && (
+                            <div className="text-xs text-[#466272]/75 mt-2 bg-[#f7f3ee]/40 border-l-2 border-[#8CC0EB] pl-2 italic whitespace-normal break-words">
+                              <strong>Director Notes:</strong> "{event.directorNotes}"
+                            </div>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell className="py-4 align-top">
+                        <div className="flex flex-col text-xs text-[#466272]">
+                          <span className="font-semibold">{event.date}</span>
+                          <span className="text-[#466272]/70 flex items-center gap-1 mt-1">
+                            <Clock className="w-3.5 h-3.5 text-[#8CC0EB]" /> {event.time}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="py-4 align-top">
+                        <div className="flex items-center gap-1.5 text-xs text-[#466272]">
+                          <MapPin className="w-3.5 h-3.5 text-[#8CC0EB]" />
+                          <span className="truncate">{event.location}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="py-4 align-top">
+                        <Badge className={`rounded px-2.5 py-0.5 text-[11px] font-semibold border ${
+                          event.status === "Accepted" ? "bg-emerald-50 text-emerald-700 border-emerald-200" :
+                          event.status === "Declined" ? "bg-red-50 text-red-700 border-red-200" :
+                          "bg-amber-50 text-amber-700 border-amber-200"
+                        }`}>
+                          {event.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="py-4 text-right align-top">
+                        {event.status === "Pending" ? (
+                          <div className="flex justify-end gap-2">
+                            <Button
+                              size="sm"
+                              className="bg-emerald-600 hover:bg-emerald-700 text-white h-8 w-8 p-0 rounded-md transition-all active:scale-95"
+                              onClick={() => handleStatusChange(event.id, "Accepted")}
+                            >
+                              <Check className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 h-8 w-8 p-0 rounded-md transition-all active:scale-95"
+                              onClick={() => handleStatusChange(event.id, "Declined")}
+                            >
+                              <X className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        ) : (
+                          <span className="text-xs text-[#466272]/50 italic">Decision Made</span>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-8 text-sm text-[#466272]/50 italic bg-[#fcfbfa]">
+                    No rehearsals or events scheduled at the moment.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      </section>
+
       {/* Production Calendar Dialog */}
       <Dialog open={calendarOpen} onOpenChange={setCalendarOpen}>
-        <DialogContent className="bg-[#fdf9f4] border border-[#e6e2dd] text-[#466272] max-w-md">
+        <DialogContent className="bg-[#fdf9f4] border border-[#e6e2dd] text-[#466272] max-w-3xl">
           <DialogHeader>
             <DialogTitle className="font-serif text-[#635f41] text-xl font-bold flex items-center gap-2">
               <CalendarIcon className="w-5 h-5 text-[#8CC0EB]" /> Production Calendar
             </DialogTitle>
             <DialogDescription className="text-xs text-[#466272]/85">
-              Matinee schedule & events for July 2026.
+              Scheduled events for {monthNames[displayMonth]} {displayYear}.
             </DialogDescription>
           </DialogHeader>
           <div className="py-4 space-y-4">
-            {/* Calendar Grid */}
-            <div className="border border-[#e6e2dd] rounded-[8px] bg-white p-4 shadow-xs">
-              <div className="flex items-center justify-between border-b border-[#e6e2dd] pb-2 mb-3">
-                <span className="font-serif text-[#635f41] font-bold text-sm">July 2026</span>
-                <span className="text-[10px] uppercase font-semibold text-[#8CC0EB]">Macbeth Season</span>
-              </div>
-              <div className="grid grid-cols-7 gap-1 text-center text-xs font-semibold text-[#635f41] mb-2">
-                <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
-              </div>
-              <div className="grid grid-cols-7 gap-1 text-center text-xs text-[#466272]">
-                {/* Offset for July 2026 starting on Wednesday (Offset: 3 empty cells) */}
-                <div /> <div /> <div />
-                
-                {/* Days */}
-                <span>1</span>
-                <span>2</span>
-                <span>3</span>
-                <span className="bg-[#8CC0EB]/20 text-[#635f41] rounded-full font-bold relative group cursor-pointer p-1" title="Macbeth Act III Rehearsal">
-                  4
-                  <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 bg-[#8CC0EB] rounded-full" />
-                </span>
-                <span>5</span>
-                <span>6</span>
-                <span className="bg-[#8CC0EB]/20 text-[#635f41] rounded-full font-bold relative group cursor-pointer p-1" title="Technical Dress Run">
-                  7
-                  <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 bg-[#8CC0EB] rounded-full" />
-                </span>
-                <span>8</span>
-                <span>9</span>
-                <span className="bg-amber-100 text-amber-800 rounded-full font-bold relative group cursor-pointer p-1" title="Sponsor Gala Pre-Performance Read">
-                  10
-                  <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 bg-amber-500 rounded-full" />
-                </span>
-                <span>11</span>
-                <span className="bg-[#635f41] text-white rounded-full font-bold relative group cursor-pointer p-1" title="Macbeth Opening Night Gala">
-                  12
-                  <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 bg-white rounded-full" />
-                </span>
-                <span>13</span>
-                <span>14</span>
-                <span>15</span>
-                <span>16</span>
-                <span>17</span>
-                <span>18</span>
-                <span>19</span>
-                <span>20</span>
-                <span>21</span>
-                <span>22</span>
-                <span>23</span>
-                <span>24</span>
-                <span>25</span>
-                <span>26</span>
-                <span>27</span>
-                <span>28</span>
-                <span>29</span>
-                <span>30</span>
-                <span>31</span>
-              </div>
-            </div>
-            {/* Legend */}
-            <div className="space-y-1.5 text-xs text-[#466272]/95 border border-[#e6e2dd] rounded-[8px] bg-white p-3">
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#8CC0EB]/40 flex-shrink-0" />
-                <span>Rehearsal Session (July 4, July 7)</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-amber-200 flex-shrink-0" />
-                <span>Sponsor Gala / Online Read (July 10)</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#635f41] flex-shrink-0" />
-                <span>Opening Matinee Performance (July 12)</span>
+            {/* Dynamic Calendar Grid */}
+            <div className="border border-[#e6e2dd] rounded-[8px] bg-white shadow-xs">
+              <div className="grid grid-cols-7 gap-[1px] border-l border-[#e6e2dd] bg-[#e6e2dd]">
+                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => (
+                  <div key={d} className="text-center text-xs font-semibold text-[#635f41] py-2 bg-[#f7f3ee]/50">{d}</div>
+                ))}
+                {calendarEmptyDays.map((_, i) => <div key={`empty-${i}`} className="p-2 bg-[#fcfbfa]" />)}
+                {calendarDays.map(day => {
+                  const dayEvents = events.filter(e => {
+                    if (e.status !== "Accepted") return false;
+                    const d = new Date(e.date);
+                    return !isNaN(d.getTime()) && d.getFullYear() === day.getFullYear() && d.getMonth() === day.getMonth() && d.getDate() === day.getDate();
+                  });
+                  
+                  return (
+                    <div key={day.toISOString()} className="min-h-[80px] p-1 bg-white relative flex flex-col">
+                      <div className="text-right text-[#635f41] text-xs font-medium mb-1 pr-1">{day.getDate()}</div>
+                      <div className="space-y-1 flex-1 overflow-y-auto max-h-[100px]">
+                        {dayEvents.map(e => (
+                          <div key={e.id} className="bg-[#8CC0EB]/20 hover:bg-[#8CC0EB]/40 text-[#466272] text-[10px] px-1 py-0.5 rounded truncate border border-[#8CC0EB]/30 transition-colors" title={`${e.time} - ${e.title}`}>
+                            {e.time.split(' ')[0]} {e.title}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )
+                })}
               </div>
             </div>
           </div>
