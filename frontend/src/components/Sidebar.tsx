@@ -116,12 +116,12 @@ export default function Sidebar({
         title="User Account Details"
       >
         <div className="w-9 h-9 rounded-full bg-[#635f41]/10 border border-[#e6e2dd] flex items-center justify-center text-[#635f41] font-bold flex-shrink-0">
-          {activeUser.initials}
+          {activeUser?.initials || activeUser?.name?.slice(0, 2).toUpperCase() || "AU"}
         </div>
         {!collapsed && (
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-semibold text-[#635f41] truncate">{activeUser.name}</p>
-            <p className="text-[10px] text-[#466272]/75 truncate">{activeUser.role}</p>
+            <p className="text-xs font-semibold text-[#635f41] truncate">{activeUser?.name || "Aayam Member"}</p>
+            <p className="text-[10px] text-[#466272]/75 truncate">{activeUser?.role || "Member"}</p>
           </div>
         )}
       </button>
@@ -136,11 +136,11 @@ export default function Sidebar({
           <div className="flex items-start justify-between mb-3">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-[#635f41]/10 border border-[#e6e2dd] flex items-center justify-center text-[#635f41] font-bold text-sm">
-                {activeUser.initials}
+                {activeUser?.initials || activeUser?.name?.slice(0, 2).toUpperCase() || "AU"}
               </div>
               <div className="min-w-0">
-                <p className="text-sm font-semibold text-[#635f41] truncate">{activeUser.name}</p>
-                <p className="text-xs text-[#466272]/70 truncate">{activeUser.role}</p>
+                <p className="text-sm font-semibold text-[#635f41] truncate">{activeUser?.name || "Aayam Member"}</p>
+                <p className="text-xs text-[#466272]/70 truncate">{activeUser?.role || "Member"}</p>
               </div>
             </div>
             <button 
@@ -150,7 +150,7 @@ export default function Sidebar({
               ✕
             </button>
           </div>
-          {activeUser.email && (
+          {activeUser?.email && (
             <div className="text-xs text-[#466272]/85 mb-4 border-t border-[#e6e2dd] pt-2 space-y-1">
               <p className="truncate"><strong>Email:</strong> {activeUser.email}</p>
             </div>

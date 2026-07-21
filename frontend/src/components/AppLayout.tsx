@@ -9,14 +9,15 @@ import {
   Bell,
   User,
   LineChart,
-  Scale,
-  Sliders,
   HardDrive,
   Calendar,
   Menu,
   ShieldAlert,
   PlayCircle,
-  FileText
+  FileText,
+  Eye,
+  EyeOff,
+  Bot
 } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
@@ -29,6 +30,7 @@ interface NavItem {
   path: string;
   icon: React.ComponentType<any>;
   description: string;
+  section?: string;
 }
 
 const navItems: NavItem[] = [
@@ -38,16 +40,19 @@ const navItems: NavItem[] = [
   { label: "Auditions", path: "/auditions", icon: ClipboardList, description: "Apply for play casting" },
   { label: "Plays & Productions", path: "/member-plays", icon: PlayCircle, description: "Production lineup & scripts" },
   { label: "Script Vault", path: "/member-scripts", icon: FileText, description: "Confidential play scripts" },
+  { label: "Rehearsal Studio", path: "/ai-rehearsal", icon: Bot, description: "Interactive voice script rehearsal & memory test" },
 ];
 
 const maintainerNavItems: NavItem[] = [
-  { label: "Maintainer Dashboard", path: "/maintainer", icon: LayoutDashboard, description: "System & Core Maintenance" },
-  { label: "Production Control", path: "/control-panel", icon: Sliders, description: "Technical & access control panel" },
-  { label: "Events Management", path: "/events-admin", icon: Calendar, description: "Proposal curation & concurrent lock editor" },
+  { label: "Maintainer Dashboard", path: "/maintainer", icon: LayoutDashboard, description: "Executive overview & live metrics" },
+  { label: "My Schedule", path: "/schedule-admin", icon: Calendar, description: "Personal production & rehearsal schedule" },
+  { label: "Events Management", path: "/events-admin", icon: Calendar, description: "Proposal curation & sponsor deals" },
+  { label: "Auditions & Casting", path: "/auditions-admin", icon: ClipboardList, description: "Role callings & candidate requests" },
   { label: "Members Directory", path: "/directory-admin", icon: Users, description: "Ensemble & crew directory" },
+  { label: "Script Vault", path: "/member-scripts", icon: FileText, description: "Confidential play scripts & texts" },
+  { label: "Rehearsal Studio", path: "/ai-rehearsal", icon: Bot, description: "Interactive voice script rehearsal" },
   { label: "Media Moderation", path: "/media-moderation", icon: HardDrive, description: "Review gallery content & storage" },
-  { label: "Platform Analytics", path: "/analytics", icon: LineChart, description: "Forecasting & system health" },
-  { label: "Compliance Ledger", path: "/compliance", icon: Scale, description: "Financial audit & ledger" },
+  { label: "Platform Analytics", path: "/analytics", icon: LineChart, description: "Graphical analytics & financial ledger" },
 ];
 
 export default function AppLayout() {
@@ -74,6 +79,7 @@ export default function AppLayout() {
   const [hasUnread, setHasUnread] = useState(true);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [portalOpen, setPortalOpen] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   // Notifications from Backend
   const [dbNotifications, setDbNotifications] = useState<any[]>([]);
@@ -82,7 +88,7 @@ export default function AppLayout() {
     if (!activeUser?.email) return;
     const fetchNotifications = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5001"}/api/notifications?email=${encodeURIComponent(activeUser.email)}`);
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005"}/api/notifications?email=${encodeURIComponent(activeUser.email)}`);
         if (res.ok) {
           const data = await res.json();
           setDbNotifications(data);
@@ -101,7 +107,7 @@ export default function AppLayout() {
   const handleMarkAllRead = async () => {
     if (!activeUser?.email) return;
     try {
-      await fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5001"}/api/notifications/mark-read`, {
+      await fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005"}/api/notifications/mark-read`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: activeUser.email })
@@ -113,9 +119,9 @@ export default function AppLayout() {
     }
   };
 
-  const isMaintainer = activeUser?.role.toLowerCase().includes("maintainer") || activeUser?.isAdmin || false;
+  const isMaintainer = (activeUser?.role && activeUser.role.toLowerCase().includes("maintainer")) || activeUser?.isAdmin || false;
 
-  const isLandingPage = ["/", "/about", "/manifesto", "/plays", "/events", "/directory", "/gallery", "/public-gallery"].includes(location.pathname) || location.pathname.startsWith("/profile") || !activeUser;
+  const isLandingPage = !activeUser || ["/", "/about", "/manifesto", "/plays", "/events", "/directory", "/gallery", "/public-gallery"].includes(location.pathname);
 
   const filteredNavItems = isMaintainer
     ? maintainerNavItems
@@ -125,8 +131,8 @@ export default function AppLayout() {
         }
         const isNormalMember = !isMaintainer;
         if (isNormalMember) {
-          // Display only Member Dashboard, My Schedule, Auditions, Plays, and Scripts.
-          return ["/member", "/schedule", "/auditions", "/member-plays", "/member-scripts"].includes(item.path);
+          // Display Member Dashboard, My Schedule, Auditions, Plays, Scripts, and Rehearsal Studio.
+          return ["/member", "/schedule", "/auditions", "/member-plays", "/member-scripts", "/ai-rehearsal"].includes(item.path);
         }
         return true;
       });
@@ -135,15 +141,15 @@ export default function AppLayout() {
     maintainerNavItems.find((item) => item.path === location.pathname) ||
     navItems[0];
 
-  const handleLoginSubmit = async (email: string, password?: string) => {
+  const handleLoginSubmit = async (identifier: string, password?: string) => {
     setLoginError(null);
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5001"}/api/login`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005"}/api/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password: password || "" }),
+        body: JSON.stringify({ username: identifier, email: identifier, password: password || "" }),
       });
 
       if (!response.ok) {
@@ -186,7 +192,7 @@ export default function AppLayout() {
   };
 
   const isMember = activeUser ? !isMaintainer : false;
-  const isAllowedPath = ["/", "/member", "/schedule", "/auditions", "/member-plays", "/member-scripts", "/plays", "/events", "/directory", "/gallery", "/public-gallery"].includes(location.pathname) || location.pathname.startsWith("/profile");
+  const isAllowedPath = ["/", "/member", "/schedule", "/auditions", "/auditions-admin", "/member-plays", "/member-scripts", "/script-builder", "/ai-rehearsal", "/plays", "/events", "/events-admin", "/directory-admin", "/maintainer", "/analytics", "/directory", "/gallery", "/public-gallery"].includes(location.pathname) || location.pathname.startsWith("/profile") || location.pathname.startsWith("/script-builder") || location.pathname.startsWith("/ai-rehearsal");
   const showAccessDenied = activeUser && !isMaintainer && isMember && !isAllowedPath;
 
   const sidebarWidthClass = isCollapsed ? "w-[72px]" : "w-64 xl:w-72";
@@ -444,64 +450,96 @@ export default function AppLayout() {
 
         {/* Login Dialog */}
         <Dialog open={portalOpen} onOpenChange={setPortalOpen}>
-          <DialogContent className="bg-[#fdf9f4] border border-[#cac6b9] text-[#466272] max-w-sm rounded-2xl shadow-xl p-6">
-            <DialogHeader className="border-b border-[#e6e2dd]/60 pb-3 text-center">
-              <DialogTitle className="font-serif text-[24px] text-[#635f41] leading-tight">Ensemble Portal</DialogTitle>
-              <DialogDescription className="text-xs text-[#466272]/85 mt-1">
-                Enter your credentials to access the Aayam backstage boards.
+          <DialogContent className="bg-[#fdf9f4]/95 backdrop-blur-md border border-[#cac6b9]/80 text-[#466272] max-w-md rounded-3xl shadow-2xl p-7 transition-all duration-300">
+            <DialogHeader className="border-b border-[#e6e2dd]/80 pb-4 text-center space-y-1.5">
+              <div className="mx-auto w-12 h-12 rounded-2xl bg-[#635f41]/10 flex items-center justify-center mb-1 text-[#635f41] shadow-inner">
+                <User className="w-6 h-6" />
+              </div>
+              <DialogTitle className="font-serif text-2xl font-bold text-[#635f41] tracking-tight">Ensemble Portal</DialogTitle>
+              <DialogDescription className="text-xs text-[#466272]/80 font-medium max-w-xs mx-auto">
+                Sign in with your username or email address to access your Aayam workspace.
               </DialogDescription>
             </DialogHeader>
+            
             <form onSubmit={(e) => {
               e.preventDefault();
               const target = e.target as any;
-              handleLoginSubmit(target.email.value, target.password.value);
-            }} className="py-4 space-y-4 text-left">
+              handleLoginSubmit(target.identifier.value, target.password.value);
+            }} className="pt-4 space-y-4 text-left">
               {loginError && (
-                <div className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg p-2.5 text-center font-medium animate-pulse">
+                <div className="text-xs text-red-600 bg-red-50/90 border border-red-200/80 rounded-xl p-3 text-center font-medium shadow-sm animate-shake">
                   {loginError}
                 </div>
               )}
-              <div className="space-y-1">
-                <label className="text-[10px] uppercase tracking-wider text-[#635f41] font-bold">Email Address</label>
+              
+              <div className="space-y-1.5">
+                <label className="text-[11px] uppercase tracking-wider text-[#635f41] font-bold block">
+                  Username or Email Address
+                </label>
                 <Input
-                  type="email"
-                  name="email"
-                  placeholder="e.g. maintainer@matinee.club"
-                  className="border-[#e6e2dd] h-10 bg-white focus-visible:ring-[#8CC0EB] focus-visible:ring-3 focus-visible:ring-[#8CC0EB]/20 transition-all text-sm rounded-lg"
+                  type="text"
+                  name="identifier"
+                  placeholder="Username or user@domain.com"
+                  className="border-[#e6e2dd] h-11 bg-white/90 focus-visible:ring-2 focus-visible:ring-[#635f41]/40 focus-visible:border-[#635f41] transition-all text-sm rounded-xl px-3.5 shadow-sm"
                   required
+                  autoFocus
                 />
               </div>
               
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 <div className="flex justify-between items-center">
-                  <label className="text-[10px] uppercase tracking-wider text-[#635f41] font-bold">Password</label>
-                  <a href="#" onClick={(e) => { e.preventDefault(); alert("Prototype info: any password is accepted."); }} className="text-[10px] text-[#8CC0EB] hover:underline font-semibold">Forgot?</a>
+                  <label className="text-[11px] uppercase tracking-wider text-[#635f41] font-bold">
+                    Password
+                  </label>
+                  <a 
+                    href="#" 
+                    onClick={(e) => { e.preventDefault(); alert("Prototype info: any password is accepted."); }} 
+                    className="text-[11px] text-[#635f41] hover:underline font-semibold transition-colors"
+                  >
+                    Forgot?
+                  </a>
                 </div>
-                <Input
-                  type="password"
-                  name="password"
-                  placeholder="••••••••"
-                  className="border-[#e6e2dd] h-10 bg-white focus-visible:ring-[#8CC0EB] focus-visible:ring-3 focus-visible:ring-[#8CC0EB]/20 transition-all text-sm rounded-lg"
-                  required
-                />
+                <div className="relative">
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    placeholder="Enter your password"
+                    className="border-[#e6e2dd] h-11 bg-white/90 focus-visible:ring-2 focus-visible:ring-[#635f41]/40 focus-visible:border-[#635f41] transition-all text-sm rounded-xl pl-3.5 pr-10 shadow-sm"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#466272]/60 hover:text-[#635f41] transition-colors focus:outline-none p-1"
+                    title={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-4 h-4" />
+                    ) : (
+                      <Eye className="w-4 h-4" />
+                    )}
+                  </button>
+                </div>
               </div>
 
-              <span className="text-[9px] text-[#466272]/70 leading-relaxed block italic pt-1">
-                Note: Use email containing <strong>'maintainer'</strong> for Admin, <strong>'sponsor'</strong> for Sponsor boards, or others for Member portal.
-              </span>
+              <div className="bg-[#f4efe8]/70 border border-[#e6e2dd] rounded-xl p-2.5">
+                <span className="text-[10px] text-[#466272]/85 leading-relaxed block text-center">
+                  <strong>Tip:</strong> Log in with <strong>username</strong> or <strong>email</strong> (e.g. <em>maintainer@matinee.club</em> for Admin).
+                </span>
+              </div>
 
-              <DialogFooter className="pt-4 border-t border-[#e6e2dd]/60 flex flex-col gap-2 sm:flex-row">
+              <DialogFooter className="pt-3 flex flex-col-reverse sm:flex-row gap-2.5">
                 <Button 
                   type="button" 
                   variant="outline" 
                   onClick={() => setPortalOpen(false)} 
-                  className="border-[#cac6b9] text-[#466272] hover:bg-[#f7f3ee] rounded-lg text-xs font-bold py-2.5 flex-1"
+                  className="border-[#cac6b9] text-[#466272] hover:bg-[#f7f3ee] rounded-xl text-xs font-semibold h-11 flex-1 shadow-sm transition-all"
                 >
                   Cancel
                 </Button>
                 <Button 
                   type="submit" 
-                  className="bg-[#635f41] text-white hover:bg-[#635f41]/90 rounded-lg text-xs font-bold py-2.5 flex-1"
+                  className="bg-[#635f41] text-white hover:bg-[#4d4a32] active:scale-[0.99] rounded-xl text-xs font-bold h-11 flex-1 shadow-md hover:shadow-lg transition-all"
                 >
                   Sign In
                 </Button>

@@ -1,481 +1,327 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import {
-    TrendingUp,
-    ArrowRight,
-    Shirt,
-    Armchair,
-    Lightbulb,
-    Volume2,
-    Calendar,
-    Settings,
-    Edit,
-    Clock,
-    Zap,
-    Activity
+  ArrowRight,
+  Calendar,
+  Users,
+  ClipboardList,
+  DollarSign,
+  ShieldCheck,
+  Activity
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger
-} from "@/components/ui/dialog";
-
-interface RoomBooking {
-    id: string;
-    time: string;
-    period: string;
-    stage: string;
-    details: string;
-    isSecondaryStyle?: boolean;
-}
 
 export default function MaintainerDashboard() {
-    // Bookings State
-    const [bookings, setBookings] = useState<RoomBooking[]>([]);
+  const [stats, setStats] = useState<any>({
+    events: { total_proposals: 8, pending_proposals: 4, member_pitches: 5, sponsor_proposals: 3 },
+    sponsors: { total_ads: 4, pending_ads: 2 },
+    auditions: { open_callings: 5, total_requests: 8, shortlisted: 3, selected: 3 },
+    members: { total_registered: 42, pending_approvals: 2 },
+    financials: { total_revenue: 413000, total_expenses: 119500, net_surplus: 293500 }
+  });
 
-    useEffect(() => {
-        // Fetch bookings
-        fetch("http://localhost:5001/api/stage-bookings")
-            .then(res => res.json())
-            .then(data => setBookings(data))
-            .catch(err => console.error(err));
-
-        // Fetch revenue metrics
-        fetch("http://localhost:5001/api/revenue-metrics")
-            .then(res => res.json())
-            .then(data => {
-                setPlaybillSold(data.playbillSold || 18);
-                setCorporatePatrons(data.corporatePatrons || 12);
-            })
-            .catch(err => console.error(err));
-    }, []);
-
-    const [bookingDialogOpen, setBookingDialogOpen] = useState(false);
-    // New Booking Form States
-    const [newBookingTime, setNewBookingTime] = useState("10:00");
-    const [newBookingPeriod, setNewBookingPeriod] = useState("AM");
-    const [newBookingStage, setNewBookingStage] = useState("Studio A");
-    const [newBookingTitle, setNewBookingTitle] = useState("");
-    const [newBookingDetails, setNewBookingDetails] = useState("");
-
-    // Revenue/Playbill Interactivity State
-    const [playbillSold, setPlaybillSold] = useState(18);
-    const [corporatePatrons, setCorporatePatrons] = useState(12);
-
-    const handleAddBooking = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!newBookingTitle || !newBookingDetails) return;
-
-        const newBooking = {
-            time: newBookingTime,
-            period: newBookingPeriod,
-            stage: `${newBookingStage}: ${newBookingTitle}`,
-            details: newBookingDetails,
-            isSecondaryStyle: newBookingStage.startsWith("Studio"),
-        };
-
-        try {
-            const res = await fetch("http://localhost:5001/api/stage-bookings", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(newBooking)
-            });
-            const data = await res.json();
-            
-            setBookings([...bookings, { id: data.id, ...newBooking }]);
-            setNewBookingTitle("");
-            setNewBookingDetails("");
-            setBookingDialogOpen(false);
-        } catch (err) {
-            console.error("Failed to add booking", err);
+  useEffect(() => {
+    const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005";
+    fetch(`${baseUrl}/api/maintainer/stats`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && data.events) {
+          setStats(data);
         }
-    };
+      })
+      .catch((err) => {
+        console.error("Error loading maintainer stats:", err);
+      });
+  }, []);
 
-    const updateRevenueMetric = async (metric: string, value: number) => {
-        try {
-            await fetch("http://localhost:5001/api/revenue-metrics", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ [metric]: value })
-            });
-        } catch (err) {
-            console.error("Failed to update metric", err);
-        }
-    };
-
-    return (
-        <div className="space-y-8 font-sans text-[#466272] max-w-[1280px] mx-auto min-h-screen">
-            {/* Header Section */}
-            <section className="mb-8">
-                <h2 className="text-[40px] font-semibold font-serif text-[#1c1b19] leading-tight mb-2">Production Office</h2>
-                <p className="text-[18px] text-[#49473d] max-w-2xl opacity-80 leading-relaxed font-normal">
-                    Managing the intricate layers of the 2024 Winter Matinee Season. Every prop, every sponsor, every member matters.
-                </p>
-            </section>
-
-            {/* Bento Grid Layout */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-
-                {/* Operational Insights - 8 Columns */}
-                <div className="lg:col-span-8 bg-white rounded-xl border border-[#cac6b9] p-6 shadow-[0_8px_32px_rgba(140,192,235,0.08)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md">
-                    <div className="flex items-center justify-between mb-6">
-                        <div>
-                            <h3 className="text-[28px] font-semibold font-serif text-[#635f41]">Operational Efficiency</h3>
-                            <p className="text-xs uppercase tracking-wider text-[#49473d]/70 font-semibold mt-0.5 font-sans">Performance metrics for the current season</p>
-                        </div>
-                    </div>
-
-                    {/* Stat Cards Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                        <div className="p-4 bg-[#f7f3ee] rounded-lg border border-[#cac6b9]/30">
-                            <p className="text-[11px] text-[#49473d]/70 uppercase tracking-wider font-bold mb-1 font-sans">Venue Utilization</p>
-                            <div className="flex items-center justify-between">
-                                <span className="text-lg font-bold text-[#1c1b19] font-sans">84%</span>
-                                <span className="text-[#635f41] text-xs font-bold font-sans">+5%</span>
-                            </div>
-                        </div>
-                        <div className="p-4 bg-[#f7f3ee] rounded-lg border border-[#cac6b9]/30">
-                            <p className="text-[11px] text-[#49473d]/70 uppercase tracking-wider font-bold mb-1 font-sans">Resource Turnover</p>
-                            <div className="flex items-center justify-between">
-                                <span className="text-lg font-bold text-[#1c1b19] font-sans">12.4 days</span>
-                                <Clock className="text-[#466272] w-4 h-4" />
-                            </div>
-                        </div>
-                        <div className="p-4 bg-[#f7f3ee] rounded-lg border border-[#cac6b9]/30">
-                            <p className="text-[11px] text-[#49473d]/70 uppercase tracking-wider font-bold mb-1 font-sans">Tech Support SLA</p>
-                            <div className="flex items-center justify-between">
-                                <span className="text-lg font-bold text-[#1c1b19] font-sans">18 mins</span>
-                                <Zap className="text-[#635f41] w-4 h-4" />
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Facility Health Index */}
-                    <div>
-                        <h4 className="font-bold text-[#1c1b19] text-xs uppercase tracking-wider text-[#49473d]/70 mb-4 flex items-center gap-2 font-sans">
-                            <Activity className="w-4 h-4 text-[#635f41]" /> Facility Health Index
-                        </h4>
-                        <div className="space-y-4">
-                            <div className="space-y-1">
-                                <div className="flex justify-between text-xs font-bold text-[#49473d] font-sans">
-                                    <span>Stage Lighting</span>
-                                    <span>98%</span>
-                                </div>
-                                <div className="w-full bg-[#e6e2dd] h-1.5 rounded-full overflow-hidden">
-                                    <div className="bg-[#635f41] h-full" style={{ width: "98%" }}></div>
-                                </div>
-                            </div>
-                            <div className="space-y-1">
-                                <div className="flex justify-between text-xs font-bold text-[#49473d] font-sans">
-                                    <span>Audio Rig</span>
-                                    <span>92%</span>
-                                </div>
-                                <div className="w-full bg-[#e6e2dd] h-1.5 rounded-full overflow-hidden">
-                                    <div className="bg-[#8CC0EB] h-full" style={{ width: "92%" }}></div>
-                                </div>
-                            </div>
-                            <div className="space-y-1">
-                                <div className="flex justify-between text-xs font-bold text-[#49473d] font-sans">
-                                    <span>Backstage HVAC</span>
-                                    <span>85%</span>
-                                </div>
-                                <div className="w-full bg-[#e6e2dd] h-1.5 rounded-full overflow-hidden">
-                                    <div className="bg-[#635f41] h-full" style={{ width: "85%" }}></div>
-                                </div>
-                            </div>
-                            <div className="space-y-1">
-                                <div className="flex justify-between text-xs font-bold text-[#49473d] font-sans">
-                                    <span>Rigging Safety</span>
-                                    <span>100%</span>
-                                </div>
-                                <div className="w-full bg-[#e6e2dd] h-1.5 rounded-full overflow-hidden">
-                                    <div className="bg-[#8CC0EB] h-full" style={{ width: "100%" }}></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Revenue & Spotlight - 4 Columns */}
-                <div className="lg:col-span-4 space-y-6 flex flex-col justify-between">
-
-                    {/* Revenue Card */}
-                    <div className="bg-[#FFF9D2] rounded-xl border border-[#cac6b9] p-6 shadow-[0_8px_32px_rgba(140,192,235,0.08)] flex-1 flex flex-col justify-center">
-                        <h3 className="text-[28px] font-semibold font-serif text-[#635f41] mb-0.5">Revenue Tracking</h3>
-                        <p className="text-xs uppercase tracking-wider text-[#49473d]/70 font-semibold mb-4">Sponsorship & Ad Sales</p>
-
-                        <div className="flex items-end gap-2 mb-6">
-                            <span className="text-[40px] font-semibold text-[#1c1b19] font-serif leading-none">$24,800</span>
-                            <span className="text-[#635f41] font-bold pb-1 text-sm flex items-center gap-0.5">
-                                <TrendingUp className="w-3.5 h-3.5" /> 12%
-                            </span>
-                        </div>
-
-                        <div className="space-y-4">
-                            <div className="space-y-1.5">
-                                <div className="flex items-center justify-between text-xs font-semibold">
-                                    <span className="text-[#49473d] opacity-80">Playbill Ad Slots</span>
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-[#1c1b19] font-bold">{playbillSold}/24 Sold</span>
-                                        <button
-                                            onClick={() => {
-                                                const newVal = Math.min(24, playbillSold + 1);
-                                                setPlaybillSold(newVal);
-                                                updateRevenueMetric('playbillSold', newVal);
-                                            }}
-                                            className="px-1 bg-[#8CC0EB]/20 text-[#001e2c] border border-[#8CC0EB]/40 rounded hover:bg-[#8CC0EB]/40 text-[10px]"
-                                            title="Sell Slot"
-                                        >
-                                            +1
-                                        </button>
-                                    </div>
-                                </div>
-                                <div className="w-full bg-[#e6e2dd] h-2 rounded-full overflow-hidden">
-                                    <div
-                                        className="bg-[#8CC0EB] h-full transition-all duration-500"
-                                        style={{ width: `${(playbillSold / 24) * 100}%` }}
-                                    ></div>
-                                </div>
-                            </div>
-
-                            <div className="space-y-1.5">
-                                <div className="flex items-center justify-between text-xs font-semibold">
-                                    <span className="text-[#49473d] opacity-80">Corporate Patrons</span>
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-[#1c1b19] font-bold">{corporatePatrons} Active</span>
-                                        <button
-                                            onClick={() => {
-                                                const newVal = corporatePatrons + 1;
-                                                setCorporatePatrons(newVal);
-                                                updateRevenueMetric('corporatePatrons', newVal);
-                                            }}
-                                            className="px-1 bg-[#635f41]/20 text-[#635f41] border border-[#635f41]/40 rounded hover:bg-[#635f41]/30 text-[10px]"
-                                            title="Add Patron"
-                                        >
-                                            +1
-                                        </button>
-                                    </div>
-                                </div>
-                                <div className="w-full bg-[#e6e2dd] h-2 rounded-full overflow-hidden">
-                                    <div
-                                        className="bg-[#635f41] h-full transition-all duration-500"
-                                        style={{ width: `${Math.min(100, (corporatePatrons / 20) * 100)}%` }}
-                                    ></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Featured Sponsor Card */}
-                    <div className="bg-white rounded-xl border border-[#cac6b9] p-6 shadow-[0_8px_32px_rgba(140,192,235,0.08)] relative overflow-hidden group">
-                        <div className="relative z-10">
-                            <h4 className="font-bold text-[#635f41] text-sm mb-3">Featured Sponsor</h4>
-                            <div className="h-12 w-32 bg-[#F8F9FA]/65 backdrop-blur rounded flex items-center justify-center mb-4 border border-[#cac6b9]/40">
-                                <span className="text-[#1c1b19]/60 italic font-serif text-lg tracking-wide">Azure Arts</span>
-                            </div>
-                            <p className="text-xs text-[#49473d] opacity-80 mb-4 leading-normal">
-                                Renewing for the 2025 season. Platinum tier partner.
-                            </p>
-                            <button className="text-xs font-bold text-[#8CC0EB] flex items-center gap-1 hover:gap-2 transition-all">
-                                Manage Partner <ArrowRight className="w-3.5 h-3.5" />
-                            </button>
-                        </div>
-                        <div className="absolute top-0 right-0 w-24 h-24 bg-[#8CC0EB]/5 rounded-bl-full pointer-events-none group-hover:scale-110 transition-transform duration-300"></div>
-                    </div>
-                </div>
-
-                {/* Inventory Management - 6 Columns */}
-                <div className="lg:col-span-6 bg-white rounded-xl border border-[#cac6b9] p-6 shadow-[0_8px_32px_rgba(140,192,235,0.08)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md">
-                    <div className="flex items-center justify-between mb-6">
-                        <div>
-                            <h3 className="text-[28px] font-semibold font-serif text-[#635f41]">Inventory &amp; Assets</h3>
-                            <p className="text-xs uppercase tracking-wider text-[#49473d]/70 font-semibold mt-0.5">Asset storage and upkeep status</p>
-                        </div>
-                        <div className="h-8 w-8 rounded-full bg-[#f7f3ee] flex items-center justify-center text-[#635f41]">
-                            <Settings className="w-4 h-4 cursor-pointer hover:rotate-45 transition-transform duration-300" />
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="p-4 border border-[#cac6b9] rounded-lg bg-[#fdf9f4] hover:bg-[#f7f3ee]/40 transition-colors">
-                            <div className="flex items-center gap-2 mb-2">
-                                <Shirt className="w-4 h-4 text-[#635f41]" />
-                                <span className="font-bold text-xs text-[#1c1b19]">Costumes</span>
-                            </div>
-                            <div className="text-2xl font-semibold font-serif text-[#1c1b19]">1,240</div>
-                            <p className="text-[10px] text-[#ba1a1a] mt-1 font-medium">42 requiring repair</p>
-                        </div>
-
-                        <div className="p-4 border border-[#cac6b9] rounded-lg bg-[#fdf9f4] hover:bg-[#f7f3ee]/40 transition-colors">
-                            <div className="flex items-center gap-2 mb-2">
-                                <Armchair className="w-4 h-4 text-[#635f41]" />
-                                <span className="font-bold text-xs text-[#1c1b19]">Props</span>
-                            </div>
-                            <div className="text-2xl font-semibold font-serif text-[#1c1b19]">856</div>
-                            <p className="text-[10px] text-[#49473d]/80 mt-1 font-medium">12 out on loan</p>
-                        </div>
-
-                        <div className="p-4 border border-[#cac6b9] rounded-lg bg-[#fdf9f4] hover:bg-[#f7f3ee]/40 transition-colors">
-                            <div className="flex items-center gap-2 mb-2">
-                                <Lightbulb className="w-4 h-4 text-[#635f41]" />
-                                <span className="font-bold text-xs text-[#1c1b19]">Lighting Kit</span>
-                            </div>
-                            <div className="text-2xl font-semibold font-serif text-[#1c1b19]">14</div>
-                            <p className="text-[10px] text-emerald-700 mt-1 font-medium">All functional</p>
-                        </div>
-
-                        <div className="p-4 border border-[#cac6b9] rounded-lg bg-[#fdf9f4] hover:bg-[#f7f3ee]/40 transition-colors">
-                            <div className="flex items-center gap-2 mb-2">
-                                <Volume2 className="w-4 h-4 text-[#635f41]" />
-                                <span className="font-bold text-xs text-[#1c1b19]">Audio Gear</span>
-                            </div>
-                            <div className="text-2xl font-semibold font-serif text-[#1c1b19]">22</div>
-                            <p className="text-[10px] text-amber-700 mt-1 font-medium">3 scheduled for maint.</p>
-                        </div>
-                    </div>
-
-                    <Button
-                        variant="outline"
-                        className="w-full mt-6 py-2.5 border border-[#cac6b9] text-[#49473d] hover:bg-[#f7f3ee]/50 text-xs font-bold rounded-lg transition-colors"
-                        onClick={() => alert("Generating Full Inventory Audit Report...")}
-                    >
-                        Full Inventory Audit Report
-                    </Button>
-                </div>
-
-                {/* Stage & Studio Bookings - 6 Columns */}
-                <div className="lg:col-span-6 bg-white rounded-xl border border-[#cac6b9] p-6 shadow-[0_8px_32px_rgba(140,192,235,0.08)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md">
-                    <div className="flex items-center justify-between mb-6">
-                        <div>
-                            <h3 className="text-[28px] font-semibold font-serif text-[#635f41]">Stage &amp; Studio Bookings</h3>
-                            <p className="text-xs uppercase tracking-wider text-[#49473d]/70 font-semibold mt-0.5">Logistical tracking for play spaces</p>
-                        </div>
-                        <div className="flex gap-1 bg-[#f7f3ee] p-0.5 rounded-lg border border-[#cac6b9]/40">
-                            <span className="px-2 py-1 bg-white text-[#635f41] rounded text-[10px] font-bold shadow-sm">Today</span>
-                            <span className="px-2 py-1 text-[#49473d]/60 rounded text-[10px] font-bold cursor-pointer hover:text-[#49473d]">Week</span>
-                        </div>
-                    </div>
-
-                    <div className="space-y-3 max-h-[220px] overflow-y-auto pr-1">
-                        {bookings.map((booking) => (
-                            <div
-                                key={booking.id}
-                                className="flex items-center gap-4 p-3 hover:bg-[#f7f3ee]/35 rounded-lg border border-transparent hover:border-[#cac6b9]/20 transition-all group"
-                            >
-                                <div className={`flex flex-col items-center justify-center w-12 h-12 rounded-lg border ${booking.isSecondaryStyle
-                                    ? "bg-[#BFDDF0]/10 border-[#8CC0EB]/30 text-[#466272]"
-                                    : "bg-[#FFF9D2]/70 border-[#cac6b9] text-[#635f41]"
-                                    }`}>
-                                    <span className="text-xs font-bold leading-none">{booking.time}</span>
-                                    <span className="text-[9px] uppercase font-bold tracking-wider mt-0.5">{booking.period}</span>
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                    <h5 className="font-bold text-[#1c1b19] text-sm truncate">{booking.stage}</h5>
-                                    <p className="text-xs text-[#49473d]/80 mt-0.5 truncate">{booking.details}</p>
-                                </div>
-                                <Edit className="w-4 h-4 text-[#49473d]/50 opacity-0 group-hover:opacity-100 cursor-pointer hover:text-[#635f41] transition-all flex-shrink-0" />
-                            </div>
-                        ))}
-                    </div>
-
-                    <div className="mt-6 pt-6 border-t border-[#cac6b9]/60 flex items-center justify-between gap-4">
-                        <span className="text-xs text-[#49473d]/85 italic block truncate">
-                            Next availability: Tomorrow 10:00 AM (Studio A)
-                        </span>
-
-                        <Dialog open={bookingDialogOpen} onOpenChange={setBookingDialogOpen}>
-                            <DialogTrigger render={
-                                <Button className="bg-[#635f41] text-white hover:bg-[#635f41]/90 rounded-lg text-xs font-bold py-2.5 px-4 shadow-lg shadow-[#635f41]/10 flex items-center gap-1 flex-shrink-0" />
-                            }>
-                                <Calendar className="w-3.5 h-3.5" /> Book Room
-                            </DialogTrigger>
-                            <DialogContent className="bg-[#fdf9f4] border border-[#cac6b9] text-[#466272]">
-                                <form onSubmit={handleAddBooking}>
-                                    <DialogHeader className="space-y-2">
-                                        <DialogTitle className="font-serif text-[#635f41] text-lg">Book Studio Space</DialogTitle>
-                                        <DialogDescription className="text-[#466272]/85 text-xs">
-                                            Reserve a rehearse stage or studio board for casting sessions and script reads.
-                                        </DialogDescription>
-                                    </DialogHeader>
-                                    <div className="py-4 space-y-4">
-                                        <div className="grid grid-cols-3 gap-2">
-                                            <div className="space-y-1">
-                                                <label className="text-xs font-semibold text-[#635f41]">Time</label>
-                                                <Input
-                                                    placeholder="09:00"
-                                                    value={newBookingTime}
-                                                    onChange={(e) => setNewBookingTime(e.target.value)}
-                                                    className="bg-[#F8F9FA] border-0 border-b-2 border-[#E1E2E6] focus-visible:ring-0 focus-visible:border-[#8CC0EB] rounded-none"
-                                                    required
-                                                />
-                                            </div>
-                                            <div className="space-y-1">
-                                                <label className="text-xs font-semibold text-[#635f41]">AM/PM</label>
-                                                <select
-                                                    value={newBookingPeriod}
-                                                    onChange={(e) => setNewBookingPeriod(e.target.value)}
-                                                    className="w-full bg-[#F8F9FA] border-0 border-b-2 border-[#E1E2E6] focus:ring-0 focus:border-[#8CC0EB] h-9 text-xs"
-                                                >
-                                                    <option value="AM">AM</option>
-                                                    <option value="PM">PM</option>
-                                                </select>
-                                            </div>
-                                            <div className="space-y-1">
-                                                <label className="text-xs font-semibold text-[#635f41]">Space</label>
-                                                <select
-                                                    value={newBookingStage}
-                                                    onChange={(e) => setNewBookingStage(e.target.value)}
-                                                    className="w-full bg-[#F8F9FA] border-0 border-b-2 border-[#E1E2E6] focus:ring-0 focus:border-[#8CC0EB] h-9 text-xs"
-                                                >
-                                                    <option value="Main Stage">Main Stage</option>
-                                                    <option value="Studio A">Studio A</option>
-                                                    <option value="Studio B">Studio B</option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <div className="space-y-1">
-                                            <label className="text-xs font-semibold text-[#635f41]">Event Title</label>
-                                            <Input
-                                                placeholder="e.g. Macbeth Read-through"
-                                                value={newBookingTitle}
-                                                onChange={(e) => setNewBookingTitle(e.target.value)}
-                                                className="bg-[#F8F9FA] border-0 border-b-2 border-[#E1E2E6] focus-visible:ring-0 focus-visible:border-[#8CC0EB] rounded-none"
-                                                required
-                                            />
-                                        </div>
-
-                                        <div className="space-y-1">
-                                            <label className="text-xs font-semibold text-[#635f41]">Booking Details</label>
-                                            <Input
-                                                placeholder="e.g. Director: James Thorne • 2 Hours"
-                                                value={newBookingDetails}
-                                                onChange={(e) => setNewBookingDetails(e.target.value)}
-                                                className="bg-[#F8F9FA] border-0 border-b-2 border-[#E1E2E6] focus-visible:ring-0 focus-visible:border-[#8CC0EB] rounded-none"
-                                                required
-                                            />
-                                        </div>
-                                    </div>
-                                    <DialogFooter>
-                                        <Button type="button" variant="outline" onClick={() => setBookingDialogOpen(false)} className="border-2 border-[#8CC0EB] text-[#8CC0EB] hover:bg-[#8CC0EB]/5 rounded-lg text-xs">
-                                            Cancel
-                                        </Button>
-                                        <Button type="submit" className="bg-[#635f41] text-white hover:bg-[#635f41]/90 rounded-lg text-xs font-bold">
-                                            Confirm Booking
-                                        </Button>
-                                    </DialogFooter>
-                                </form>
-                            </DialogContent>
-                        </Dialog>
-                    </div>
-                </div>
-
-            </div>
+  return (
+    <div className="bg-[#fdf9f4] min-h-screen text-[#1c1b19] p-6 md:p-10 font-sans space-y-8 max-w-7xl mx-auto">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-[#e6e2dd] pb-6">
+        <div>
+          <span className="text-[10px] font-bold text-[#635f41] uppercase tracking-[0.25em] block mb-1">
+            Core Maintenance Portal
+          </span>
+          <h1 className="font-serif text-3xl md:text-4xl font-bold text-[#1c1b19] tracking-tight">
+            Maintainer Control Center
+          </h1>
+          <p className="text-xs md:text-sm text-[#466272] mt-1 font-light">
+            Real-time live system status across event proposals, auditions, member directory, and financial surplus.
+          </p>
         </div>
-    );
+
+        <div className="flex items-center gap-3">
+          <Link to="/analytics">
+            <Button className="bg-[#466272] hover:bg-[#314652] text-white font-bold text-xs rounded-xl px-5 h-10 shadow-xs flex items-center gap-2">
+              <Activity className="w-4 h-4" /> Platform Analytics
+            </Button>
+          </Link>
+
+          <Link to="/events-admin">
+            <Button className="bg-[#635f41] hover:bg-[#4d4a32] text-white font-bold text-xs rounded-xl px-5 h-10 shadow-xs flex items-center gap-2">
+              <Calendar className="w-4 h-4" /> Manage Events
+            </Button>
+          </Link>
+        </div>
+      </div>
+
+      {/* Live System Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+        {/* 1. Event Proposals */}
+        <div className="bg-white border border-[#e6e2dd] p-5 rounded-2xl shadow-xs space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#635f41]">
+              Event Proposals
+            </span>
+            <span className="p-2 bg-[#635f41]/10 text-[#635f41] rounded-xl">
+              <Calendar className="w-4 h-4" />
+            </span>
+          </div>
+
+          <div>
+            <div className="text-3xl font-serif font-bold text-[#1c1b19]">
+              {stats.events.total_proposals}
+            </div>
+            <div className="flex items-center justify-between text-xs text-[#466272] mt-1 font-medium">
+              <span>Member Pitches: {stats.events.member_pitches}</span>
+              <span>Sponsors: {stats.events.sponsor_proposals}</span>
+            </div>
+          </div>
+
+          <div className="pt-2 border-t border-[#e6e2dd]/60 flex items-center justify-between text-[11px]">
+            <span className="text-amber-700 font-bold bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
+              {stats.events.pending_proposals} Pending Review
+            </span>
+            <Link to="/events-admin" className="text-[#635f41] font-bold hover:underline">
+              Review →
+            </Link>
+          </div>
+        </div>
+
+        {/* 2. Auditions & Role Callings */}
+        <div className="bg-white border border-[#e6e2dd] p-5 rounded-2xl shadow-xs space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#635f41]">
+              Auditions & Casting
+            </span>
+            <span className="p-2 bg-[#8CC0EB]/20 text-[#1e4866] rounded-xl">
+              <ClipboardList className="w-4 h-4" />
+            </span>
+          </div>
+
+          <div>
+            <div className="text-3xl font-serif font-bold text-[#1c1b19]">
+              {stats.auditions.total_requests}
+            </div>
+            <div className="flex items-center justify-between text-xs text-[#466272] mt-1 font-medium">
+              <span>Open Callings: {stats.auditions.open_callings}</span>
+              <span>Shortlisted: {stats.auditions.shortlisted}</span>
+            </div>
+          </div>
+
+          <div className="pt-2 border-t border-[#e6e2dd]/60 flex items-center justify-between text-[11px]">
+            <span className="text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+              {stats.auditions.selected} Castings Confirmed
+            </span>
+            <Link to="/auditions-admin" className="text-[#635f41] font-bold hover:underline">
+              Inspect →
+            </Link>
+          </div>
+        </div>
+
+        {/* 3. Registered Members */}
+        <div className="bg-white border border-[#e6e2dd] p-5 rounded-2xl shadow-xs space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#635f41]">
+              Ensemble Roster
+            </span>
+            <span className="p-2 bg-purple-100 text-purple-800 rounded-xl">
+              <Users className="w-4 h-4" />
+            </span>
+          </div>
+
+          <div>
+            <div className="text-3xl font-serif font-bold text-[#1c1b19]">
+              {stats.members.total_registered}
+            </div>
+            <div className="flex items-center justify-between text-xs text-[#466272] mt-1 font-medium">
+              <span>Active Performers & Crew</span>
+            </div>
+          </div>
+
+          <div className="pt-2 border-t border-[#e6e2dd]/60 flex items-center justify-between text-[11px]">
+            <span className="text-purple-700 font-bold bg-purple-50 px-2 py-0.5 rounded-md border border-purple-200">
+              {stats.members.pending_approvals} Pending Approvals
+            </span>
+            <Link to="/directory-admin" className="text-[#635f41] font-bold hover:underline">
+              Directory →
+            </Link>
+          </div>
+        </div>
+
+        {/* 4. Financial Surplus (Restricted Maintainer Access) */}
+        <div className="bg-gradient-to-br from-[#FFF9D2] to-[#f7f0bb] border border-[#cac6b9] p-5 rounded-2xl shadow-xs space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#635f41] flex items-center gap-1">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#635f41]" /> Maintainer Ledger
+            </span>
+            <span className="p-2 bg-white/80 text-[#635f41] rounded-xl shadow-2xs">
+              <DollarSign className="w-4 h-4" />
+            </span>
+          </div>
+
+          <div>
+            <div className="text-3xl font-serif font-bold text-[#1c1b19]">
+              ₹{stats.financials.net_surplus.toLocaleString()}
+            </div>
+            <div className="flex items-center justify-between text-xs text-[#466272] mt-1 font-medium">
+              <span>Revenue: ₹{(stats.financials.total_revenue / 1000).toFixed(0)}k</span>
+              <span>Spent: ₹{(stats.financials.total_expenses / 1000).toFixed(0)}k</span>
+            </div>
+          </div>
+
+          <div className="pt-2 border-t border-[#cac6b9]/60 flex items-center justify-between text-[11px]">
+            <span className="text-emerald-800 font-bold bg-emerald-100 px-2 py-0.5 rounded-md">
+              Positive Cashflow
+            </span>
+            <Link to="/analytics" className="text-[#635f41] font-bold hover:underline">
+              Analytics →
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* Main 2-Column Section: Operational Quick Clips & Recent System Logs */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        {/* Quick Maintainer Action Clips (8 cols) */}
+        <div className="lg:col-span-8 bg-white border border-[#e6e2dd] p-6 rounded-3xl shadow-xs space-y-6">
+          <div className="flex items-center justify-between pb-3 border-b border-[#e6e2dd]">
+            <div>
+              <span className="text-[10px] font-bold text-[#635f41] uppercase tracking-wider">
+                Operational Shortcuts
+              </span>
+              <h2 className="font-serif text-2xl font-bold text-[#1c1b19]">
+                Maintainer Management Clips
+              </h2>
+            </div>
+            <span className="text-xs text-emerald-700 bg-emerald-50 px-3 py-1 rounded-xl font-bold border border-emerald-200">
+              Live Database Connected
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Clip 1: Proposal Review */}
+            <div className="bg-[#fdf9f4] border border-[#cac6b9]/60 p-5 rounded-2xl space-y-2 hover:border-[#635f41] transition-all">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#635f41] bg-[#635f41]/10 px-2.5 py-0.5 rounded-full">
+                Events & Proposals
+              </span>
+              <h3 className="font-serif text-lg font-bold text-[#1c1b19]">
+                Event Proposal Curation
+              </h3>
+              <p className="text-xs text-[#466272] leading-relaxed font-light">
+                Review Red Bull Energy stage deals, member jam pitches, and AI auto-filled briefs with pre-populated deliverable signals.
+              </p>
+              <div className="pt-2">
+                <Link to="/events-admin" className="text-xs font-bold text-[#635f41] hover:underline inline-flex items-center gap-1">
+                  Open Events Desk <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            </div>
+
+            {/* Clip 2: Auditions */}
+            <div className="bg-[#fdf9f4] border border-[#cac6b9]/60 p-5 rounded-2xl space-y-2 hover:border-[#635f41] transition-all">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#635f41] bg-[#635f41]/10 px-2.5 py-0.5 rounded-full">
+                Auditions & Casting
+              </span>
+              <h3 className="font-serif text-lg font-bold text-[#1c1b19]">
+                Character Role Callings
+              </h3>
+              <p className="text-xs text-[#466272] leading-relaxed font-light">
+                Inspect candidate monologue reels, run AI portfolio role fit scanners, and confirm performer casting decisions.
+              </p>
+              <div className="pt-2">
+                <Link to="/auditions-admin" className="text-xs font-bold text-[#635f41] hover:underline inline-flex items-center gap-1">
+                  Open Auditions Desk <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            </div>
+
+            {/* Clip 3: Script Vault */}
+            <div className="bg-[#fdf9f4] border border-[#cac6b9]/60 p-5 rounded-2xl space-y-2 hover:border-[#635f41] transition-all">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#635f41] bg-[#635f41]/10 px-2.5 py-0.5 rounded-full">
+                Script Vault
+              </span>
+              <h3 className="font-serif text-lg font-bold text-[#1c1b19]">
+                Confidential Play Manuscripts
+              </h3>
+              <p className="text-xs text-[#466272] leading-relaxed font-light">
+                Access Tughlaq, Macbeth, and Andha Yug play scripts with character line splits and AI rehearsal cue generators.
+              </p>
+              <div className="pt-2">
+                <Link to="/member-scripts" className="text-xs font-bold text-[#635f41] hover:underline inline-flex items-center gap-1">
+                  Open Script Vault <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            </div>
+
+            {/* Clip 4: Financial Analytics */}
+            <div className="bg-[#fdf9f4] border border-[#cac6b9]/60 p-5 rounded-2xl space-y-2 hover:border-[#635f41] transition-all">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#635f41] bg-[#635f41]/10 px-2.5 py-0.5 rounded-full">
+                Financial Ledger
+              </span>
+              <h3 className="font-serif text-lg font-bold text-[#1c1b19]">
+                Revenue & Expense Analytics
+              </h3>
+              <p className="text-xs text-[#466272] leading-relaxed font-light">
+                Restricted financial audit tracking ticket sales revenue, venue rental deposits, and sponsor grants.
+              </p>
+              <div className="pt-2">
+                <Link to="/analytics" className="text-xs font-bold text-[#635f41] hover:underline inline-flex items-center gap-1">
+                  View Analytics & Ledger <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Live System Activity Feed (4 cols) */}
+        <div className="lg:col-span-4 bg-white border border-[#e6e2dd] p-6 rounded-3xl shadow-xs space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-[#e6e2dd]">
+            <h2 className="font-serif text-lg font-bold text-[#1c1b19]">
+              System Activity Feed
+            </h2>
+            <span className="text-[10px] font-bold text-gray-400 font-mono">LIVE API</span>
+          </div>
+
+          <div className="space-y-3 text-xs">
+            <div className="p-3 bg-[#fdf9f4] rounded-xl border border-[#cac6b9]/40 space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-[#1c1b19]">Red Bull Sponsorship</span>
+                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">₹1,50,000</span>
+              </div>
+              <p className="text-[#466272] text-[11px]">Sponsorship deal registered in database ledger.</p>
+            </div>
+
+            <div className="p-3 bg-[#fdf9f4] rounded-xl border border-[#cac6b9]/40 space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-[#1c1b19]">Audition Slate Submitted</span>
+                <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded">Aarav Varma</span>
+              </div>
+              <p className="text-[#466272] text-[11px]">Applied for Sultan Tughlaq Lead Role.</p>
+            </div>
+
+            <div className="p-3 bg-[#fdf9f4] rounded-xl border border-[#cac6b9]/40 space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-[#1c1b19]">Stage Booking Confirmed</span>
+                <span className="text-[10px] font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded">Royal Stage</span>
+              </div>
+              <p className="text-[#466272] text-[11px]">Prithvi Theatre venue deposit logged.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
 }

@@ -61,7 +61,7 @@ export default function AllMembersDirectory() {
   });
 
   useEffect(() => {
-    const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5001";
+    const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005";
     fetch(`${baseUrl}/api/members`)
       .then((res) => {
         if (!res.ok) throw new Error("HTTP error");

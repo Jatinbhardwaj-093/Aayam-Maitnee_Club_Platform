@@ -192,7 +192,7 @@ export default function Directory() {
   const [filter, setFilter] = useState<"All" | "Actor" | "Director" | "Design" | "Production">("All");
 
   useEffect(() => {
-    fetch("http://localhost:5001/api/members")
+    fetch("http://localhost:5005/api/members")
       .then((res) => {
         if (!res.ok) throw new Error("HTTP error");
         return res.json();

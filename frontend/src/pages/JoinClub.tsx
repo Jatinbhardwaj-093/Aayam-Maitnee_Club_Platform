@@ -60,7 +60,7 @@ export default function JoinClub() {
     }
 
     try {
-      const response = await fetch("http://localhost:5001/api/join", {
+      const response = await fetch("http://localhost:5005/api/join", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

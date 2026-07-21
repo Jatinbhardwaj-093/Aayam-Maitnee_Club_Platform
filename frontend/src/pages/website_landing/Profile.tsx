@@ -33,7 +33,7 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5001";
+    const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005";
     
     fetch(`${baseUrl}/api/members`)
       .then((res) => {
@@ -410,7 +410,7 @@ export default function Profile() {
   }
 
   return (
-    <div className="bg-[#fdf9f4] text-[#1c1b19] min-h-screen font-sans selection:bg-[#c6e4f7] pt-8 pb-16">
+    <div className="bg-[#fdf9f4] text-[#1c1b19] min-h-screen font-sans selection:bg-[#c6e4f7] pt-2 pb-12">
       <main className="max-w-7xl mx-auto px-6 md:px-12">
         {/* Page Header */}
         <header className="mb-16 border-b border-[#cac6b9]/30 pb-6 flex flex-col md:flex-row md:items-end justify-between">
@@ -507,7 +507,10 @@ export default function Profile() {
                   <img 
                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" 
                     alt={item.title} 
-                    src={item.image}
+                    src={item.image || profile.image}
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src = profile.image;
+                    }}
                   />
                 </div>
               </article>

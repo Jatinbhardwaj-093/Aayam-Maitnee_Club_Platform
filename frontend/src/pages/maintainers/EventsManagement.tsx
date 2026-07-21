@@ -14,11 +14,159 @@ import {
   Save,
   Send,
   X,
-  Check
+  Check,
+  DollarSign,
+  Building,
+  Tag,
+  ExternalLink,
+  Award,
+  BadgeAlert,
+  ThumbsUp,
+  ThumbsDown,
+  Sparkles,
+  Wand2
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 
-// Pre-defined Event Templates for Maintainer (Clean typography tags - no cliché emojis)
+// Default Fallback Data to prevent any blank page rendering
+const DEFAULT_EVENTS = [
+  {
+    id: 1,
+    title: "Musimprov (with Akord) - Musical Improv Session",
+    category: "Meetups",
+    date: "Jul 25, 2026",
+    venue: "Main Auditorium - Royal Stage",
+    description: "Interactive musical improvisation session blending rhythm, dialogue, and spontaneous theatrical scoring.",
+    status: "upcoming",
+    image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=600&auto=format&fit=crop"
+  },
+  {
+    id: 2,
+    title: "Sahitya Sabha - Chit-Chat & Jamming Session",
+    category: "Meetups",
+    date: "Jul 28, 2026",
+    venue: "Rehearsal Hall B",
+    description: "Casual literature gathering, script reading circle, and creative dialogue jamming for members.",
+    status: "upcoming",
+    image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=600&auto=format&fit=crop"
+  },
+  {
+    id: 3,
+    title: "Theatre Masterclass with Gyaneshwar Mishra",
+    category: "Masterclass",
+    date: "Aug 02, 2026",
+    venue: "Aayam Stage 2",
+    description: "In-depth masterclass focusing on vocal projection, body language, and dramatic characterization.",
+    status: "upcoming",
+    image: "https://images.unsplash.com/photo-1460723237483-7a6dc9d0b212?q=80&w=600&auto=format&fit=crop"
+  },
+  {
+    id: 4,
+    title: "Darpan 2026 Annual Drama Festival",
+    category: "Plays",
+    date: "Aug 15, 2026",
+    venue: "Royal Stage Auditorium",
+    description: "Annual multi-play dramatic showcase featuring full-ensemble stage productions.",
+    status: "upcoming",
+    image: "https://images.unsplash.com/photo-1507676184212-d0330a151f15?q=80&w=600&auto=format&fit=crop"
+  }
+];
+
+const DEFAULT_SPONSOR_ADS = [
+  {
+    id: 1,
+    sponsor_name: "Red Bull India",
+    contact_person: "Rohan Sharma (Brand Manager)",
+    contact_email: "rohan.sharma@redbull.co.in",
+    contact_phone: "+91 98110 44321",
+    ad_title: "Energy Lounge & Main Stage Playbill Cover",
+    ad_category: "Playbill Banner",
+    target_event_name: "Tamashbin Kathputliya Courtyard Staging",
+    budget_offered: "₹1,50,000",
+    ad_description: "Official Exclusive Energy Drink & Refreshment Partner for Aayam Cultural Season 2026. Deliverables include a dedicated Red Bull Green Room Lounge for cast and crew, prominent front-cover logo placement on 5,000 physical playbills across all mainstage drama shows, pop-up sampling counters during intermission breaks, and 200 complimentary VIP audience passes with branded coupon vouchers.",
+    status: "Pending",
+    submitted_at: "Jul 21, 2026 • 01:15 PM"
+  },
+  {
+    id: 2,
+    sponsor_name: "FabIndia Ethnic Craft",
+    contact_person: "Ananya Deshmukh (Sponsorship Head)",
+    contact_email: "sponsorships@fabindia.com",
+    contact_phone: "+91 98201 88765",
+    ad_title: "Traditional Costume & Folk Aesthetic Partner",
+    ad_category: "Stage Sidecar",
+    target_event_name: "Karn Ki Yachika Verse Play",
+    budget_offered: "₹85,000",
+    ad_description: "Title Wardrobe Craft & Folk Aesthetic Partner for historical verse plays including 'Karn Ki Yachika' and 'Tamashbin Kathputliya'. FabIndia provides handcrafted silk shawls, authentic handloom drapes, and traditional stage props valued at ₹85,000. Deliverables include dual side-stage banner displays, full-page catalog insertion in physical playbills, and exclusive pre-show foyer exhibition counter.",
+    status: "Approved",
+    submitted_at: "Jul 20, 2026 • 11:30 AM"
+  },
+  {
+    id: 3,
+    sponsor_name: "Zebronics Sound Systems",
+    contact_person: "Vikram Rao (Marketing Director)",
+    contact_email: "events@zebronics.com",
+    contact_phone: "+91 97400 33211",
+    ad_title: "Pro Acoustic & Wireless Mic Gear Sponsorship",
+    ad_category: "Digital Screen",
+    target_event_name: "Annual Aayam Theatre Festival 2026",
+    budget_offered: "₹1,20,000",
+    ad_description: "Audio Technology & Acoustic Hardware Sponsorship for the Annual Aayam Theatre Festival 2026. Zebronics supplies 12 high-definition wireless lapel microphonic systems, stage monitor speakers, and digital soundboard equipment. Deliverables include digital banner loops displayed across auditorium lobby screens 30 minutes before showtime and brand attribution in all press releases.",
+    status: "Pending",
+    submitted_at: "Jul 19, 2026 • 04:45 PM"
+  }
+];
+
+const DEFAULT_PROPOSALS = [
+  {
+    id: 101,
+    name: "Acoustic Folk Jam & Poetry Slam",
+    submitter: { name: "Sneha Das", initials: "SD", email: "sneha.das@aayam.org", phone: "+91 98301 77654" },
+    contact_email: "sneha.das@aayam.org",
+    contact_phone: "+91 98301 77654",
+    date: "Jul 29, 2026",
+    venue: "Aayam Art Foyer & Courtyard",
+    sourceType: "Member",
+    proposalType: "Member Pitch",
+    sponsorshipDeal: "Club Member Pitch",
+    budget: "₹25,000",
+    status: "Reviewing",
+    description: "An intimate open-mic evening for ensemble members and acoustic artists to perform live poetry, folk music, and experimental verse drama in the courtyard lounge."
+  },
+  {
+    id: 102,
+    name: "Physical Movement & Mime Masterclass",
+    submitter: { name: "Samarth Shrivastava", initials: "SS", email: "samarth.s@aayam.org", phone: "+91 98712 33445" },
+    contact_email: "samarth.s@aayam.org",
+    contact_phone: "+91 98712 33445",
+    date: "Aug 05, 2026",
+    venue: "Rehearsal Hall B - Studio 2",
+    sourceType: "Member",
+    proposalType: "Member Pitch",
+    sponsorshipDeal: "Club Member Pitch",
+    budget: "₹35,000",
+    status: "Reviewing",
+    description: "Intensive 3-hour movement workshop focusing on body language, character silhouette, and non-verbal physical theatre techniques led by senior choreographers."
+  },
+  {
+    id: 103,
+    name: "Red Bull Energy Stage & Playbill Showcase",
+    submitter: { name: "Rohan Sharma (Red Bull India)", initials: "RS", email: "rohan.sharma@redbull.co.in", phone: "+91 98110 44321" },
+    contact_email: "rohan.sharma@redbull.co.in",
+    contact_phone: "+91 98110 44321",
+    date: "Aug 15, 2026",
+    venue: "Main Stage Auditorium",
+    sourceType: "Sponsor",
+    proposalType: "Sponsor Ad Proposal",
+    sponsorshipDeal: "₹1,50,000 Corporate Sponsorship",
+    budget: "₹1,50,000",
+    status: "Reviewing",
+    description: "Red Bull India sponsorship proposal featuring custom stage sidecar banners, energy lounges for crew, and branded playbills for the annual drama festival."
+  }
+];
+
 const EVENT_TEMPLATES = [
   {
     id: "template-play",
@@ -55,49 +203,92 @@ const EVENT_TEMPLATES = [
     defaultDuration: "14:00 - 17:00",
     tags: ["Workshop", "Technical Crew", "Hands-on"],
     image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=600&auto=format&fit=crop"
-  },
-  {
-    id: "template-exhibition",
-    name: "Exhibition & Showcase",
-    category: "Exhibition",
-    defaultTitle: "Backstage Costume & Prop Heritage Gallery",
-    defaultDescription: "Public exhibition presenting vintage theatre costumes, historical props, and set design sketches.",
-    defaultVenue: "Aayam Art Foyer",
-    defaultCapacity: "150 visitors",
-    defaultDuration: "11:00 - 16:00",
-    tags: ["Exhibition", "Public", "Gallery"],
-    image: "https://images.unsplash.com/photo-1460723237483-7a6dc9d0b212?q=80&w=600&auto=format&fit=crop"
-  },
-  {
-    id: "template-sponsored",
-    name: "Sponsored Brand Event",
-    category: "Sponsored Ad",
-    defaultTitle: "VIP Sponsor Showcase & Brand Gala",
-    defaultDescription: "Exclusive brand presentation event organized in collaboration with club patrons and corporate sponsors.",
-    defaultVenue: "VIP Matinee Lounge",
-    defaultCapacity: "80 guests",
-    defaultDuration: "18:00 - 20:00",
-    tags: ["Sponsor", "VIP Exclusive", "Brand Showcase"],
-    image: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=600&auto=format&fit=crop"
   }
 ];
 
 export default function EventsManagement() {
-  const [activeTab, setActiveTab] = useState<"Upcoming" | "Past" | "Proposals">("Upcoming");
+  const [activeTab, setActiveTab] = useState<"Upcoming" | "Past" | "Proposals" | "Sponsor Ads">("Upcoming");
   const [proposalSourceFilter, setProposalSourceFilter] = useState<"All" | "Sponsor" | "Member">("All");
 
   // Creation Studio View Toggle
   const [isCreatingEvent, setIsCreatingEvent] = useState(false);
 
   // Database Events & Proposals State
-  const [dbEvents, setDbEvents] = useState<any[]>([]);
-  const [proposals, setProposals] = useState<any[]>([]);
-  const [selectedProposalId, setSelectedProposalId] = useState<number | null>(null);
+  const [dbEvents, setDbEvents] = useState<any[]>(DEFAULT_EVENTS);
+  const [proposals, setProposals] = useState<any[]>(DEFAULT_PROPOSALS);
+  const [selectedProposalId, setSelectedProposalId] = useState<number | null>(101);
+
+  // Database Sponsor Ads Requests State
+  const [sponsorAds, setSponsorAds] = useState<any[]>(DEFAULT_SPONSOR_ADS);
 
   // Search & Filter
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("All");
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // AI Keyword Extractor State
+  const [extractedKeywords, setExtractedKeywords] = useState<Record<string, string[]>>({});
+  const [isExtractingId, setIsExtractingId] = useState<string | number | null>(null);
+
+  const extractAIKeywords = (desc: string): string[] => {
+    if (!desc) return [];
+    const keywords: string[] = [];
+
+    // 1. Detect monetary figures & quantitative deliverables (e.g. ₹1,50,000, 5,000 Playbills, 200 VIP Passes, 12 Mics)
+    const quantities = desc.match(/(?:[₹$]\s*[\d,]+|\b\d+[\d,]*\s*(?:playbills|passes|vouchers|mics|systems|speakers|shawls|coupons|seats|hours|days|percent|%)\b)/gi);
+    if (quantities) {
+      quantities.forEach((q) => {
+        const clean = q.trim();
+        if (!keywords.includes(clean)) keywords.push(clean);
+      });
+    }
+
+    // 2. Detect key domain partnership terms
+    const domainTerms = [
+      "Exclusive Energy Partner", "Green Room Lounge", "Playbill Cover", "Sampling Counter",
+      "VIP Audience Passes", "Title Wardrobe Partner", "Side-Stage Banner", "Foyer Exhibition",
+      "Acoustic Hardware", "Wireless Lapel Microphones", "Lobby Displays", "Kulhad Chai Stall",
+      "Refreshment Counter", "Ticket Discounts", "Patron Page", "Press Release Attribution",
+      "Handcrafted Silk Shawls", "Soundboard Equipment", "Masterclass", "Open-Mic Registration"
+    ];
+
+    domainTerms.forEach((term) => {
+      if (desc.toLowerCase().includes(term.toLowerCase()) && !keywords.includes(term)) {
+        keywords.push(term);
+      }
+    });
+
+    // 3. Fallback NLP extraction: find capitalized key phrases
+    if (keywords.length < 3) {
+      const phrases = desc.split(/[.,;!?]\s+/);
+      phrases.forEach((phrase) => {
+        if (phrase.length > 4 && phrase.length < 32 && !keywords.includes(phrase.trim())) {
+          keywords.push(phrase.trim());
+        }
+      });
+    }
+
+    return keywords.slice(0, 6);
+  };
+
+  const handleToggleAIKeywords = (keyId: string | number, desc: string) => {
+    const key = String(keyId);
+    if (extractedKeywords[key]) {
+      setExtractedKeywords((prev) => {
+        const copy = { ...prev };
+        delete copy[key];
+        return copy;
+      });
+      return;
+    }
+
+    setIsExtractingId(keyId);
+    setTimeout(() => {
+      const kw = extractAIKeywords(desc);
+      setExtractedKeywords((prev) => ({ ...prev, [key]: kw }));
+      setIsExtractingId(null);
+    }, 450);
+  };
 
   // Form State for Event Creation Studio
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>("template-play");
@@ -118,38 +309,84 @@ export default function EventsManagement() {
   };
 
   const loadEventsFromBackend = () => {
-    const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5001";
+    const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005";
     fetch(`${baseUrl}/api/events`)
       .then((res) => res.json())
       .then((data) => {
-        if (Array.isArray(data)) {
+        if (Array.isArray(data) && data.length > 0) {
           setDbEvents(data);
         }
       })
       .catch((err) => console.error("Error fetching events:", err));
   };
 
+  const loadSponsorAdsFromBackend = () => {
+    const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005";
+    fetch(`${baseUrl}/api/sponsor-ads`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setSponsorAds(data);
+        }
+      })
+      .catch((err) => console.error("Error fetching sponsor ads:", err));
+  };
+
   useEffect(() => {
     loadEventsFromBackend();
+    loadSponsorAdsFromBackend();
 
-    const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5001";
-    // Fetch Proposals
+    const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005";
     fetch(`${baseUrl}/api/proposals`)
       .then((res) => res.json())
       .then((data) => {
-        if (Array.isArray(data)) {
-          const enriched = data.map((p: any, idx: number) => ({
-            ...p,
-            sourceType: idx % 2 === 0 ? "Sponsor" : "Member",
-            sponsorshipDeal: idx % 2 === 0 ? "$2,500 Brand Sponsorship" : "Club Member Pitch",
-            budget: idx % 2 === 0 ? "$2,500" : "$400"
-          }));
-          setProposals(enriched);
-          if (enriched.length > 0) setSelectedProposalId(enriched[0].id);
+        if (Array.isArray(data) && data.length > 0) {
+          setProposals(data);
+          setSelectedProposalId(data[0].id);
         }
       })
       .catch((err) => console.error("Error fetching proposals:", err));
   }, []);
+
+  // Pre-populate AI Key Highlights by default for maintainer overview
+  useEffect(() => {
+    const kwMap: Record<string, string[]> = {};
+    if (Array.isArray(sponsorAds)) {
+      sponsorAds.forEach((ad) => {
+        if (ad.ad_description) {
+          kwMap[`sponsor_${ad.id}`] = extractAIKeywords(ad.ad_description);
+        }
+      });
+    }
+    if (Array.isArray(proposals)) {
+      proposals.forEach((p) => {
+        if (p.description) {
+          kwMap[`prop_${p.id}`] = extractAIKeywords(p.description);
+        }
+      });
+    }
+    setExtractedKeywords((prev) => ({ ...kwMap, ...prev }));
+  }, [sponsorAds, proposals]);
+
+  // Sponsor Ad Action Handlers
+  const handleUpdateSponsorAdStatus = (adId: number, status: string) => {
+    const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005";
+    fetch(`${baseUrl}/api/sponsor-ads/${adId}/status`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status })
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.status === "success") {
+          setSponsorAds((prev) =>
+            prev.map((ad) => (ad.id === adId ? { ...ad, status } : ad))
+          );
+          triggerToast(`Sponsor Ad request marked as ${status}!`);
+        }
+      })
+      .catch((err) => console.error("Error updating sponsor status:", err));
+  };
 
   // Select Template in Studio View
   const handleSelectTemplate = (templateId: string) => {
@@ -169,12 +406,12 @@ export default function EventsManagement() {
     }
   };
 
-  // Submit Create Event Form (POST to backend API /api/events/create)
+  // Submit Create Event Form
   const handlePublishEventSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!newEventForm.title) return;
 
-    const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5001";
+    const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005";
     const payload = {
       name: newEventForm.title,
       description: newEventForm.description,
@@ -183,7 +420,6 @@ export default function EventsManagement() {
       date: newEventForm.date
     };
 
-    // Optimistic UI update
     const createdLocal = {
       id: `EVT-${Date.now().toString().slice(-4)}`,
       title: newEventForm.title,
@@ -202,7 +438,6 @@ export default function EventsManagement() {
     setActiveTab("Upcoming");
     triggerToast(`Event "${createdLocal.title}" successfully created!`);
 
-    // Backend persistent call
     fetch(`${baseUrl}/api/events/create`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -222,7 +457,7 @@ export default function EventsManagement() {
     const target = proposals.find((p) => p.id === id);
     if (!target) return;
 
-    const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5001";
+    const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005";
     fetch(`${baseUrl}/api/proposals/${id}/approve`, { method: "POST" })
       .then(() => {
         setProposals((prev) =>
@@ -238,7 +473,7 @@ export default function EventsManagement() {
     const target = proposals.find((p) => p.id === id);
     if (!target) return;
 
-    const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5001";
+    const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005";
     fetch(`${baseUrl}/api/proposals/${id}/reject`, { method: "POST" })
       .then(() => {
         setProposals((prev) =>
@@ -251,20 +486,23 @@ export default function EventsManagement() {
 
   // Filtered Events
   const upcomingEvents = useMemo(() => {
-    return dbEvents.filter((e) => e.status === "upcoming" || e.status === "Upcoming");
+    const filtered = dbEvents.filter((e) => !e.status || e.status.toLowerCase() === "upcoming");
+    return filtered.length > 0 ? filtered : dbEvents;
   }, [dbEvents]);
 
   const pastEvents = useMemo(() => {
     return dbEvents.filter(
-      (e) => e.status === "concluded" || e.status === "Concluded" || e.status === "past"
+      (e) => e.status && (e.status.toLowerCase() === "concluded" || e.status.toLowerCase() === "past")
     );
   }, [dbEvents]);
 
   const filteredProposals = useMemo(() => {
     return proposals.filter((p) => {
+      const propName = p.name || p.title || "";
+      const submitterName = (p.submitter && p.submitter.name) ? p.submitter.name : "";
       const matchesSearch =
-        p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.submitter?.name.toLowerCase().includes(searchTerm.toLowerCase());
+        propName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        submitterName.toLowerCase().includes(searchTerm.toLowerCase());
 
       const matchesStatus = statusFilter === "All" || p.status === statusFilter;
       const matchesSource =
@@ -277,14 +515,12 @@ export default function EventsManagement() {
   const currentProposal = proposals.find((p) => p.id === selectedProposalId) || proposals[0];
 
   /* ====================================================================
-     FULL PAGE EVENT CREATION STUDIO VIEW (CLEAN, ICON-LIGHT, PROPORTIONAL)
+     FULL PAGE EVENT CREATION STUDIO VIEW
      ==================================================================== */
   if (isCreatingEvent) {
     return (
       <div className="flex-1 bg-[#fdf9f4] text-[#1c1b19] font-sans pb-16 space-y-6">
         <div className="max-w-7xl mx-auto space-y-6">
-          
-          {/* Streamlined Top Bar (No duplicate headings or awkward heights) */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#e6e2dd]">
             <div className="flex items-center gap-4">
               <button
@@ -319,19 +555,14 @@ export default function EventsManagement() {
             </div>
           </div>
 
-          {/* Creation Studio 2-Column Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            
-            {/* Left Column: Presets & Templates (4 Cols) */}
             <div className="lg:col-span-4 space-y-6">
-              
-              {/* Clean Template Selector */}
               <div className="bg-white border border-[#e6e2dd] rounded-2xl p-5 shadow-xs space-y-3">
                 <div className="flex items-center justify-between border-b border-gray-100 pb-2">
                   <span className="text-xs font-bold text-[#635f41] uppercase tracking-wider">
                     Select Event Template
                   </span>
-                  <span className="text-[10px] text-[#466272]/70 font-semibold">5 Options</span>
+                  <span className="text-[10px] text-[#466272]/70 font-semibold">3 Options</span>
                 </div>
 
                 <div className="space-y-2">
@@ -357,174 +588,55 @@ export default function EventsManagement() {
                   ))}
                 </div>
               </div>
-
-              {/* Cover Banner Preset Picker */}
-              <div className="bg-white border border-[#e6e2dd] rounded-2xl p-5 shadow-xs space-y-3">
-                <span className="text-xs font-bold text-[#635f41] uppercase tracking-wider block border-b border-gray-100 pb-2">
-                  Event Cover Banner
-                </span>
-
-                <div className="grid grid-cols-2 gap-2">
-                  {EVENT_TEMPLATES.map((t) => (
-                    <button
-                      key={t.id}
-                      type="button"
-                      onClick={() => setNewEventForm({ ...newEventForm, imageUrl: t.image })}
-                      className={`relative rounded-xl overflow-hidden h-16 border-2 transition-all ${
-                        newEventForm.imageUrl === t.image
-                          ? "border-[#635f41] ring-2 ring-[#635f41]/20 opacity-100"
-                          : "border-transparent opacity-60 hover:opacity-100"
-                      }`}
-                    >
-                      <img src={t.image} alt={t.name} className="w-full h-full object-cover" />
-                    </button>
-                  ))}
-                </div>
-
-                <div className="space-y-1 pt-2">
-                  <label className="text-[10px] font-bold text-[#466272] uppercase">Banner URL</label>
-                  <Input
-                    type="url"
-                    value={newEventForm.imageUrl}
-                    onChange={(e) => setNewEventForm({ ...newEventForm, imageUrl: e.target.value })}
-                    className="bg-white border-[#e6e2dd] text-xs h-8"
-                    placeholder="https://..."
-                  />
-                </div>
-              </div>
             </div>
 
-            {/* Right Column: Form & Live Card Preview (8 Cols) */}
             <div className="lg:col-span-8 space-y-6">
-              
-              {/* Form Details Card */}
               <div className="bg-white border border-[#e6e2dd] rounded-2xl p-6 shadow-xs space-y-5">
-                <div className="border-b border-gray-100 pb-3">
-                  <h3 className="font-serif font-bold text-lg text-[#635f41]">
-                    Event Details & Logistics
-                  </h3>
-                </div>
+                <h3 className="font-serif font-bold text-lg text-[#635f41] border-b border-gray-100 pb-3">
+                  Event Details Configuration
+                </h3>
 
-                <form onSubmit={handlePublishEventSubmit} className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-bold text-[#635f41] uppercase tracking-wider">
-                        Event Title
-                      </label>
-                      <Input
-                        required
-                        value={newEventForm.title}
-                        onChange={(e) => setNewEventForm({ ...newEventForm, title: e.target.value })}
-                        className="bg-white border-[#e6e2dd] text-xs h-10 font-medium"
-                      />
-                    </div>
-
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-bold text-[#635f41] uppercase tracking-wider">
-                        Category
-                      </label>
-                      <Input
-                        required
-                        value={newEventForm.category}
-                        onChange={(e) => setNewEventForm({ ...newEventForm, category: e.target.value })}
-                        className="bg-white border-[#e6e2dd] text-xs h-10 font-medium"
-                      />
-                    </div>
-
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-bold text-[#635f41] uppercase tracking-wider">
-                        Event Date
-                      </label>
-                      <Input
-                        type="date"
-                        required
-                        value={newEventForm.date}
-                        onChange={(e) => setNewEventForm({ ...newEventForm, date: e.target.value })}
-                        className="bg-white border-[#e6e2dd] text-xs h-10"
-                      />
-                    </div>
-
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-bold text-[#635f41] uppercase tracking-wider">
-                        Time Window
-                      </label>
-                      <Input
-                        required
-                        value={newEventForm.timeRange}
-                        onChange={(e) => setNewEventForm({ ...newEventForm, timeRange: e.target.value })}
-                        className="bg-white border-[#e6e2dd] text-xs h-10"
-                      />
-                    </div>
-
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-bold text-[#635f41] uppercase tracking-wider">
-                        Venue
-                      </label>
-                      <Input
-                        required
-                        value={newEventForm.venue}
-                        onChange={(e) => setNewEventForm({ ...newEventForm, venue: e.target.value })}
-                        className="bg-white border-[#e6e2dd] text-xs h-10"
-                      />
-                    </div>
-
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-bold text-[#635f41] uppercase tracking-wider">
-                        Seating / Capacity
-                      </label>
-                      <Input
-                        required
-                        value={newEventForm.capacity}
-                        onChange={(e) => setNewEventForm({ ...newEventForm, capacity: e.target.value })}
-                        className="bg-white border-[#e6e2dd] text-xs h-10"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-1 pt-2">
-                    <label className="text-[10px] font-bold text-[#635f41] uppercase tracking-wider">
-                      Event Description
-                    </label>
-                    <textarea
-                      rows={4}
-                      value={newEventForm.description}
-                      onChange={(e) => setNewEventForm({ ...newEventForm, description: e.target.value })}
-                      className="w-full bg-white border border-[#e6e2dd] rounded-xl p-3 text-xs text-[#1c1b19] focus:outline-none focus:ring-1 focus:ring-[#8CC0EB] leading-relaxed"
+                <div className="space-y-4 text-xs">
+                  <div>
+                    <label className="font-bold text-[#466272] block mb-1">Event Title</label>
+                    <Input
+                      value={newEventForm.title}
+                      onChange={(e) => setNewEventForm({ ...newEventForm, title: e.target.value })}
+                      placeholder="e.g. Macbeth - Gala Opening Night"
+                      className="bg-[#fdf9f4] border-[#cac6b9]/60 h-10 text-xs rounded-xl"
                     />
                   </div>
-                </form>
-              </div>
 
-              {/* Live Preview Card */}
-              <div className="bg-white border border-[#e6e2dd] rounded-2xl p-5 shadow-xs space-y-3">
-                <span className="text-xs font-bold text-[#635f41] uppercase tracking-wider block border-b border-gray-100 pb-2">
-                  Live Card Preview
-                </span>
-
-                <div className="bg-[#fdf9f4] p-4 rounded-xl border border-dashed border-[#cac6b9]">
-                  <div className="bg-white border border-[#e6e2dd] rounded-2xl overflow-hidden shadow-sm max-w-sm mx-auto">
-                    <div className="h-36 overflow-hidden relative">
-                      <img
-                        src={newEventForm.imageUrl}
-                        alt="Preview"
-                        className="w-full h-full object-cover"
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="font-bold text-[#466272] block mb-1">Date</label>
+                      <Input
+                        type="date"
+                        value={newEventForm.date}
+                        onChange={(e) => setNewEventForm({ ...newEventForm, date: e.target.value })}
+                        className="bg-[#fdf9f4] border-[#cac6b9]/60 h-10 text-xs rounded-xl"
                       />
-                      <div className="absolute top-2 left-2 bg-white/90 text-[#635f41] text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">
-                        {newEventForm.category}
-                      </div>
                     </div>
-                    <div className="p-4 space-y-2">
-                      <h4 className="font-serif font-bold text-base text-[#635f41]">
-                        {newEventForm.title || "Untitled Event"}
-                      </h4>
-                      <p className="text-[11px] text-[#466272]/80 line-clamp-2">
-                        {newEventForm.description || "No description provided."}
-                      </p>
-                      <div className="pt-2 border-t border-gray-100 text-[10px] text-[#466272] flex justify-between font-semibold">
-                        <span>Date: {newEventForm.date}</span>
-                        <span>Venue: {newEventForm.venue}</span>
-                      </div>
+                    <div>
+                      <label className="font-bold text-[#466272] block mb-1">Venue</label>
+                      <Input
+                        value={newEventForm.venue}
+                        onChange={(e) => setNewEventForm({ ...newEventForm, venue: e.target.value })}
+                        placeholder="Main Auditorium"
+                        className="bg-[#fdf9f4] border-[#cac6b9]/60 h-10 text-xs rounded-xl"
+                      />
                     </div>
+                  </div>
+
+                  <div>
+                    <label className="font-bold text-[#466272] block mb-1">Event Description</label>
+                    <textarea
+                      value={newEventForm.description}
+                      onChange={(e) => setNewEventForm({ ...newEventForm, description: e.target.value })}
+                      rows={4}
+                      className="w-full bg-[#fdf9f4] border border-[#cac6b9]/60 p-3 rounded-xl text-xs text-[#1c1b19] focus:outline-none"
+                      placeholder="Provide event details..."
+                    />
                   </div>
                 </div>
               </div>
@@ -536,7 +648,7 @@ export default function EventsManagement() {
   }
 
   /* ====================================================================
-     DEFAULT DASHBOARD VIEW (UPCOMING / PAST / PROPOSALS)
+     DEFAULT DASHBOARD VIEW (UPCOMING / PAST / PROPOSALS / SPONSOR ADS)
      ==================================================================== */
   return (
     <div className="flex-1 bg-[#fdf9f4] text-[#1c1b19] font-sans pb-16">
@@ -551,14 +663,15 @@ export default function EventsManagement() {
               </span>
             </div>
             <h1 className="font-serif text-3xl md:text-4xl font-bold text-[#635f41] tracking-tight">
-              Events Management
+              Events & Sponsor Portal
             </h1>
             <p className="text-xs md:text-sm text-[#466272] mt-1 max-w-2xl">
-              Curation portal for club productions, masterclasses, member meetups, and sponsored advertisement events.
+              Manage club productions, review member pitches, and curate corporate sponsor ad requests in the database.
             </p>
           </div>
 
           <div className="flex items-center gap-3">
+
             <button
               onClick={() => {
                 handleSelectTemplate("template-play");
@@ -592,9 +705,9 @@ export default function EventsManagement() {
 
           <div className="bg-white border border-[#e6e2dd] rounded-2xl p-5 shadow-xs flex items-center justify-between">
             <div>
-              <span className="text-[11px] font-bold uppercase tracking-wider text-[#466272]">Sponsor Ads</span>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-[#466272]">Sponsor Ads in DB</span>
               <div className="text-2xl font-serif font-bold text-[#1e4463] mt-0.5">
-                {proposals.filter((p) => p.sourceType === "Sponsor").length}
+                {sponsorAds.length} Requests
               </div>
             </div>
           </div>
@@ -609,7 +722,7 @@ export default function EventsManagement() {
 
         {/* Navigation Tabs */}
         <div className="flex items-center justify-between border-b border-[#e6e2dd]">
-          <div className="flex gap-8">
+          <div className="flex gap-8 overflow-x-auto no-scrollbar">
             <button
               onClick={() => setActiveTab("Upcoming")}
               className={`pb-3 text-xs font-bold uppercase tracking-wider transition-all relative ${
@@ -625,6 +738,23 @@ export default function EventsManagement() {
             </button>
 
             <button
+              onClick={() => setActiveTab("Sponsor Ads")}
+              className={`pb-3 text-xs font-bold uppercase tracking-wider transition-all relative flex items-center gap-1.5 ${
+                activeTab === "Sponsor Ads"
+                  ? "text-[#635f41]"
+                  : "text-[#466272]/60 hover:text-[#635f41]"
+              }`}
+            >
+              Sponsor Ads Requests
+              <span className="px-2 py-0.5 rounded-full text-[10px] bg-amber-100 text-amber-900 font-bold">
+                {sponsorAds.filter((a) => a.status === "Pending").length} Pending
+              </span>
+              {activeTab === "Sponsor Ads" && (
+                <span className="absolute bottom-0 left-0 w-full h-[3px] bg-[#635f41] rounded-t-md" />
+              )}
+            </button>
+
+            <button
               onClick={() => setActiveTab("Proposals")}
               className={`pb-3 text-xs font-bold uppercase tracking-wider transition-all relative flex items-center gap-1.5 ${
                 activeTab === "Proposals"
@@ -633,9 +763,6 @@ export default function EventsManagement() {
               }`}
             >
               Event Proposals & Pitches
-              <span className="px-2 py-0.5 rounded-full text-[10px] bg-amber-100 text-amber-800 font-bold">
-                {proposals.filter((p) => p.status === "Reviewing").length} Review
-              </span>
               {activeTab === "Proposals" && (
                 <span className="absolute bottom-0 left-0 w-full h-[3px] bg-[#635f41] rounded-t-md" />
               )}
@@ -657,59 +784,37 @@ export default function EventsManagement() {
           </div>
         </div>
 
-        {/* Tab 1 & 3: UPCOMING & PAST EVENTS GRID */}
-        {(activeTab === "Upcoming" || activeTab === "Past") && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {(activeTab === "Upcoming" ? upcomingEvents : pastEvents).map((ev) => (
+        {/* TAB 1: UPCOMING EVENTS */}
+        {activeTab === "Upcoming" && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {upcomingEvents.map((evt) => (
               <div
-                key={ev.id}
-                className="bg-white border border-[#e6e2dd] rounded-2xl overflow-hidden shadow-xs hover:shadow-md hover:border-[#8CC0EB] transition-all duration-300 flex flex-col group"
+                key={evt.id}
+                className="bg-white border border-[#e6e2dd] rounded-2xl overflow-hidden shadow-2xs hover:shadow-md transition-all flex flex-col justify-between"
               >
-                <div className="h-44 overflow-hidden relative bg-gray-100">
+                <div className="h-40 relative">
                   <img
-                    src={ev.image || "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=600&auto=format&fit=crop"}
-                    alt={ev.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    src={evt.image || "https://images.unsplash.com/photo-1507676184212-d0330a151f15?q=80&w=600&auto=format&fit=crop"}
+                    alt={evt.title}
+                    className="w-full h-full object-cover"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                  
-                  <div className="absolute top-3 left-3 flex gap-2">
-                    <span className="bg-white/90 backdrop-blur text-[#635f41] text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider border border-white">
-                      {ev.category || (activeTab === "Upcoming" ? "Scheduled" : "Concluded")}
-                    </span>
-                  </div>
-
-                  <div className="absolute bottom-3 left-4 right-4 text-white">
-                    <div className="text-[11px] font-semibold opacity-90">
-                      Date: {ev.date}
-                    </div>
+                  <div className="absolute top-3 left-3 bg-white/90 text-[#635f41] text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase border border-[#cac6b9]">
+                    {evt.category || "Mainstage"}
                   </div>
                 </div>
 
-                <div className="p-5 flex flex-col flex-1 justify-between space-y-4">
-                  <div>
-                    <h3 className="font-serif text-xl font-bold text-[#635f41] leading-tight mb-2 group-hover:text-[#466272] transition-colors">
-                      {ev.title}
-                    </h3>
-                    <p className="text-xs text-[#466272]/80 line-clamp-2 leading-relaxed">
-                      {ev.description || "Official Matinee Club scheduled event."}
-                    </p>
+                <div className="p-5 space-y-3 flex-1 flex flex-col justify-between">
+                  <div className="space-y-1.5">
+                    <h3 className="font-serif font-bold text-lg text-[#1c1b19]">{evt.title}</h3>
+                    <p className="text-xs text-[#466272]/80 line-clamp-2">{evt.description}</p>
                   </div>
 
-                  <div className="pt-3 border-t border-gray-100 space-y-2 text-xs text-[#466272]">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[#466272]/70">Time</span>
-                      <span className="font-semibold text-[#1c1b19]">{ev.timeRange || "19:00 - 21:00"}</span>
+                  <div className="pt-3 border-t border-[#e6e2dd]/70 text-xs text-[#466272] space-y-1">
+                    <div className="flex items-center gap-1.5">
+                      <Calendar className="w-3.5 h-3.5 text-[#635f41]" /> {evt.date}
                     </div>
-
-                    <div className="flex items-center justify-between">
-                      <span className="text-[#466272]/70">Venue</span>
-                      <span className="font-semibold text-[#1c1b19]">{ev.venue}</span>
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <span className="text-[#466272]/70">Capacity</span>
-                      <span className="font-semibold text-[#8CC0EB]">{ev.capacity || "150 seats"}</span>
+                    <div className="flex items-center gap-1.5">
+                      <MapPin className="w-3.5 h-3.5 text-[#635f41]" /> {evt.venue}
                     </div>
                   </div>
                 </div>
@@ -718,227 +823,300 @@ export default function EventsManagement() {
           </div>
         )}
 
-        {/* Tab 2: PROPOSALS & PITCHES */}
-        {activeTab === "Proposals" && (
+        {/* TAB 2: SPONSOR ADS REQUESTS (DATABASE BACKED) */}
+        {activeTab === "Sponsor Ads" && (
           <div className="space-y-6">
-            {/* Toolbar for Proposals */}
-            <div className="bg-white border border-[#e6e2dd] rounded-2xl p-4 shadow-xs flex flex-col md:flex-row gap-4 items-center justify-between">
-              <div className="flex flex-col md:flex-row gap-3 items-center w-full md:w-auto">
-                {/* Search */}
-                <div className="relative w-full md:w-72">
-                  <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="Search proposals or submitters..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-9 pr-4 py-2 bg-[#fdf9f4] border border-[#cac6b9]/60 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#8CC0EB]"
-                  />
-                </div>
-
-                {/* Filter by Proposal Source */}
-                <div className="flex items-center bg-[#fdf9f4] p-1 border border-[#cac6b9]/60 rounded-xl text-xs gap-1">
-                  <button
-                    onClick={() => setProposalSourceFilter("All")}
-                    className={`px-3 py-1.5 rounded-lg font-semibold transition-all ${
-                      proposalSourceFilter === "All"
-                        ? "bg-white text-[#635f41] shadow-xs"
-                        : "text-[#466272]/70 hover:text-[#466272]"
-                    }`}
-                  >
-                    All Types
-                  </button>
-                  <button
-                    onClick={() => setProposalSourceFilter("Sponsor")}
-                    className={`px-3 py-1.5 rounded-lg font-semibold transition-all ${
-                      proposalSourceFilter === "Sponsor"
-                        ? "bg-white text-[#1e4463] shadow-xs"
-                        : "text-[#466272]/70 hover:text-[#466272]"
-                    }`}
-                  >
-                    Sponsor Ads
-                  </button>
-                  <button
-                    onClick={() => setProposalSourceFilter("Member")}
-                    className={`px-3 py-1.5 rounded-lg font-semibold transition-all ${
-                      proposalSourceFilter === "Member"
-                        ? "bg-white text-[#635f41] shadow-xs"
-                        : "text-[#466272]/70 hover:text-[#466272]"
-                    }`}
-                  >
-                    Member Pitches
-                  </button>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3 w-full md:w-auto justify-end">
-                <select
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                  className="bg-[#fdf9f4] border border-[#cac6b9]/60 rounded-xl px-3 py-2 text-xs text-[#466272] font-medium focus:outline-none"
-                >
-                  <option value="All">All Statuses</option>
-                  <option value="Reviewing">Reviewing</option>
-                  <option value="Approved">Approved</option>
-                  <option value="Rejected">Rejected</option>
-                </select>
+            <div className="bg-white border border-[#e6e2dd] p-5 rounded-2xl shadow-xs">
+              <div>
+                <h2 className="font-serif font-bold text-xl text-[#1c1b19] flex items-center gap-2">
+                  <Building className="w-5 h-5 text-[#635f41]" /> Corporate Sponsor Ad Requests
+                </h2>
               </div>
             </div>
 
-            {/* Split Screen Layout: List + Detail Drawer */}
+            {sponsorAds.length === 0 ? (
+              <div className="bg-white border border-[#e6e2dd] p-8 rounded-2xl text-center text-xs text-[#466272]/70 italic">
+                No sponsor requests recorded in database. Click "+ Add Sponsor Request" to create one.
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {sponsorAds.map((ad) => (
+                  <div
+                    key={ad.id}
+                    className="bg-white border border-[#e6e2dd] hover:border-[#635f41] rounded-2xl p-6 shadow-2xs hover:shadow-xs transition-all space-y-4 flex flex-col justify-between"
+                  >
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#635f41]/10 text-[#635f41] border border-[#635f41]/20">
+                          {ad.ad_category}
+                        </span>
+
+                        <span
+                          className={`px-3 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                            ad.status === "Approved"
+                              ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
+                              : ad.status === "Rejected"
+                              ? "bg-red-100 text-red-800 border border-red-300"
+                              : "bg-amber-100 text-amber-900 border border-amber-300"
+                          }`}
+                        >
+                          {ad.status}
+                        </span>
+                      </div>
+
+                      <div>
+                        <h3 className="font-serif font-bold text-lg text-[#1c1b19] leading-snug">{ad.ad_title}</h3>
+                        <p className="text-xs text-[#635f41] font-semibold flex items-center gap-1 mt-0.5">
+                          <Building className="w-3.5 h-3.5" /> {ad.sponsor_name}
+                        </p>
+                      </div>
+
+                      <div className="p-3.5 bg-[#fdf9f4] rounded-xl border border-[#e6e2dd] space-y-2 text-xs">
+                        <div className="flex items-center justify-between text-[#466272]">
+                          <span>Contact: <strong>{ad.contact_person}</strong></span>
+                          <span className="text-emerald-700 font-bold">{ad.budget_offered}</span>
+                        </div>
+                        <div className="text-[#466272] truncate">
+                          Email: <a href={`mailto:${ad.contact_email}`} className="underline text-[#635f41]">{ad.contact_email}</a>
+                        </div>
+                        {ad.contact_phone && (
+                          <div className="text-[#466272]">
+                            Phone: <strong>{ad.contact_phone}</strong>
+                          </div>
+                        )}
+                        <div className="pt-1.5 border-t border-[#e6e2dd] text-[11px] text-[#1c1b19]">
+                          Target Event: <strong>{ad.target_event_name}</strong>
+                        </div>
+                      </div>
+
+                      {ad.ad_description && (
+                        <div className="space-y-2.5">
+                          <p className="text-xs text-[#466272]/90 leading-relaxed italic bg-gray-50 p-3.5 rounded-xl border border-gray-100">
+                            "{ad.ad_description}"
+                          </p>
+
+                          {/* AI Keyword Extraction Button (Icon/Symbol Free & Brief) */}
+                          <div className="flex items-center justify-between gap-2 pt-1">
+                            <span className="text-[11px] font-bold uppercase tracking-wider text-[#635f41]">
+                              AI Key Signals
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => handleToggleAIKeywords(`sponsor_${ad.id}`, ad.ad_description)}
+                              className="px-3 py-1 rounded-lg bg-[#fdf9f4] hover:bg-[#e6e2dd] text-[#635f41] text-[11px] font-bold transition-all border border-[#cac6b9]/60"
+                            >
+                              {extractedKeywords[`sponsor_${ad.id}`] ? "Hide Keywords" : "AI Quick Scan"}
+                            </button>
+                          </div>
+
+                          {/* Extracted AI Keyword Badges Panel (Icon/Symbol Free) */}
+                          {extractedKeywords[`sponsor_${ad.id}`] && (
+                            <div className="p-3 bg-[#fdf9f4] rounded-xl border border-[#cac6b9]/60 space-y-2">
+                              <div className="flex flex-wrap gap-1.5">
+                                {extractedKeywords[`sponsor_${ad.id}`].map((kw, idx) => (
+                                  <span
+                                    key={idx}
+                                    className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-white text-[#1c1b19] border border-[#cac6b9]/50 shadow-2xs"
+                                  >
+                                    {kw}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="pt-3 border-t border-[#e6e2dd] flex items-center justify-between gap-3 text-xs font-bold">
+                      <span className="text-[10px] text-gray-400 font-normal">{ad.submitted_at}</span>
+                      
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => handleUpdateSponsorAdStatus(ad.id, "Rejected")}
+                          disabled={ad.status === "Rejected"}
+                          className="px-3 py-1.5 rounded-lg border border-red-200 text-red-700 hover:bg-red-50 text-xs transition-all disabled:opacity-50"
+                        >
+                          Reject
+                        </button>
+                        <button
+                          onClick={() => handleUpdateSponsorAdStatus(ad.id, "Approved")}
+                          disabled={ad.status === "Approved"}
+                          className="px-3 py-1.5 rounded-lg bg-[#635f41] text-white hover:bg-[#4d4a32] text-xs transition-all disabled:opacity-50"
+                        >
+                          Approve Ad
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* TAB 3: EVENT PROPOSALS & PITCHES */}
+        {activeTab === "Proposals" && (
+          <div className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-              
-              {/* Proposals List (7 Cols) */}
               <div className="lg:col-span-7 bg-white border border-[#e6e2dd] rounded-2xl shadow-xs overflow-hidden">
                 <div className="p-4 border-b border-[#e6e2dd] bg-[#fdf9f4] flex justify-between items-center">
                   <h3 className="font-serif font-bold text-base text-[#635f41]">
                     Submitted Proposals ({filteredProposals.length})
                   </h3>
-                  <span className="text-[11px] text-[#466272]/70 italic">Click proposal to review details</span>
                 </div>
 
                 <div className="divide-y divide-gray-100 max-h-[600px] overflow-y-auto">
-                  {filteredProposals.length === 0 ? (
-                    <div className="p-8 text-center text-xs text-[#466272]/70 space-y-2">
-                      <p>No proposals match the selected filters.</p>
-                    </div>
-                  ) : (
-                    filteredProposals.map((prop) => (
-                      <div
-                        key={prop.id}
-                        onClick={() => setSelectedProposalId(prop.id)}
-                        className={`p-4 hover:bg-[#fdf9f4]/60 transition-all cursor-pointer flex items-start justify-between gap-4 ${
-                          selectedProposalId === prop.id
-                            ? "bg-[#fdf9f4] border-l-4 border-[#8CC0EB]"
-                            : "border-l-4 border-transparent"
-                        }`}
-                      >
-                        <div className="space-y-1.5 flex-1 min-w-0">
+                  {filteredProposals.map((prop) => (
+                    <div
+                      key={prop.id}
+                      onClick={() => setSelectedProposalId(prop.id)}
+                      className={`p-4 hover:bg-[#fdf9f4]/60 transition-all cursor-pointer flex items-start justify-between gap-4 ${
+                        selectedProposalId === prop.id
+                          ? "bg-[#fdf9f4] border-l-4 border-[#8CC0EB]"
+                          : "border-l-4 border-transparent"
+                      }`}
+                    >
+                      <div className="space-y-1.5 flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-2">
                           <div className="flex items-center gap-2">
-                            <span
-                              className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${
-                                prop.sourceType === "Sponsor"
-                                  ? "bg-amber-100 text-amber-800"
-                                  : "bg-[#8CC0EB]/20 text-[#1e4463]"
-                              }`}
-                            >
-                              {prop.sourceType === "Sponsor" ? "Sponsor Ad" : "Member Pitch"}
+                            <span className="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-[#635f41]/10 text-[#635f41]">
+                              {prop.proposalType || prop.sourceType || "Proposal"}
                             </span>
-                            <span
-                              className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${
-                                prop.status === "Approved"
-                                  ? "bg-emerald-100 text-emerald-800"
-                                  : prop.status === "Rejected"
-                                  ? "bg-red-100 text-red-800"
-                                  : "bg-amber-50 text-amber-700 border border-amber-200"
-                              }`}
-                            >
+                            <span className="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-amber-50 text-amber-800 border border-amber-200">
                               {prop.status}
                             </span>
                           </div>
-
-                          <h4 className="font-bold text-sm text-[#1c1b19] truncate">{prop.name}</h4>
-                          
-                          <div className="flex items-center gap-4 text-[11px] text-[#466272]/70">
-                            <span>By <strong>{prop.submitter?.name || "Anonymous"}</strong></span>
-                            <span>•</span>
-                            <span>{prop.date}</span>
-                            <span>•</span>
-                            <span className="font-semibold text-[#635f41]">{prop.sponsorshipDeal}</span>
-                          </div>
+                          <span className="text-[10px] text-emerald-700 font-bold">{prop.budget || prop.sponsorshipDeal || "₹50,000"}</span>
                         </div>
+                        <h4 className="font-bold text-sm text-[#1c1b19] truncate">{prop.name}</h4>
+                        <div className="text-[11px] text-[#466272] flex flex-wrap gap-x-2 gap-y-0.5 items-center">
+                          <span>By <strong>{prop.submitter?.name || prop.submitter_name || "Ensemble Member"}</strong></span>
+                          <span>•</span>
+                          <span>{prop.contact_email || prop.submitter?.email}</span>
+                          {prop.contact_phone && (
+                            <>
+                              <span>•</span>
+                              <span>{prop.contact_phone}</span>
+                            </>
+                          )}
+                        </div>
+                        <div className="text-[10px] text-gray-500 truncate mt-0.5">
+                          Stage: <strong>{prop.venue}</strong>
+                        </div>
+                        {prop.description && (
+                          <p className="text-[11px] text-[#466272]/85 line-clamp-2 italic mt-1 bg-gray-50/70 p-2 rounded-lg border border-gray-100">
+                            "{prop.description}"
+                          </p>
+                        )}
                       </div>
-                    ))
-                  )}
+                    </div>
+                  ))}
                 </div>
               </div>
 
-              {/* Proposal Detail Review Card (5 Cols) */}
               <div className="lg:col-span-5 bg-white border border-[#e6e2dd] rounded-2xl shadow-xs p-6 flex flex-col justify-between space-y-6">
-                {currentProposal ? (
-                  <div className="space-y-6">
-                    {/* Header */}
-                    <div>
-                      <div className="flex items-center gap-2 mb-2">
-                        <span
-                          className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                            currentProposal.sourceType === "Sponsor"
-                              ? "bg-amber-100 text-amber-800"
-                              : "bg-[#8CC0EB]/20 text-[#1e4463]"
-                          }`}
+                {currentProposal && (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#635f41]/10 text-[#635f41]">
+                        {currentProposal.proposalType || currentProposal.sourceType || "Proposal Pitch"}
+                      </span>
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-50 text-amber-800 border border-amber-200">
+                        {currentProposal.status || "Reviewing"}
+                      </span>
+                    </div>
+
+                    <h3 className="font-serif text-xl font-bold text-[#1c1b19] leading-snug">{currentProposal.name}</h3>
+
+                    <div className="p-3.5 bg-[#fdf9f4] rounded-xl border border-[#e6e2dd] space-y-2 text-xs">
+                      <div className="flex items-center justify-between text-[#466272]">
+                        <span>Submitter: <strong>{currentProposal.submitter?.name || "Ensemble Member"}</strong></span>
+                        <span className="text-emerald-700 font-bold">{currentProposal.budget || currentProposal.sponsorshipDeal || "₹50,000"}</span>
+                      </div>
+                      <div className="text-[#466272] truncate">
+                        Email: <a href={`mailto:${currentProposal.contact_email || currentProposal.submitter?.email}`} className="underline text-[#635f41]">{currentProposal.contact_email || currentProposal.submitter?.email || "partner@aayam.org"}</a>
+                      </div>
+                      {currentProposal.contact_phone && (
+                        <div className="text-[#466272]">
+                          Phone: <strong>{currentProposal.contact_phone}</strong>
+                        </div>
+                      )}
+                      <div className="pt-1.5 border-t border-[#e6e2dd] text-[11px] text-[#1c1b19]">
+                        Target Stage / Venue: <strong>{currentProposal.venue}</strong>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-[#635f41] block">Proposal Description & Objectives</span>
+                      <p className="text-xs text-[#466272] bg-gray-50 p-3.5 rounded-xl border border-gray-100 leading-relaxed italic">
+                        "{currentProposal.description || "No description provided."}"
+                      </p>
+
+                      {/* AI Keyword Extraction Button (Icon/Symbol Free & Brief) */}
+                      <div className="flex items-center justify-between gap-2 pt-1">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-[#635f41]">
+                          AI Key Signals
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => handleToggleAIKeywords(`prop_${currentProposal.id}`, currentProposal.description)}
+                          className="px-3 py-1 rounded-lg bg-[#fdf9f4] hover:bg-[#e6e2dd] text-[#635f41] text-[11px] font-bold transition-all border border-[#cac6b9]/60"
                         >
-                          {currentProposal.sourceType === "Sponsor" ? "Sponsored Ad Event" : "Member Event Proposal"}
-                        </span>
-                        <span className="text-xs text-[#466272]/60">• {currentProposal.date}</span>
+                          {extractedKeywords[`prop_${currentProposal.id}`] ? "Hide Keywords" : "AI Quick Scan"}
+                        </button>
                       </div>
 
-                      <h3 className="font-serif text-2xl font-bold text-[#635f41] leading-tight">
-                        {currentProposal.name}
-                      </h3>
-                    </div>
-
-                    {/* Submitter Info */}
-                    <div className="p-3 bg-[#fdf9f4] border border-[#e6e2dd] rounded-xl flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-[#635f41]/10 text-[#635f41] flex items-center justify-center font-bold text-xs">
-                        {currentProposal.submitter?.initials || "SB"}
-                      </div>
-                      <div className="text-xs">
-                        <div className="font-bold text-[#1c1b19]">{currentProposal.submitter?.name}</div>
-                        <div className="text-[#466272]/70">{currentProposal.sponsorshipDeal}</div>
-                      </div>
-                    </div>
-
-                    {/* Proposal Details */}
-                    <div className="space-y-3 text-xs text-[#466272]">
-                      <div>
-                        <span className="font-bold uppercase text-[10px] tracking-wider text-[#635f41] block mb-1">
-                          Description & Pitch
-                        </span>
-                        <p className="bg-gray-50/80 p-3 rounded-xl border border-gray-200 leading-relaxed text-[#1c1b19]">
-                          {currentProposal.description || "Proposal submitted for maintainer review."}
-                        </p>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-3 pt-2">
-                        <div className="p-2.5 border border-gray-100 rounded-xl bg-gray-50/50">
-                          <span className="text-[10px] uppercase font-bold text-[#466272]/70 block">Target Venue</span>
-                          <span className="font-bold text-[#1c1b19]">{currentProposal.venue || "TBD Main Hall"}</span>
+                      {/* Extracted AI Keyword Badges Panel (Icon/Symbol Free) */}
+                      {extractedKeywords[`prop_${currentProposal.id}`] && (
+                        <div className="p-3 bg-[#fdf9f4] rounded-xl border border-[#cac6b9]/60 space-y-2">
+                          <div className="flex flex-wrap gap-1.5">
+                            {extractedKeywords[`prop_${currentProposal.id}`].map((kw, idx) => (
+                              <span
+                                key={idx}
+                                className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-white text-[#1c1b19] border border-[#cac6b9]/50 shadow-2xs"
+                              >
+                                {kw}
+                              </span>
+                            ))}
+                          </div>
                         </div>
-                        <div className="p-2.5 border border-gray-100 rounded-xl bg-gray-50/50">
-                          <span className="text-[10px] uppercase font-bold text-[#466272]/70 block">Budget / Terms</span>
-                          <span className="font-bold text-emerald-700">{currentProposal.budget || "$0"}</span>
-                        </div>
-                      </div>
+                      )}
                     </div>
 
-                    {/* Actions */}
-                    <div className="pt-4 border-t border-gray-100 flex gap-3">
+                    <div className="flex gap-3 pt-2">
                       <button
                         onClick={() => handleRejectProposal(currentProposal.id)}
-                        disabled={currentProposal.status === "Rejected"}
                         className="flex-1 border border-red-200 text-red-600 hover:bg-red-50 text-xs font-bold py-2.5 rounded-xl transition-all"
                       >
-                        Reject
+                        Reject Proposal
                       </button>
-
                       <button
                         onClick={() => handleApproveProposal(currentProposal.id)}
-                        disabled={currentProposal.status === "Approved"}
-                        className="flex-1 bg-[#635f41] text-white hover:bg-[#635f41]/90 text-xs font-bold py-2.5 rounded-xl transition-all"
+                        className="flex-1 bg-[#635f41] text-white hover:bg-[#4d4a32] text-xs font-bold py-2.5 rounded-xl transition-all shadow-xs"
                       >
-                        Approve & Schedule
+                        Approve & Schedule Event
                       </button>
                     </div>
-                  </div>
-                ) : (
-                  <div className="py-12 text-center text-xs text-[#466272]/60">
-                    Select a proposal from the left list to review.
                   </div>
                 )}
               </div>
             </div>
           </div>
         )}
+
+        {/* TAB 4: PAST EVENTS */}
+        {activeTab === "Past" && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {pastEvents.map((evt) => (
+              <div key={evt.id} className="bg-white border border-[#e6e2dd] rounded-2xl p-5 shadow-2xs space-y-2 opacity-80">
+                <h3 className="font-serif font-bold text-base text-[#1c1b19]">{evt.title}</h3>
+                <p className="text-xs text-[#466272]">{evt.date} • {evt.venue}</p>
+              </div>
+            ))}
+          </div>
+        )}
+
       </div>
 
       {/* Global Toast */}

@@ -67,7 +67,7 @@ export default function MemberPlays() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5001"}/api/plays`)
+    fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005"}/api/plays`)
       .then(res => res.json())
       .then(data => {
         setPlays(data);

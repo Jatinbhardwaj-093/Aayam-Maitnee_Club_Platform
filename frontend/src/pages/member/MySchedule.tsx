@@ -26,7 +26,7 @@ export default function MySchedule() {
     const fetchEvents = async () => {
       if (!activeUser?.email) return;
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5001"}/api/my-schedule?email=${activeUser.email}`);
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005"}/api/my-schedule?email=${activeUser.email}`);
         if (response.ok) {
           const data = await response.json();
           const formatted = data.map((e: any) => ({
@@ -65,7 +65,7 @@ export default function MySchedule() {
     setEvents(prev => prev.map(e => e.id === id ? { ...e, status: newStatus } : e));
     
     try {
-      await fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5001"}/api/my-schedule/update`, {
+      await fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005"}/api/my-schedule/update`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ participation_id: event.participation_id, status: newStatus })

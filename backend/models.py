@@ -98,6 +98,7 @@ class User(db.Model):
             'name': self.name,
             'email': self.email,
             'avatarUrl': avatar_url,
+            'image': avatar_url,
             'age': self.age,
             'address': self.address,
             'city': self.city,
@@ -268,14 +269,43 @@ class SharedEvent(db.Model):
     __tablename__ = "shared_event"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     submitted_by = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=True)
+    submitter_name = db.Column(db.String(150), nullable=True)
+    contact_email = db.Column(db.String(255), nullable=True)
+    contact_phone = db.Column(db.String(50), nullable=True)
     title = db.Column(db.String(150), nullable=False)
     description = db.Column(db.Text)
-    event_date = db.Column(db.DateTime)
-    location_or_link = db.Column(db.String(255))
+    event_date = db.Column(db.DateTime, nullable=True)
+    location_or_link = db.Column(db.String(255), nullable=True)
+    budget = db.Column(db.String(100), nullable=True, default="₹50,000")
+    proposal_type = db.Column(db.String(100), nullable=True, default="Member Pitch")
     status = db.Column(db.String(20), default="pending")
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     submitter = db.relationship("User", back_populates="shared_events")
+
+    def to_dict(self):
+        s_name = self.submitter_name or (self.submitter.name if self.submitter else "Ensemble Member")
+        s_initials = "".join([x[0] for x in s_name.split()]).upper()[:2] if s_name else "EM"
+        return {
+            'id': self.id,
+            'name': self.title,
+            'description': self.description or '',
+            'date': self.event_date.strftime('%b %d, %Y') if self.event_date else 'Jul 29, 2026',
+            'venue': self.location_or_link or 'Studio Lounge',
+            'budget': self.budget or '₹50,000',
+            'proposalType': self.proposal_type or 'Member Pitch',
+            'sourceType': 'Sponsor' if (self.proposal_type and 'Sponsor' in self.proposal_type) else 'Member',
+            'sponsorshipDeal': self.budget or 'Club Member Pitch',
+            'status': self.status.capitalize() if self.status else 'Reviewing',
+            'contact_email': self.contact_email or (self.submitter.email if self.submitter else 'partner@aayam.org'),
+            'contact_phone': self.contact_phone or '+91 98110 44321',
+            'submitter': {
+                'name': s_name,
+                'initials': s_initials,
+                'email': self.contact_email or (self.submitter.email if self.submitter else ''),
+                'phone': self.contact_phone or ''
+            }
+        }
 
 class Notification(db.Model):
     __tablename__ = "notification"
@@ -414,6 +444,80 @@ class GalleryItem(db.Model):
             'uploaderName': self.uploader_name or "Aayam Media Team"
         }
 
+class Script(db.Model):
+    __tablename__ = "script"
+
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(255), nullable=False)
+    playwright = db.Column(db.String(255), nullable=True)
+    genre = db.Column(db.String(100), nullable=True, default="Drama")
+    language = db.Column(db.String(100), nullable=True, default="Hindi / English")
+    acts = db.Column(db.String(100), nullable=True, default="1 Act")
+    pages = db.Column(db.Integer, nullable=True, default=30)
+    roles_count = db.Column(db.String(100), nullable=True, default="Ensemble Roster")
+    rehearsal_focus = db.Column(db.String(255), nullable=True, default="Scene & Dialogue Work")
+    excerpt = db.Column(db.Text, nullable=True)
+    content = db.Column(db.Text, nullable=True)
+    author_email = db.Column(db.String(255), nullable=False)
+    author_name = db.Column(db.String(255), nullable=True)
+    status = db.Column(db.String(50), nullable=False, default="Draft") # "Public", "Draft", "Pending"
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'playwright': self.playwright or self.author_name or 'Aayam Collective',
+            'genre': self.genre or 'Drama',
+            'language': self.language or 'Hindi & English',
+            'acts': self.acts or '1 Act',
+            'pages': self.pages or 30,
+            'rolesCount': self.roles_count or 'Ensemble Roster',
+            'rehearsalFocus': self.rehearsal_focus or 'Scene & Dialogue Work',
+            'excerpt': self.excerpt or '',
+            'content': self.content or '',
+            'author_email': self.author_email,
+            'author_name': self.author_name or self.author_email.split('@')[0],
+            'status': self.status,
+            'created_at': self.created_at.strftime('%b %d, %Y') if self.created_at else ''
+        }
+
+class SponsorAdRequest(db.Model):
+    __tablename__ = "sponsor_ad_request"
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    sponsor_name = db.Column(db.String(150), nullable=False)
+    contact_person = db.Column(db.String(150), nullable=False)
+    contact_email = db.Column(db.String(255), nullable=False)
+    contact_phone = db.Column(db.String(30), nullable=True)
+    company_website = db.Column(db.String(255), nullable=True)
+    ad_title = db.Column(db.String(200), nullable=False)
+    ad_category = db.Column(db.String(100), nullable=False, default="Playbill Banner")
+    target_event_name = db.Column(db.String(200), nullable=True, default="Annual Cultural Festival")
+    budget_offered = db.Column(db.String(100), nullable=False, default="₹50,000")
+    banner_image_url = db.Column(db.Text, nullable=True)
+    ad_description = db.Column(db.Text, nullable=True)
+    status = db.Column(db.String(50), default="Pending") # "Pending", "Approved", "Rejected"
+    submitted_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'sponsor_name': self.sponsor_name,
+            'contact_person': self.contact_person,
+            'contact_email': self.contact_email,
+            'contact_phone': self.contact_phone or '',
+            'company_website': self.company_website or '',
+            'ad_title': self.ad_title,
+            'ad_category': self.ad_category,
+            'target_event_name': self.target_event_name or 'All Season Plays',
+            'budget_offered': self.budget_offered,
+            'banner_image_url': self.banner_image_url or '',
+            'ad_description': self.ad_description or '',
+            'status': self.status,
+            'submitted_at': self.submitted_at.strftime('%b %d, %Y • %I:%M %p') if self.submitted_at else ''
+        }
+
 from sqlalchemy import event, text
 
 def create_notification_raw(connection, target_id, n_type):
@@ -436,6 +540,92 @@ def audition_after_insert(mapper, connection, target):
 
 def sharedevent_after_insert(mapper, connection, target):
     create_notification_raw(connection, target.id, 'new_event_share')
+
+class AuditionPosition(db.Model):
+    __tablename__ = "audition_position"
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    production_name = db.Column(db.String(150), nullable=False)
+    role_name = db.Column(db.String(150), nullable=False)
+    role_category = db.Column(db.String(100), default="Character Role") # Character Role, Makeup & Hair, Backstage Technical, Costume, Stage Management
+    character_description = db.Column(db.Text)
+    requirements = db.Column(db.Text)
+    slots_available = db.Column(db.Integer, default=1)
+    status = db.Column(db.String(50), default="Open Calling") # Open Calling, In Review, Casting Closed
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'production_name': self.production_name,
+            'role_name': self.role_name,
+            'role_category': self.role_category,
+            'character_description': self.character_description or '',
+            'requirements': self.requirements or '',
+            'slots_available': self.slots_available or 1,
+            'status': self.status or 'Open Calling',
+            'created_at': self.created_at.strftime('%b %d, %Y') if self.created_at else 'Jul 20, 2026'
+        }
+
+
+class AuditionApplication(db.Model):
+    __tablename__ = "audition_application"
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    position_id = db.Column(db.Integer, db.ForeignKey("audition_position.id"), nullable=True)
+    role_name = db.Column(db.String(150), nullable=False)
+    applicant_name = db.Column(db.String(150), nullable=False)
+    applicant_email = db.Column(db.String(255), nullable=False)
+    applicant_phone = db.Column(db.String(50), nullable=True)
+    experience_level = db.Column(db.String(50), default="Ensemble Senior")
+    portfolio_link = db.Column(db.String(255), nullable=True)
+    notes = db.Column(db.Text)
+    status = db.Column(db.String(50), default="Pending Review") # Pending Review, Shortlisted, Selected, Rejected
+    audition_date = db.Column(db.String(100), default="Aug 25, 2026 @ 4:00 PM")
+    submitted_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    position = db.relationship("AuditionPosition", backref="applications")
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'position_id': self.position_id,
+            'role_name': self.role_name,
+            'applicant_name': self.applicant_name,
+            'applicant_email': self.applicant_email,
+            'applicant_phone': self.applicant_phone or '+91 98110 44321',
+            'experience_level': self.experience_level or 'Ensemble Senior',
+            'portfolio_link': self.portfolio_link or 'https://youtube.com/watch?v=sample_slate',
+            'notes': self.notes or '',
+            'status': self.status or 'Pending Review',
+            'audition_date': self.audition_date or 'Aug 25, 2026 @ 4:00 PM',
+            'submitted_at': self.submitted_at.strftime('%b %d, %Y') if self.submitted_at else 'Jul 21, 2026'
+        }
+
+
+class FinancialRecord(db.Model):
+    __tablename__ = "financial_record"
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    title = db.Column(db.String(150), nullable=False)
+    amount = db.Column(db.Float, nullable=False)
+    record_type = db.Column(db.String(20), nullable=False) # 'Income' or 'Expense'
+    category = db.Column(db.String(100), default="Sponsorship") # Sponsorship, Ticket Sales, Venue Rent, Production Props, Grant, Equipment
+    date = db.Column(db.String(50), default="2026-07-20")
+    status = db.Column(db.String(50), default="Completed") # Completed, Pending, Audited
+    notes = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'amount': self.amount,
+            'record_type': self.record_type,
+            'category': self.category,
+            'date': self.date,
+            'status': self.status,
+            'notes': self.notes or '',
+            'created_at': self.created_at.strftime('%b %d, %Y') if self.created_at else 'Jul 20, 2026'
+        }
+
 
 event.listen(User, 'after_insert', user_after_insert)
 event.listen(Audition, 'after_insert', audition_after_insert)

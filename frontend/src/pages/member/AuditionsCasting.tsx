@@ -61,7 +61,7 @@ export default function AuditionsCasting() {
 
   const fetchOpenPositions = async () => {
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5001"}/api/open-positions`);
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005"}/api/open-positions`);
       if (res.ok) {
         const positions = await res.json();
         if (Array.isArray(positions) && positions.length > 0) {
@@ -107,7 +107,7 @@ export default function AuditionsCasting() {
   const fetchMyAuditions = async () => {
     if (!activeUser?.email) return;
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5001"}/api/my-auditions?email=${encodeURIComponent(activeUser.email)}`);
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005"}/api/my-auditions?email=${encodeURIComponent(activeUser.email)}`);
       if (res.ok) {
         const apps = await res.json();
         setApplications(apps);
@@ -141,7 +141,7 @@ export default function AuditionsCasting() {
     if (!activePosition || !activeUser) return;
     
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5001"}/api/audition/submit`, {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005"}/api/audition/submit`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
