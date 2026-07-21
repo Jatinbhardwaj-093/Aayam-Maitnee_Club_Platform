@@ -383,7 +383,15 @@ def seed_database():
     from populate_proposals_and_sponsors import seed_data as seed_proposals
     seed_proposals()
 
-    print("Database seeding with authentic Aayam IITM data, auditions, financials, and proposals completed successfully!")
+    # 12. Seed Schedules for ALL users
+    from populate_schedules import seed_schedules_data
+    seed_schedules_data()
+
+    # 13. Seed Script Vault Playbooks
+    from populate_scripts import seed_scripts_data
+    seed_scripts_data()
+
+    print("Database seeding with authentic Aayam IITM data, auditions, financials, proposals, schedules, and scripts completed successfully!")
 
 if __name__ == "__main__":
     with app.app_context():

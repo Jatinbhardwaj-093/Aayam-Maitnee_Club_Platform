@@ -70,6 +70,7 @@ export default function App() {
           <Route path="admin" element={<ProductionOffice />} />
           <Route path="backstage" element={<BackstagePass />} />
           <Route path="maintainer" element={<MaintainerDashboard />} />
+          <Route path="schedule-admin" element={<MySchedule />} />
           <Route path="analytics" element={<PlatformAnalytics />} />
           <Route path="control-panel" element={<ProductionControlPanel />} />
           <Route path="profile-audit" element={<MemberProfileAudit />} />

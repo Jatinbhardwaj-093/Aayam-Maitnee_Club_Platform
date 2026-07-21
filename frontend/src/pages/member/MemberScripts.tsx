@@ -46,13 +46,67 @@ interface ScriptItem {
   created_at: string;
 }
 
+const fallbackPublicScripts: ScriptItem[] = [
+  {
+    id: 1,
+    title: "Tamashbin Kathputliya",
+    playwright: "Aayam Collective & Utkarsh (Yuuhi)",
+    genre: "Nukkad Natak / Street Play",
+    language: "Hindustani & English",
+    acts: "1 Act (2 Scenes)",
+    pages: 18,
+    rolesCount: "12 Performers",
+    rehearsalFocus: "Choral Chants, Dholak Beat Sync & Crowd Projection",
+    excerpt: "[SCENE 1: COURTYARD] (All performers enter in a circular formation, clapping rhythmically.) SUTRADHAR: Suno suno hey Bharat ke logo! Aaj hum laye hain Tamashbin Kathputliya...",
+    content: "[SCENE 1: COURTYARD]\nSUTRADHAR: Suno suno hey Bharat ke logo! Aaj hum laye hain Tamashbin Kathputliya!",
+    author_email: "utkarsh123@ds.study.iitm.ac.in",
+    author_name: "Utkarsh (Yuuhi)",
+    status: "Public",
+    created_at: "Aug 2026"
+  },
+  {
+    id: 2,
+    title: "DDDJ - Stage Playbook",
+    playwright: "Abay Nandhiga & Aayam Writing Cell",
+    genre: "Proscenium Drama",
+    language: "Hindi & English",
+    acts: "2 Acts",
+    pages: 42,
+    rolesCount: "8 Roles",
+    rehearsalFocus: "Dialogue Intensity, Pauses & Stage Blocking",
+    excerpt: "[ACT I, SCENE 2] VIKRAM: Three years of silence. And you expect a standing ovation?",
+    content: "[ACT I, SCENE 2]\nVIKRAM: Three years of silence. And you expect a standing ovation?",
+    author_email: "abay123@ds.study.iitm.ac.in",
+    author_name: "Abay Nandhiga",
+    status: "Public",
+    created_at: "Aug 2026"
+  },
+  {
+    id: 3,
+    title: "Karn Ki Yachika",
+    playwright: "Classical Hindi Adaptation",
+    genre: "Classical Tragedy",
+    language: "Hindi (Sanskritized)",
+    acts: "3 Acts",
+    pages: 56,
+    rolesCount: "14 Roles",
+    rehearsalFocus: "Verse Recitation & Emotional Diction",
+    excerpt: "[SCENE 4: KURUKSHETRA SUNSET] KARN: Daanveer kehkar tumne mujhe jeeta...",
+    content: "[SCENE 4: KURUKSHETRA SUNSET]\nKARN: Daanveer kehkar tumne mujhe jeeta...",
+    author_email: "abay123@ds.study.iitm.ac.in",
+    author_name: "Abay Nandhiga",
+    status: "Public",
+    created_at: "Aug 2026"
+  }
+];
+
 export default function MemberScripts() {
   const navigate = useNavigate();
   const { activeUser } = useOutletContext<any>() || {};
   const isMaintainer = activeUser?.role?.toLowerCase().includes("maintainer") || activeUser?.isAdmin || false;
 
   const [activeTab, setActiveTab] = useState<"public" | "drafts" | "pending">("public");
-  const [publicScripts, setPublicScripts] = useState<ScriptItem[]>([]);
+  const [publicScripts, setPublicScripts] = useState<ScriptItem[]>(fallbackPublicScripts);
   const [myDrafts, setMyDrafts] = useState<ScriptItem[]>([]);
   const [pendingScripts, setPendingScripts] = useState<ScriptItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -88,12 +142,14 @@ export default function MemberScripts() {
       const data = await res.json();
 
       if (data.status === "success") {
-        setPublicScripts(data.public || []);
+        const fetchedPublic = data.public || [];
+        setPublicScripts(fetchedPublic.length > 0 ? fetchedPublic : fallbackPublicScripts);
         setMyDrafts(data.drafts || []);
         setPendingScripts(data.pending || []);
       }
     } catch (err) {
       console.error("Failed to fetch scripts:", err);
+      setPublicScripts(fallbackPublicScripts);
     } finally {
       setLoading(false);
     }

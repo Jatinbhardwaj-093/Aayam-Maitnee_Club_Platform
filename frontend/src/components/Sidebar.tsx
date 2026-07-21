@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -61,10 +61,9 @@ export default function Sidebar({
 
       {/* Navigation List */}
       <nav className={`flex-1 px-4 py-6 space-y-1.5 overflow-y-auto ${collapsed ? "flex flex-col items-center" : ""}`}>
-        {filteredNavItems.map((item, idx) => {
+        {filteredNavItems.map((item) => {
           const isActive = location.pathname === item.path;
           const Icon = item.icon;
-          const showSectionHeader = !collapsed && item.section && (idx === 0 || filteredNavItems[idx - 1]?.section !== item.section);
 
           if (collapsed) {
             return (
@@ -86,32 +85,26 @@ export default function Sidebar({
           }
 
           return (
-            <React.Fragment key={item.path}>
-              {showSectionHeader && (
-                <div className="px-3 pt-3 pb-1 text-[9px] font-bold text-[#635f41] uppercase tracking-[0.2em]">
-                  {item.section}
-                </div>
-              )}
-              <Link
-                to={item.path}
-                onClick={() => setMobileOpen && setMobileOpen(false)}
-                className={`flex items-center gap-3 px-4 py-3 rounded-[8px] text-sm font-medium transition-all group relative ${
-                  isActive
-                    ? "bg-[#635f41]/10 text-[#635f41] font-bold"
-                    : "hover:bg-[#635f41]/5 hover:text-[#635f41]"
-                }`}
-              >
-                <Icon className={`w-5 h-5 transition-transform group-hover:scale-105 ${
-                  isActive ? "text-[#635f41]" : "text-[#466272]/70"
-                }`} />
-                <div className="flex flex-col text-left">
-                  <span>{item.label}</span>
-                  <span className="text-[10px] text-[#466272]/65 font-normal leading-none mt-0.5 group-hover:text-[#466272]/85">
-                    {item.description}
-                  </span>
-                </div>
-              </Link>
-            </React.Fragment>
+            <Link
+              key={item.path}
+              to={item.path}
+              onClick={() => setMobileOpen && setMobileOpen(false)}
+              className={`flex items-center gap-3 px-4 py-3 rounded-[8px] text-sm font-medium transition-all group relative ${
+                isActive
+                  ? "bg-[#635f41]/10 text-[#635f41] font-bold"
+                  : "hover:bg-[#635f41]/5 hover:text-[#635f41]"
+              }`}
+            >
+              <Icon className={`w-5 h-5 transition-transform group-hover:scale-105 ${
+                isActive ? "text-[#635f41]" : "text-[#466272]/70"
+              }`} />
+              <div className="flex flex-col text-left">
+                <span>{item.label}</span>
+                <span className="text-[10px] text-[#466272]/65 font-normal leading-none mt-0.5 group-hover:text-[#466272]/85">
+                  {item.description}
+                </span>
+              </div>
+            </Link>
           );
         })}
       </nav>

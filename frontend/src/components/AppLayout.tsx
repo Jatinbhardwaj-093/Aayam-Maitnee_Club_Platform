@@ -44,14 +44,15 @@ const navItems: NavItem[] = [
 ];
 
 const maintainerNavItems: NavItem[] = [
-  { label: "Maintainer Dashboard", path: "/maintainer", icon: LayoutDashboard, description: "Executive overview & live metrics", section: "Core Control" },
-  { label: "Platform Analytics", path: "/analytics", icon: LineChart, description: "Graphical analytics & financial ledger", section: "Core Control" },
-  { label: "Events Management", path: "/events-admin", icon: Calendar, description: "Proposal curation & sponsor deals", section: "Production Management" },
-  { label: "Auditions & Casting", path: "/auditions-admin", icon: ClipboardList, description: "Role callings & candidate requests", section: "Production Management" },
-  { label: "Script Vault", path: "/member-scripts", icon: FileText, description: "Confidential play scripts & texts", section: "Ensemble Desk" },
-  { label: "Rehearsal Studio", path: "/ai-rehearsal", icon: Bot, description: "Interactive voice script rehearsal", section: "Ensemble Desk" },
-  { label: "Members Directory", path: "/directory-admin", icon: Users, description: "Ensemble & crew directory", section: "Directory & Media" },
-  { label: "Media Moderation", path: "/media-moderation", icon: HardDrive, description: "Review gallery content & storage", section: "Directory & Media" },
+  { label: "Maintainer Dashboard", path: "/maintainer", icon: LayoutDashboard, description: "Executive overview & live metrics" },
+  { label: "My Schedule", path: "/schedule-admin", icon: Calendar, description: "Personal production & rehearsal schedule" },
+  { label: "Events Management", path: "/events-admin", icon: Calendar, description: "Proposal curation & sponsor deals" },
+  { label: "Auditions & Casting", path: "/auditions-admin", icon: ClipboardList, description: "Role callings & candidate requests" },
+  { label: "Members Directory", path: "/directory-admin", icon: Users, description: "Ensemble & crew directory" },
+  { label: "Script Vault", path: "/member-scripts", icon: FileText, description: "Confidential play scripts & texts" },
+  { label: "Rehearsal Studio", path: "/ai-rehearsal", icon: Bot, description: "Interactive voice script rehearsal" },
+  { label: "Media Moderation", path: "/media-moderation", icon: HardDrive, description: "Review gallery content & storage" },
+  { label: "Platform Analytics", path: "/analytics", icon: LineChart, description: "Graphical analytics & financial ledger" },
 ];
 
 export default function AppLayout() {
