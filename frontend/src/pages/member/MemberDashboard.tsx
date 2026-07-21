@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { useState, useEffect } from "react";
-import { useOutletContext } from "react-router-dom";
-import { Calendar as CalendarIcon, Clock, MapPin, Check, X, BookOpen, CheckCircle } from "lucide-react";
+import { useOutletContext, useNavigate } from "react-router-dom";
+import { Calendar as CalendarIcon, Clock, MapPin, Check, X, BookOpen, CheckCircle, Mic } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -61,6 +61,7 @@ const initialEvents: Event[] = [
 
 export default function MemberDashboard() {
   const { activeUser } = useOutletContext<{ activeUser: any }>();
+  const navigate = useNavigate();
   const [events, setEvents] = useState<Event[]>([]);
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const [scriptOpen, setScriptOpen] = useState(false);
@@ -81,7 +82,7 @@ export default function MemberDashboard() {
     const fetchEvents = async () => {
       if (!activeUser?.email) return;
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5001"}/api/my-schedule?email=${activeUser.email}`);
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005"}/api/my-schedule?email=${activeUser.email}`);
         if (response.ok) {
           const data = await response.json();
           const formatted = data.map((e: any) => ({
@@ -111,7 +112,7 @@ export default function MemberDashboard() {
     setEvents(prev => prev.map(e => e.id === id ? { ...e, status: newStatus } : e));
     
     try {
-      await fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5001"}/api/my-schedule/update`, {
+      await fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005"}/api/my-schedule/update`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ participation_id: event.participation_id, status: newStatus })
@@ -204,7 +205,13 @@ export default function MemberDashboard() {
           </div>
         </div>
 
-        <div className="relative z-10 flex gap-[12px] flex-shrink-0">
+        <div className="relative z-10 flex flex-wrap gap-[12px] flex-shrink-0">
+          <Button 
+            onClick={() => navigate("/ai-rehearsal")}
+            className="bg-[#635f41] hover:bg-[#4d4a32] text-white font-bold rounded-[8px] py-[10px] px-[20px] gap-2 shadow-sm transition-all active:scale-95 flex items-center"
+          >
+            <Mic className="w-4 h-4" /> Rehearsal Studio
+          </Button>
           <Button 
             onClick={() => setCalendarOpen(true)}
             className="bg-[#8CC0EB] hover:bg-[#8CC0EB]/90 text-[#001e2c] font-bold rounded-[8px] py-[10px] px-[20px] gap-2 shadow-sm transition-all active:scale-95"
@@ -216,7 +223,26 @@ export default function MemberDashboard() {
 
 
       {/* Script & Role Resources */}
-      <section className="grid grid-cols-1 md:grid-cols-2 gap-[24px]">
+      <section className="grid grid-cols-1 md:grid-cols-3 gap-[24px]">
+        {/* Dedicated AI Rehearsal Card */}
+        <div className="bg-[#f7f3ee] border border-[#e6e2dd] rounded-[8px] p-[24px] flex flex-col justify-between space-y-[16px]">
+          <div className="space-y-[8px]">
+            <span className="w-[32px] h-[32px] rounded-full bg-[#635f41]/10 flex items-center justify-center text-[#635f41]">
+              <Mic className="w-4 h-4 text-[#635f41]" />
+            </span>
+            <h4 className="font-bold text-base text-[#635f41] font-serif">Script Voice Rehearsals</h4>
+            <p className="text-xs text-[#466272]/80 leading-relaxed">
+              Practice lines live with interactive audio readers, run memory recall tests, and track your scores.
+            </p>
+          </div>
+          <Button
+            onClick={() => navigate("/ai-rehearsal")}
+            className="w-full bg-[#635f41] hover:bg-[#4d4a32] text-white font-semibold rounded-[8px] py-[10px] shadow-2xs"
+          >
+            Open Rehearsal Studio →
+          </Button>
+        </div>
+
         <div className="bg-[#f7f3ee] border border-[#e6e2dd] rounded-[8px] p-[24px] flex flex-col justify-between space-y-[16px]">
           <div className="space-y-[8px]">
             <span className="w-[32px] h-[32px] rounded-full bg-[#635f41]/10 flex items-center justify-center text-[#635f41]">

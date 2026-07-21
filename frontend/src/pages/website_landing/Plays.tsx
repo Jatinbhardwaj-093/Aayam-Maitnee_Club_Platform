@@ -99,7 +99,7 @@ export default function Plays() {
   const [productions, setProductions] = useState<Production[]>(fallbackProductions);
 
   useEffect(() => {
-    fetch("http://localhost:5001/api/plays")
+    fetch("http://localhost:5005/api/plays")
       .then((res) => {
         if (!res.ok) throw new Error("HTTP error");
         return res.json();

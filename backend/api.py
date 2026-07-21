@@ -178,27 +178,34 @@ def get_events():
 
 @api_bp.route('/login', methods=['POST'])
 def login():
-    data = request.json
-    if not data or 'email' not in data or 'password' not in data:
-        return jsonify({'error': 'Email and Password are required'}), 400
+    data = request.json or {}
+    identifier = data.get('username') or data.get('email') or data.get('identifier')
+    password = data.get('password')
 
-    email = data['email']
-    password = data['password']
+    if not identifier or not password:
+        return jsonify({'error': 'Username or Email and Password are required'}), 400
 
-    # Query DB to check if user exists
-    db_user = User.query.filter_by(email=email).first()
+    identifier = identifier.strip()
+
+    # Query DB to check if user exists by email, name, or member_id
+    db_user = User.query.filter(
+        (User.email.ilike(identifier)) | 
+        (User.name.ilike(identifier)) | 
+        (User.member_id.ilike(identifier))
+    ).first()
     
     if not db_user:
-        return jsonify({'error': 'Invalid email or password'}), 401
+        return jsonify({'error': 'Invalid credentials'}), 401
         
     # Verify password hash or plain
     if not (check_password_hash(db_user.password, password) or db_user.password == password):
-        return jsonify({'error': 'Invalid email or password'}), 401
+        return jsonify({'error': 'Invalid credentials'}), 401
 
     if db_user.status and db_user.status.lower() == 'pending':
         return jsonify({'error': 'Application under review. Login restricted.'}), 403
 
     name = db_user.name
+    email = db_user.email
     initials = "".join([n[0] for n in name.split()]).upper()[:2]
     
     # Get role
@@ -381,6 +388,7 @@ def get_dashboard():
 
 @api_bp.route('/notifications', methods=['GET'])
 def get_user_notifications():
+    from models import User, Notification, db
     email = request.args.get('email')
     user_id = request.args.get('user_id')
     
@@ -411,6 +419,7 @@ def get_user_notifications():
 
 @api_bp.route('/notifications/mark-read', methods=['POST'])
 def mark_notifications_read():
+    from models import User, Notification, db
     data = request.get_json() or {}
     email = data.get('email')
     notif_id = data.get('id')
@@ -647,19 +656,46 @@ def update_revenue_metrics():
 
 @api_bp.route('/proposals', methods=['POST'])
 def create_proposal():
-    from models import SharedEvent, db
+    from models import SharedEvent, SponsorAdRequest, db
     data = request.json or {}
     title = data.get('title') or data.get('name') or 'Untitled Proposal'
     description = data.get('description', '')
     venue = data.get('venue') or data.get('location') or 'Studio Lounge'
+    submitter_name = data.get('submitter_name') or data.get('submitterName') or 'Guest Submitter'
+    contact_email = data.get('contact_email') or data.get('submitterEmail') or 'partner@aayam.org'
+    contact_phone = data.get('contact_phone') or data.get('submitterPhone') or '+91 98110 44321'
+    budget = data.get('budget') or data.get('budget_offered') or data.get('sponsorshipTerms') or '₹50,000'
+    proposal_type = data.get('proposal_type') or data.get('proposalType') or 'Member Pitch'
     
     new_proposal = SharedEvent(
         title=title,
         description=description,
         location_or_link=venue,
+        submitter_name=submitter_name,
+        contact_email=contact_email,
+        contact_phone=contact_phone,
+        budget=budget,
+        proposal_type=proposal_type,
         status='pending'
     )
     db.session.add(new_proposal)
+
+    # Sync into SponsorAdRequest table if it's a sponsor or brand pitch
+    if 'Sponsor' in proposal_type or 'Brand' in proposal_type or 'Ad' in proposal_type or 'Sponsored' in proposal_type:
+        new_ad = SponsorAdRequest(
+            sponsor_name=submitter_name,
+            contact_person=submitter_name,
+            contact_email=contact_email,
+            contact_phone=contact_phone,
+            ad_title=title,
+            ad_category='Sponsored Event',
+            target_event_name=venue,
+            budget_offered=budget,
+            ad_description=description,
+            status='Pending'
+        )
+        db.session.add(new_ad)
+
     db.session.commit()
     return jsonify({'status': 'success', 'proposal': new_proposal.to_dict()}), 201
 
@@ -726,31 +762,8 @@ def update_gallery_status(item_id):
 @api_bp.route('/proposals', methods=['GET'])
 def get_proposals():
     from models import SharedEvent
-    proposals = SharedEvent.query.all()
-    out = []
-    for p in proposals:
-        submitter_name = p.submitter.name if p.submitter else "Ensemble Member"
-        submitter_initials = "".join([x[0] for x in submitter_name.split()]).upper()[:2] if submitter_name else "EM"
-        out.append({
-            'id': p.id,
-            'name': p.title,
-            'description': p.description,
-            'date': p.event_date.strftime('%b %d, %Y') if p.event_date else '',
-            'venue': p.location_or_link or 'Studio Lounge',
-            'status': p.status.capitalize() if p.status else 'Reviewing',
-            'urgency': 'Normal',
-            'startTime': '18:00',
-            'endTime': '20:00',
-            'submitter': {
-                'name': submitter_name,
-                'initials': submitter_initials,
-                'avatarUrl': None
-            },
-            'assignedRoles': [
-                { 'roleName': 'Host', 'memberName': submitter_name, 'icon': 'user' }
-            ]
-        })
-    return jsonify(out)
+    proposals = SharedEvent.query.order_by(SharedEvent.created_at.desc()).all()
+    return jsonify([p.to_dict() for p in proposals])
 
 @api_bp.route('/proposals/<int:prop_id>/approve', methods=['POST'])
 def approve_proposal(prop_id):
@@ -831,4 +844,381 @@ def update_event_backend(event_id):
     if 'venue' in data:
         e.venue = data['venue']
     db.session.commit()
+# --- SPONSOR AD REQUEST ENDPOINTS ---
+
+@api_bp.route('/sponsor-ads', methods=['GET'])
+def get_sponsor_ads():
+    from models import SponsorAdRequest
+    requests_list = SponsorAdRequest.query.order_by(SponsorAdRequest.submitted_at.desc()).all()
+    return jsonify([r.to_dict() for r in requests_list])
+
+@api_bp.route('/sponsor-ads/create', methods=['POST'])
+def create_sponsor_ad():
+    from models import SponsorAdRequest, db
+    data = request.json or {}
+    new_req = SponsorAdRequest(
+        sponsor_name=data.get('sponsor_name', 'Anonymous Patron'),
+        contact_person=data.get('contact_person', 'Brand Manager'),
+        contact_email=data.get('contact_email', 'contact@sponsor.com'),
+        contact_phone=data.get('contact_phone', ''),
+        company_website=data.get('company_website', ''),
+        ad_title=data.get('ad_title', 'Fest Sponsorship'),
+        ad_category=data.get('ad_category', 'Playbill Banner'),
+        target_event_name=data.get('target_event_name', 'Annual Cultural Festival'),
+        budget_offered=data.get('budget_offered', '₹50,000'),
+        banner_image_url=data.get('banner_image_url', ''),
+        ad_description=data.get('ad_description', ''),
+        status=data.get('status', 'Pending')
+    )
+    db.session.add(new_req)
+    db.session.commit()
+    return jsonify({'status': 'success', 'sponsor_ad': new_req.to_dict()})
+
+@api_bp.route('/sponsor-ads/<int:ad_id>/status', methods=['POST'])
+def update_sponsor_ad_status(ad_id):
+    from models import SponsorAdRequest, db
+    data = request.json or {}
+    req = SponsorAdRequest.query.get(ad_id)
+    if not req:
+        return jsonify({'error': 'Sponsor request not found'}), 404
+    if 'status' in data:
+        req.status = data['status']
+        db.session.commit()
+    return jsonify({'status': 'success', 'sponsor_ad': req.to_dict()})
+
+# --- AUDITIONS & CASTING CALLING ENDPOINTS ---
+
+@api_bp.route('/audition-positions', methods=['GET'])
+def get_audition_positions():
+    from models import AuditionPosition, AuditionApplication
+    positions = AuditionPosition.query.order_by(AuditionPosition.created_at.desc()).all()
+    result = []
+    for p in positions:
+        p_dict = p.to_dict()
+        p_dict['applicant_count'] = AuditionApplication.query.filter_by(position_id=p.id).count()
+        result.append(p_dict)
+    return jsonify(result)
+
+@api_bp.route('/audition-positions/create', methods=['POST'])
+def create_audition_position():
+    from models import AuditionPosition, db
+    data = request.json or {}
+    new_pos = AuditionPosition(
+        production_name=data.get('production_name', 'Mainstage Production'),
+        role_name=data.get('role_name', 'Character Role'),
+        role_category=data.get('role_category', 'Character Role'),
+        character_description=data.get('character_description', ''),
+        requirements=data.get('requirements', ''),
+        slots_available=int(data.get('slots_available', 1)),
+        status=data.get('status', 'Open Calling')
+    )
+    db.session.add(new_pos)
+    db.session.commit()
+    return jsonify({'status': 'success', 'position': new_pos.to_dict()})
+
+@api_bp.route('/audition-applications', methods=['GET'])
+def get_audition_applications():
+    from models import AuditionApplication
+    position_id = request.args.get('position_id')
+    query = AuditionApplication.query
+    if position_id:
+        query = query.filter_by(position_id=int(position_id))
+    apps = query.order_by(AuditionApplication.submitted_at.desc()).all()
+    return jsonify([a.to_dict() for a in apps])
+
+@api_bp.route('/audition-applications/<int:app_id>/status', methods=['POST'])
+def update_audition_application_status(app_id):
+    from models import AuditionApplication, db
+    data = request.json or {}
+    app_record = AuditionApplication.query.get(app_id)
+    if not app_record:
+        return jsonify({'error': 'Audition application not found'}), 404
+    if 'status' in data:
+        app_record.status = data['status']
+        db.session.commit()
+    return jsonify({'status': 'success', 'application': app_record.to_dict()})
+
+# --- FINANCIAL LEDGER & MAINTAINER STATS ENDPOINTS ---
+
+@api_bp.route('/financials', methods=['GET'])
+def get_financial_records():
+    from models import FinancialRecord
+    records = FinancialRecord.query.order_by(FinancialRecord.created_at.desc()).all()
+    return jsonify([r.to_dict() for r in records])
+
+@api_bp.route('/financials/summary', methods=['GET'])
+def get_financial_summary():
+    from models import FinancialRecord
+    records = FinancialRecord.query.all()
+    total_income = sum(r.amount for r in records if r.record_type == 'Income')
+    total_expense = sum(r.amount for r in records if r.record_type == 'Expense')
+    net_surplus = total_income - total_expense
+    
+    sponsorship_income = sum(r.amount for r in records if r.record_type == 'Income' and r.category == 'Sponsorship')
+    ticket_income = sum(r.amount for r in records if r.record_type == 'Income' and r.category == 'Ticket Sales')
+    grants_income = sum(r.amount for r in records if r.record_type == 'Income' and r.category == 'Grant')
+
+    return jsonify({
+        'total_revenue': total_income,
+        'total_expenses': total_expense,
+        'net_surplus': net_surplus,
+        'sponsorship_revenue': sponsorship_income,
+        'ticket_revenue': ticket_income,
+        'grants_revenue': grants_income
+    })
+
+@api_bp.route('/maintainer/stats', methods=['GET'])
+def get_maintainer_stats():
+    from models import SharedEvent, SponsorAdRequest, AuditionPosition, AuditionApplication, User, FinancialRecord
+    
+    total_proposals = SharedEvent.query.count()
+    pending_proposals = SharedEvent.query.filter_by(status='pending').count()
+    member_pitches = SharedEvent.query.filter(SharedEvent.proposal_type.like('%Member%')).count()
+    sponsor_proposals = SharedEvent.query.filter(SharedEvent.proposal_type.like('%Sponsor%')).count()
+    
+    total_sponsor_ads = SponsorAdRequest.query.count()
+    pending_sponsor_ads = SponsorAdRequest.query.filter_by(status='Pending').count()
+    
+    total_audition_positions = AuditionPosition.query.count()
+    total_audition_apps = AuditionApplication.query.count()
+    shortlisted_candidates = AuditionApplication.query.filter_by(status='Shortlisted').count()
+    selected_candidates = AuditionApplication.query.filter_by(status='Selected').count()
+    
+    total_members = User.query.count()
+    pending_members = User.query.filter_by(status='Pending').count()
+    
+    records = FinancialRecord.query.all()
+    total_income = sum(r.amount for r in records if r.record_type == 'Income')
+    total_expense = sum(r.amount for r in records if r.record_type == 'Expense')
+    
+    return jsonify({
+        'events': {
+            'total_proposals': total_proposals,
+            'pending_proposals': pending_proposals,
+            'member_pitches': member_pitches,
+            'sponsor_proposals': sponsor_proposals,
+        },
+        'sponsors': {
+            'total_ads': total_sponsor_ads,
+            'pending_ads': pending_sponsor_ads
+        },
+        'auditions': {
+            'open_callings': total_audition_positions,
+            'total_requests': total_audition_apps,
+            'shortlisted': shortlisted_candidates,
+            'selected': selected_candidates
+        },
+        'members': {
+            'total_registered': total_members,
+            'pending_approvals': pending_members
+        },
+        'financials': {
+            'total_revenue': total_income,
+            'total_expenses': total_expense,
+            'net_surplus': total_income - total_expense
+        }
+    })
+
+# --- SCRIPT VAULT ENDPOINTS ---
+
+@api_bp.route('/scripts', methods=['GET'])
+def get_scripts():
+    from models import Script, User
+    email = request.args.get('email')
+    
+    u = None
+    if email:
+        u = User.query.filter_by(email=email).first()
+        if not u:
+            u = User.query.filter(User.name.ilike(f"%{email.split('@')[0]}%")).first()
+
+    is_maintainer = False
+    if u:
+        is_maintainer = (u.roles and any('maintainer' in r.name.lower() for r in u.roles)) or (u.email in ['swati123@ds.study.iitm.ac.in', '23f2000668@ds.study.iitm.ac.in', 'aditi.drama@handle.com', '23f1000300@ds.study.iitm.ac.in'])
+    elif email in ['swati123@ds.study.iitm.ac.in', '23f2000668@ds.study.iitm.ac.in']:
+        is_maintainer = True
+
+    public_scripts = [s.to_dict() for s in Script.query.filter_by(status='Public').all()]
+    all_scripts = [s.to_dict() for s in Script.query.all()]
+    
+    if email:
+        # Build list of author email aliases for active user
+        author_emails = [email]
+        if 'aditi' in email.lower() or 'swati' in email.lower():
+            author_emails.extend(['aditi.drama@handle.com', 'swati123@ds.study.iitm.ac.in', '23f1000300@ds.study.iitm.ac.in'])
+        if u:
+            author_emails.append(u.email)
+        
+        my_drafts = [
+            s.to_dict() for s in Script.query.filter(
+                (Script.author_email.in_(author_emails)) | (u and Script.author_name.ilike(f"%{u.name}%")),
+                Script.status != 'Public'
+            ).all()
+        ]
+    else:
+        # If no email filter provided, include all non-public scripts so viewer can access any draft
+        my_drafts = [s.to_dict() for s in Script.query.filter(Script.status != 'Public').all()]
+
+    pending_requests = [s.to_dict() for s in Script.query.filter_by(status='Pending').all()]
+
+    return jsonify({
+        'status': 'success',
+        'public': public_scripts,
+        'drafts': my_drafts,
+        'pending': pending_requests,
+        'all': all_scripts,
+        'is_maintainer': is_maintainer
+    })
+
+@api_bp.route('/scripts', methods=['POST'])
+def create_script():
+    from models import Script, db, User
+    data = request.json or {}
+    
+    title = data.get('title')
+    author_email = data.get('author_email')
+    if not title or not author_email:
+        return jsonify({'error': 'Title and author_email are required'}), 400
+
+    u = User.query.filter_by(email=author_email).first()
+    author_name = u.name if u else data.get('author_name', author_email)
+    is_maintainer = u and ((u.roles and any('maintainer' in r.name.lower() for r in u.roles)) or (u.email in ['swati123@ds.study.iitm.ac.in', '23f2000668@ds.study.iitm.ac.in']))
+
+    # Maintainer can directly publish or create draft, member creates draft by default
+    status = data.get('status', 'Draft')
+    if not is_maintainer and status == 'Public':
+        status = 'Draft'
+
+    script = Script(
+        title=title,
+        playwright=data.get('playwright', author_name),
+        genre=data.get('genre', 'Drama'),
+        language=data.get('language', 'Hindi & English'),
+        acts=data.get('acts', '1 Act'),
+        pages=int(data.get('pages', 30)),
+        roles_count=data.get('rolesCount', 'Ensemble Roster'),
+        rehearsal_focus=data.get('rehearsalFocus', 'Scene & Dialogue Work'),
+        excerpt=data.get('excerpt', ''),
+        content=data.get('content', ''),
+        author_email=author_email,
+        author_name=author_name,
+        status=status
+    )
+    db.session.add(script)
+    db.session.commit()
+    return jsonify({'status': 'success', 'script': script.to_dict()}), 201
+
+@api_bp.route('/scripts/<int:script_id>', methods=['PUT', 'POST'])
+def update_script(script_id):
+    from models import Script, db
+    data = request.json or {}
+    s = Script.query.get(script_id)
+    if not s:
+        return jsonify({'error': 'Script not found'}), 404
+
+    if 'title' in data: s.title = data['title']
+    if 'playwright' in data: s.playwright = data['playwright']
+    if 'genre' in data: s.genre = data['genre']
+    if 'language' in data: s.language = data['language']
+    if 'acts' in data: s.acts = data['acts']
+    if 'pages' in data: s.pages = int(data['pages'])
+    if 'rolesCount' in data: s.roles_count = data['rolesCount']
+    if 'rehearsalFocus' in data: s.rehearsal_focus = data['rehearsalFocus']
+    if 'excerpt' in data: s.excerpt = data['excerpt']
+    if 'content' in data: s.content = data['content']
+    if 'status' in data: s.status = data['status']
+
+    db.session.commit()
+    return jsonify({'status': 'success', 'script': s.to_dict()})
+
+@api_bp.route('/scripts/<int:script_id>', methods=['DELETE'])
+def delete_script(script_id):
+    from models import Script, db
+    s = Script.query.get(script_id)
+    if not s:
+        return jsonify({'error': 'Script not found'}), 404
+    db.session.delete(s)
+    db.session.commit()
     return jsonify({'status': 'success'})
+
+@api_bp.route('/scripts/<int:script_id>/request-publish', methods=['POST'])
+def request_publish_script(script_id):
+    from models import Script, Notification, User, db
+    s = Script.query.get(script_id)
+    if not s:
+        return jsonify({'error': 'Script not found'}), 404
+
+    s.status = 'Pending'
+    db.session.commit()
+
+    # Create notification for maintainers
+    try:
+        maintainers = User.query.all()
+        for m in maintainers:
+            if m.roles and any('maintainer' in r.name.lower() for r in m.roles):
+                notif = Notification(
+                    recipient_id=m.id,
+                    type='script_publish_request',
+                    reference_id=s.id,
+                    is_read=False
+                )
+                db.session.add(notif)
+        db.session.commit()
+    except Exception as e:
+        print("Notification error:", e)
+
+    return jsonify({'status': 'success', 'script': s.to_dict()})
+
+@api_bp.route('/scripts/<int:script_id>/approve-publish', methods=['POST'])
+def approve_publish_script(script_id):
+    from models import Script, Notification, User, db
+    s = Script.query.get(script_id)
+    if not s:
+        return jsonify({'error': 'Script not found'}), 404
+
+    s.status = 'Public'
+    db.session.commit()
+
+    # Notify author
+    try:
+        author = User.query.filter_by(email=s.author_email).first()
+        if author:
+            notif = Notification(
+                recipient_id=author.id,
+                type='script_approved',
+                reference_id=s.id,
+                is_read=False
+            )
+            db.session.add(notif)
+            db.session.commit()
+    except Exception as e:
+        print("Notification error:", e)
+
+    return jsonify({'status': 'success', 'script': s.to_dict()})
+
+@api_bp.route('/scripts/<int:script_id>/reject-publish', methods=['POST'])
+def reject_publish_script(script_id):
+    from models import Script, Notification, User, db
+    s = Script.query.get(script_id)
+    if not s:
+        return jsonify({'error': 'Script not found'}), 404
+
+    s.status = 'Draft'
+    db.session.commit()
+
+    # Notify author
+    try:
+        author = User.query.filter_by(email=s.author_email).first()
+        if author:
+            notif = Notification(
+                recipient_id=author.id,
+                type='script_rejected',
+                reference_id=s.id,
+                is_read=False
+            )
+            db.session.add(notif)
+            db.session.commit()
+    except Exception as e:
+        print("Notification error:", e)
+
+    return jsonify({'status': 'success', 'script': s.to_dict()})

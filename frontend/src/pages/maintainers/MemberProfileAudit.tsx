@@ -22,7 +22,7 @@ export default function MemberProfileAudit() {
     }
 
     // Fetch user details from database
-    fetch(`http://localhost:5001/api/profile/get?email=${encodeURIComponent(targetEmail)}`)
+    fetch(`http://localhost:5005/api/profile/get?email=${encodeURIComponent(targetEmail)}`)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to retrieve profile");
         return res.json();
@@ -37,7 +37,7 @@ export default function MemberProfileAudit() {
       });
       
     // Fetch all available labels
-    fetch("http://localhost:5001/api/labels")
+    fetch("http://localhost:5005/api/labels")
       .then(res => res.json())
       .then(data => setAllLabels(data))
       .catch(err => console.error(err));
@@ -46,13 +46,13 @@ export default function MemberProfileAudit() {
   const handleAssignLabel = async (labelId: number) => {
     if (!profile) return;
     try {
-      await fetch(`http://localhost:5001/api/users/${profile.id}/labels`, {
+      await fetch(`http://localhost:5005/api/users/${profile.id}/labels`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ label_id: labelId })
       });
       // Refresh profile
-      const res = await fetch(`http://localhost:5001/api/profile/get?email=${encodeURIComponent(targetEmail!)}`);
+      const res = await fetch(`http://localhost:5005/api/profile/get?email=${encodeURIComponent(targetEmail!)}`);
       const data = await res.json();
       setProfile(data);
       setShowLabelDropdown(false);
@@ -64,11 +64,11 @@ export default function MemberProfileAudit() {
   const handleRemoveLabel = async (labelId: number) => {
     if (!profile) return;
     try {
-      await fetch(`http://localhost:5001/api/users/${profile.id}/labels/${labelId}`, {
+      await fetch(`http://localhost:5005/api/users/${profile.id}/labels/${labelId}`, {
         method: 'DELETE'
       });
       // Refresh profile
-      const res = await fetch(`http://localhost:5001/api/profile/get?email=${encodeURIComponent(targetEmail!)}`);
+      const res = await fetch(`http://localhost:5005/api/profile/get?email=${encodeURIComponent(targetEmail!)}`);
       const data = await res.json();
       setProfile(data);
     } catch (err) {
@@ -88,24 +88,32 @@ export default function MemberProfileAudit() {
   }
 
   return (
-    <div className="flex-1 bg-[#fdf9f4] text-[#1c1b19] font-sans py-12 md:py-16 selection:bg-[#c6e4f7]">
+    <div className="flex-1 bg-[#fdf9f4] text-[#1c1b19] font-sans py-2 md:py-4 selection:bg-[#c6e4f7]">
       <div className="max-w-5xl mx-auto px-6">
         
         {/* Back header */}
         <div className="mb-6 flex justify-between items-center">
           <button
-            onClick={() => navigate("/directory")}
+            onClick={() => navigate("/directory-admin")}
             className="flex items-center gap-2 text-xs font-semibold text-[#635f41] hover:text-[#635f41]/80 transition-all"
           >
-            <ArrowLeft className="w-4 h-4" /> Back to Directory
+            <ArrowLeft className="w-4 h-4" /> Back to Members Directory
           </button>
         </div>
 
         {/* Profile Card Header */}
         <div className="bg-white border border-[#cac6b9]/30 rounded-3xl shadow-sm overflow-hidden mb-8">
           <div className="bg-[#635f41]/10 border-b border-[#e6e2dd]/60 p-8 flex flex-col md:flex-row items-center gap-6 relative overflow-visible">
-            <div className="w-20 h-20 rounded-full bg-[#635f41]/20 border-2 border-white flex items-center justify-center text-[#635f41] font-bold text-2xl shadow-sm">
-              {profile.name?.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2)}
+            <div className="w-20 h-20 rounded-full overflow-hidden bg-[#635f41]/20 border-2 border-white flex items-center justify-center text-[#635f41] font-bold text-2xl shadow-sm flex-shrink-0">
+              {profile.avatarUrl || profile.image ? (
+                <img
+                  src={profile.avatarUrl || profile.image}
+                  alt={profile.name}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                profile.name?.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2)
+              )}
             </div>
             
             <div className="text-center md:text-left flex-1 space-y-1.5">

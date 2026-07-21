@@ -21,7 +21,7 @@ export default function Landing() {
   const [members, setMembers] = useState<any[]>([]);
 
   useEffect(() => {
-    const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5001";
+    const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005";
 
     // Fetch Plays from Backend
     fetch(`${baseUrl}/api/plays`)

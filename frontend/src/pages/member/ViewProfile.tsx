@@ -18,7 +18,7 @@ export default function ViewProfile() {
     }
 
     // Fetch user details from database
-    fetch(`http://localhost:5001/api/profile/get?email=${encodeURIComponent(activeUser.email)}`)
+    fetch(`http://localhost:5005/api/profile/get?email=${encodeURIComponent(activeUser.email)}`)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to retrieve profile");
         return res.json();
@@ -52,7 +52,7 @@ export default function ViewProfile() {
   }
 
   return (
-    <div className="flex-1 bg-[#fdf9f4] text-[#1c1b19] font-sans py-12 md:py-16 selection:bg-[#c6e4f7]">
+    <div className="flex-1 bg-[#fdf9f4] text-[#1c1b19] font-sans py-2 md:py-4 selection:bg-[#c6e4f7]">
       <div className="max-w-5xl mx-auto px-6">
         
         {/* Back header */}

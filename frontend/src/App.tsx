@@ -12,16 +12,18 @@ import EditProfile from "./pages/member/EditProfile";
 import ViewProfile from "./pages/member/ViewProfile";
 import MemberPlays from "./pages/member/MemberPlays";
 import MemberScripts from "./pages/member/MemberScripts";
+import ScriptBuilder from "./pages/member/ScriptBuilder";
+import AiRehearsalStudio from "./pages/member/AiRehearsalStudio";
 
 // Maintainer pages
 import MaintainerDashboard from "./pages/maintainers/MaintainerDashboard";
 import PlatformAnalytics from "./pages/maintainers/PlatformAnalytics";
-import ComplianceLedger from "./pages/maintainers/ComplianceLedger";
 import ProductionControlPanel from "./pages/maintainers/ProductionControlPanel";
 import MemberProfileAudit from "./pages/maintainers/MemberProfileAudit";
 import MediaModeration from "./pages/maintainers/MediaModeration";
 import EventsManagement from "./pages/maintainers/EventsManagement";
 import AllMembersDirectory from "./pages/maintainers/AllMembersDirectory";
+import AuditionsManagement from "./pages/maintainers/AuditionsManagement";
 
 // Landing pages
 import Landing from "./pages/website_landing/Landing";
@@ -59,17 +61,21 @@ export default function App() {
           <Route path="auditions" element={<AuditionsCasting />} />
           <Route path="member-plays" element={<MemberPlays />} />
           <Route path="member-scripts" element={<MemberScripts />} />
+          <Route path="script-builder" element={<ScriptBuilder />} />
+          <Route path="script-builder/:scriptId" element={<ScriptBuilder />} />
+          <Route path="ai-rehearsal" element={<AiRehearsalStudio />} />
+          <Route path="ai-rehearsal/:scriptId" element={<AiRehearsalStudio />} />
           <Route path="sponsor" element={<SponsorDashboard />} />
           <Route path="member-gallery" element={<ProductionGallery />} />
           <Route path="admin" element={<ProductionOffice />} />
           <Route path="backstage" element={<BackstagePass />} />
           <Route path="maintainer" element={<MaintainerDashboard />} />
           <Route path="analytics" element={<PlatformAnalytics />} />
-          <Route path="compliance" element={<ComplianceLedger />} />
           <Route path="control-panel" element={<ProductionControlPanel />} />
           <Route path="profile-audit" element={<MemberProfileAudit />} />
           <Route path="media-moderation" element={<MediaModeration />} />
           <Route path="events-admin" element={<EventsManagement />} />
+          <Route path="auditions-admin" element={<AuditionsManagement />} />
           <Route path="directory-admin" element={<AllMembersDirectory />} />
         </Route>
       </Routes>

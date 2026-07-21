@@ -370,7 +370,20 @@ def seed_database():
             db.session.add(notif)
     db.session.commit()
     print("User notifications seeded successfully.")
-    print("Database seeding with authentic Aayam IITM data completed successfully!")
+
+    # 9. Seed Audition Positions & Applications
+    from populate_auditions import seed_auditions_data
+    seed_auditions_data()
+
+    # 10. Seed Financial Records & Ledger
+    from populate_financials import seed_financials_data
+    seed_financials_data()
+
+    # 11. Seed Proposals & Sponsor Ads
+    from populate_proposals_and_sponsors import seed_data as seed_proposals
+    seed_proposals()
+
+    print("Database seeding with authentic Aayam IITM data, auditions, financials, and proposals completed successfully!")
 
 if __name__ == "__main__":
     with app.app_context():
