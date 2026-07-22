@@ -45,3 +45,9 @@
 - Send and aggregate role-specific user notifications and alerts
 - Track notification read/unread states and allow batch marking them as read
 - Support automated fetching and status updates of user notifications without reloading pages
+
+## 10. AI Intelligence Component
+- Identify and extract all character roles from a provided script
+- Generate dynamic character suggestions tailored to user prompts
+- Evaluate the quality of uploaded audition footage
+- Assess an actor's compatibility for a specific character based on their audition
