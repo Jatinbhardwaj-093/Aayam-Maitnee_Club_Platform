@@ -47,7 +47,40 @@
 - Support automated fetching and status updates of user notifications without reloading pages
 
 ## 10. AI Intelligence Component
-- Identify and extract all character roles from a provided script
-- Generate dynamic character suggestions tailored to user prompts
-- Evaluate the quality of uploaded audition footage
-- Assess an actor's compatibility for a specific character based on their audition
+
+### 10.1 Event Summarizer
+- **Overview:** Parses raw unstructured text (e.g. event details, notes, announcements) to automatically extract key metadata and autofill the event request form.
+- **Input:** Raw unstructured event text, notes, or plain text details.
+- **Output:** Autofilled event request form fields (Title, Date, Time, Venue, Description, Category, Summary Highlights, Tags).
+- **Target Users:** Event Organizers, Club Admins, Production Maintainers.
+- **Key Benefits:** Eliminates manual data entry when creating events; speeds up event request submissions.
+
+### 10.2 Key Point Filter (Event & Play Requests & Portfolio)
+- **Overview:** Scans and extracts essential key points from event/play requests submitted by sponsors or organizers (allowing admins to quickly grasp what they want and how they want it) as well as member portfolios and requests.
+- **Input:** Event/play request descriptions, sponsor proposal notes, member portfolio documents, raw request text.
+- **Output:** Extracted key points summary, structured requirement highlights (what they want, deliverables, timeline/budget needs), matched skill and experience tags.
+- **Target Users:** Club Admins, Production Managers, Review Committees, Sponsors, Casting Directors.
+- **Key Benefits:** Accelerates request and proposal review; provides instant clarity on sponsor/event expectations and candidate qualifications without reading lengthy descriptions.
+
+### 10.3 Cue Partner & Line Reader
+- **Overview:** Interactive rehearsal assistant that fetches scripts directly from the platform's Script Vault, speaks prompt lines for co-characters, and acts as a virtual cue partner for actors practicing solo.
+- **Input:** Selected script from site Script Vault, target character role, actor's spoken response (audio microphone input).
+- **Output:** Synthesized audio line delivery (cue lines), active line highlight in script UI, line accuracy feedback.
+- **Target Users:** Actors, Cast Members, Rehearsal Participants.
+- **Key Benefits:** Allows solo rehearsals anywhere using platform scripts; improves line memorization and prompt timing.
+
+### 10.4 Character Suggester for Plays (Discussion)
+- **Overview:** Uses the complete play script as context to extract and generate key personality traits and characteristics for requested roles (e.g. hero's rival, mentor), while suggesting matching actors and facilitating director casting discussions.
+- **Input:** Complete play script text context, requested character query/prompt (e.g. "Rival of the hero"), member directory profiles.
+- **Output:** Generated character trait breakdown (personality traits, relationship dynamics, narrative role), ranked actor recommendations, collaborative casting discussion thread.
+- **Target Users:** Play Directors, Casting Committee, Production Admins.
+- **Key Benefits:** Automated script analysis for character profiling; data-driven casting decisions and centralized director feedback.
+
+### 10.5 Audition Sanity Checker
+- **Overview:** Automated verification system that performs two core checks for audition submissions: (1) portfolio matching and scoring against applied role requirements, and (2) technical quality auditing of the provided audition video/audio.
+- **Input:** Uploaded audition video/audio file, applicant member portfolio, target role criteria.
+- **Output:** Dual audit report:
+  1. **Portfolio Match Score:** Role compatibility score based on portfolio skills, past experience, and character criteria.
+  2. **Audio/Video Quality Check:** Technical audit report (resolution, audio clarity/volume, lighting score, format/duration pass-fail status).
+- **Target Users:** Auditioning Members, Performers, Casting Directors, Admins.
+- **Key Benefits:** Guarantees applicant compatibility for applied roles; prevents poor-quality audio/video submissions.
