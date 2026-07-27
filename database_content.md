@@ -2,7 +2,7 @@
 
 > **Last Updated**: July 20, 2026  
 > **Seed File**: [`backend/seed.py`](file:///Users/jatinbhardwaj/Github/software_project/backend/seed.py)  
-> **Gallery Data**: [`backend/seed_gallery_data.py`](file:///Users/jatinbhardwaj/Github/software_project/backend/seed_gallery_data.py)  
+> **Gallery Data**: [`backend/scripts/seed_gallery_data.py`](file:///Users/jatinbhardwaj/Github/software_project/backend/scripts/seed_gallery_data.py)  
 > **Models**: [`backend/models.py`](file:///Users/jatinbhardwaj/Github/software_project/backend/models.py)
 
 ---

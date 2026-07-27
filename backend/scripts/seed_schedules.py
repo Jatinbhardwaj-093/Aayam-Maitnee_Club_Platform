@@ -1,3 +1,6 @@
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from app import app
 from models import db, User, ScheduleSlot, Audition, SharedEvent, Notification
 import datetime
