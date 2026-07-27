@@ -264,12 +264,21 @@ def seed_default_scripts():
         db.session.add_all(default_scripts)
         db.session.commit()
 
-# Ensure tables exist
+def auto_seed_if_empty():
+    from models import User
+    if User.query.count() == 0:
+        print("Empty database detected on startup. Auto-seeding initial dataset...")
+        from seed import seed_database
+        seed_database()
+
+# Ensure tables exist and seed default scripts
 with app.app_context():
     db.create_all()
     ensure_user_columns()
     seed_default_scripts()
 
 if __name__ == '__main__':
+    with app.app_context():
+        auto_seed_if_empty()
     port = int(os.environ.get('PORT', 5005))
     app.run(host='0.0.0.0', port=port, debug=True)

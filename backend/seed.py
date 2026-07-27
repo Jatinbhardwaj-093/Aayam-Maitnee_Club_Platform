@@ -254,6 +254,58 @@ def seed_database():
     # 6. Seed Real Aayam IITM Events
     events_data = [
         {
+            "title": "August Orientation & Welcome Meetup",
+            "description": "Kick-off orientation meetup for new and returning Aayam ensemble members. Icebreaker games, season roadmap preview, and team induction.",
+            "category": "Meetups",
+            "venue": "Aayam Hub & SAC Courtyard, IIT Madras",
+            "event_date": date(2026, 8, 2),
+            "start_time": time(17, 30),
+            "end_time": time(19, 30),
+            "max_participants": 80,
+            "poster": "/aayam_assets/tamashbin_user_3.jpg",
+            "status": "Upcoming",
+            "admin": admin_abay
+        },
+        {
+            "title": "Natyashastra Movement & Body Control Workshop",
+            "description": "Physical theatre workshop focusing on Angika Abhinaya (body gestures), spatial dynamics, and rhythmic stage movement.",
+            "category": "Workshops",
+            "venue": "Rehearsal Hall B, IIT Madras",
+            "event_date": date(2026, 8, 5),
+            "start_time": time(16, 0),
+            "end_time": time(18, 30),
+            "max_participants": 40,
+            "poster": "/aayam_assets/samatvam_user_4.jpg",
+            "status": "Upcoming",
+            "admin": admin_samarth
+        },
+        {
+            "title": "Sunday Chai & Monologue Jamming Meetup",
+            "description": "Relaxed weekend meetup for ensemble actors to perform short 2-minute monologues, receive peer feedback, and share chai.",
+            "category": "Meetups",
+            "venue": "OAT Amphitheatre Lawns, IIT Madras",
+            "event_date": date(2026, 8, 9),
+            "start_time": time(16, 30),
+            "end_time": time(18, 30),
+            "max_participants": 50,
+            "poster": "/aayam_assets/kky_user_2.jpg",
+            "status": "Upcoming",
+            "admin": admin_utkarsh
+        },
+        {
+            "title": "Stage Lighting & DMX Rigging Masterclass",
+            "description": "Technical crew masterclass covering DMX lighting consoles, spot gels, color temperatures, and cue timing for live plays.",
+            "category": "Workshops",
+            "venue": "CLT Main Auditorium Tech Booth, IIT Madras",
+            "event_date": date(2026, 8, 12),
+            "start_time": time(14, 0),
+            "end_time": time(17, 0),
+            "max_participants": 35,
+            "poster": "/aayam_assets/krishna_subramanian.jpg",
+            "status": "Upcoming",
+            "admin": admin_samarth
+        },
+        {
             "title": "Musimprov (with Akord) - Musical Improv Session",
             "description": "A vibrant joint session with Akord music club blending spontaneous theatrical improv with live vocal rhythms.",
             "category": "Workshops",
@@ -265,6 +317,19 @@ def seed_database():
             "poster": "/aayam_assets/tamashbin_user_3.jpg",
             "status": "Upcoming",
             "admin": admin_abay
+        },
+        {
+            "title": "August Script Reading Circle - Tamashbin & DDDJ",
+            "description": "Group table-read session for the upcoming festival scripts. Actors assign roles and analyze dialogue subtext.",
+            "category": "Meetups",
+            "venue": "Aayam Conference Room 2, IITM Campus",
+            "event_date": date(2026, 8, 18),
+            "start_time": time(18, 0),
+            "end_time": time(20, 30),
+            "max_participants": 45,
+            "poster": "/aayam_assets/dddj_user_3.jpg",
+            "status": "Upcoming",
+            "admin": admin_utkarsh
         },
         {
             "title": "Sahitya Sabha - Chit-Chat & Jamming Session",
@@ -280,6 +345,32 @@ def seed_database():
             "admin": admin_utkarsh
         },
         {
+            "title": "Backstage Props & Set Crafting Social",
+            "description": "Hands-on set design session. Painting backdrops, crafting stage props, and organizing wardrobe racks for the August showcase.",
+            "category": "Meetups",
+            "venue": "Aayam Art & Set Studio, IIT Madras",
+            "event_date": date(2026, 8, 25),
+            "start_time": time(15, 0),
+            "end_time": time(18, 0),
+            "max_participants": 40,
+            "poster": "/aayam_assets/sneha_das.jpg",
+            "status": "Upcoming",
+            "admin": admin_samarth
+        },
+        {
+            "title": "Aayam Monthly Ensemble Showcase & Open Mic",
+            "description": "Monthly showcase performance featuring short plays, original street drama acts, and acoustic musical numbers.",
+            "category": "Plays",
+            "venue": "Open Air Theatre (OAT), IIT Madras",
+            "event_date": date(2026, 8, 29),
+            "start_time": time(18, 30),
+            "end_time": time(21, 30),
+            "max_participants": 200,
+            "poster": "/aayam_assets/tamashbin_user_4.jpg",
+            "status": "Upcoming",
+            "admin": admin_abay
+        },
+        {
             "title": "Theatre Masterclass with Gyaneshwar Mishra",
             "description": "Exclusive masterclass on voice modulation, spatial awareness, and classical stage blocking.",
             "category": "Workshops",
@@ -293,19 +384,6 @@ def seed_database():
             "admin": admin_samarth
         },
         {
-            "title": "Darpan 2026 Annual Drama Festival",
-            "description": "Aayam's signature annual festival featuring Abhinaya Mono-acting, Envisage Directorial, and ScreenKraft Script Writing competitions.",
-            "category": "Plays",
-            "venue": "Open Air Theatre & CLT, IIT Madras",
-            "event_date": date(2026, 10, 5),
-            "start_time": time(0, 0),
-            "end_time": time(22, 0),
-            "max_participants": 300,
-            "poster": "/aayam_assets/dddj_user_3.jpg",
-            "status": "Upcoming",
-            "admin": admin_abay
-        },
-        {
             "title": "Nukkad Natak Guidance Session with Om Bhope",
             "description": "Hands-on street play rehearsal covering crowd engagement, vocal projection, and formation changes.",
             "category": "Workshops",
@@ -317,6 +395,19 @@ def seed_database():
             "poster": "/aayam_assets/tamashbin_user_4.jpg",
             "status": "Upcoming",
             "admin": admin_utkarsh
+        },
+        {
+            "title": "Darpan 2026 Annual Drama Festival",
+            "description": "Aayam's signature annual festival featuring Abhinaya Mono-acting, Envisage Directorial, and ScreenKraft Script Writing competitions.",
+            "category": "Plays",
+            "venue": "Open Air Theatre & CLT, IIT Madras",
+            "event_date": date(2026, 10, 5),
+            "start_time": time(0, 0),
+            "end_time": time(22, 0),
+            "max_participants": 300,
+            "poster": "/aayam_assets/dddj_user_3.jpg",
+            "status": "Upcoming",
+            "admin": admin_abay
         }
     ]
     
