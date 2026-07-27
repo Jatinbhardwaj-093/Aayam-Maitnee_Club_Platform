@@ -197,8 +197,15 @@ def login():
     if not db_user:
         return jsonify({'error': 'Invalid credentials'}), 401
         
-    # Verify password hash or plain
-    if not (check_password_hash(db_user.password, password) or db_user.password == password):
+    # Verify password securely via hash check (support legacy plain text fallback if hash check fails)
+    password_valid = False
+    if db_user.password:
+        if db_user.password.startswith(('pbkdf2:', 'scrypt:', 'argon2:')):
+            password_valid = check_password_hash(db_user.password, password)
+        else:
+            password_valid = check_password_hash(db_user.password, password) or (db_user.password == password)
+
+    if not password_valid:
         return jsonify({'error': 'Invalid credentials'}), 401
 
     if db_user.status and db_user.status.lower() == 'pending':
@@ -225,16 +232,15 @@ def login():
         'isAdmin': is_admin
     }
 
-    # Generate JWT token
+    # Generate JWT token with timezone-aware expiration
     JWT_SECRET = os.environ.get('JWT_SECRET', 'aayam_super_secret_key_67890')
-    import datetime
     payload = {
         'sub': db_user.id,
         'email': db_user.email,
         'name': db_user.name,
         'role': role,
         'isAdmin': is_admin,
-        'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)
+        'exp': datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=24)
     }
     token = jwt.encode(payload, JWT_SECRET, algorithm='HS256')
 
