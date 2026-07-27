@@ -340,7 +340,7 @@ def seed_database():
 
     # 7. Seed Gallery Items (60 Authentic High-Res Play Photos matching website)
     from models import GalleryItem
-    from seed_gallery_data import gallery_data
+    from scripts.seed_gallery_data import gallery_data
 
     for gi in gallery_data:
         item = GalleryItem(
@@ -372,24 +372,31 @@ def seed_database():
     print("User notifications seeded successfully.")
 
     # 9. Seed Audition Positions & Applications
-    from populate_auditions import seed_auditions_data
+    from scripts.populate_auditions import seed_auditions_data
     seed_auditions_data()
 
     # 10. Seed Financial Records & Ledger
-    from populate_financials import seed_financials_data
+    from scripts.populate_financials import seed_financials_data
     seed_financials_data()
 
     # 11. Seed Proposals & Sponsor Ads
-    from populate_proposals_and_sponsors import seed_data as seed_proposals
+    from scripts.populate_proposals_and_sponsors import seed_data as seed_proposals
     seed_proposals()
 
+    from scripts.populate_sponsor_ads import seed_sponsor_ads
+    seed_sponsor_ads()
+
     # 12. Seed Schedules for ALL users
-    from populate_schedules import seed_schedules_data
+    from scripts.populate_schedules import seed_schedules_data
     seed_schedules_data()
 
     # 13. Seed Script Vault Playbooks
-    from populate_scripts import seed_scripts_data
+    from scripts.populate_scripts import seed_scripts_data
     seed_scripts_data()
+
+    # 14. Setup Open Positions
+    from scripts.setup_positions import run as setup_positions
+    setup_positions()
 
     print("Database seeding with authentic Aayam IITM data, auditions, financials, proposals, schedules, and scripts completed successfully!")
 

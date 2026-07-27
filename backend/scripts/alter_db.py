@@ -1,7 +1,7 @@
 import sqlite3
 import os
 
-db_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'aayam.db')
+db_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'aayam.db')
 
 conn = sqlite3.connect(db_path)
 try:
