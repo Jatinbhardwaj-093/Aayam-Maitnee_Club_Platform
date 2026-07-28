@@ -126,16 +126,16 @@ export default function AppLayout() {
   const filteredNavItems = isMaintainer
     ? maintainerNavItems
     : navItems.filter((item) => {
-        if (item.path === "/") {
-          return false;
-        }
-        const isNormalMember = !isMaintainer;
-        if (isNormalMember) {
-          // Display Member Dashboard, My Schedule, Auditions, Plays, Scripts, and Rehearsal Studio.
-          return ["/member", "/schedule", "/auditions", "/member-plays", "/member-scripts", "/ai-rehearsal"].includes(item.path);
-        }
-        return true;
-      });
+      if (item.path === "/") {
+        return false;
+      }
+      const isNormalMember = !isMaintainer;
+      if (isNormalMember) {
+        // Display Member Dashboard, My Schedule, Auditions, Plays, Scripts, and Rehearsal Studio.
+        return ["/member", "/schedule", "/auditions", "/member-plays", "/member-scripts", "/ai-rehearsal"].includes(item.path);
+      }
+      return true;
+    });
 
   const activeItem = navItems.find((item) => item.path === location.pathname) ||
     maintainerNavItems.find((item) => item.path === location.pathname) ||
@@ -223,8 +223,8 @@ export default function AppLayout() {
             <div className="flex justify-between items-center px-6 md:px-12 w-full max-w-7xl mx-auto h-full">
               {/* Logo / Brand */}
               <div className="flex items-center gap-12">
-                <Link 
-                  to="/" 
+                <Link
+                  to="/"
                   className="font-serif text-2xl font-bold tracking-tight text-[#635f41] hover:opacity-90 active:scale-95 transition-all"
                 >
                   AAYAM
@@ -234,51 +234,46 @@ export default function AppLayout() {
                 <nav className="hidden md:flex items-center gap-8">
                   <Link
                     to="/about"
-                    className={`text-sm font-semibold tracking-wide transition-all ${
-                      location.pathname === "/about" || location.pathname === "/manifesto"
-                        ? "text-[#635f41] border-b-2 border-[#635f41] pb-1"
-                        : "text-[#466272] hover:text-[#635f41]"
-                    }`}
+                    className={`text-sm font-semibold tracking-wide transition-all ${location.pathname === "/about" || location.pathname === "/manifesto"
+                      ? "text-[#635f41] border-b-2 border-[#635f41] pb-1"
+                      : "text-[#466272] hover:text-[#635f41]"
+                      }`}
                   >
                     About / Manifesto
                   </Link>
                   <Link
                     to="/plays"
-                    className={`text-sm font-semibold tracking-wide transition-all ${
-                      location.pathname === "/plays"
-                        ? "text-[#635f41] border-b-2 border-[#635f41] pb-1"
-                        : "text-[#466272] hover:text-[#635f41]"
-                    }`}
+                    className={`text-sm font-semibold tracking-wide transition-all ${location.pathname === "/plays"
+                      ? "text-[#635f41] border-b-2 border-[#635f41] pb-1"
+                      : "text-[#466272] hover:text-[#635f41]"
+                      }`}
                   >
                     Our Plays
                   </Link>
                   <Link
                     to="/events"
-                    className={`text-sm font-semibold tracking-wide transition-all ${
-                      location.pathname === "/events"
-                        ? "text-[#635f41] border-b-2 border-[#635f41] pb-1"
-                        : "text-[#466272] hover:text-[#635f41]"
-                    }`}
+                    className={`text-sm font-semibold tracking-wide transition-all ${location.pathname === "/events"
+                      ? "text-[#635f41] border-b-2 border-[#635f41] pb-1"
+                      : "text-[#466272] hover:text-[#635f41]"
+                      }`}
                   >
                     Events
                   </Link>
                   <Link
                     to="/directory"
-                    className={`text-sm font-semibold tracking-wide transition-all ${
-                      location.pathname === "/directory"
-                        ? "text-[#635f41] border-b-2 border-[#635f41] pb-1"
-                        : "text-[#466272] hover:text-[#635f41]"
-                    }`}
+                    className={`text-sm font-semibold tracking-wide transition-all ${location.pathname === "/directory"
+                      ? "text-[#635f41] border-b-2 border-[#635f41] pb-1"
+                      : "text-[#466272] hover:text-[#635f41]"
+                      }`}
                   >
                     Member Directory
                   </Link>
                   <Link
                     to="/gallery"
-                    className={`text-sm font-semibold tracking-wide transition-all ${
-                      location.pathname === "/gallery" || location.pathname === "/public-gallery"
-                        ? "text-[#635f41] border-b-2 border-[#635f41] pb-1"
-                        : "text-[#466272] hover:text-[#635f41]"
-                    }`}
+                    className={`text-sm font-semibold tracking-wide transition-all ${location.pathname === "/gallery" || location.pathname === "/public-gallery"
+                      ? "text-[#635f41] border-b-2 border-[#635f41] pb-1"
+                      : "text-[#466272] hover:text-[#635f41]"
+                      }`}
                   >
                     Gallery
                   </Link>
@@ -302,7 +297,7 @@ export default function AppLayout() {
                     >
                       Join Club
                     </Link>
-                    <Button 
+                    <Button
                       onClick={() => setPortalOpen(true)}
                       className="gap-2 bg-[#8CC0EB] text-[#1c1b19] hover:bg-[#8CC0EB]/95 font-semibold rounded-[8px] h-9 px-4 transition-all active:scale-95 flex items-center"
                     >
@@ -392,11 +387,10 @@ export default function AppLayout() {
                           </div>
                         ) : (
                           dbNotifications.map((notif) => (
-                            <div 
-                              key={notif.id} 
-                              className={`p-3.5 border rounded-[10px] space-y-1 transition-all ${
-                                notif.is_read ? "bg-white/70 border-[#e6e2dd]" : "bg-white border-[#8CC0EB] shadow-xs"
-                              }`}
+                            <div
+                              key={notif.id}
+                              className={`p-3.5 border rounded-[10px] space-y-1 transition-all ${notif.is_read ? "bg-white/70 border-[#e6e2dd]" : "bg-white border-[#8CC0EB] shadow-xs"
+                                }`}
                             >
                               <div className="flex justify-between items-center gap-2">
                                 <span className="text-xs font-bold text-[#635f41] flex items-center gap-1.5">
@@ -433,7 +427,7 @@ export default function AppLayout() {
 
               {/* Portal Access Dialog (Login Button) - shown only when logged out */}
               {!activeUser && (
-                <Button 
+                <Button
                   onClick={() => setPortalOpen(true)}
                   className="gap-2 bg-[#8CC0EB] text-[#1c1b19] hover:bg-[#8CC0EB]/95 font-semibold rounded-[8px] h-9 px-4 transition-all active:scale-95 flex items-center"
                 >
@@ -460,7 +454,7 @@ export default function AppLayout() {
                 Sign in with your username or email address to access your Aayam workspace.
               </DialogDescription>
             </DialogHeader>
-            
+
             <form onSubmit={(e) => {
               e.preventDefault();
               const target = e.target as any;
@@ -471,7 +465,7 @@ export default function AppLayout() {
                   {loginError}
                 </div>
               )}
-              
+
               <div className="space-y-1.5">
                 <label className="text-[11px] uppercase tracking-wider text-[#635f41] font-bold block">
                   Username or Email Address
@@ -485,15 +479,15 @@ export default function AppLayout() {
                   autoFocus
                 />
               </div>
-              
+
               <div className="space-y-1.5">
                 <div className="flex justify-between items-center">
                   <label className="text-[11px] uppercase tracking-wider text-[#635f41] font-bold">
                     Password
                   </label>
-                  <a 
-                    href="#" 
-                    onClick={(e) => { e.preventDefault(); alert("Prototype info: any password is accepted."); }} 
+                  <a
+                    href="#"
+                    onClick={(e) => { e.preventDefault(); alert("Prototype info: any password is accepted."); }}
                     className="text-[11px] text-[#635f41] hover:underline font-semibold transition-colors"
                   >
                     Forgot?
@@ -529,16 +523,16 @@ export default function AppLayout() {
               </div>
 
               <DialogFooter className="pt-3 flex flex-col-reverse sm:flex-row gap-2.5">
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  onClick={() => setPortalOpen(false)} 
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setPortalOpen(false)}
                   className="border-[#cac6b9] text-[#466272] hover:bg-[#f7f3ee] rounded-xl text-xs font-semibold h-11 flex-1 shadow-sm transition-all"
                 >
                   Cancel
                 </Button>
-                <Button 
-                  type="submit" 
+                <Button
+                  type="submit"
                   className="bg-[#635f41] text-white hover:bg-[#4d4a32] active:scale-[0.99] rounded-xl text-xs font-bold h-11 flex-1 shadow-md hover:shadow-lg transition-all"
                 >
                   Sign In
@@ -554,7 +548,7 @@ export default function AppLayout() {
             <main className="flex-1 w-full">
               <Outlet context={{ activeUser, setActiveUser }} />
             </main>
-            
+
             {/* Footer */}
             <footer className="bg-white py-16 px-6 md:px-12 border-t border-[#cac6b9]/30 mt-auto w-full">
               <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">

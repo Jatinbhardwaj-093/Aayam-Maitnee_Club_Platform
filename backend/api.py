@@ -3,9 +3,9 @@ import json
 import random
 import jwt
 import datetime
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, Response
 from werkzeug.security import generate_password_hash, check_password_hash
-from models import db, User, Role, Membership, Event, Booking, Announcement, Feedback, Gallery, ScheduleSlot, Audition, SharedEvent, Volunteer, Participation, Play, OpenPosition
+from models import db, User, Role, Membership, Event, Booking, Announcement, Feedback, Gallery, ScheduleSlot, Audition, SharedEvent, Volunteer, Participation, Play, OpenPosition, ExtractedCharacter
 import redis
 
 api_bp = Blueprint('api', __name__)
@@ -1228,3 +1228,212 @@ def reject_publish_script(script_id):
         print("Notification error:", e)
 
     return jsonify({'status': 'success', 'script': s.to_dict()})
+
+
+# ==========================================
+# Character Extractor & SSE API Endpoints
+# ==========================================
+import queue
+
+sse_queues = []
+
+def extract_characters_from_text(text):
+    if not text or not text.strip():
+        return []
+    
+    text_lower = text.lower()
+    chars = []
+    
+    # Pre-defined mock matches for the manuscript editor
+    if "arthur" in text_lower or "merlin" in text_lower or "excalibur" in text_lower:
+        chars = [
+            {
+                "name": "Arthur",
+                "description": "A brave and noble knight destined for greatness.",
+                "traits": ["brave", "noble", "determined"],
+                "motivation": "To protect his kingdom and unite the realm.",
+                "role": "Protagonist"
+            },
+            {
+                "name": "Merlin",
+                "description": "A wise and enigmatic wizard who guides Arthur.",
+                "traits": ["wise", "enigmatic", "mysterious"],
+                "motivation": "To ensure Arthur fulfills his destiny.",
+                "role": "Supporting"
+            }
+        ]
+    elif "jane" in text_lower or "bob" in text_lower or "merchant" in text_lower:
+        chars = [
+            {
+                "name": "Jane",
+                "description": "A brave adventurer exploring unknown lands.",
+                "traits": ["brave", "curious", "resourceful"],
+                "motivation": "To find the lost city of gold.",
+                "role": "Protagonist"
+            },
+            {
+                "name": "Bob",
+                "description": "A cowardly merchant who reluctantly accompanies Jane.",
+                "traits": ["cowardly", "greedy", "anxious"],
+                "motivation": "To make a profit and return home alive.",
+                "role": "Supporting"
+            }
+        ]
+    else:
+        # Simple local rule-based name-extractor fallback
+        import re
+        words = re.findall(r'\b[A-Z][a-z]+\b', text)
+        stop_words = {"The", "A", "An", "He", "She", "It", "They", "We", "I", "You", "But", "And", "Or", "If", "Then", "This", "That", "There", "Here", "When", "Where", "Why", "How"}
+        names = sorted(list(set([w for w in words if w not in stop_words])))
+        
+        if names:
+            for name in names[:3]:
+                chars.append({
+                    "name": name,
+                    "description": f"A mysterious character found in the text named {name}.",
+                    "traits": ["observant", "mysterious"],
+                    "motivation": "Unclear motives from the text.",
+                    "role": "Supporting"
+                })
+        else:
+            chars = [
+                {
+                    "name": "The Stranger",
+                    "description": "A mysterious traveler who just entered the tavern.",
+                    "traits": ["shady", "vigilant", "mysterious"],
+                    "motivation": "Watching the room.",
+                    "role": "Minor"
+                }
+            ]
+    return chars
+
+@api_bp.route('/stream', methods=['GET'])
+def stream_events():
+    def event_generator():
+        q = queue.Queue()
+        sse_queues.append(q)
+        try:
+            # Send connection confirmation event
+            yield f"data: Connected to analysis stream\n\n"
+            while True:
+                event_data = q.get()
+                yield event_data
+        except GeneratorExit:
+            pass
+        finally:
+            if q in sse_queues:
+                sse_queues.remove(q)
+                
+    return Response(event_generator(), mimetype='text/event-stream')
+
+@api_bp.route('/analyze-text', methods=['POST'])
+def analyze_text():
+    data = request.json or {}
+    text = data.get("text", "")
+    if not text.strip():
+        return jsonify({"success": True, "message": "Text is empty."})
+        
+    characters = extract_characters_from_text(text)
+    
+    # Broadcast to SSE queues to simulate streaming character push
+    event_payload = f"event: analysis\ndata: {json.dumps({'characters': characters})}\n\n"
+    for q in sse_queues:
+        q.put(event_payload)
+        
+    return jsonify({"success": True, "characters": characters})
+
+@api_bp.route('/characters', methods=['GET'])
+def get_characters():
+    chars = ExtractedCharacter.query.all()
+    return jsonify([c.to_dict() for c in chars])
+
+@api_bp.route('/characters', methods=['POST'])
+def save_character():
+    data = request.json or {}
+    name = data.get("name")
+    if not name:
+        return jsonify({"error": "Character name is required"}), 400
+        
+    char_id = data.get("id")
+    char_obj = None
+    if char_id:
+        char_obj = ExtractedCharacter.query.get(char_id)
+        
+    if not char_obj:
+        char_obj = ExtractedCharacter.query.filter_by(name=name).first()
+        
+    if not char_obj:
+        char_obj = ExtractedCharacter(name=name)
+        db.session.add(char_obj)
+        
+    char_obj.description = data.get("description", char_obj.description)
+    traits = data.get("traits")
+    if traits is not None:
+        char_obj.traits = json.dumps(traits)
+    char_obj.motivation = data.get("motivation", char_obj.motivation)
+    char_obj.role = data.get("role", char_obj.role)
+    
+    db.session.commit()
+    return jsonify(char_obj.to_dict())
+
+@api_bp.route('/characters', methods=['DELETE'])
+def delete_character():
+    char_id = request.args.get('id')
+    if not char_id:
+        return jsonify({"error": "Character ID is required"}), 400
+        
+    char_obj = ExtractedCharacter.query.get(char_id)
+    if not char_obj:
+        return jsonify({"error": "Character not found"}), 404
+        
+    db.session.delete(char_obj)
+    db.session.commit()
+    return jsonify({"success": True})
+
+@api_bp.route('/suggest-character', methods=['POST'])
+def suggest_character():
+    data = request.json or {}
+    prompt = data.get("prompt", "")
+    story_context = data.get("context", "")
+    
+    if not prompt.strip():
+        return jsonify({"error": "Prompt is required"}), 400
+        
+    prompt_lower = prompt.lower()
+    if "rogue" in prompt_lower or "thief" in prompt_lower:
+        suggested = {
+            "name": "Garrett",
+            "description": "A quiet and agile thief who knows the city's underbelly like the back of his hand. He is cynical but loyal to those who earn his trust.",
+            "traits": ["agile", "cynical", "stealthy"],
+            "motivation": "To survive and retrieve stolen relics from corrupt nobles.",
+            "role": "Supporting"
+        }
+    elif "rival" in prompt_lower or "wizard" in prompt_lower or "garrick" in prompt_lower:
+        suggested = {
+            "name": "Garrick",
+            "description": "A talented and ambitious wizard who was passed over for the Archmage position. He seeks to prove his superiority over Merlin.",
+            "traits": ["ambitious", "crafty", "brilliant"],
+            "motivation": "To surpass his rivals and gain forbidden magical knowledge.",
+            "role": "Rival"
+        }
+    elif "aurelia" in prompt_lower or "scholar" in prompt_lower or "historian" in prompt_lower:
+        suggested = {
+            "name": "Aurelia",
+            "description": "A scholar from the Royal Archive who seeks ancient ruins to translate lost magic. She is curious and often gets into danger.",
+            "traits": ["curious", "intellectual", "reckless"],
+            "motivation": "To uncover the secrets of the ancients.",
+            "role": "Supporting"
+        }
+    else:
+        import re
+        words = re.findall(r'\b[A-Z][a-z]+\b', prompt)
+        name = words[0] if words else "Valerius"
+        suggested = {
+            "name": name,
+            "description": f"A dynamic character generated for the prompt: '{prompt}'.",
+            "traits": ["brave", "honest", "determined"],
+            "motivation": "To fulfill their destiny.",
+            "role": "Protagonist"
+        }
+        
+    return jsonify(suggested)

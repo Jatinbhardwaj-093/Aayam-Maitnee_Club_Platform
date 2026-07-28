@@ -17,7 +17,6 @@ import {
   Send,
   Clock,
   ShieldAlert,
-  Sparkles,
   X,
   FilePlus,
   Eye,
@@ -325,22 +324,20 @@ export default function MemberScripts() {
         <div className="flex items-center gap-2 bg-[#f4efe8] p-1.5 rounded-2xl border border-[#cac6b9]/40">
           <button
             onClick={() => setActiveTab("public")}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
-              activeTab === "public"
-                ? "bg-[#635f41] text-white shadow-sm"
-                : "text-[#466272] hover:text-[#1c1b19] hover:bg-[#e6e2dd]/50"
-            }`}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${activeTab === "public"
+              ? "bg-[#635f41] text-white shadow-sm"
+              : "text-[#466272] hover:text-[#1c1b19] hover:bg-[#e6e2dd]/50"
+              }`}
           >
             <BookOpen className="w-4 h-4" /> Public Vault ({publicScripts.length})
           </button>
-          
+
           <button
             onClick={() => setActiveTab("drafts")}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
-              activeTab === "drafts"
-                ? "bg-[#635f41] text-white shadow-sm"
-                : "text-[#466272] hover:text-[#1c1b19] hover:bg-[#e6e2dd]/50"
-            }`}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${activeTab === "drafts"
+              ? "bg-[#635f41] text-white shadow-sm"
+              : "text-[#466272] hover:text-[#1c1b19] hover:bg-[#e6e2dd]/50"
+              }`}
           >
             <FilePlus className="w-4 h-4" /> My Scripts ({myDrafts.length})
           </button>
@@ -348,11 +345,10 @@ export default function MemberScripts() {
           {isMaintainer && (
             <button
               onClick={() => setActiveTab("pending")}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 relative ${
-                activeTab === "pending"
-                  ? "bg-[#635f41] text-white shadow-sm"
-                  : "text-[#466272] hover:text-[#1c1b19] hover:bg-[#e6e2dd]/50"
-              }`}
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 relative ${activeTab === "pending"
+                ? "bg-[#635f41] text-white shadow-sm"
+                : "text-[#466272] hover:text-[#1c1b19] hover:bg-[#e6e2dd]/50"
+                }`}
             >
               <Clock className="w-4 h-4" /> Pending Requests ({pendingScripts.length})
               {pendingScripts.length > 0 && (
@@ -397,7 +393,7 @@ export default function MemberScripts() {
                               Playwright: <span className="text-[#1c1b19]">{item.playwright}</span>
                             </p>
                           </div>
-                          
+
                           <div className="flex flex-col items-end gap-1.5">
                             <Badge className="bg-[#8CC0EB]/20 text-[#001e2c] border border-[#8CC0EB]/40 font-bold text-[10px] uppercase tracking-wider px-3 py-1 flex-shrink-0">
                               {item.language}
@@ -922,7 +918,7 @@ export default function MemberScripts() {
                           ));
                         }
                       }
-                    } catch (e) {}
+                    } catch (e) { }
                     return <div className="whitespace-pre-wrap">{selectedScript.content || selectedScript.excerpt || "Full script playbook PDF download available."}</div>;
                   })()}
                 </div>

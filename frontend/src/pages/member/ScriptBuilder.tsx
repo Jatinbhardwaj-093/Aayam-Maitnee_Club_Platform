@@ -6,26 +6,29 @@ import {
   Users,
   MessageSquare,
   Plus,
-  Trash2,
   Save,
   Send,
   BookOpen,
   CheckCircle2,
   X,
   FileText,
-  CornerDownLeft,
   Sparkles,
   Sliders,
   Wand2,
   Feather,
   Bot,
   UserCheck,
-  RefreshCw
+  RefreshCw,
+  Activity
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import PlateEditor from "@/components/PlateEditor";
+import { CharacterDirectory, type CharacterItem } from "@/components/CharacterDirectory";
+import SseAnalysis from "@/components/SseAnalysis";
+import AiSuggestions from "@/components/AiSuggestions";
 
 interface Character {
   id: string;
@@ -82,21 +85,18 @@ export default function ScriptBuilder() {
   const [abstract, setAbstract] = useState("");
 
   // Step 2: Characters
-  const [characters, setCharacters] = useState<Character[]>([
-    { id: "c1", name: "Protagonist", traits: "Lead Role", color: "#635f41" }
-  ]);
+  const [characters, setCharacters] = useState<CharacterItem[]>([]);
   const [charNameInput, setCharNameInput] = useState("");
   const [charTraitsInput, setCharTraitsInput] = useState("");
 
   // AI Character Suggestor States
+  const [charTab, setCharTab] = useState<"analyzer" | "assistant">("analyzer");
   const [aiPretext, setAiPretext] = useState("");
   const [aiGenerating, setAiGenerating] = useState(false);
   const [aiSuggestion, setAiSuggestion] = useState<AiCharacterSuggestion | null>(null);
 
   // Step 3: Storyline Canvas
-  const [lines, setLines] = useState<ScriptLine[]>([]);
-  const [activeSpeakerId, setActiveSpeakerId] = useState<string>("");
-  const [lineInput, setLineInput] = useState("");
+  const [markdownContent, setMarkdownContent] = useState("");
 
   // Script Auto-Extractor Modal State
   const [importOpen, setImportOpen] = useState(false);
@@ -140,239 +140,169 @@ export default function ScriptBuilder() {
             setLanguage(found.language || "Hindi & English");
             setAbstract(found.excerpt || "");
 
+            let loadedMarkdown = "";
             try {
               if (found.content && (found.content.trim().startsWith("{") || found.content.trim().startsWith("["))) {
                 const parsed = JSON.parse(found.content);
                 if (parsed.characters && parsed.characters.length > 0) setCharacters(parsed.characters);
-                if (parsed.lines && parsed.lines.length > 0) setLines(parsed.lines);
                 if (parsed.abstract) setAbstract(parsed.abstract);
                 if (parsed.labels) setLabels(parsed.labels);
                 if (parsed.theme) setTheme(parsed.theme);
                 if (parsed.settingInfo) setSettingInfo(parsed.settingInfo);
+
+                if (parsed.lines && parsed.lines.length > 0) {
+                  // Build a nice Markdown presentation of the dialogue lines
+                  loadedMarkdown = parsed.lines.map((line: any) => {
+                    if (line.characterName === "stage-note" || line.characterId === "stage-note") {
+                      return `(${line.text})`;
+                    }
+                    return `**${line.characterName}**:\n${line.text}`;
+                  }).join("\n\n");
+                }
               } else if (found.content) {
-                setRawScriptText(found.content);
-                setTimeout(() => handleAutoExtractScript(), 100);
+                loadedMarkdown = found.content;
               }
             } catch (e) {
               console.warn("Script content parse fallback:", e);
+              loadedMarkdown = found.content || "";
             }
+            setMarkdownContent(loadedMarkdown);
           }
         })
         .catch(console.error);
     }
   }, [scriptId]);
 
-  // Sync active speaker
-  useEffect(() => {
-    if (characters.length > 0 && !activeSpeakerId) {
-      setActiveSpeakerId(characters[0].id);
-    }
-  }, [characters]);
 
   // AI Story Abstract Generator
   const handleAiGenerateAbstract = () => {
+    if (!title.trim()) {
+      alert("Please enter a script title first to generate a synopsis.");
+      return;
+    }
     setAiGenerating(true);
     setTimeout(() => {
-      const charNames = characters.map((c) => c.name).join(", ");
-      const samplePlot = lines.length > 0
-        ? `In a dramatic struggle between ${charNames || "the ensemble"}, key conflicts unfold around ${theme || "morality and duty"}.`
-        : `A compelling theatrical narrative exploring ${theme || "ambition and power"}, featuring ${charNames || "diverse central characters"}.`;
+      const selectedGenre = genre || "Drama";
+      const selectedTheme = theme || "morality, ambition and justice";
+      const selectedSetting = settingInfo || "a dramatic setting";
 
-      const generatedAbstract = `${samplePlot} Set against the backdrop of ${settingInfo || "a dramatic stage setting"}, tensions peak as internal principles collide with societal expectations.`;
-      
-      setAbstract(generatedAbstract);
+      const generationTemplates = [
+        `"${title}" is a powerful ${selectedGenre.toLowerCase()} centering on the theme of ${selectedTheme}. Set in ${selectedSetting}, the piece delves into the fragile boundary between personal integrity and external pressure as the central conflict unfolds.`,
+        `Set against the backdrop of ${selectedSetting}, "${title}" explores the themes of ${selectedTheme}. This ${selectedGenre.toLowerCase()} maps the emotional landscape of modern struggles, weaving together ambition, secrets, and eventual revelation.`,
+        `In "${title}", a gripping ${selectedGenre.toLowerCase()} set in ${selectedSetting}, the stage becomes a battleground for ${selectedTheme}. As conflicts arise and relationships are tested, the story charts an unforgettable journey of identity and choices.`
+      ];
+
+      const randomIndex = Math.floor(Math.random() * generationTemplates.length);
+      setAbstract(generationTemplates[randomIndex]);
       setAiGenerating(false);
-      alert("AI successfully generated story synopsis!");
-    }, 600);
+    }, 1200);
   };
 
-  // AI Dynamic Character Suggestor
-  const handleGenerateAiCharacter = () => {
-    setAiGenerating(true);
-    setTimeout(() => {
-      const input = aiPretext.trim();
-      const existingLead = characters[0]?.name || "Lead";
-
-      let suggestedName = "Archon";
-      let suggestedArchetype = "Key Archetype Role";
-      let suggestedTraits = "Calculated, driven by internal motives, creates tension in dialogue";
-      let suggestedVoice = "Clear, sharp projection with dramatic pauses";
-
-      if (input) {
-        // Derive name from first major word or input pretext
-        const words = input.split(" ").filter((w) => w.length > 2);
-        if (words.length > 0) {
-          const capitalized = words[0].charAt(0).toUpperCase() + words[0].slice(1).toLowerCase();
-          suggestedName = `${capitalized} Role`;
-        }
-        suggestedArchetype = "Custom Character Role";
-        suggestedTraits = `Adapted from pretext "${input}". Operates in direct contrast or alliance with ${existingLead}.`;
-      } else {
-        suggestedName = "Supporting Antagonist";
-        suggestedArchetype = "Counter-Role";
-        suggestedTraits = `Challenges ${existingLead}'s motives in key scenes.`;
+  // Fetch database characters (SQLite)
+  const fetchCharacters = async () => {
+    try {
+      const response = await fetch(`${baseUrl}/api/characters`);
+      if (response.ok) {
+        const data = await response.json();
+        setCharacters(data);
       }
-
-      setAiSuggestion({
-        name: suggestedName,
-        traits: suggestedTraits,
-        archetype: suggestedArchetype,
-        voiceCue: suggestedVoice
-      });
-      setAiGenerating(false);
-    }, 700);
+    } catch (error) {
+      console.error("Error fetching characters:", error);
+    }
   };
 
-  // Add AI Suggested Character to Active Roster
-  const handleAddAiSuggestionToRoster = () => {
-    if (!aiSuggestion) return;
+  // Save selected character to database (SQLite)
+  const handleSaveCharacter = async (char: CharacterItem) => {
+    try {
+      const response = await fetch(`${baseUrl}/api/characters`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(char)
+      });
+      if (response.ok) {
+        await fetchCharacters();
+      }
+    } catch (error) {
+      console.error("Error saving character:", error);
+    }
+  };
 
-    const newChar: Character = {
-      id: `c-ai-${Date.now()}`,
-      name: aiSuggestion.name,
-      traits: aiSuggestion.traits,
-      color: PRESET_COLORS[(characters.length + 2) % PRESET_COLORS.length]
+  // Delete character from database (SQLite)
+  const handleDeleteCharacter = async (id: string | number) => {
+    try {
+      const response = await fetch(`${baseUrl}/api/characters?id=${id}`, {
+        method: "DELETE"
+      });
+      if (response.ok) {
+        await fetchCharacters();
+      }
+    } catch (error) {
+      console.error("Error deleting character:", error);
+    }
+  };
+
+  // Handle Manual Form Addition
+  const handleAddCharacter = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!charNameInput.trim()) return;
+
+    const newChar: CharacterItem = {
+      name: charNameInput.trim(),
+      description: "Manually registered in Script Builder.",
+      traits: charTraitsInput.trim() ? charTraitsInput.split(",").map(t => t.trim()) : ["custom"],
+      motivation: "Not declared",
+      role: "Supporting"
     };
 
-    setCharacters([...characters, newChar]);
-    setAiSuggestion(null);
-    setAiPretext("");
+    await handleSaveCharacter(newChar);
+    setCharNameInput("");
+    setCharTraitsInput("");
   };
 
-  // Smart Script Auto-Extractor Algorithm
-  const handleAutoExtractScript = () => {
+  // Auto-Extract Raw Script Text into Script Markdown
+  const handleAutoExtractScript = async () => {
     if (!rawScriptText.trim()) return;
 
     const rawLines = rawScriptText.split(/\r?\n/);
-    const extractedCharsMap: { [key: string]: Character } = {};
-    const parsedLines: ScriptLine[] = [];
+    const speakerRegex = /^([A-Z0-9\s_]{2,25})(?:\s*\([^)]*\))?\s*[:\-]\s*(.*)/;
 
-    const speakerRegex = /^([A-Z0-9\s]{2,25})(?:\s*\([^)]*\))?\s*[:\-]\s*(.*)/;
+    let markdownString = "";
 
-    let charCount = Object.keys(extractedCharsMap).length;
-
-    rawLines.forEach((rawLine, idx) => {
+    for (const rawLine of rawLines) {
       const trimmed = rawLine.trim();
-      if (!trimmed) return;
+      if (!trimmed) {
+        markdownString += "\n\n";
+        continue;
+      }
 
       const match = trimmed.match(speakerRegex);
       if (match) {
         const rawName = match[1].trim();
         const dialogueText = match[2].trim();
-        const normalizedKey = rawName.toUpperCase();
+        const uppercaseName = rawName.charAt(0).toUpperCase() + rawName.slice(1).toLowerCase();
 
-        if (!extractedCharsMap[normalizedKey]) {
-          charCount++;
-          extractedCharsMap[normalizedKey] = {
-            id: `c-ext-${charCount}`,
-            name: rawName,
-            traits: "Auto-extracted character",
-            color: PRESET_COLORS[(charCount - 1) % PRESET_COLORS.length]
+        // Save character if not exists
+        const exists = characters.some(c => c.name.toLowerCase() === rawName.toLowerCase());
+        if (!exists) {
+          const newChar = {
+            name: uppercaseName,
+            description: "Auto-extracted from raw script text.",
+            traits: ["extracted"],
+            motivation: "Not declared",
+            role: "Supporting"
           };
+          await handleSaveCharacter(newChar);
         }
 
-        const charObj = extractedCharsMap[normalizedKey];
-
-        if (dialogueText) {
-          parsedLines.push({
-            id: `l-ext-${idx}`,
-            characterId: charObj.id,
-            characterName: charObj.name,
-            color: charObj.color,
-            text: dialogueText
-          });
-        }
-      } else if (trimmed.startsWith("[") || trimmed.startsWith("(")) {
-        parsedLines.push({
-          id: `l-ext-sd-${idx}`,
-          characterId: "stage-note",
-          characterName: "Stage Direction",
-          color: "#466272",
-          text: trimmed
-        });
-      } else if (parsedLines.length > 0) {
-        const lastLine = parsedLines[parsedLines.length - 1];
-        lastLine.text += " " + trimmed;
+        markdownString += `**${uppercaseName}**\n${dialogueText}\n\n`;
+      } else {
+        // Stage direction or other
+        markdownString += `${trimmed}\n\n`;
       }
-    });
-
-    const newCharList = Object.values(extractedCharsMap);
-    if (newCharList.length > 0) {
-      setCharacters(newCharList);
-      setActiveSpeakerId(newCharList[0].id);
-    }
-    if (parsedLines.length > 0) {
-      setLines(parsedLines);
     }
 
-    if (!title && rawLines[0]) {
-      setTitle(rawLines[0].substring(0, 40));
-    }
-
+    setMarkdownContent(markdownString.replace(/\n{3,}/g, "\n\n").trim());
     setImportOpen(false);
-    setRawScriptText("");
-    alert(`Successfully extracted ${newCharList.length} Characters and ${parsedLines.length} Lines!`);
-    setCurrentStep(3);
-  };
-
-  // Add Character manually
-  const handleAddCharacter = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!charNameInput.trim()) return;
-
-    const newChar: Character = {
-      id: `c-${Date.now()}`,
-      name: charNameInput.trim(),
-      traits: charTraitsInput.trim() || "Ensemble",
-      color: PRESET_COLORS[characters.length % PRESET_COLORS.length]
-    };
-
-    setCharacters([...characters, newChar]);
-    setCharNameInput("");
-    setCharTraitsInput("");
-    if (!activeSpeakerId) {
-      setActiveSpeakerId(newChar.id);
-    }
-  };
-
-  const handleRemoveCharacter = (id: string) => {
-    setCharacters(characters.filter((c) => c.id !== id));
-    if (activeSpeakerId === id) {
-      const remaining = characters.filter((c) => c.id !== id);
-      setActiveSpeakerId(remaining[0]?.id || "");
-    }
-  };
-
-  // Add Line from Type Box
-  const handleAddLine = (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    if (!lineInput.trim()) return;
-
-    const speaker = characters.find((c) => c.id === activeSpeakerId);
-    const charName = speaker ? speaker.name : "Stage Direction";
-    const color = speaker ? speaker.color : "#466272";
-
-    const newLine: ScriptLine = {
-      id: `l-${Date.now()}`,
-      characterId: activeSpeakerId,
-      characterName: charName,
-      color: color,
-      text: lineInput.trim()
-    };
-
-    setLines([...lines, newLine]);
-    setLineInput("");
-  };
-
-  const handleKeyDownLine = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleAddLine();
-    }
-  };
-
-  const handleRemoveLine = (id: string) => {
-    setLines(lines.filter((l) => l.id !== id));
   };
 
   // Save Script
@@ -388,26 +318,17 @@ export default function ScriptBuilder() {
 
     setSaving(true);
     try {
-      const formattedContent = JSON.stringify({
-        characters,
-        lines,
-        abstract,
-        labels,
-        theme,
-        settingInfo
-      });
-
       const payload = {
         title: title.trim(),
         playwright: playwright.trim() || activeUser.name,
         genre,
         language,
         acts: "Script Edition",
-        pages: Math.max(1, Math.ceil(lines.length / 5)),
+        pages: Math.max(1, Math.ceil(markdownContent.split("\n\n").length / 5)),
         rolesCount: `${characters.length} Characters`,
         rehearsalFocus: theme || "Dialogue & Scene Work",
-        excerpt: abstract || (lines[0] ? `${lines[0].characterName}: ${lines[0].text}` : "Play script draft."),
-        content: formattedContent,
+        excerpt: abstract || "Play script draft.",
+        content: markdownContent,
         author_email: activeUser.email,
         author_name: activeUser.name,
         status: targetStatus
@@ -514,44 +435,40 @@ export default function ScriptBuilder() {
             <div className="flex items-center gap-1.5 bg-[#f4efe8] p-1.5 rounded-2xl border border-[#cac6b9]/50 text-xs flex-nowrap shadow-2xs">
               <button
                 onClick={() => setCurrentStep(1)}
-                className={`px-3.5 sm:px-4 py-1.5 rounded-xl font-bold transition-all flex items-center gap-1.5 whitespace-nowrap ${
-                  currentStep === 1
-                    ? "bg-[#635f41] text-white shadow-sm"
-                    : "text-[#466272] hover:text-[#1c1b19] hover:bg-white/60"
-                }`}
+                className={`px-3.5 sm:px-4 py-1.5 rounded-xl font-bold transition-all flex items-center gap-1.5 whitespace-nowrap ${currentStep === 1
+                  ? "bg-[#635f41] text-white shadow-sm"
+                  : "text-[#466272] hover:text-[#1c1b19] hover:bg-white/60"
+                  }`}
               >
                 <Sliders className="w-3.5 h-3.5" /> 1. Setup
               </button>
-              
+
               <button
                 onClick={() => setCurrentStep(2)}
-                className={`px-3.5 sm:px-4 py-1.5 rounded-xl font-bold transition-all flex items-center gap-1.5 whitespace-nowrap ${
-                  currentStep === 2
-                    ? "bg-[#635f41] text-white shadow-sm"
-                    : "text-[#466272] hover:text-[#1c1b19] hover:bg-white/60"
-                }`}
+                className={`px-3.5 sm:px-4 py-1.5 rounded-xl font-bold transition-all flex items-center gap-1.5 whitespace-nowrap ${currentStep === 2
+                  ? "bg-[#635f41] text-white shadow-sm"
+                  : "text-[#466272] hover:text-[#1c1b19] hover:bg-white/60"
+                  }`}
               >
-                <Users className="w-3.5 h-3.5" /> 2. Characters
+                <MessageSquare className="w-3.5 h-3.5" /> 2. Storyline
               </button>
 
               <button
                 onClick={() => setCurrentStep(3)}
-                className={`px-3.5 sm:px-4 py-1.5 rounded-xl font-bold transition-all flex items-center gap-1.5 whitespace-nowrap ${
-                  currentStep === 3
-                    ? "bg-[#635f41] text-white shadow-sm"
-                    : "text-[#466272] hover:text-[#1c1b19] hover:bg-white/60"
-                }`}
+                className={`px-3.5 sm:px-4 py-1.5 rounded-xl font-bold transition-all flex items-center gap-1.5 whitespace-nowrap ${currentStep === 3
+                  ? "bg-[#635f41] text-white shadow-sm"
+                  : "text-[#466272] hover:text-[#1c1b19] hover:bg-white/60"
+                  }`}
               >
-                <MessageSquare className="w-3.5 h-3.5" /> 3. Storyline
+                <Users className="w-3.5 h-3.5" /> 3. Characters
               </button>
 
               <button
                 onClick={() => setCurrentStep(4)}
-                className={`px-3.5 sm:px-4 py-1.5 rounded-xl font-bold transition-all flex items-center gap-1.5 whitespace-nowrap ${
-                  currentStep === 4
-                    ? "bg-[#635f41] text-white shadow-sm"
-                    : "text-[#466272] hover:text-[#1c1b19] hover:bg-white/60"
-                }`}
+                className={`px-3.5 sm:px-4 py-1.5 rounded-xl font-bold transition-all flex items-center gap-1.5 whitespace-nowrap ${currentStep === 4
+                  ? "bg-[#635f41] text-white shadow-sm"
+                  : "text-[#466272] hover:text-[#1c1b19] hover:bg-white/60"
+                  }`}
               >
                 <BookOpen className="w-3.5 h-3.5" /> 4. Final Preview
               </button>
@@ -676,262 +593,145 @@ export default function ScriptBuilder() {
                   onClick={() => setCurrentStep(2)}
                   className="bg-[#635f41] hover:bg-[#4d4a32] text-white text-xs font-bold rounded-xl px-6 h-10 shadow-sm"
                 >
-                  Proceed to Characters →
+                  Proceed to Storyline →
                 </Button>
               </div>
             </div>
           </div>
         )}
 
-        {/* STEP 2: CHARACTERS & AI CHARACTER SUGGESTOR */}
-        {currentStep === 2 && (
-          <div className="space-y-6 max-w-3xl mx-auto">
-            {/* AI Character Suggestor Widget */}
-            <div className="bg-gradient-to-br from-[#fcf9f2] via-white to-[#f4efe8] border-2 border-[#635f41]/30 rounded-3xl p-6 sm:p-8 shadow-sm space-y-4">
-              <div className="flex items-center justify-between border-b border-[#e6e2dd] pb-3">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-xl bg-[#635f41] text-white flex items-center justify-center">
-                    <Bot className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h3 className="text-base font-serif font-bold text-[#1c1b19]">
-                      AI Character Suggestor
-                    </h3>
-                    <p className="text-[11px] text-[#466272]/80">Enter any pretext or role idea to generate a tailored character suggestion</p>
-                  </div>
-                </div>
-                <Badge className="bg-[#635f41] text-white text-[10px] uppercase font-bold">AI Assistant</Badge>
-              </div>
-
-              {/* Single Pretext Input & Action Bar */}
-              <div className="flex flex-col sm:flex-row items-center gap-3">
-                <Input
-                  value={aiPretext}
-                  onChange={(e) => setAiPretext(e.target.value)}
-                  placeholder="Enter character concept or pretext (e.g. A rival to the lead, a corrupt judge...)"
-                  className="bg-white border-[#e6e2dd] h-11 text-xs rounded-xl flex-1"
-                />
-                <Button
-                  onClick={handleGenerateAiCharacter}
-                  disabled={aiGenerating}
-                  className="bg-[#635f41] hover:bg-[#4d4a32] text-white font-bold h-11 rounded-xl text-xs px-5 flex-shrink-0 shadow-sm flex items-center gap-1.5"
-                >
-                  {aiGenerating ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
-                  Suggest Character
-                </Button>
-              </div>
-
-              {/* AI Generated Character Output Card */}
-              {aiSuggestion && (
-                <div className="bg-white border border-[#635f41]/40 rounded-2xl p-5 shadow-xs space-y-3 mt-3 animate-in fade-in duration-300">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <span className="text-[10px] uppercase font-bold tracking-widest text-[#635f41]">
-                        Suggested Character
-                      </span>
-                      <h4 className="text-base font-bold font-serif text-[#1c1b19]">{aiSuggestion.name}</h4>
-                    </div>
-                    <Badge className="bg-[#8CC0EB] text-[#001e2c] text-[10px] font-bold">{aiSuggestion.archetype}</Badge>
-                  </div>
-
-                  <p className="text-xs text-[#466272] leading-relaxed">
-                    <strong>Traits & Role:</strong> {aiSuggestion.traits}
-                  </p>
-                  
-                  <p className="text-[11px] text-[#466272]/80 italic">
-                    <strong>Voice / Direction Note:</strong> {aiSuggestion.voiceCue}
-                  </p>
-
-                  <div className="pt-2 border-t border-[#e6e2dd] flex justify-end">
+        {/* STEP 3: CHARACTERS & AI CHARACTER SUGGESTOR */}
+        {currentStep === 3 && (
+          <div className="space-y-6 max-w-5xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
+              {/* Left side: Character Directory roster + Add Manually Form */}
+              <div className="md:col-span-6 flex flex-col space-y-6 bg-white border border-[#e6e2dd] rounded-3xl p-6 shadow-sm">
+                <div className="flex items-center justify-between border-b border-[#e6e2dd] pb-3">
+                  <h3 className="text-base font-serif font-bold text-[#635f41] flex items-center gap-2">
+                    <Users className="w-5 h-5 text-[#635f41]" />
+                    <span>Roster Directory ({characters.length})</span>
+                  </h3>
+                  <div className="flex items-center gap-2">
                     <Button
-                      onClick={handleAddAiSuggestionToRoster}
-                      className="bg-[#8CC0EB] hover:bg-[#68a0cd] text-[#001e2c] font-bold text-xs rounded-xl h-8 px-4 flex items-center gap-1 shadow-2xs"
+                      onClick={() => setCurrentStep(2)}
+                      variant="outline"
+                      className="border-[#cac6b9] text-[#466272] text-[11px] font-bold rounded-xl px-3 h-8 shadow-2xs"
                     >
-                      <UserCheck className="w-3.5 h-3.5" /> Add to Roster
+                      ← Edit Storyline
+                    </Button>
+                    <Button
+                      onClick={() => setCurrentStep(4)}
+                      className="bg-[#635f41] hover:bg-[#4d4a32] text-white text-[11px] font-bold rounded-xl px-4 h-8 shadow-sm cursor-pointer"
+                    >
+                      Proceed to Preview →
                     </Button>
                   </div>
                 </div>
-              )}
-            </div>
 
-            {/* Manual Character Input Form */}
-            <div className="bg-white border border-[#e6e2dd] rounded-3xl p-6 sm:p-8 shadow-xs space-y-4">
-              <h3 className="text-base font-serif font-bold text-[#635f41] flex items-center justify-between">
-                <span>Add Character Manually</span>
-                <span className="text-xs font-sans font-normal text-[#466272]/70">Enter name and optional role trait</span>
-              </h3>
+                <div className="flex-1 min-h-[350px] overflow-y-auto">
+                  <CharacterDirectory
+                    characters={characters}
+                    onDeleteCharacter={handleDeleteCharacter}
+                  />
+                </div>
 
-              <form onSubmit={handleAddCharacter} className="flex flex-col sm:flex-row items-center gap-3">
-                <Input
-                  required
-                  value={charNameInput}
-                  onChange={(e) => setCharNameInput(e.target.value)}
-                  placeholder="Character Name (e.g. Tara)"
-                  className="bg-[#fdf9f4] border-[#e6e2dd] h-11 text-sm rounded-xl flex-1 focus:ring-2 focus:ring-[#635f41]/30"
-                />
-
-                <Input
-                  value={charTraitsInput}
-                  onChange={(e) => setCharTraitsInput(e.target.value)}
-                  placeholder="Trait / Role (e.g. Lead Activist)"
-                  className="bg-[#fdf9f4] border-[#e6e2dd] h-11 text-xs rounded-xl flex-1 focus:ring-2 focus:ring-[#635f41]/30"
-                />
-
-                <Button
-                  type="submit"
-                  className="bg-[#635f41] hover:bg-[#4d4a32] text-white font-bold h-11 rounded-xl text-xs px-6 flex-shrink-0 shadow-sm transition-all"
-                >
-                  <Plus className="w-4 h-4 mr-1" /> Add Character
-                </Button>
-              </form>
-            </div>
-
-            {/* Character Roster Chips */}
-            <div className="bg-white border border-[#e6e2dd] rounded-3xl p-6 sm:p-8 shadow-xs space-y-4">
-              <div className="flex items-center justify-between border-b border-[#e6e2dd] pb-3">
-                <h3 className="text-base font-serif font-bold text-[#635f41]">
-                  Active Character Roster ({characters.length})
-                </h3>
-                <Button
-                  onClick={() => setCurrentStep(3)}
-                  className="bg-[#635f41] hover:bg-[#4d4a32] text-white text-xs font-bold rounded-xl px-5 h-9 shadow-sm"
-                >
-                  Start Writing Storyline →
-                </Button>
+                <div className="border-t border-[#e6e2dd] pt-4 space-y-3">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-[#635f41]">Add Character Manually</h4>
+                  <form onSubmit={handleAddCharacter} className="flex flex-col sm:flex-row items-center gap-2">
+                    <Input
+                      required
+                      value={charNameInput}
+                      onChange={(e) => setCharNameInput(e.target.value)}
+                      placeholder="Name (e.g. Tara)"
+                      className="bg-[#fdf9f4] border-[#e6e2dd] h-9 text-xs rounded-xl flex-1"
+                    />
+                    <Input
+                      value={charTraitsInput}
+                      onChange={(e) => setCharTraitsInput(e.target.value)}
+                      placeholder="Traits (e.g. Lead)"
+                      className="bg-[#fdf9f4] border-[#e6e2dd] h-9 text-xs rounded-xl flex-1"
+                    />
+                    <Button
+                      type="submit"
+                      className="bg-[#635f41] hover:bg-[#4d4a32] text-white font-bold h-9 rounded-xl text-xs px-4"
+                    >
+                      <Plus className="w-3.5 h-3.5 mr-0.5" /> Add
+                    </Button>
+                  </form>
+                </div>
               </div>
 
-              {characters.length === 0 ? (
-                <p className="text-xs text-center text-[#466272]/60 py-8">No characters added yet. Use AI suggestor or form above to add characters.</p>
-              ) : (
-                <div className="flex flex-wrap gap-3 pt-2">
-                  {characters.map((char) => (
-                    <div
-                      key={char.id}
-                      className="flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-[#fdf9f4] border border-[#e6e2dd] shadow-2xs group hover:border-[#635f41] hover:shadow-xs transition-all"
-                    >
-                      <span
-                        className="w-3 h-3 rounded-full flex-shrink-0 shadow-2xs"
-                        style={{ backgroundColor: char.color }}
-                      />
-                      <div className="text-left">
-                        <span className="font-bold text-xs text-[#1c1b19] block">{char.name}</span>
-                        {char.traits && (
-                          <span className="text-[10px] text-[#466272]/70 block">{char.traits}</span>
-                        )}
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveCharacter(char.id)}
-                        className="text-gray-400 hover:text-red-600 transition-colors ml-1 p-1 hover:bg-red-50 rounded-lg"
-                        title="Remove character"
-                      >
-                        <X className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  ))}
+              {/* Right side: Tabs (Stream Analyzer, AI Assistant) */}
+              <div className="md:col-span-6 flex flex-col bg-white border border-[#e6e2dd] rounded-3xl overflow-hidden shadow-sm">
+                <div className="flex border-b border-[#e6e2dd] select-none bg-[#fdf9f4]">
+                  <button
+                    onClick={() => setCharTab("analyzer")}
+                    className={`flex-1 flex items-center justify-center gap-2 py-3 text-xs font-bold border-b-2 transition-all cursor-pointer ${charTab === "analyzer"
+                      ? "border-[#635f41] text-[#635f41] bg-white font-extrabold"
+                      : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/30"
+                      }`}
+                  >
+                    <Activity className="w-4 h-4" />
+                    <span>Stream Analyzer</span>
+                  </button>
+                  <button
+                    onClick={() => setCharTab("assistant")}
+                    className={`flex-1 flex items-center justify-center gap-2 py-3 text-xs font-bold border-b-2 transition-all cursor-pointer ${charTab === "assistant"
+                      ? "border-[#635f41] text-[#635f41] bg-white font-extrabold"
+                      : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/30"
+                      }`}
+                  >
+                    <Sparkles className="w-4 h-4" />
+                    <span>AI Assistant</span>
+                  </button>
                 </div>
-              )}
+
+                <div className="flex-1 p-5 overflow-y-auto min-h-[380px]">
+                  {charTab === "analyzer" && (
+                    <SseAnalysis
+                      onAddToDirectory={handleSaveCharacter}
+                      savedCharacters={characters}
+                    />
+                  )}
+                  {charTab === "assistant" && (
+                    <AiSuggestions
+                      onSaveCharacter={handleSaveCharacter}
+                      storyContext={markdownContent}
+                    />
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         )}
 
-        {/* STEP 3: STORYLINE CANVAS & TYPING BAR */}
-        {currentStep === 3 && (
+        {/* STEP 2: STORYLINE CANVAS & TYPING BAR */}
+        {currentStep === 2 && (
           <div className="space-y-6 max-w-4xl mx-auto">
-            {/* Blank Canvas Sheet */}
-            <div className="bg-white border-2 border-[#e6e2dd] rounded-3xl p-6 sm:p-10 shadow-md min-h-[460px] flex flex-col justify-between font-serif relative">
-              <div className="space-y-5">
-                <div className="flex items-center justify-between border-b border-[#e6e2dd] pb-4 font-sans">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-[#635f41]" />
-                    <span className="text-xs font-bold text-[#635f41] uppercase tracking-wider">
-                      {title || "Untitled Storyline Canvas"}
-                    </span>
-                  </div>
-                  <span className="text-xs text-[#466272]/70 font-semibold bg-[#fdf9f4] px-3 py-1 rounded-full border border-[#e6e2dd]">
-                    {lines.length} Line{lines.length === 1 ? "" : "s"}
-                  </span>
-                </div>
+            <PlateEditor
+              markdownContent={markdownContent}
+              onChangeMarkdown={(markdown) => setMarkdownContent(markdown)}
+              onChangeText={async (text) => {
+                if (!text.trim()) return;
+                try {
+                  await fetch(`${baseUrl}/api/analyze-text`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ text })
+                  });
+                } catch (error) {
+                  console.error("Text analysis error:", error);
+                }
+              }}
+            />
 
-                {lines.length === 0 ? (
-                  <div className="text-center py-24 text-xs font-sans text-gray-400 italic space-y-2">
-                    <Feather className="w-8 h-8 mx-auto text-gray-300" />
-                    <p>Blank Storyline Canvas. Select speaker below and type dialogue line + Enter.</p>
-                  </div>
-                ) : (
-                  <div className="space-y-4 pt-1">
-                    {lines.map((line) => (
-                      <div
-                        key={line.id}
-                        className="group flex items-start justify-between gap-4 p-3.5 rounded-2xl hover:bg-[#fdf9f4] transition-all border-l-3 border-transparent hover:border-[#635f41]"
-                      >
-                        <div className="space-y-1 text-left flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <span
-                              className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-                              style={{ backgroundColor: line.color }}
-                            />
-                            <span
-                              className="text-xs font-sans font-bold uppercase tracking-wider"
-                              style={{ color: line.color }}
-                            >
-                              {line.characterName}
-                            </span>
-                          </div>
-                          <p className="text-sm text-[#1c1b19] leading-relaxed pl-4 font-serif">
-                            "{line.text}"
-                          </p>
-                        </div>
-
-                        <button
-                          onClick={() => handleRemoveLine(line.id)}
-                          className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-600 transition-all p-1.5 hover:bg-red-50 rounded-lg"
-                          title="Delete line"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Floating Type Box Bar */}
-            <div className="bg-white border border-[#cac6b9] rounded-2xl p-4 shadow-xl flex flex-col sm:flex-row items-center gap-3 sticky bottom-6 z-20">
-              <div className="w-full sm:w-52 flex-shrink-0">
-                <select
-                  value={activeSpeakerId}
-                  onChange={(e) => setActiveSpeakerId(e.target.value)}
-                  className="w-full bg-[#fdf9f4] border border-[#e6e2dd] h-11 px-3 text-xs font-bold rounded-xl text-[#1c1b19] focus:outline-none focus:ring-2 focus:ring-[#635f41]/30"
-                >
-                  {characters.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                  <option value="stage-note">Stage Direction</option>
-                </select>
-              </div>
-
-              <div className="flex-1 w-full relative">
-                <Input
-                  value={lineInput}
-                  onChange={(e) => setLineInput(e.target.value)}
-                  onKeyDown={handleKeyDownLine}
-                  placeholder="Type line and press Enter..."
-                  className="bg-[#fdf9f4] border-[#e6e2dd] h-11 text-sm font-serif pr-12 rounded-xl focus:ring-2 focus:ring-[#635f41]/30"
-                  autoFocus
-                />
-                <button
-                  type="button"
-                  onClick={() => handleAddLine()}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-[#635f41] text-white hover:bg-[#4d4a32] rounded-lg transition-all shadow-xs active:scale-95"
-                  title="Add Line (Enter)"
-                >
-                  <CornerDownLeft className="w-4 h-4" />
-                </button>
-              </div>
+            <div className="flex justify-between items-center bg-white p-4 rounded-2xl border border-[#e6e2dd] mt-4 shadow-xs">
+              <Button onClick={() => setCurrentStep(1)} variant="outline" className="border-[#cac6b9] text-[#466272] text-xs font-bold rounded-xl h-9">
+                ← Back to Setup
+              </Button>
+              <Button onClick={() => setCurrentStep(3)} className="bg-[#635f41] hover:bg-[#4d4a32] text-white text-xs font-bold rounded-xl h-9 px-6 shadow-sm">
+                Proceed to Characters →
+              </Button>
             </div>
           </div>
         )}
@@ -985,7 +785,7 @@ export default function ScriptBuilder() {
                 <div className="flex flex-wrap gap-2.5">
                   {characters.map((c) => (
                     <span key={c.id} className="bg-gray-100 border border-gray-200 px-3.5 py-1.5 rounded-full font-semibold text-[#1c1b19]">
-                      {c.name} ({c.traits})
+                      {c.name} ({Array.isArray(c.traits) ? c.traits.join(", ") : c.traits})
                     </span>
                   ))}
                 </div>
@@ -993,23 +793,17 @@ export default function ScriptBuilder() {
 
               {/* Complete Storyline Flow */}
               <div className="space-y-5 pt-2">
-                {lines.map((line) => (
-                  <div key={line.id} className="space-y-1">
-                    <span className="text-xs font-sans font-bold uppercase tracking-wider" style={{ color: line.color }}>
-                      {line.characterName}
-                    </span>
-                    <p className="text-sm text-[#1c1b19] leading-relaxed pl-4 font-serif">
-                      "{line.text}"
-                    </p>
-                  </div>
-                ))}
+                <PlateEditor
+                  markdownContent={markdownContent}
+                  readOnly={true}
+                />
               </div>
             </div>
 
             {/* Bottom Controls */}
             <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-white p-6 rounded-2xl border border-[#e6e2dd] shadow-xs">
               <Button onClick={() => setCurrentStep(3)} variant="outline" className="border-[#cac6b9] text-[#466272]">
-                ← Back to Storyline Canvas
+                ← Back to Characters
               </Button>
 
               <div className="flex items-center gap-3">

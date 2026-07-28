@@ -53,7 +53,7 @@ export default function App() {
           <Route path="profile/edit" element={<EditProfile />} />
           <Route path="profile/:memberId" element={<Profile />} />
           <Route path="join" element={<JoinClub />} />
-          
+
           {/* Portal / Dashboard paths */}
           <Route path="member" element={<MemberDashboard />} />
           <Route path="schedule" element={<MySchedule />} />
