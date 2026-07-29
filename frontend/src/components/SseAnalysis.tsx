@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Sparkles, Activity, FileText } from "lucide-react";
+import { Sparkles, Activity, FileText, Loader2 } from "lucide-react";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import type { CharacterItem } from "./CharacterDirectory";
@@ -7,16 +7,19 @@ import type { CharacterItem } from "./CharacterDirectory";
 interface SseAnalysisProps {
     onAddToDirectory: (char: CharacterItem) => void;
     savedCharacters: CharacterItem[];
+    scriptId?: string;
+    hasContent?: boolean;
 }
 
-export const SseAnalysis: React.FC<SseAnalysisProps> = ({ onAddToDirectory, savedCharacters }) => {
+export const SseAnalysis: React.FC<SseAnalysisProps> = ({ onAddToDirectory, savedCharacters, scriptId, hasContent = true }) => {
     const [extracted, setExtracted] = useState<CharacterItem[]>([]);
     const [status, setStatus] = useState<"connecting" | "connected" | "disconnected">("disconnected");
+    const [hasReceivedData, setHasReceivedData] = useState(false);
 
     useEffect(() => {
         setStatus("connecting");
         const BACKEND_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5005";
-        const url = `${BACKEND_URL}/api/stream`;
+        const url = `${BACKEND_URL}/api/stream${scriptId ? `?script_id=${scriptId}` : ""}`;
 
         console.log(`[SSE] Connecting to ${url}...`);
         const eventSource = new EventSource(url);
@@ -29,6 +32,7 @@ export const SseAnalysis: React.FC<SseAnalysisProps> = ({ onAddToDirectory, save
         eventSource.onerror = (e) => {
             console.error("[SSE] Connection error/disconnected.", e);
             setStatus("disconnected");
+            setHasReceivedData(true);
         };
 
         eventSource.addEventListener("analysis", (event: any) => {
@@ -38,8 +42,10 @@ export const SseAnalysis: React.FC<SseAnalysisProps> = ({ onAddToDirectory, save
                 if (parsed.characters && Array.isArray(parsed.characters)) {
                     setExtracted(parsed.characters);
                 }
+                setHasReceivedData(true);
             } catch (err) {
                 console.error("[SSE] Failed to parse event content:", err);
+                setHasReceivedData(true);
             }
         });
 
@@ -90,7 +96,7 @@ export const SseAnalysis: React.FC<SseAnalysisProps> = ({ onAddToDirectory, save
 
             {/* Extracted Character Cards */}
             <div className="flex-1 overflow-y-auto space-y-3.5 pr-1">
-                {extracted.length === 0 ? (
+                {!hasContent ? (
                     <div className="flex flex-col items-center justify-center h-48 border border-dashed border-border rounded-xl p-6 text-center select-none bg-card">
                         <FileText className="w-8 h-8 text-muted-foreground mr-1.5 mb-2.5" />
                         <p className="text-sm font-semibold text-foreground">No characters analyzed yet</p>
@@ -98,12 +104,30 @@ export const SseAnalysis: React.FC<SseAnalysisProps> = ({ onAddToDirectory, save
                             Start writing in the editor, and characters will appear here automatically.
                         </p>
                     </div>
+                ) : !hasReceivedData ? (
+                    <div className="flex flex-col items-center justify-center py-16 space-y-3.5 select-none animate-pulse">
+                        <div className="relative">
+                            <div className="w-12 h-12 rounded-full border border-primary/25 border-t-2 border-t-primary animate-spin" />
+                            <Loader2 className="w-5 h-5 text-primary absolute top-3.5 left-3.5 animate-pulse" />
+                        </div>
+                        <div className="text-center space-y-1">
+                            <p className="text-xs font-semibold text-foreground">Analyzing storyline content...</p>
+                            <p className="text-[10px] text-muted-foreground">Extracting character concepts, traits, and roles via live stream</p>
+                        </div>
+                    </div>
+                ) : extracted.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center h-48 border border-dashed border-border rounded-xl p-6 text-center select-none bg-card">
+                        <FileText className="w-8 h-8 text-muted-foreground mr-1.5 mb-2.5" />
+                        <p className="text-sm font-semibold text-foreground">No characters found</p>
+                        <p className="text-xs text-muted-foreground mt-1.5 max-w-[280px] leading-relaxed">
+                            We analyzed the text, but couldn't identify any distinct characters yet. Try adding more descriptiveness!
+                        </p>
+                    </div>
                 ) : (
                     extracted.map((char, index) => {
                         const saved = isAlreadySaved(char.name);
                         return (
                             <div key={index} className="group/card border border-border relative bg-card rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-200">
-                                <div className="absolute top-0 left-0 w-1.5 h-full rounded-l-xl bg-gradient-to-b from-primary to-transparent" />
                                 <div className="flex flex-row items-center justify-between pb-3 border-b border-border/40 space-y-0">
                                     <div className="text-sm font-bold flex items-center space-x-2">
                                         <span className="text-foreground">{char.name}</span>

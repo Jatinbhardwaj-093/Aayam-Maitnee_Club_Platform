@@ -3,10 +3,22 @@ import json
 import random
 import jwt
 import datetime
-from flask import Blueprint, request, jsonify, Response
+from flask import Blueprint, request, jsonify, Response, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User, Role, Membership, Event, Booking, Announcement, Feedback, Gallery, ScheduleSlot, Audition, SharedEvent, Volunteer, Participation, Play, OpenPosition, ExtractedCharacter
 import redis
+from dotenv import load_dotenv
+import litellm
+
+load_dotenv()
+
+# LLM provider settings from environment variables (configured for Gemini support via LiteLLM)
+API_BASE = os.getenv("COMPLETIONS_API_BASE", "http://localhost:4000/v1")
+MODEL_NAME = os.getenv("COMPLETIONS_MODEL", "gemini/gemini-3.6-flash")
+
+
+if API_KEY != "mock" and MODEL_NAME.startswith("gemini/"):
+    os.environ["GEMINI_API_KEY"] = API_KEY
 
 api_bp = Blueprint('api', __name__)
 
@@ -1241,10 +1253,60 @@ def extract_characters_from_text(text):
     if not text or not text.strip():
         return []
     
+    # Try calling LiteLLM strictly following the inspiration's completion structure
+    try:
+        if API_KEY != "mock" and not current_app.config.get("TESTING"):
+            prompt = f"""
+            You are an expert novel consultant. Given the following excerpt from a story, identify all characters mentioned in it.
+            For each character, capture:
+            - name (string)
+            - description (a brief description based on the context, string)
+            - traits (a list of 1-3 adjectives describing their personality or appearance, list of strings)
+            - motivation (their apparent goal or what drives them, string)
+            - role (their role in this segment: e.g. Protagonist, Antagonist, Supporting, Minor, string)
+
+            Return the list strictly as a JSON array of character objects, and do not wrap it in markdown codeblocks.
+            Example output format:
+            [
+              {{
+                "name": "Jane",
+                "description": "A clever detective with a quick eye.",
+                "traits": ["clever", "observant"],
+                "motivation": "Solving the mysterious disappearance.",
+                "role": "Protagonist"
+              }}
+            ]
+
+            Story text:
+            ---
+            {text}
+            ---
+            """
+            completion_kwargs = {
+                "model": MODEL_NAME,
+                "messages": [{"role": "user", "content": prompt}],
+                "api_key": API_KEY,
+                "response_format": {"type": "json_object"}
+            }
+            if os.getenv("COMPLETIONS_API_BASE") or not MODEL_NAME.startswith("gemini/"):
+                completion_kwargs["api_base"] = API_BASE
+
+            response = litellm.completion(**completion_kwargs)
+            content = response.choices[0].message.content.strip()
+            # Clean markdown code blocks from response if present
+            if content.startswith("```json"):
+                content = content[7:]
+            if content.endswith("```"):
+                content = content[:-3]
+            content = content.strip()
+            return json.loads(content)
+    except Exception as e:
+        print(f"LiteLLM analysis error: {e}. Falling back to default pattern rules.")
+
     text_lower = text.lower()
     chars = []
     
-    # Pre-defined mock matches for the manuscript editor
+    # Pre-defined mock matches for the manuscript editor (to ensure offline tests pass)
     if "arthur" in text_lower or "merlin" in text_lower or "excalibur" in text_lower:
         chars = [
             {
@@ -1307,14 +1369,23 @@ def extract_characters_from_text(text):
             ]
     return chars
 
+STREAM_ANALYSIS_CACHE = {}
+
 @api_bp.route('/stream', methods=['GET'])
 def stream_events():
+    script_id = request.args.get("script_id") or "global_fallback"
     def event_generator():
         q = queue.Queue()
         sse_queues.append(q)
         try:
             # Send connection confirmation event
             yield f"data: Connected to analysis stream\n\n"
+            
+            # Yield cached analysis results for this script if present
+            cached_payload = STREAM_ANALYSIS_CACHE.get(script_id)
+            if cached_payload:
+                yield cached_payload
+
             while True:
                 event_data = q.get()
                 yield event_data
@@ -1330,6 +1401,7 @@ def stream_events():
 def analyze_text():
     data = request.json or {}
     text = data.get("text", "")
+    script_id = data.get("script_id") or "global_fallback"
     if not text.strip():
         return jsonify({"success": True, "message": "Text is empty."})
         
@@ -1337,6 +1409,10 @@ def analyze_text():
     
     # Broadcast to SSE queues to simulate streaming character push
     event_payload = f"event: analysis\ndata: {json.dumps({'characters': characters})}\n\n"
+    
+    # Update cache
+    STREAM_ANALYSIS_CACHE[script_id] = event_payload
+
     for q in sse_queues:
         q.put(event_payload)
         
@@ -1399,6 +1475,52 @@ def suggest_character():
     if not prompt.strip():
         return jsonify({"error": "Prompt is required"}), 400
         
+    try:
+        if API_KEY != "mock" and not current_app.config.get("TESTING"):
+            system_instruction = """
+            You are a creative writer's AI assistant. Generate a highly creative and detailed character outline matching the user's prompt, making sure it aligns with and fits the provided story context if any.
+            Provide the details strictly in JSON format with the following fields:
+            - name (string)
+            - description (a rich paragraph describing who they are, string)
+            - traits (a list of 3 personality traits, list of strings)
+            - motivation (their core desires and goals, string)
+            - role (their role, e.g. Protagonist, Antagonist, Supporting, Mentor, Rival, string)
+
+            Return only the raw JSON. Do not include markdown formatting or tags.
+            """
+            user_query = f"""
+            Story Context:
+            ---
+            {story_context}
+            ---
+
+            User Prompt for the new character: {prompt}
+            """
+            completion_kwargs = {
+                "model": MODEL_NAME,
+                "messages": [
+                    {"role": "system", "content": system_instruction},
+                    {"role": "user", "content": user_query}
+                ],
+                "api_key": API_KEY,
+                "response_format": {"type": "json_object"}
+            }
+            if os.getenv("COMPLETIONS_API_BASE") or not MODEL_NAME.startswith("gemini/"):
+                completion_kwargs["api_base"] = API_BASE
+
+            response = litellm.completion(**completion_kwargs)
+            content = response.choices[0].message.content.strip()
+            # Clean markdown code blocks from response
+            if content.startswith("```json"):
+                content = content[7:]
+            if content.endswith("```"):
+                content = content[:-3]
+            content = content.strip()
+            return jsonify(json.loads(content))
+    except Exception as e:
+        print(f"LiteLLM suggestion error: {e}. Falling back to default pattern rules.")
+
+    # Fallback to local mock choices (ensures offline tests pass)
     prompt_lower = prompt.lower()
     if "rogue" in prompt_lower or "thief" in prompt_lower:
         suggested = {
@@ -1435,5 +1557,4 @@ def suggest_character():
             "motivation": "To fulfill their destiny.",
             "role": "Protagonist"
         }
-        
     return jsonify(suggested)

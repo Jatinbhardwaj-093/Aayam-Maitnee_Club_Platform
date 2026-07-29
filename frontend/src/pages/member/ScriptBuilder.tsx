@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useOutletContext, useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft,
@@ -97,6 +97,7 @@ export default function ScriptBuilder() {
 
   // Step 3: Storyline Canvas
   const [markdownContent, setMarkdownContent] = useState("");
+  const lastAnalyzedTextRef = useRef("");
 
   // Script Auto-Extractor Modal State
   const [importOpen, setImportOpen] = useState(false);
@@ -116,6 +117,10 @@ export default function ScriptBuilder() {
       const email = activeUser?.email || "";
       fetch(`${baseUrl}/api/scripts/${scriptId}`)
         .then((res) => (res.ok ? res.json() : null))
+        .catch((err) => {
+          console.warn("GET /api/scripts/:id failed, falling back to query list", err);
+          return null;
+        })
         .then((data) => {
           if (data && data.script) {
             return data.script;
@@ -691,6 +696,8 @@ export default function ScriptBuilder() {
                     <SseAnalysis
                       onAddToDirectory={handleSaveCharacter}
                       savedCharacters={characters}
+                      scriptId={scriptId}
+                      hasContent={!!markdownContent?.trim()}
                     />
                   )}
                   {charTab === "assistant" && (
@@ -712,12 +719,13 @@ export default function ScriptBuilder() {
               markdownContent={markdownContent}
               onChangeMarkdown={(markdown) => setMarkdownContent(markdown)}
               onChangeText={async (text) => {
-                if (!text.trim()) return;
+                if (!text.trim() || text === lastAnalyzedTextRef.current) return;
+                lastAnalyzedTextRef.current = text;
                 try {
                   await fetch(`${baseUrl}/api/analyze-text`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ text })
+                    body: JSON.stringify({ text, script_id: scriptId })
                   });
                 } catch (error) {
                   console.error("Text analysis error:", error);

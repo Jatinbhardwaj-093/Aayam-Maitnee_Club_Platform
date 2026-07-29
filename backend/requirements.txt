@@ -5,3 +5,4 @@ redis==5.0.4
 python-dotenv==1.0.1
 PyJWT==2.8.0
 pytest==8.2.0
+litellm==1.42.5
