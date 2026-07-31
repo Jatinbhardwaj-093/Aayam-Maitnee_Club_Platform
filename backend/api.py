@@ -5,7 +5,7 @@ import jwt
 import datetime
 from flask import Blueprint, request, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
-from models import db, User, Role, Membership, Event, Booking, Announcement, Feedback, Gallery, ScheduleSlot, Audition, SharedEvent, Volunteer, Participation, Play, OpenPosition
+from models import db, User, Role, Membership, Event, Booking, Announcement, Feedback, Gallery, ScheduleSlot, Audition, SharedEvent, Volunteer, Participation, Play, OpenPosition, Notification
 import redis
 
 api_bp = Blueprint('api', __name__)
@@ -850,6 +850,7 @@ def update_event_backend(event_id):
     if 'venue' in data:
         e.venue = data['venue']
     db.session.commit()
+    return jsonify({'status': 'success', 'message': 'Event updated successfully'}), 200
 # --- SPONSOR AD REQUEST ENDPOINTS ---
 
 @api_bp.route('/sponsor-ads', methods=['GET'])
