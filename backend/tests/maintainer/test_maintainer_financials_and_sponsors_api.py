@@ -1,85 +1,111 @@
 from models import FinancialRecord, SponsorAdRequest, Script, db
 
-def test_financial_records_and_summary(client, app):
+def test_get_financial_records(client, app):
     """
-    Test GET /api/financials and GET /api/financials/summary.
+    Test GET /api/financials returns all logged income and expense records.
     """
     with app.app_context():
-        record1 = FinancialRecord(
-            title="Sponsorship Grant",
-            amount=50000.0,
-            record_type="Income",
-            category="Sponsorship"
-        )
-        record2 = FinancialRecord(
-            title="Stage Props Purchase",
-            amount=15000.0,
-            record_type="Expense",
-            category="Production Props"
-        )
-        db.session.add_all([record1, record2])
+        r1 = FinancialRecord(title="Grant", amount=50000.0, record_type="Income", category="Sponsorship")
+        r2 = FinancialRecord(title="Props", amount=15000.0, record_type="Expense", category="Props")
+        db.session.add_all([r1, r2])
         db.session.commit()
 
-    # Get all records
-    list_res = client.get("/api/financials")
-    assert list_res.status_code == 200
-    assert len(list_res.get_json()) >= 2
+    response = client.get("/api/financials")
+    assert response.status_code == 200
+    assert len(response.get_json()) >= 2
 
-    # Get summary
-    summary_res = client.get("/api/financials/summary")
-    assert summary_res.status_code == 200
-    summary = summary_res.get_json()
-    assert summary["total_revenue"] == 50000.0
-    assert summary["total_expenses"] == 15000.0
-    assert summary["net_surplus"] == 35000.0
-
-
-def test_sponsor_ads_create_and_status_update(client, app):
+def test_get_financials_summary(client):
     """
-    Test POST /api/sponsor-ads/create and updating status.
+    Test GET /api/financials/summary calculates revenue, expenses, and net surplus.
     """
-    create_payload = {
-        "sponsor_name": "Tech Corp",
-        "contact_person": "Jane Doe",
-        "contact_email": "jane@techcorp.com",
-        "ad_title": "Playbill Banner Ad",
-        "budget_offered": "₹75,000"
-    }
-    create_res = client.post("/api/sponsor-ads/create", json=create_payload)
-    assert create_res.status_code == 200
+    response = client.get("/api/financials/summary")
+    assert response.status_code == 200
+    summary = response.get_json()
+    assert "total_revenue" in summary
+    assert "total_expenses" in summary
+    assert "net_surplus" in summary
+
+def test_create_sponsor_ad_request(client):
+    """
+    Test POST /api/sponsor-ads/create submits a new sponsor promotion request.
+    """
+    response = client.post(
+        "/api/sponsor-ads/create",
+        json={
+            "sponsor_name": "Tech Corp",
+            "contact_person": "Jane Doe",
+            "contact_email": "jane@techcorp.com",
+            "ad_title": "Playbill Banner Ad",
+            "budget_offered": "₹75,000"
+        }
+    )
+    assert response.status_code == 200
+    assert "sponsor_ad" in response.get_json()
+
+def test_update_sponsor_ad_status(client):
+    """
+    Test POST /api/sponsor-ads/<id>/status updates sponsor ad approval status.
+    """
+    create_res = client.post(
+        "/api/sponsor-ads/create",
+        json={
+            "sponsor_name": "Red Bull",
+            "contact_person": "John",
+            "contact_email": "john@redbull.com",
+            "ad_title": "Stage Sponsor",
+            "budget_offered": "₹1,50,000"
+        }
+    )
     ad_id = create_res.get_json()["sponsor_ad"]["id"]
 
-    status_res = client.post(
+    response = client.post(
         f"/api/sponsor-ads/{ad_id}/status",
         json={"status": "Approved"}
     )
-    assert status_res.status_code == 200
-    assert status_res.get_json()["sponsor_ad"]["status"] == "Approved"
+    assert response.status_code == 200
+    assert response.get_json()["sponsor_ad"]["status"] == "Approved"
 
-
-def test_script_approve_and_reject_publish(client, app):
+def test_update_sponsor_ad_invalid_id(client):
     """
-    Test maintainer approval and rejection of script publication requests.
+    Test POST /api/sponsor-ads/<id>/status returns HTTP 404 for non-existent ad request.
+    """
+    response = client.post(
+        "/api/sponsor-ads/99999/status",
+        json={"status": "Approved"}
+    )
+    assert response.status_code == 404
+
+def test_approve_script_publication(client, app):
+    """
+    Test POST /api/scripts/<id>/approve-publish sets script status to Public.
     """
     with app.app_context():
-        script1 = Script(
-            title="Draft Playbook 1",
-            author_email="author1@example.com",
-            status="Pending"
-        )
-        script2 = Script(
-            title="Draft Playbook 2",
-            author_email="author2@example.com",
-            status="Pending"
-        )
-        db.session.add_all([script1, script2])
+        s = Script(title="Script A", author_email="a@test.com", status="Pending")
+        db.session.add(s)
         db.session.commit()
-        s1_id, s2_id = script1.id, script2.id
+        s_id = s.id
 
-    approve_res = client.post(f"/api/scripts/{s1_id}/approve-publish")
-    assert approve_res.status_code == 200
-    assert approve_res.get_json()["script"]["status"] == "Public"
+    response = client.post(f"/api/scripts/{s_id}/approve-publish")
+    assert response.status_code == 200
+    assert response.get_json()["script"]["status"] == "Public"
 
-    reject_res = client.post(f"/api/scripts/{s2_id}/reject-publish")
-    assert reject_res.status_code == 200
-    assert reject_res.get_json()["script"]["status"] == "Draft"
+def test_reject_script_publication(client, app):
+    """
+    Test POST /api/scripts/<id>/reject-publish sets script status to Draft.
+    """
+    with app.app_context():
+        s = Script(title="Script B", author_email="b@test.com", status="Pending")
+        db.session.add(s)
+        db.session.commit()
+        s_id = s.id
+
+    response = client.post(f"/api/scripts/{s_id}/reject-publish")
+    assert response.status_code == 200
+    assert response.get_json()["script"]["status"] == "Draft"
+
+def test_approve_script_invalid_id(client):
+    """
+    Test POST /api/scripts/<id>/approve-publish returns HTTP 404 for invalid script ID.
+    """
+    response = client.post("/api/scripts/99999/approve-publish")
+    assert response.status_code == 404

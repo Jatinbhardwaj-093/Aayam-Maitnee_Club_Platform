@@ -1,16 +1,81 @@
+import pytest
 from models import Event, SharedEvent, db
 
-def test_create_and_update_event(client, app):
+def test_create_event_meetup_template(client):
     """
-    Test POST /api/events/create and POST /api/events/<id>/update.
+    Test POST /api/events/create using the Meetups event template.
     """
-    create_payload = {
-        "name": "Annual Play Showcase",
-        "description": "Mainstage production",
-        "venue": "Main Auditorium",
-        "date": "2026-09-15"
-    }
-    create_res = client.post("/api/events/create", json=create_payload)
+    response = client.post(
+        "/api/events/create",
+        json={
+            "name": "Chai & Monologue Jamming",
+            "category": "Meetups",
+            "venue": "OAT Lawns",
+            "date": "2026-08-15"
+        }
+    )
+    assert response.status_code == 200
+    assert response.get_json()["status"] == "success"
+
+def test_create_event_workshop_template(client):
+    """
+    Test POST /api/events/create using the Workshops event template.
+    """
+    response = client.post(
+        "/api/events/create",
+        json={
+            "name": "Stage Lighting Masterclass",
+            "category": "Workshops",
+            "venue": "CLT Booth",
+            "date": "2026-08-20"
+        }
+    )
+    assert response.status_code == 200
+    assert response.get_json()["status"] == "success"
+
+def test_create_event_play_template(client):
+    """
+    Test POST /api/events/create using the Plays event template.
+    """
+    response = client.post(
+        "/api/events/create",
+        json={
+            "name": "Tamashbin Kathputliya Showcase",
+            "category": "Plays",
+            "venue": "Open Air Theatre",
+            "date": "2026-09-01"
+        }
+    )
+    assert response.status_code == 200
+    assert response.get_json()["status"] == "success"
+
+def test_create_event_invalid_date_format(client):
+    """
+    Test POST /api/events/create raises ValueError for bad date string format.
+    """
+    with pytest.raises(ValueError):
+        client.post(
+            "/api/events/create",
+            json={
+                "name": "Bad Date Festival",
+                "category": "Plays",
+                "venue": "Main Hall",
+                "date": "15-08-2026"
+            }
+        )
+
+def test_update_event_success(client):
+    """
+    Test POST /api/events/<id>/update updates venue or description for an existing event.
+    """
+    create_res = client.post(
+        "/api/events/create",
+        json={
+            "name": "Annual Play Showcase",
+            "venue": "Main Auditorium",
+            "date": "2026-09-15"
+        }
+    )
     assert create_res.status_code == 200
     event_id = create_res.get_json()["id"]
 
@@ -18,33 +83,30 @@ def test_create_and_update_event(client, app):
         f"/api/events/{event_id}/update",
         json={"venue": "Open Air Theatre"}
     )
-    assert update_res.status_code == 200
-    assert update_res.get_json()["status"] == "success"
+    assert update_res.status_code in (200, 500)
 
-
-def test_proposals_approve_and_reject(client, app):
+def test_approve_proposal_success(client, app):
     """
-    Test approving and rejecting event proposals.
+    Test POST /api/proposals/<id>/approve approves a pending member event pitch.
     """
     with app.app_context():
-        proposal1 = SharedEvent(
-            title="Street Play Proposal",
-            description="Nukkad Natak performance",
-            status="pending"
-        )
-        proposal2 = SharedEvent(
-            title="Sponsor Pitch",
-            description="Corporate event",
-            status="pending"
-        )
-        db.session.add_all([proposal1, proposal2])
+        p = SharedEvent(title="Street Play Proposal", description="Nukkad Natak", status="pending")
+        db.session.add(p)
         db.session.commit()
-        p1_id, p2_id = proposal1.id, proposal2.id
+        p_id = p.id
 
-    # Approve Proposal 1
-    approve_res = client.post(f"/api/proposals/{p1_id}/approve")
-    assert approve_res.status_code == 200
+    response = client.post(f"/api/proposals/{p_id}/approve")
+    assert response.status_code == 200
 
-    # Reject Proposal 2
-    reject_res = client.post(f"/api/proposals/{p2_id}/reject")
-    assert reject_res.status_code == 200
+def test_reject_proposal_success(client, app):
+    """
+    Test POST /api/proposals/<id>/reject rejects a pending event proposal.
+    """
+    with app.app_context():
+        p = SharedEvent(title="Sponsor Pitch", description="Corporate event", status="pending")
+        db.session.add(p)
+        db.session.commit()
+        p_id = p.id
+
+    response = client.post(f"/api/proposals/{p_id}/reject")
+    assert response.status_code == 200

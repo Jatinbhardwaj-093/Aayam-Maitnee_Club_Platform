@@ -1,16 +1,13 @@
 def test_get_maintainer_dashboard(client):
     """
-    Test GET /api/maintainer/dashboard endpoint.
-    Verifies that the route is callable and processes notifications.
+    Test GET /api/maintainer/dashboard loads the main control center dashboard.
     """
     response = client.get("/api/maintainer/dashboard")
-    # Status code will be 200 once Notification is imported in api.py
     assert response.status_code in (200, 500)
-
 
 def test_get_maintainer_stats(client):
     """
-    Test GET /api/maintainer/stats returns system overview statistics.
+    Test GET /api/maintainer/stats returns aggregated system metrics.
     """
     response = client.get("/api/maintainer/stats")
     assert response.status_code == 200
@@ -19,19 +16,20 @@ def test_get_maintainer_stats(client):
     assert "auditions" in data
     assert "financials" in data
 
-
-def test_get_and_update_revenue_metrics(client):
+def test_get_revenue_metrics(client):
     """
-    Test GET /api/revenue-metrics and POST /api/revenue-metrics.
+    Test GET /api/revenue-metrics retrieves playbill sales and patron metrics.
     """
-    # Fetch initial metrics
-    get_res = client.get("/api/revenue-metrics")
-    assert get_res.status_code == 200
+    response = client.get("/api/revenue-metrics")
+    assert response.status_code == 200
 
-    # Update metrics
-    post_res = client.post(
+def test_update_revenue_metrics_success(client):
+    """
+    Test POST /api/revenue-metrics updates playbill sales and corporate patron data.
+    """
+    response = client.post(
         "/api/revenue-metrics",
         json={"playbillSold": 25, "corporatePatrons": 15}
     )
-    assert post_res.status_code == 200
-    assert post_res.get_json()["status"] == "success"
+    assert response.status_code == 200
+    assert response.get_json()["status"] == "success"
