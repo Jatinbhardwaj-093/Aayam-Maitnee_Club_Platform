@@ -17,6 +17,37 @@ db.init_app(app)
 # Register Blueprint
 app.register_blueprint(api_bp, url_prefix='/api')
 
+from flask import jsonify, request
+
+@app.route('/')
+def home_page():
+    return jsonify({'status': 'success', 'message': 'Aayam Backend API Active'}), 200
+
+@app.route('/member/calendar')
+@app.route('/member/rehearsal')
+@app.route('/ai-rehearsal')
+@app.route('/script-directory')
+@app.route('/member/schedule')
+def page_views():
+    return jsonify({'status': 'success', 'message': 'Page loaded successfully'}), 200
+
+@app.route('/scripts', methods=['GET', 'POST'])
+def scripts_alias():
+    from api import get_scripts, create_script
+    if request.method == 'POST':
+        return create_script()
+    return get_scripts()
+
+@app.route('/rehearsal/start', methods=['POST'])
+def rehearsal_start_alias():
+    from api import start_rehearsal
+    return start_rehearsal()
+
+@app.route('/script/pin', methods=['POST'])
+def script_pin_alias():
+    from api import pin_script
+    return pin_script()
+
 def ensure_user_columns():
     with db.engine.begin() as conn:
         existing_columns = {

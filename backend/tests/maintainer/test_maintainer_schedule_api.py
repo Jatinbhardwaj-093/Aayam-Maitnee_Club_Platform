@@ -22,10 +22,17 @@ def test_get_schedule_success(client, app):
     Test GET /api/my-schedule retrieves schedule events for a valid user.
     """
     with app.app_context():
-        u = User(name="Sched User", email="sched_valid@aayam.org", password="pass")
-        e = Event(title="Rehearsal Session", category="Meetups")
-        db.session.add_all([u, e])
-        db.session.commit()
+        u = User.query.filter_by(email="sched_valid@aayam.org").first()
+        if not u:
+            u = User(name="Sched User", email="sched_valid@aayam.org", password="pass")
+            db.session.add(u)
+            db.session.commit()
+        
+        e = Event.query.first()
+        if not e:
+            e = Event(title="Rehearsal Session", category="Meetups")
+            db.session.add(e)
+            db.session.commit()
 
         p = Participation(user_id=u.id, event_id=e.id, status="Confirmed")
         db.session.add(p)
@@ -60,10 +67,17 @@ def test_update_schedule_success(client, app):
     Test POST /api/my-schedule/update successfully updates event invitation status.
     """
     with app.app_context():
-        u = User(name="Part User", email="part_valid@aayam.org", password="pass")
-        e = Event(title="Mainstage Rehearsal")
-        db.session.add_all([u, e])
-        db.session.commit()
+        u = User.query.filter_by(email="part_valid@aayam.org").first()
+        if not u:
+            u = User(name="Part User", email="part_valid@aayam.org", password="pass")
+            db.session.add(u)
+            db.session.commit()
+        
+        e = Event.query.first()
+        if not e:
+            e = Event(title="Mainstage Rehearsal")
+            db.session.add(e)
+            db.session.commit()
 
         p = Participation(user_id=u.id, event_id=e.id, status="Pending")
         db.session.add(p)
