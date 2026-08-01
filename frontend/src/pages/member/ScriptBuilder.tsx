@@ -19,7 +19,8 @@ import {
   Bot,
   UserCheck,
   RefreshCw,
-  Activity
+  Activity,
+  Loader2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -104,6 +105,7 @@ export default function ScriptBuilder() {
   const [rawScriptText, setRawScriptText] = useState("");
 
   const [saving, setSaving] = useState(false);
+  const [extracting, setExtracting] = useState(false);
 
   // Load existing script if editing or viewing
   useEffect(() => {
@@ -268,46 +270,35 @@ export default function ScriptBuilder() {
   const handleAutoExtractScript = async () => {
     if (!rawScriptText.trim()) return;
 
-    const rawLines = rawScriptText.split(/\r?\n/);
-    const speakerRegex = /^([A-Z0-9\s_]{2,25})(?:\s*\([^)]*\))?\s*[:\-]\s*(.*)/;
-
-    let markdownString = "";
-
-    for (const rawLine of rawLines) {
-      const trimmed = rawLine.trim();
-      if (!trimmed) {
-        markdownString += "\n\n";
-        continue;
-      }
-
-      const match = trimmed.match(speakerRegex);
-      if (match) {
-        const rawName = match[1].trim();
-        const dialogueText = match[2].trim();
-        const uppercaseName = rawName.charAt(0).toUpperCase() + rawName.slice(1).toLowerCase();
-
-        // Save character if not exists
-        const exists = characters.some(c => c.name.toLowerCase() === rawName.toLowerCase());
-        if (!exists) {
-          const newChar = {
-            name: uppercaseName,
-            description: "Auto-extracted from raw script text.",
-            traits: ["extracted"],
-            motivation: "Not declared",
-            role: "Supporting"
-          };
-          await handleSaveCharacter(newChar);
+    setExtracting(true);
+    try {
+      const response = await fetch(`${baseUrl}/api/auto-extract`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text: rawScriptText,
+          script_id: scriptId
+        })
+      });
+      if (response.ok) {
+        const data = await response.json();
+        if (data.dialogue_script) {
+          setMarkdownContent(data.dialogue_script);
         }
-
-        markdownString += `**${uppercaseName}**\n${dialogueText}\n\n`;
+        // Force refresh character roster Directory list
+        await fetchCharacters();
+        // Redirect to Step 2 (Characters) to show the updated directory roster
+        setCurrentStep(2);
+        setImportOpen(false);
       } else {
-        // Stage direction or other
-        markdownString += `${trimmed}\n\n`;
+        alert("Failed to auto-extract text. Please try again.");
       }
+    } catch (e) {
+      console.error("Auto-extraction error:", e);
+      alert("Error occurred during extraction.");
+    } finally {
+      setExtracting(false);
     }
-
-    setMarkdownContent(markdownString.replace(/\n{3,}/g, "\n\n").trim());
-    setImportOpen(false);
   };
 
   // Save Script
@@ -455,7 +446,7 @@ export default function ScriptBuilder() {
                   : "text-[#466272] hover:text-[#1c1b19] hover:bg-white/60"
                   }`}
               >
-                <MessageSquare className="w-3.5 h-3.5" /> 2. Storyline
+                <Users className="w-3.5 h-3.5" /> 2. Characters
               </button>
 
               <button
@@ -465,7 +456,7 @@ export default function ScriptBuilder() {
                   : "text-[#466272] hover:text-[#1c1b19] hover:bg-white/60"
                   }`}
               >
-                <Users className="w-3.5 h-3.5" /> 3. Characters
+                <MessageSquare className="w-3.5 h-3.5" /> 3. Storyline
               </button>
 
               <button
@@ -598,15 +589,15 @@ export default function ScriptBuilder() {
                   onClick={() => setCurrentStep(2)}
                   className="bg-[#635f41] hover:bg-[#4d4a32] text-white text-xs font-bold rounded-xl px-6 h-10 shadow-sm"
                 >
-                  Proceed to Storyline →
+                  Proceed to Characters →
                 </Button>
               </div>
             </div>
           </div>
         )}
 
-        {/* STEP 3: CHARACTERS & AI CHARACTER SUGGESTOR */}
-        {currentStep === 3 && (
+        {/* STEP 2: CHARACTERS & AI CHARACTER SUGGESTOR */}
+        {currentStep === 2 && (
           <div className="space-y-6 max-w-5xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
               {/* Left side: Character Directory roster + Add Manually Form */}
@@ -618,17 +609,17 @@ export default function ScriptBuilder() {
                   </h3>
                   <div className="flex items-center gap-2">
                     <Button
-                      onClick={() => setCurrentStep(2)}
+                      onClick={() => setCurrentStep(1)}
                       variant="outline"
                       className="border-[#cac6b9] text-[#466272] text-[11px] font-bold rounded-xl px-3 h-8 shadow-2xs"
                     >
-                      ← Edit Storyline
+                      ← Setup
                     </Button>
                     <Button
-                      onClick={() => setCurrentStep(4)}
+                      onClick={() => setCurrentStep(3)}
                       className="bg-[#635f41] hover:bg-[#4d4a32] text-white text-[11px] font-bold rounded-xl px-4 h-8 shadow-sm cursor-pointer"
                     >
-                      Proceed to Preview →
+                      Write Storyline →
                     </Button>
                   </div>
                 </div>
@@ -712,8 +703,8 @@ export default function ScriptBuilder() {
           </div>
         )}
 
-        {/* STEP 2: STORYLINE CANVAS & TYPING BAR */}
-        {currentStep === 2 && (
+        {/* STEP 3: STORYLINE CANVAS & TYPING BAR */}
+        {currentStep === 3 && (
           <div className="space-y-6 max-w-4xl mx-auto">
             <PlateEditor
               markdownContent={markdownContent}
@@ -734,11 +725,11 @@ export default function ScriptBuilder() {
             />
 
             <div className="flex justify-between items-center bg-white p-4 rounded-2xl border border-[#e6e2dd] mt-4 shadow-xs">
-              <Button onClick={() => setCurrentStep(1)} variant="outline" className="border-[#cac6b9] text-[#466272] text-xs font-bold rounded-xl h-9">
-                ← Back to Setup
+              <Button onClick={() => setCurrentStep(2)} variant="outline" className="border-[#cac6b9] text-[#466272] text-xs font-bold rounded-xl h-9">
+                ← Edit Characters
               </Button>
-              <Button onClick={() => setCurrentStep(3)} className="bg-[#635f41] hover:bg-[#4d4a32] text-white text-xs font-bold rounded-xl h-9 px-6 shadow-sm">
-                Proceed to Characters →
+              <Button onClick={() => setCurrentStep(4)} className="bg-[#635f41] hover:bg-[#4d4a32] text-white text-xs font-bold rounded-xl h-9 px-6 shadow-sm">
+                Proceed to Preview →
               </Button>
             </div>
           </div>
@@ -870,11 +861,24 @@ export default function ScriptBuilder() {
           </div>
 
           <DialogFooter className="pt-3 flex justify-between items-center gap-3 border-t border-[#e6e2dd]">
-            <Button variant="outline" onClick={() => setImportOpen(false)} className="border-[#cac6b9] text-[#466272]">
+            <Button variant="outline" onClick={() => setImportOpen(false)} disabled={extracting} className="border-[#cac6b9] text-[#466272]">
               Cancel
             </Button>
-            <Button onClick={handleAutoExtractScript} className="bg-[#635f41] hover:bg-[#4d4a32] text-white font-bold text-xs px-6 shadow-sm">
-              <Sparkles className="w-4 h-4 mr-1" /> Run Parser & Extract
+            <Button
+              onClick={handleAutoExtractScript}
+              disabled={extracting}
+              className="bg-[#635f41] hover:bg-[#4d4a32] text-white font-bold text-xs px-6 shadow-sm flex items-center gap-1.5"
+            >
+              {extracting ? (
+                <>
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  <span>Extracting...</span>
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-4 h-4 mr-1" /> Run Parser & Extract
+                </>
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>

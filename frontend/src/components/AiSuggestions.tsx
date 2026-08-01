@@ -94,7 +94,7 @@ export const AiSuggestions: React.FC<AiSuggestionsProps> = ({ onSaveCharacter, s
                         <Button
                             type="submit"
                             disabled={loading || !prompt.trim()}
-                            className="px-4.5 h-9 shrink-0"
+                            className="px-5 h-9 shrink-0"
                         >
                             {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" /> : <Wand2 className="w-3.5 h-3.5 mr-1.5" />}
                             <span>Suggest</span>
@@ -171,7 +171,7 @@ export const AiSuggestions: React.FC<AiSuggestionsProps> = ({ onSaveCharacter, s
                                 ) : (
                                     <Button
                                         onClick={handleSave}
-                                        className="h-8.5 px-3.5 font-semibold text-xs rounded-lg"
+                                        className="h-9 px-5 font-semibold text-xs rounded-lg"
                                     >
                                         <Save className="w-3.5 h-3.5 mr-1" />
                                         Save to Roster
