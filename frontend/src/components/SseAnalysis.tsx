@@ -162,14 +162,14 @@ export const SseAnalysis: React.FC<SseAnalysisProps> = ({ onAddToDirectory, save
 
                                     <div className="mt-4 pt-3 border-t border-border/40 flex justify-end">
                                         {saved ? (
-                                            <Badge variant="outline" className="border-emerald-500/20 bg-emerald-100 text-emerald-800 font-bold tracking-wide rounded-md py-1 px-2.5">
+                                            <Badge variant="outline" className="border-emerald-500/20 bg-emerald-100 text-emerald-800 font-bold tracking-wide rounded-xl py-1 px-2.5">
                                                 ✓ Saved in Directory
                                             </Badge>
                                         ) : (
                                             <Button
                                                 size="sm"
                                                 onClick={() => onAddToDirectory(char)}
-                                                className="text-xs h-7 px-3 py-1 font-semibold"
+                                                className="text-xs h-7 px-3 py-1 font-semibold rounded-xl"
                                             >
                                                 <Sparkles className="w-3.5 h-3.5 mr-1" />
                                                 Add to Directory

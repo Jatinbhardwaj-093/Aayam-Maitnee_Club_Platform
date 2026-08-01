@@ -388,7 +388,7 @@ export const PlateEditor: React.FC<PlateEditorProps> = ({ markdownContent, onCha
         <div className="flex flex-col h-full bg-[#fdf9f4] border border-[#cac6b9] rounded-2xl overflow-hidden shadow-xs min-h-[460px]">
             {/* Tiny rich text styling floating/anchored toolbar */}
             {!readOnly && (
-                <div className="flex flex-wrap items-center gap-1.5 p-2 bg-[#fdf9f4] border-b border-[#e6e2dd] select-none">
+                <div className="flex flex-wrap items-center gap-1.5 p-2 bg-[#f4efe8]/80 border-b border-[#cac6b9]/40 select-none backdrop-blur-xs">
                     <Button
                         size="icon-xs"
                         variant={isMarkActive(editor, "bold") ? "secondary" : "ghost"}

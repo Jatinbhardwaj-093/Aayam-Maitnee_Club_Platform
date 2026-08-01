@@ -93,7 +93,7 @@ export const CharacterDirectory: React.FC<CharacterDirectoryProps> = ({ characte
                             size="sm"
                             variant={roleFilter === role ? "default" : "outline"}
                             onClick={() => setRoleFilter(role)}
-                            className="text-xs h-7.5 px-3 py-1 font-medium"
+                            className="text-xs h-7.5 px-3 py-1 font-medium rounded-xl"
                         >
                             {role}
                         </Button>

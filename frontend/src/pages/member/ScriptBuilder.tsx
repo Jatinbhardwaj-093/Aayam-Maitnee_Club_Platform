@@ -391,7 +391,7 @@ export default function ScriptBuilder() {
               <Button
                 onClick={() => setImportOpen(true)}
                 variant="outline"
-                className="border-[#635f41]/40 text-[#635f41] hover:bg-[#635f41]/10 text-xs font-bold h-9 rounded-xl flex items-center gap-1.5 px-3 shadow-xs transition-all active:scale-95"
+                className="border-[#635f41]/40 text-[#635f41] hover:bg-[#635f41]/10 text-xs font-bold h-9 rounded-xl flex items-center gap-1.5 px-3.5 shadow-xs transition-all active:scale-95"
               >
                 <Wand2 className="w-3.5 h-3.5" />
                 <span>Auto-Extract</span>
@@ -401,7 +401,7 @@ export default function ScriptBuilder() {
                 onClick={() => handleSaveScript("Draft")}
                 disabled={saving}
                 variant="outline"
-                className="border-[#cac6b9] text-[#466272] hover:bg-[#f7f3ee] text-xs font-bold h-9 rounded-xl px-3 shadow-xs transition-all active:scale-95"
+                className="border-[#cac6b9] text-[#466272] hover:bg-[#f7f3ee] text-xs font-bold h-9 rounded-xl px-3.5 shadow-xs transition-all active:scale-95"
               >
                 <Save className="w-3.5 h-3.5 mr-1" /> Save Draft
               </Button>
@@ -410,7 +410,7 @@ export default function ScriptBuilder() {
                 <Button
                   onClick={() => handleSaveScript("Public")}
                   disabled={saving}
-                  className="bg-[#635f41] hover:bg-[#4d4a32] text-white text-xs font-bold h-9 rounded-xl shadow-md hover:shadow-lg transition-all active:scale-95 px-3.5"
+                  className="bg-[#635f41] hover:bg-[#4d4a32] text-white text-xs font-bold h-9 rounded-xl shadow-md hover:shadow-lg transition-all active:scale-95 px-4"
                 >
                   <CheckCircle2 className="w-3.5 h-3.5 mr-1" /> Publish to Vault
                 </Button>
@@ -418,7 +418,7 @@ export default function ScriptBuilder() {
                 <Button
                   onClick={() => handleSaveScript("Pending")}
                   disabled={saving}
-                  className="bg-[#8CC0EB] hover:bg-[#68a0cd] text-[#001e2c] text-xs font-bold h-9 rounded-xl shadow-md hover:shadow-lg transition-all active:scale-95 px-3.5"
+                  className="bg-[#8CC0EB] hover:bg-[#68a0cd] text-[#001e2c] text-xs font-bold h-9 rounded-xl shadow-md hover:shadow-lg transition-all active:scale-95 px-4"
                 >
                   <Send className="w-3.5 h-3.5 mr-1" /> Request Publish
                 </Button>
@@ -477,8 +477,8 @@ export default function ScriptBuilder() {
       <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
         {/* STEP 1: SETUP DETAILS */}
         {currentStep === 1 && (
-          <div className="space-y-6 max-w-3xl mx-auto">
-            <div className="bg-white border border-[#e6e2dd] rounded-3xl p-6 sm:p-10 shadow-xs space-y-6">
+          <div className="space-y-5 max-w-3xl mx-auto">
+            <div className="bg-white border border-[#e6e2dd] rounded-3xl p-6 sm:p-8 shadow-xs space-y-5">
               <div className="border-b border-[#e6e2dd] pb-4 flex items-center justify-between">
                 <div>
                   <h2 className="text-xl font-bold font-serif text-[#635f41]">Production Setup & Metadata</h2>
@@ -487,78 +487,80 @@ export default function ScriptBuilder() {
                 <Badge className="bg-[#635f41]/10 text-[#635f41] font-bold text-xs rounded-full px-3 py-1">Step 1 of 4</Badge>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <div className="space-y-1.5">
+
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1">
                   <label className="text-[11px] font-bold uppercase tracking-wider text-[#635f41]">Script Title *</label>
                   <Input
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="e.g. Mahabhoj Courtroom Drama"
-                    className="bg-[#fdf9f4] border-[#e6e2dd] h-11 text-sm rounded-xl focus:ring-2 focus:ring-[#635f41]/30"
+                    className="bg-[#fdf9f4] border-[#e6e2dd] h-10 text-sm rounded-xl focus:ring-2 focus:ring-[#635f41]/30"
                   />
                 </div>
 
-                <div className="space-y-1.5">
+                <div className="space-y-1">
                   <label className="text-[11px] font-bold uppercase tracking-wider text-[#635f41]">Playwright / Adapter</label>
                   <Input
                     value={playwright}
                     onChange={(e) => setPlaywright(e.target.value)}
                     placeholder="e.g. Mannu Bhandari"
-                    className="bg-[#fdf9f4] border-[#e6e2dd] h-11 text-sm rounded-xl focus:ring-2 focus:ring-[#635f41]/30"
+                    className="bg-[#fdf9f4] border-[#e6e2dd] h-10 text-sm rounded-xl focus:ring-2 focus:ring-[#635f41]/30"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="space-y-1.5">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                <div className="space-y-1">
                   <label className="text-[10px] font-bold uppercase tracking-wider text-[#635f41]">Genre</label>
                   <Input
                     value={genre}
                     onChange={(e) => setGenre(e.target.value)}
                     placeholder="Political Drama"
-                    className="bg-[#fdf9f4] border-[#e6e2dd] h-10 text-xs rounded-xl"
+                    className="bg-[#fdf9f4] border-[#e6e2dd] h-9 text-xs rounded-xl"
                   />
                 </div>
 
-                <div className="space-y-1.5">
+                <div className="space-y-1">
                   <label className="text-[10px] font-bold uppercase tracking-wider text-[#635f41]">Language</label>
                   <Input
                     value={language}
                     onChange={(e) => setLanguage(e.target.value)}
                     placeholder="Hindi & English"
-                    className="bg-[#fdf9f4] border-[#e6e2dd] h-10 text-xs rounded-xl"
+                    className="bg-[#fdf9f4] border-[#e6e2dd] h-9 text-xs rounded-xl"
                   />
                 </div>
 
-                <div className="space-y-1.5">
+                <div className="space-y-1">
                   <label className="text-[10px] font-bold uppercase tracking-wider text-[#635f41]">Story Labels / Tags</label>
                   <Input
                     value={labels}
                     onChange={(e) => setLabels(e.target.value)}
                     placeholder="Classic, Courtroom, Ensemble"
-                    className="bg-[#fdf9f4] border-[#e6e2dd] h-10 text-xs rounded-xl"
+                    className="bg-[#fdf9f4] border-[#e6e2dd] h-9 text-xs rounded-xl"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <div className="space-y-1.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1">
                   <label className="text-[11px] font-bold uppercase tracking-wider text-[#635f41]">Characteristic Theme</label>
                   <Input
                     value={theme}
                     onChange={(e) => setTheme(e.target.value)}
                     placeholder="e.g. Struggle for justice, moral dilemmas"
-                    className="bg-[#fdf9f4] border-[#e6e2dd] h-10 text-xs rounded-xl"
+                    className="bg-[#fdf9f4] border-[#e6e2dd] h-9 text-xs rounded-xl"
                   />
                 </div>
 
-                <div className="space-y-1.5">
+                <div className="space-y-1">
                   <label className="text-[11px] font-bold uppercase tracking-wider text-[#635f41]">Setting & Time Period</label>
                   <Input
                     value={settingInfo}
                     onChange={(e) => setSettingInfo(e.target.value)}
                     placeholder="e.g. Rural North India, late 1970s"
-                    className="bg-[#fdf9f4] border-[#e6e2dd] h-10 text-xs rounded-xl"
+                    className="bg-[#fdf9f4] border-[#e6e2dd] h-9 text-xs rounded-xl"
                   />
                 </div>
               </div>
@@ -607,24 +609,9 @@ export default function ScriptBuilder() {
                     <Users className="w-5 h-5 text-[#635f41]" />
                     <span>Roster Directory ({characters.length})</span>
                   </h3>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      onClick={() => setCurrentStep(1)}
-                      variant="outline"
-                      className="border-[#cac6b9] text-[#466272] text-[11px] font-bold rounded-xl px-3 h-8 shadow-2xs"
-                    >
-                      ← Setup
-                    </Button>
-                    <Button
-                      onClick={() => setCurrentStep(3)}
-                      className="bg-[#635f41] hover:bg-[#4d4a32] text-white text-[11px] font-bold rounded-xl px-4 h-8 shadow-sm cursor-pointer"
-                    >
-                      Write Storyline →
-                    </Button>
-                  </div>
                 </div>
 
-                <div className="flex-1 min-h-[350px] overflow-y-auto">
+                <div className="flex-1 min-h-[400px] overflow-y-auto">
                   <CharacterDirectory
                     characters={characters}
                     onDeleteCharacter={handleDeleteCharacter}
@@ -649,7 +636,7 @@ export default function ScriptBuilder() {
                     />
                     <Button
                       type="submit"
-                      className="bg-[#635f41] hover:bg-[#4d4a32] text-white font-bold h-9 rounded-xl text-xs px-4"
+                      className="bg-[#635f41] hover:bg-[#4d4a32] text-white font-bold h-9 rounded-xl text-xs px-5"
                     >
                       <Plus className="w-3.5 h-3.5 mr-0.5" /> Add
                     </Button>
@@ -682,7 +669,7 @@ export default function ScriptBuilder() {
                   </button>
                 </div>
 
-                <div className="flex-1 p-5 overflow-y-auto min-h-[380px]">
+                <div className="flex-1 p-5 overflow-y-auto min-h-[400px]">
                   {charTab === "analyzer" && (
                     <SseAnalysis
                       onAddToDirectory={handleSaveCharacter}
@@ -699,6 +686,22 @@ export default function ScriptBuilder() {
                   )}
                 </div>
               </div>
+            </div>
+
+            <div className="flex justify-between items-center bg-white p-4 rounded-2xl border border-[#e6e2dd] shadow-xs">
+              <Button
+                onClick={() => setCurrentStep(1)}
+                variant="outline"
+                className="border-[#cac6b9] text-[#466272] text-xs font-bold rounded-xl h-9 px-4"
+              >
+                ← Back to Setup
+              </Button>
+              <Button
+                onClick={() => setCurrentStep(3)}
+                className="bg-[#635f41] hover:bg-[#4d4a32] text-white text-xs font-bold rounded-xl h-9 px-6 shadow-sm cursor-pointer"
+              >
+                Proceed to Storyline →
+              </Button>
             </div>
           </div>
         )}
@@ -725,7 +728,7 @@ export default function ScriptBuilder() {
             />
 
             <div className="flex justify-between items-center bg-white p-4 rounded-2xl border border-[#e6e2dd] mt-4 shadow-xs">
-              <Button onClick={() => setCurrentStep(2)} variant="outline" className="border-[#cac6b9] text-[#466272] text-xs font-bold rounded-xl h-9">
+              <Button onClick={() => setCurrentStep(2)} variant="outline" className="border-[#cac6b9] text-[#466272] text-xs font-bold rounded-xl h-9 px-4">
                 ← Edit Characters
               </Button>
               <Button onClick={() => setCurrentStep(4)} className="bg-[#635f41] hover:bg-[#4d4a32] text-white text-xs font-bold rounded-xl h-9 px-6 shadow-sm">
@@ -801,15 +804,15 @@ export default function ScriptBuilder() {
 
             {/* Bottom Controls */}
             <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-white p-6 rounded-2xl border border-[#e6e2dd] shadow-xs">
-              <Button onClick={() => setCurrentStep(3)} variant="outline" className="border-[#cac6b9] text-[#466272]">
-                ← Back to Characters
+              <Button onClick={() => setCurrentStep(3)} variant="outline" className="border-[#cac6b9] text-[#466272] rounded-xl px-4 h-9">
+                ← Back to Storyline
               </Button>
 
               <div className="flex items-center gap-3">
                 <Button
                   onClick={() => handleSaveScript("Draft")}
                   variant="outline"
-                  className="border-[#cac6b9] text-[#466272] font-bold text-xs"
+                  className="border-[#cac6b9] text-[#466272] font-bold text-xs rounded-xl px-4 h-9"
                 >
                   <Save className="w-3.5 h-3.5 mr-1" /> Save as Personal Draft
                 </Button>
@@ -817,14 +820,14 @@ export default function ScriptBuilder() {
                 {isMaintainer ? (
                   <Button
                     onClick={() => handleSaveScript("Public")}
-                    className="bg-[#635f41] hover:bg-[#4d4a32] text-white font-bold text-xs shadow-md"
+                    className="bg-[#635f41] hover:bg-[#4d4a32] text-white font-bold text-xs rounded-xl px-4 h-9 shadow-md"
                   >
                     <CheckCircle2 className="w-3.5 h-3.5 mr-1" /> Publish to Vault
                   </Button>
                 ) : (
                   <Button
                     onClick={() => handleSaveScript("Pending")}
-                    className="bg-[#8CC0EB] hover:bg-[#68a0cd] text-[#001e2c] font-bold text-xs shadow-md"
+                    className="bg-[#8CC0EB] hover:bg-[#68a0cd] text-[#001e2c] font-bold text-xs rounded-xl px-4 h-9 shadow-md"
                   >
                     <Send className="w-3.5 h-3.5 mr-1" /> Submit Request to Publish
                   </Button>
@@ -861,13 +864,13 @@ export default function ScriptBuilder() {
           </div>
 
           <DialogFooter className="pt-3 flex justify-between items-center gap-3 border-t border-[#e6e2dd]">
-            <Button variant="outline" onClick={() => setImportOpen(false)} disabled={extracting} className="border-[#cac6b9] text-[#466272]">
+            <Button variant="outline" onClick={() => setImportOpen(false)} disabled={extracting} className="border-[#cac6b9] text-[#466272] rounded-xl px-4 h-9">
               Cancel
             </Button>
             <Button
               onClick={handleAutoExtractScript}
               disabled={extracting}
-              className="bg-[#635f41] hover:bg-[#4d4a32] text-white font-bold text-xs px-6 shadow-sm flex items-center gap-1.5"
+              className="bg-[#635f41] hover:bg-[#4d4a32] text-white font-bold text-xs px-6 shadow-sm rounded-xl h-9 flex items-center gap-1.5"
             >
               {extracting ? (
                 <>
