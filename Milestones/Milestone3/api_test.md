@@ -20,6 +20,78 @@ A total of 135 API test operations underwent validation across maintainer, membe
 - **135 API Mismatch Scan Before Fix:** 8
 - **135 API Mismatch Scan After Fix:** 0
 
+### 2.1 Selected Key API Test Cases (from `backend/tests`)
+
+Below are 5 representative test cases extracted directly from the pytest test suite in `backend/tests`:
+
+#### Test Case 1: `test_join_missing_fields_api`
+- **File Location:** `backend/tests/test_auth_api.py`
+- **API Endpoint:** `POST /api/join`
+- **Input:**
+  ```json
+  {
+    "name": "Test User"
+  }
+  ```
+- **Expected Output:** Status `400` (`{"error": "Missing field: phone"}`)
+- **Actual Output:** Status `400`
+- **Result Status:** `PASS FIRST TRY`
+
+#### Test Case 2: `test_login_invalid_credentials_api`
+- **File Location:** `backend/tests/test_auth_api.py`
+- **API Endpoint:** `POST /api/login`
+- **Input:**
+  ```json
+  {
+    "email": "nonexistent@example.com",
+    "password": "wrongpassword"
+  }
+  ```
+- **Expected Output:** Status `401` or `404` (`{"error": "Invalid credentials"}`)
+- **Actual Output:** Status `404`
+- **Result Status:** `PASS FIRST TRY`
+
+#### Test Case 3: `test_create_event_meetup_template`
+- **File Location:** `backend/tests/maintainer/test_maintainer_events_and_proposals_api.py`
+- **API Endpoint:** `POST /api/events/create`
+- **Input:**
+  ```json
+  {
+    "name": "Chai & Monologue Jamming",
+    "category": "Meetups",
+    "venue": "OAT Lawns",
+    "date": "2026-08-15"
+  }
+  ```
+- **Expected Output:** Status `200` (`{"status": "success"}`)
+- **Actual Output:** Status `200`
+- **Result Status:** `PASS FIRST TRY`
+
+#### Test Case 4: `test_start_rehearsal`
+- **File Location:** `backend/tests/member/test_rehersal_api.py`
+- **API Endpoint:** `POST /rehearsal/start`
+- **Input:**
+  ```json
+  {
+    "script_id": 1
+  }
+  ```
+- **Expected Output:** Status `200` (`{"status": "success", "script": {...}}`)
+- **Actual Output (Before Fix):** Status `404`  
+- **Actual Output (After Fix):** Status `200`
+- **Result Status:** `FIXED`
+
+#### Test Case 5: `test_filter_genre`
+- **File Location:** `backend/tests/member/test_rehersal_api.py`
+- **API Endpoint:** `GET /scripts?genre=Street Play`
+- **Input:** Query parameter `genre=Street Play`
+- **Expected Output:** Status `200`
+- **Actual Output (Before Fix):** Status `404`  
+- **Actual Output (After Fix):** Status `200`
+- **Result Status:** `FIXED`
+
+### 2.2 Comprehensive Endpoint Execution List
+
 Below is the comprehensive, portrait-optimized execution list of all tested endpoints:
 
 | # | API Operation | Expected Statuses | Actual | First Attempt |
