@@ -1,0 +1,2187 @@
+openapi: 3.1.0
+info:
+  title: Cultural Club Operations Platform API (Aayam)
+  description: |
+    Backend API for Aayam - IIT BS Cultural & Drama Club Department Operations Platform.
+    
+    User stories covered in this specification (from Milestone 1):
+    - US-MEM-001: Reviewing New Member Sign-ups (Club Secretary)
+    - US-MEM-002: Discovery & Comprehensive Application (New Member)
+    - US-MEM-003: Real-Time Application Tracking & Audition Scheduling (New Member)
+    - US-SPA-001: Booking a Practice Room (Club Member)
+    - US-SPA-002: Equipment Issue & Accountability Tracking (Club Administrator)
+    - US-EVE-001: Personalized Schedule Feed (Club Member)
+    - US-EVE-002: Standardized Event Proposals & Compliance Review (Event Organizer)
+    - US-FIN-001: Financial Auditing & View-Only Ledgers (Regulatory Representative)
+    - US-FIN-002: Digital Reimbursement Request Tracking (Club Member)
+    - US-GOV-001: Annual Committee Account Role Handover (System Maintainer)
+    - US-GOV-002: Confidential Misconduct Reporting Portal (Regulatory Representative)
+    - US-SPO-001: Digital Sponsorship Proposal Submission (Advertiser / Sponsor)
+    - US-SPO-002: Promotional Material & Media Asset Upload (Advertiser / Sponsor)
+    - US-COL-001: External Collaboration Requests (External Club / Partner Organization)
+    - US-COL-002: Institutional Workshop Request & Scheduling (Educational Institution)
+
+    API Mapping Summary:
+    - Authentication & Member Onboarding: /api/join, /api/login, /api/logout
+    - Member Profile & Directory: /api/profile/*, /api/members, /api/labels/*
+    - Events & Plays: /api/events/*, /api/plays/*, /api/open-positions
+    - Rehearsals & Script Vault: /scripts, /rehearsal/*, /script/*, /api/scripts/*
+    - Auditions & Stage Bookings: /api/audition-positions/*, /api/audition-applications/*, /api/my-auditions, /api/audition/submit, /api/stage-bookings
+    - Proposals & Sponsorships: /api/proposals/*, /api/sponsor-ads/*
+    - Media Gallery & Moderation: /api/gallery/*
+    - Financials & Budget Governance: /api/financials/*, /api/revenue-metrics
+    - User Schedule & Notifications: /api/my-schedule/*, /api/notifications/*
+    - Maintainer & Dashboard Governance: /api/maintainer/*
+    - System & Health: /api/health, /
+  version: 1.0.0
+  license:
+    name: Proprietary
+    url: https://aayam.iitm.ac.in/license
+servers:
+  - url: /
+    description: Current API host
+security:
+  - BearerAuth: []
+x-user-stories:
+  - id: US-MEM-001
+    actor: Club Secretary
+    story: As a Club Secretary, I want to review incoming student applications online and approve them into active member status with one click, so that approved applicants automatically gain system access.
+    api_mapping:
+      - path: /api/join
+        method: post
+        operationId: join_club_api_join_post
+      - path: /api/members
+        method: get
+        operationId: get_members_api_members_get
+      - path: /api/users/{user_id}/labels
+        method: post
+        operationId: assign_user_label_api_users__user_id__labels_post
+  - id: US-MEM-002
+    actor: New Member
+    story: As a New Member, I want to browse interest tracks, upload media portfolio samples, save application drafts, and submit forms online.
+    api_mapping:
+      - path: /api/join
+        method: post
+        operationId: join_club_api_join_post
+      - path: /api/open-positions
+        method: get
+        operationId: get_open_positions_api_open_positions_get
+      - path: /api/plays
+        method: get
+        operationId: get_plays_api_plays_get
+  - id: US-MEM-003
+    actor: New Member
+    story: As a New Member, I want to track my application status on a visual dashboard and pick available audition time slots.
+    api_mapping:
+      - path: /api/my-auditions
+        method: get
+        operationId: get_my_auditions_api_my_auditions_get
+      - path: /api/audition/submit
+        method: post
+        operationId: submit_audition_api_audition_submit_post
+      - path: /api/audition-positions
+        method: get
+        operationId: get_audition_positions_api_audition_positions_get
+  - id: US-SPA-001
+    actor: Club Member
+    story: As a regular Club Member, I want to select an open rehearsal space on the digital calendar and reserve a 1-hour slot up to 7 days in advance.
+    api_mapping:
+      - path: /api/stage-bookings
+        method: get
+        operationId: get_stage_bookings_api_stage_bookings_get
+      - path: /api/stage-bookings
+        method: post
+        operationId: create_stage_booking_api_stage_bookings_post
+  - id: US-SPA-002
+    actor: Club Administrator
+    story: As a Club Administrator, I want to digitally log stage equipment issued to and returned by members for each show.
+    api_mapping:
+      - path: /api/stage-bookings
+        method: get
+        operationId: get_stage_bookings_api_stage_bookings_get
+      - path: /api/maintainer/dashboard
+        method: get
+        operationId: get_maintainer_dashboard_api_maintainer_dashboard_get
+  - id: US-EVE-001
+    actor: Club Member
+    story: As a regular Club Member, I want to view a timeline on my personal dashboard showing only the rehearsals, call times, and duties assigned to me.
+    api_mapping:
+      - path: /api/my-schedule
+        method: get
+        operationId: get_my_schedule_api_my_schedule_get
+      - path: /api/my-schedule/update
+        method: post
+        operationId: update_my_schedule_api_my_schedule_update_post
+      - path: /api/notifications
+        method: get
+        operationId: get_notifications_api_notifications_get
+      - path: /api/notifications/mark-read
+        method: post
+        operationId: mark_notifications_read_api_notifications_mark_read_post
+  - id: US-EVE-002
+    actor: Event Organizer
+    story: As an Event Organizer, I want to submit event proposal forms with mandatory fields for venue, budget, and safety plans.
+    api_mapping:
+      - path: /api/proposals
+        method: post
+        operationId: create_proposal_api_proposals_post
+      - path: /api/proposals/{prop_id}/approve
+        method: post
+        operationId: approve_proposal_api_proposals__prop_id__approve_post
+      - path: /api/proposals/{prop_id}/reject
+        method: post
+        operationId: reject_proposal_api_proposals__prop_id__reject_post
+      - path: /api/events/create
+        method: post
+        operationId: create_event_api_events_create_post
+  - id: US-FIN-001
+    actor: Regulatory Representative
+    story: As a Regulatory Representative, I want to access digitized financial ledgers and receipt uploads for all past productions in view-only mode.
+    api_mapping:
+      - path: /api/financials
+        method: get
+        operationId: get_financials_api_financials_get
+      - path: /api/financials/summary
+        method: get
+        operationId: get_financials_summary_api_financials_summary_get
+      - path: /api/revenue-metrics
+        method: get
+        operationId: get_revenue_metrics_api_revenue_metrics_get
+  - id: US-FIN-002
+    actor: Club Member
+    story: As a Club Member, I want to upload digital receipt images and track my expense reimbursement status online.
+    api_mapping:
+      - path: /api/revenue-metrics
+        method: post
+        operationId: create_revenue_metric_api_revenue_metrics_post
+      - path: /api/financials
+        method: get
+        operationId: get_financials_api_financials_get
+  - id: US-GOV-001
+    actor: System Maintainer
+    story: As a System Maintainer, I want to run a batch administrative utility at the end of the academic year to revert graduating leaders to general member status.
+    api_mapping:
+      - path: /api/maintainer/stats
+        method: get
+        operationId: get_maintainer_stats_api_maintainer_stats_get
+      - path: /api/users/{user_id}/labels
+        method: post
+        operationId: assign_user_label_api_users__user_id__labels_post
+      - path: /api/users/{user_id}/labels/{label_id}
+        method: delete
+        operationId: remove_user_label_api_users__user_id__labels__label_id__delete
+  - id: US-GOV-002
+    actor: Regulatory Representative
+    story: As a Regulatory Representative, I want to provide a secure, sequestered portal where students can submit confidential safety or behavioral grievances.
+    api_mapping:
+      - path: /api/proposals
+        method: post
+        operationId: create_proposal_api_proposals_post
+      - path: /api/notifications
+        method: get
+        operationId: get_notifications_api_notifications_get
+  - id: US-SPO-001
+    actor: Advertiser / Sponsor
+    story: As an Advertiser / Sponsor, I want to review available sponsorship packages and submit partnership proposals online.
+    api_mapping:
+      - path: /api/sponsor-ads
+        method: get
+        operationId: get_sponsor_ads_api_sponsor_ads_get
+      - path: /api/sponsor-ads/create
+        method: post
+        operationId: create_sponsor_ad_api_sponsor_ads_create_post
+      - path: /api/sponsor-ads/{ad_id}/status
+        method: post
+        operationId: update_sponsor_ad_status_api_sponsor_ads__ad_id__status_post
+  - id: US-SPO-002
+    actor: Advertiser / Sponsor
+    story: As an Advertiser / Sponsor, I want to upload high-resolution digital logos, banners, and prop integration guidelines into the platform.
+    api_mapping:
+      - path: /api/gallery
+        method: get
+        operationId: get_gallery_api_gallery_get
+      - path: /api/gallery
+        method: post
+        operationId: upload_gallery_item_api_gallery_post
+      - path: /api/gallery/{item_id}/status
+        method: post
+        operationId: update_gallery_item_status_api_gallery__item_id__status_post
+      - path: /api/gallery/{item_id}
+        method: delete
+        operationId: delete_gallery_item_api_gallery__item_id__delete
+  - id: US-COL-001
+    actor: External Club / Partner Organization
+    story: As an External Club / Partner Organization, I want to submit joint performance proposals online and receive a unique tracking ID.
+    api_mapping:
+      - path: /api/proposals
+        method: post
+        operationId: create_proposal_api_proposals_post
+      - path: /api/proposals/{prop_id}/update
+        method: post
+        operationId: update_proposal_api_proposals__prop_id__update_post
+  - id: US-COL-002
+    actor: Educational Institution
+    story: As an Educational Institution, I want to request drama workshops by specifying preferred dates, target audience size, and venue details.
+    api_mapping:
+      - path: /api/events
+        method: get
+        operationId: get_events_api_events_get
+      - path: /api/events/create
+        method: post
+        operationId: create_event_api_events_create_post
+      - path: /api/events/{event_id}/update
+        method: post
+        operationId: update_event_api_events__event_id__update_post
+
+x-api-mapping:
+  Authentication:
+    - post /api/join
+    - post /api/login
+    - post /api/logout
+  User Profile & Directory:
+    - get /api/profile/get
+    - post /api/profile/update
+    - get /api/members
+    - get /api/labels
+    - post /api/labels
+    - post /api/users/{user_id}/labels
+    - delete /api/users/{user_id}/labels/{label_id}
+  Events & Plays:
+    - get /api/events
+    - post /api/events/create
+    - post /api/events/{event_id}/update
+    - get /api/plays
+    - get /api/plays/{play_id}
+    - get /api/open-positions
+  Rehearsals & Scripts:
+    - get /scripts
+    - post /scripts
+    - post /rehearsal/start
+    - post /script/pin
+    - get /api/scripts
+    - post /api/scripts
+    - get /api/scripts/{script_id}/download
+    - put /api/scripts/{script_id}
+    - post /api/scripts/{script_id}
+    - delete /api/scripts/{script_id}
+    - post /api/scripts/{script_id}/request-publish
+    - post /api/scripts/{script_id}/approve-publish
+    - post /api/scripts/{script_id}/reject-publish
+  Auditions & Stage Bookings:
+    - get /api/audition-positions
+    - post /api/audition-positions/create
+    - get /api/audition-applications
+    - post /api/audition-applications/{app_id}/status
+    - get /api/my-auditions
+    - post /api/audition/submit
+    - get /api/stage-bookings
+    - post /api/stage-bookings
+  Proposals & Sponsorships:
+    - get /api/proposals
+    - post /api/proposals
+    - post /api/proposals/{prop_id}/approve
+    - post /api/proposals/{prop_id}/reject
+    - post /api/proposals/{prop_id}/update
+    - get /api/sponsor-ads
+    - post /api/sponsor-ads/create
+    - post /api/sponsor-ads/{ad_id}/status
+  Gallery & Media:
+    - get /api/gallery
+    - post /api/gallery
+    - delete /api/gallery/{item_id}
+    - post /api/gallery/{item_id}/status
+  Financials:
+    - get /api/financials
+    - get /api/financials/summary
+    - get /api/revenue-metrics
+    - post /api/revenue-metrics
+  User Schedule & Notifications:
+    - get /api/my-schedule
+    - post /api/my-schedule/update
+    - get /api/notifications
+    - post /api/notifications/mark-read
+  Maintainer & Governance:
+    - get /api/maintainer/dashboard
+    - get /api/maintainer/stats
+  Frontend Navigation Routes:
+    - get /
+    - get /member/calendar
+    - get /member/rehearsal
+    - get /ai-rehearsal
+    - get /script-directory
+    - get /member/schedule
+  System:
+    - get /api/health
+
+paths:
+  /:
+    get:
+      tags:
+        - Frontend Navigation Routes
+      summary: Root Landing Page
+      description: Serves the primary landing page interface for Aayam platform.
+      operationId: get_root_landing_page_get
+      security: []
+      responses:
+        '200':
+          description: Successful HTML page load or index status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: active
+                  message:
+                    type: string
+                    example: Aayam Cultural Club Platform API
+
+  /member/calendar:
+    get:
+      tags:
+        - Frontend Navigation Routes
+      summary: Member Rehearsal & Event Calendar View
+      operationId: get_member_calendar_view_get
+      responses:
+        '200':
+          description: Calendar interface rendered successfully
+
+  /member/rehearsal:
+    get:
+      tags:
+        - Frontend Navigation Routes
+      summary: Rehearsal Management Workspace
+      operationId: get_member_rehearsal_view_get
+      responses:
+        '200':
+          description: Rehearsal workspace rendered successfully
+
+  /ai-rehearsal:
+    get:
+      tags:
+        - Frontend Navigation Routes
+      summary: AI Smart Rehearsal Workspace
+      operationId: get_ai_rehearsal_view_get
+      responses:
+        '200':
+          description: AI rehearsal interface rendered successfully
+
+  /script-directory:
+    get:
+      tags:
+        - Frontend Navigation Routes
+      summary: Public Script Directory View
+      operationId: get_script_directory_view_get
+      security: []
+      responses:
+        '200':
+          description: Script directory view rendered successfully
+
+  /member/schedule:
+    get:
+      tags:
+        - Frontend Navigation Routes
+      summary: Member Personal Schedule View
+      operationId: get_member_schedule_view_get
+      responses:
+        '200':
+          description: Member schedule view rendered successfully
+
+  /scripts:
+    get:
+      tags:
+        - Rehearsals & Scripts
+      summary: Search and Filter Scripts
+      description: Search scripts by title/author or filter by genre (e.g. Street Play, Stage Drama).
+      operationId: get_scripts_search_scripts_get
+      security: []
+      parameters:
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Search term for title or playwright
+        - name: genre
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter by script genre
+      responses:
+        '200':
+          description: List of matching scripts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Script'
+        '400':
+          description: Invalid genre filter parameter
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+    post:
+      tags:
+        - Rehearsals & Scripts
+      summary: Quick Create or Upload Script (Non-prefixed route)
+      operationId: post_scripts_create_scripts_post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScriptCreate'
+      responses:
+        '200':
+          description: Script created successfully
+        '201':
+          description: Script created successfully
+        '400':
+          description: Validation error
+
+  /rehearsal/start:
+    post:
+      tags:
+        - Rehearsals & Scripts
+      summary: Start Live Rehearsal Session
+      operationId: start_rehearsal_rehearsal_start_post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - script_id
+              properties:
+                script_id:
+                  type: integer
+                  example: 1
+      responses:
+        '200':
+          description: Rehearsal session started
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  script:
+                    $ref: '#/components/schemas/Script'
+        '400':
+          description: Missing script_id
+        '404':
+          description: Script not found
+
+  /script/pin:
+    post:
+      tags:
+        - Rehearsals & Scripts
+      summary: Pin Script to Favorites / Active Rehearsal List
+      operationId: pin_script_script_pin_post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - script_id
+              properties:
+                script_id:
+                  type: integer
+                  example: 1
+      responses:
+        '200':
+          description: Script pinned successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  pinned:
+                    type: boolean
+                    example: true
+                  script:
+                    $ref: '#/components/schemas/Script'
+        '400':
+          description: Missing script_id
+        '404':
+          description: Script not found
+
+  /api/health:
+    get:
+      tags:
+        - System
+      summary: Platform Health Check
+      description: Returns health status of SQLite database and Redis server connection.
+      operationId: health_check_api_health_get
+      security: []
+      responses:
+        '200':
+          description: System healthy status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: healthy
+                  database:
+                    type: string
+                    example: SQLite
+                  redis_connected:
+                    type: boolean
+                    example: true
+
+  /api/join:
+    post:
+      tags:
+        - Authentication
+      summary: Self-service Member Application & Sign-up
+      description: Submits new member application with portfolio, interest area, and emergency contacts.
+      operationId: join_club_api_join_post
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserJoin'
+      responses:
+        '200':
+          description: Application processed
+        '201':
+          description: Member registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  member:
+                    $ref: '#/components/schemas/User'
+                  generated_credentials:
+                    type: object
+                    properties:
+                      email:
+                        type: string
+                      password:
+                        type: string
+        '400':
+          description: Missing required fields or validation failure
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+
+  /api/login:
+    post:
+      tags:
+        - Authentication
+      summary: Authenticate User & Issue JWT Session Token
+      operationId: login_api_login_post
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+      responses:
+        '200':
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          description: Missing username/email or password
+        '401':
+          description: Invalid credentials
+        '403':
+          description: Account pending review
+        '404':
+          description: User not found
+
+  /api/logout:
+    post:
+      tags:
+        - Authentication
+      summary: Terminate User Session & Revoke Token
+      operationId: logout_api_logout_post
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+      responses:
+        '200':
+          description: Successfully logged out
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '400':
+          description: Token missing
+
+  /api/members:
+    get:
+      tags:
+        - User Profile & Directory
+      summary: List Club Members Directory
+      operationId: get_members_api_members_get
+      responses:
+        '200':
+          description: List of registered members
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+
+  /api/profile/get:
+    get:
+      tags:
+        - User Profile & Directory
+      summary: Get User Profile Details
+      operationId: get_profile_api_profile_get_get
+      parameters:
+        - name: email
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Email address of user profile
+      responses:
+        '200':
+          description: User profile payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        '400':
+          description: Missing email parameter
+        '404':
+          description: User not found
+
+  /api/profile/update:
+    post:
+      tags:
+        - User Profile & Directory
+      summary: Update User Profile Details
+      operationId: update_profile_api_profile_update_post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserProfileUpdate'
+      responses:
+        '200':
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        '400':
+          description: Missing email or invalid fields
+        '404':
+          description: User not found
+
+  /api/events:
+    get:
+      tags:
+        - Events & Plays
+      summary: List Club Events
+      operationId: get_events_api_events_get
+      security: []
+      responses:
+        '200':
+          description: List of upcoming and past events
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Event'
+
+  /api/events/create:
+    post:
+      tags:
+        - Events & Plays
+      summary: Create New Production Event
+      operationId: create_event_api_events_create_post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventCreate'
+      responses:
+        '200':
+          description: Event created successfully
+        '201':
+          description: Event created successfully
+        '500':
+          description: Server database error
+
+  /api/events/{event_id}/update:
+    post:
+      tags:
+        - Events & Plays
+      summary: Update Event Details
+      operationId: update_event_api_events__event_id__update_post
+      parameters:
+        - name: event_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventUpdate'
+      responses:
+        '200':
+          description: Event updated successfully
+        '404':
+          description: Event not found
+
+  /api/plays:
+    get:
+      tags:
+        - Events & Plays
+      summary: List Production Plays
+      operationId: get_plays_api_plays_get
+      security: []
+      responses:
+        '200':
+          description: List of plays
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Play'
+
+  /api/plays/{play_id}:
+    get:
+      tags:
+        - Events & Plays
+      summary: Get Single Play Details
+      operationId: get_play_api_plays__play_id__get
+      security: []
+      parameters:
+        - name: play_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Detailed play information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Play'
+        '404':
+          description: Play not found
+
+  /api/open-positions:
+    get:
+      tags:
+        - Events & Plays
+      summary: List Open Audition & Production Crew Positions
+      operationId: get_open_positions_api_open_positions_get
+      security: []
+      responses:
+        '200':
+          description: List of open positions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AuditionPosition'
+
+  /api/maintainer/dashboard:
+    get:
+      tags:
+        - Maintainer & Governance
+      summary: Maintainer Dashboard Overview
+      operationId: get_maintainer_dashboard_api_maintainer_dashboard_get
+      responses:
+        '200':
+          description: Dashboard stats and operational indicators
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MaintainerDashboard'
+
+  /api/maintainer/stats:
+    get:
+      tags:
+        - Maintainer & Governance
+      summary: System & Member Governance Statistics
+      operationId: get_maintainer_stats_api_maintainer_stats_get
+      responses:
+        '200':
+          description: Governance stats metrics payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MaintainerStats'
+
+  /api/notifications:
+    get:
+      tags:
+        - User Schedule & Notifications
+      summary: Get User Notifications Feed
+      operationId: get_notifications_api_notifications_get
+      responses:
+        '200':
+          description: List of user notifications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Notification'
+
+  /api/notifications/mark-read:
+    post:
+      tags:
+        - User Schedule & Notifications
+      summary: Mark Notifications as Read
+      operationId: mark_notifications_read_api_notifications_mark_read_post
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                notification_ids:
+                  type: array
+                  items:
+                    type: integer
+      responses:
+        '200':
+          description: Notifications marked read successfully
+
+  /api/my-schedule:
+    get:
+      tags:
+        - User Schedule & Notifications
+      summary: Get Personal Rehearsal & Duty Schedule
+      operationId: get_my_schedule_api_my_schedule_get
+      responses:
+        '200':
+          description: Personal schedule events list
+        '400':
+          description: Invalid request parameters
+        '404':
+          description: Schedule or user not found
+
+  /api/my-schedule/update:
+    post:
+      tags:
+        - User Schedule & Notifications
+      summary: Update Personal Schedule Availability
+      operationId: update_my_schedule_api_my_schedule_update_post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                schedule_data:
+                  type: object
+      responses:
+        '200':
+          description: Schedule updated successfully
+        '400':
+          description: Bad payload
+        '404':
+          description: User not found
+
+  /api/my-auditions:
+    get:
+      tags:
+        - Auditions & Stage Bookings
+      summary: List My Audition Submissions
+      operationId: get_my_auditions_api_my_auditions_get
+      responses:
+        '200':
+          description: List of user submitted audition applications
+
+  /api/audition/submit:
+    post:
+      tags:
+        - Auditions & Stage Bookings
+      summary: Submit Application for Audition Position
+      operationId: submit_audition_api_audition_submit_post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - position_id
+              properties:
+                position_id:
+                  type: integer
+                notes:
+                  type: string
+                video_url:
+                  type: string
+      responses:
+        '200':
+          description: Audition submitted successfully
+        '404':
+          description: Position not found
+
+  /api/labels:
+    get:
+      tags:
+        - User Profile & Directory
+      summary: List Member Tags/Labels
+      operationId: get_labels_api_labels_get
+      responses:
+        '200':
+          description: List of defined member labels
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Label'
+    post:
+      tags:
+        - User Profile & Directory
+      summary: Create New Member Tag/Label
+      operationId: create_label_api_labels_post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LabelCreate'
+      responses:
+        '200':
+          description: Label created successfully
+        '201':
+          description: Label created successfully
+
+  /api/users/{user_id}/labels:
+    post:
+      tags:
+        - User Profile & Directory
+      summary: Assign Tag/Label to User
+      operationId: assign_user_label_api_users__user_id__labels_post
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - label_id
+              properties:
+                label_id:
+                  type: integer
+      responses:
+        '200':
+          description: Label assigned to user
+
+  /api/users/{user_id}/labels/{label_id}:
+    delete:
+      tags:
+        - User Profile & Directory
+      summary: Remove Tag/Label from User
+      operationId: remove_user_label_api_users__user_id__labels__label_id__delete
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: label_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Label removed successfully
+
+  /api/stage-bookings:
+    get:
+      tags:
+        - Auditions & Stage Bookings
+      summary: List Stage and Rehearsal Room Bookings
+      operationId: get_stage_bookings_api_stage_bookings_get
+      responses:
+        '200':
+          description: Active stage room bookings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StageBooking'
+    post:
+      tags:
+        - Auditions & Stage Bookings
+      summary: Reserve Stage or Rehearsal Room Slot
+      operationId: create_stage_booking_api_stage_bookings_post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StageBookingCreate'
+      responses:
+        '200':
+          description: Booking successful
+        '201':
+          description: Booking slot reserved successfully
+
+  /api/revenue-metrics:
+    get:
+      tags:
+        - Financials
+      summary: Get Financial Revenue Metrics
+      operationId: get_revenue_metrics_api_revenue_metrics_get
+      responses:
+        '200':
+          description: List of financial revenue data points
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RevenueMetric'
+    post:
+      tags:
+        - Financials
+      summary: Record Financial Revenue Entry
+      operationId: create_revenue_metric_api_revenue_metrics_post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RevenueMetricCreate'
+      responses:
+        '200':
+          description: Revenue metric recorded successfully
+
+  /api/proposals:
+    get:
+      tags:
+        - Proposals & Sponsorships
+      summary: List Submitted Proposals
+      operationId: get_proposals_api_proposals_get
+      responses:
+        '200':
+          description: List of proposals
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Proposal'
+    post:
+      tags:
+        - Proposals & Sponsorships
+      summary: Submit Event or Sponsorship Proposal
+      operationId: create_proposal_api_proposals_post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProposalCreate'
+      responses:
+        '200':
+          description: Proposal submitted
+        '201':
+          description: Proposal created successfully
+
+  /api/proposals/{prop_id}/approve:
+    post:
+      tags:
+        - Proposals & Sponsorships
+      summary: Approve Submitted Proposal
+      operationId: approve_proposal_api_proposals__prop_id__approve_post
+      parameters:
+        - name: prop_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Proposal approved
+
+  /api/proposals/{prop_id}/reject:
+    post:
+      tags:
+        - Proposals & Sponsorships
+      summary: Reject Submitted Proposal
+      operationId: reject_proposal_api_proposals__prop_id__reject_post
+      parameters:
+        - name: prop_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Proposal rejected
+
+  /api/proposals/{prop_id}/update:
+    post:
+      tags:
+        - Proposals & Sponsorships
+      summary: Update Proposal Information
+      operationId: update_proposal_api_proposals__prop_id__update_post
+      parameters:
+        - name: prop_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Proposal updated
+
+  /api/gallery:
+    get:
+      tags:
+        - Gallery & Media
+      summary: List Media Gallery Items
+      operationId: get_gallery_api_gallery_get
+      security: []
+      responses:
+        '200':
+          description: List of gallery items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GalleryItem'
+    post:
+      tags:
+        - Gallery & Media
+      summary: Upload Media Gallery Asset
+      operationId: upload_gallery_item_api_gallery_post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GalleryItemCreate'
+      responses:
+        '200':
+          description: Item uploaded
+        '201':
+          description: Gallery asset uploaded successfully
+        '400':
+          description: Invalid payload
+
+  /api/gallery/{item_id}:
+    delete:
+      tags:
+        - Gallery & Media
+      summary: Delete Media Gallery Item
+      operationId: delete_gallery_item_api_gallery__item_id__delete
+      parameters:
+        - name: item_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Gallery item deleted
+
+  /api/gallery/{item_id}/status:
+    post:
+      tags:
+        - Gallery & Media
+      summary: Moderate & Update Gallery Asset Status
+      operationId: update_gallery_item_status_api_gallery__item_id__status_post
+      parameters:
+        - name: item_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  example: Approved
+      responses:
+        '200':
+          description: Gallery status updated successfully
+        '404':
+          description: Gallery item not found
+
+  /api/sponsor-ads:
+    get:
+      tags:
+        - Proposals & Sponsorships
+      summary: List Sponsor Advertisements
+      operationId: get_sponsor_ads_api_sponsor_ads_get
+      responses:
+        '200':
+          description: List of sponsor ads
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SponsorAd'
+
+  /api/sponsor-ads/create:
+    post:
+      tags:
+        - Proposals & Sponsorships
+      summary: Create New Sponsor Advertisement
+      operationId: create_sponsor_ad_api_sponsor_ads_create_post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SponsorAdCreate'
+      responses:
+        '200':
+          description: Sponsor ad created successfully
+
+  /api/sponsor-ads/{ad_id}/status:
+    post:
+      tags:
+        - Proposals & Sponsorships
+      summary: Update Sponsor Advertisement Status
+      operationId: update_sponsor_ad_status_api_sponsor_ads__ad_id__status_post
+      parameters:
+        - name: ad_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+      responses:
+        '200':
+          description: Sponsor ad status updated
+        '404':
+          description: Sponsor ad not found
+
+  /api/audition-positions:
+    get:
+      tags:
+        - Auditions & Stage Bookings
+      summary: List Audition Open Positions
+      operationId: get_audition_positions_api_audition_positions_get
+      responses:
+        '200':
+          description: List of audition roles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AuditionPosition'
+
+  /api/audition-positions/create:
+    post:
+      tags:
+        - Auditions & Stage Bookings
+      summary: Post New Audition Open Position
+      operationId: create_audition_position_api_audition_positions_create_post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuditionPositionCreate'
+      responses:
+        '200':
+          description: Audition position created successfully
+
+  /api/audition-applications:
+    get:
+      tags:
+        - Auditions & Stage Bookings
+      summary: List Submitted Audition Applications
+      operationId: get_audition_applications_api_audition_applications_get
+      responses:
+        '200':
+          description: Audition applications for maintainer review
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AuditionApplication'
+
+  /api/audition-applications/{app_id}/status:
+    post:
+      tags:
+        - Auditions & Stage Bookings
+      summary: Update Audition Application Status
+      operationId: update_audition_application_status_api_audition_applications__app_id__status_post
+      parameters:
+        - name: app_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  example: Accepted
+      responses:
+        '200':
+          description: Application status updated
+        '404':
+          description: Application not found
+
+  /api/financials:
+    get:
+      tags:
+        - Financials
+      summary: Get Financial Ledger Transactions
+      operationId: get_financials_api_financials_get
+      responses:
+        '200':
+          description: List of ledger transactions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FinancialTransaction'
+
+  /api/financials/summary:
+    get:
+      tags:
+        - Financials
+      summary: Get Financial Summary & Budget Ledger Statistics
+      operationId: get_financials_summary_api_financials_summary_get
+      responses:
+        '200':
+          description: Financial summary overview
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialSummary'
+
+  /api/scripts:
+    get:
+      tags:
+        - Rehearsals & Scripts
+      summary: List Vault Scripts
+      operationId: get_api_scripts_api_scripts_get
+      responses:
+        '200':
+          description: List of scripts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Script'
+    post:
+      tags:
+        - Rehearsals & Scripts
+      summary: Add New Script to Vault
+      operationId: create_script_api_scripts_post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScriptCreate'
+      responses:
+        '200':
+          description: Script created
+        '201':
+          description: Script created successfully
+        '400':
+          description: Title and author_email required
+
+  /api/scripts/{script_id}:
+    put:
+      tags:
+        - Rehearsals & Scripts
+      summary: Update Script Meta and Content
+      operationId: put_script_api_scripts__script_id__put
+      parameters:
+        - name: script_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScriptUpdate'
+      responses:
+        '200':
+          description: Script updated successfully
+        '404':
+          description: Script not found
+    post:
+      tags:
+        - Rehearsals & Scripts
+      summary: Update Script Meta and Content (POST fallback)
+      operationId: update_script_post_api_scripts__script_id__post
+      parameters:
+        - name: script_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScriptUpdate'
+      responses:
+        '200':
+          description: Script updated successfully
+        '404':
+          description: Script not found
+    delete:
+      tags:
+        - Rehearsals & Scripts
+      summary: Delete Script from Vault
+      operationId: delete_script_api_scripts__script_id__delete
+      parameters:
+        - name: script_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Script deleted successfully
+        '404':
+          description: Script not found
+
+  /api/scripts/{script_id}/download:
+    get:
+      tags:
+        - Rehearsals & Scripts
+      summary: Get Script Download Information
+      operationId: download_script_api_scripts__script_id__download_get
+      parameters:
+        - name: script_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Script download URL details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  download_url:
+                    type: string
+                  script:
+                    $ref: '#/components/schemas/Script'
+        '404':
+          description: Script not found
+
+  /api/scripts/{script_id}/request-publish:
+    post:
+      tags:
+        - Rehearsals & Scripts
+      summary: Request Maintainer Approval for Script Publishing
+      operationId: request_publish_script_api_scripts__script_id__request_publish_post
+      parameters:
+        - name: script_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Publish request submitted
+        '404':
+          description: Script not found
+
+  /api/scripts/{script_id}/approve-publish:
+    post:
+      tags:
+        - Rehearsals & Scripts
+      summary: Approve Script Publishing (Maintainers)
+      operationId: approve_publish_script_api_scripts__script_id__approve_publish_post
+      parameters:
+        - name: script_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Script published successfully
+        '404':
+          description: Script not found
+
+  /api/scripts/{script_id}/reject-publish:
+    post:
+      tags:
+        - Rehearsals & Scripts
+      summary: Reject Script Publishing Request
+      operationId: reject_publish_script_api_scripts__script_id__reject_publish_post
+      parameters:
+        - name: script_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Script publication rejected
+        '404':
+          description: Script not found
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    OAuth2PasswordBearer:
+      type: oauth2
+      flows:
+        password:
+          tokenUrl: /api/login
+          scopes: {}
+
+  schemas:
+    UserJoin:
+      type: object
+      required:
+        - name
+        - phone
+        - state
+        - country
+        - pronouns
+        - interest
+        - availability
+        - bio
+        - emergencyName
+        - emergencyPhone
+      properties:
+        name:
+          type: string
+          example: Jatin Bhardwaj
+        phone:
+          type: string
+          example: "+919876543210"
+        state:
+          type: string
+          example: Tamil Nadu
+        country:
+          type: string
+          example: India
+        pronouns:
+          type: string
+          example: He/Him
+        interest:
+          type: string
+          example: Acting & Scriptwriting
+        availability:
+          type: string
+          example: Weekends
+        bio:
+          type: string
+          example: Drama enthusiast interested in street plays.
+        emergencyName:
+          type: string
+          example: Parent Name
+        emergencyPhone:
+          type: string
+          example: "+919876543211"
+        portfolio:
+          type: string
+          example: https://github.com/jatinbhardwaj
+
+    UserLogin:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          example: jatin@handle.com
+        password:
+          type: string
+          example: jatin123
+
+    LoginResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        user:
+          $ref: '#/components/schemas/UserProfile'
+
+    UserProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Jatin Bhardwaj
+        email:
+          type: string
+          example: jatin@handle.com
+        role:
+          type: string
+          example: Member
+        initials:
+          type: string
+          example: JB
+        isAdmin:
+          type: boolean
+          example: false
+
+    UserProfileUpdate:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          type: string
+          example: jatin@handle.com
+        name:
+          type: string
+        phone:
+          type: string
+        bio:
+          type: string
+        availability:
+          type: string
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        member_id:
+          type: string
+          example: MC-4921
+        name:
+          type: string
+          example: Jatin Bhardwaj
+        email:
+          type: string
+          example: jatin@handle.com
+        phone:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        country:
+          type: string
+        status:
+          type: string
+          example: Active
+        interest:
+          type: string
+
+    Event:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: Annual Cultural Nite
+        description:
+          type: string
+        category:
+          type: string
+          example: Stage Play
+        venue:
+          type: string
+          example: Main Auditorium
+        date:
+          type: string
+          example: Aug 15, 2026
+        status:
+          type: string
+          example: upcoming
+        timeRange:
+          type: string
+          example: 18:00 - 21:00
+        capacity:
+          type: string
+
+    EventCreate:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+          example: Street Play Workshop
+        description:
+          type: string
+        category:
+          type: string
+        venue:
+          type: string
+        event_date:
+          type: string
+          format: date
+
+    EventUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        venue:
+          type: string
+        status:
+          type: string
+
+    Play:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: Tamashbin
+        genre:
+          type: string
+          example: Street Play
+        playwright:
+          type: string
+        description:
+          type: string
+
+    AuditionPosition:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: Lead Actor - Male
+        play_title:
+          type: string
+          example: Tamashbin
+        status:
+          type: string
+          example: Open
+
+    AuditionPositionCreate:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+        play_title:
+          type: string
+        description:
+          type: string
+
+    AuditionApplication:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        applicant_name:
+          type: string
+        position_title:
+          type: string
+        status:
+          type: string
+          example: Pending
+
+    StageBooking:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        room_name:
+          type: string
+          example: Rehearsal Room A
+        booker_name:
+          type: string
+        date:
+          type: string
+        time_slot:
+          type: string
+        status:
+          type: string
+
+    StageBookingCreate:
+      type: object
+      required:
+        - room_name
+        - date
+        - time_slot
+      properties:
+        room_name:
+          type: string
+        date:
+          type: string
+        time_slot:
+          type: string
+
+    Script:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: Tamashbin
+        playwright:
+          type: string
+          example: Jatin Bhardwaj
+        genre:
+          type: string
+          example: Street Play
+        language:
+          type: string
+          example: Hindi & English
+        acts:
+          type: string
+          example: 1 Act
+        pages:
+          type: integer
+          example: 30
+        author_email:
+          type: string
+        status:
+          type: string
+          example: Public
+
+    ScriptCreate:
+      type: object
+      required:
+        - title
+        - author_email
+      properties:
+        title:
+          type: string
+        author_email:
+          type: string
+        playwright:
+          type: string
+        genre:
+          type: string
+        language:
+          type: string
+        acts:
+          type: string
+        pages:
+          type: integer
+        excerpt:
+          type: string
+        content:
+          type: string
+        status:
+          type: string
+
+    ScriptUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+        playwright:
+          type: string
+        genre:
+          type: string
+        status:
+          type: string
+        content:
+          type: string
+
+    Proposal:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+        submitted_by:
+          type: string
+        status:
+          type: string
+          example: Pending
+
+    ProposalCreate:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+        type:
+          type: string
+        details:
+          type: string
+        budget:
+          type: number
+
+    SponsorAd:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        sponsor_name:
+          type: string
+        ad_title:
+          type: string
+        status:
+          type: string
+
+    SponsorAdCreate:
+      type: object
+      required:
+        - sponsor_name
+        - ad_title
+      properties:
+        sponsor_name:
+          type: string
+        ad_title:
+          type: string
+        banner_url:
+          type: string
+
+    GalleryItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+        media_url:
+          type: string
+        category:
+          type: string
+        status:
+          type: string
+
+    GalleryItemCreate:
+      type: object
+      required:
+        - title
+        - media_url
+      properties:
+        title:
+          type: string
+        media_url:
+          type: string
+        category:
+          type: string
+
+    Notification:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        type:
+          type: string
+        is_read:
+          type: boolean
+        timestamp:
+          type: string
+
+    FinancialTransaction:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        description:
+          type: string
+        amount:
+          type: number
+        type:
+          type: string
+
+    FinancialSummary:
+      type: object
+      properties:
+        total_revenue:
+          type: number
+        total_expenses:
+          type: number
+        net_balance:
+          type: number
+
+    RevenueMetric:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        source:
+          type: string
+        amount:
+          type: number
+
+    RevenueMetricCreate:
+      type: object
+      required:
+        - source
+        - amount
+      properties:
+        source:
+          type: string
+        amount:
+          type: number
+
+    MaintainerDashboard:
+      type: object
+      properties:
+        total_members:
+          type: integer
+        active_events:
+          type: integer
+        pending_approvals:
+          type: integer
+
+    MaintainerStats:
+      type: object
+      properties:
+        user_count:
+          type: integer
+        scripts_count:
+          type: integer
+        events_count:
+          type: integer
+
+    Label:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Core Lead
+
+    LabelCreate:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+
+    MessageResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        message:
+          type: string
+          example: Operation completed successfully
+
+    HTTPValidationError:
+      type: object
+      properties:
+        error:
+          type: string
+          example: Validation error

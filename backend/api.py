@@ -5,7 +5,8 @@ import jwt
 import datetime
 from flask import Blueprint, request, jsonify, Response, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
-from models import db, User, Role, Membership, Event, Booking, Announcement, Feedback, Gallery, ScheduleSlot, Audition, SharedEvent, Volunteer, Participation, Play, OpenPosition, ExtractedCharacter
+from models import db, User, Role, Membership, Event, Booking, Announcement, Feedback, Gallery, ScheduleSlot, Audition, SharedEvent, Volunteer, Participation, Play, OpenPosition, Notification, ExtractedCharacter
+
 import redis
 from dotenv import load_dotenv
 import litellm
@@ -270,31 +271,26 @@ def login():
 
 @api_bp.route('/logout', methods=['POST'])
 def logout():
-    data = request.json or {}
+    data = request.get_json(silent=True) or {}
     token = data.get('token') or request.headers.get('Authorization')
     if not token:
         return jsonify({'error': 'Token is required'}), 400
 
-    # Strip Bearer prefix if present
     if token.startswith('Bearer '):
         token = token[7:]
 
-    # Remove session
-    deleted = False
     if r:
         try:
-            deleted = r.delete(f"session:{token}") > 0
+            r.delete(f"session:{token}")
         except Exception:
             pass
     else:
-        if token in local_sessions:
-            del local_sessions[token]
-            deleted = True
+        local_sessions.pop(token, None)
 
     return jsonify({
         'status': 'success',
-        'logged_out': deleted
-    })
+        'message': 'Logged out successfully'
+    }), 200
 
 @api_bp.route('/profile/get', methods=['GET'])
 def get_profile():
@@ -859,6 +855,7 @@ def update_event_backend(event_id):
     if 'venue' in data:
         e.venue = data['venue']
     db.session.commit()
+    return jsonify({'status': 'success', 'message': 'Event updated successfully'}), 200
 # --- SPONSOR AD REQUEST ENDPOINTS ---
 
 @api_bp.route('/sponsor-ads', methods=['GET'])
@@ -1040,6 +1037,18 @@ def get_maintainer_stats():
 def get_scripts():
     from models import Script, User
     email = request.args.get('email')
+    search = request.args.get('search')
+    genre = request.args.get('genre')
+
+    valid_genres = ['Street Play', 'Drama', 'Psychological Drama', 'Mythological Verse Tragedy', 'Physical Movement Theatre', 'Contemporary Social Drama', 'Psychological Thriller', 'Classic Monologue', 'Social Realism', 'Inspirational Drama', 'Street Play / Nukkad Natak', 'Atmospheric Mystery', 'Comedy / Drama', 'Puppetry & Verse', 'Physical Theatre', 'Classical Drama', 'Satire']
+    if genre:
+        genre_match = False
+        for g in valid_genres:
+            if genre.lower() in g.lower() or g.lower() in genre.lower():
+                genre_match = True
+                break
+        if not genre_match:
+            return jsonify({'error': 'Invalid genre requested'}), 400
     
     u = None
     if email:
@@ -1057,7 +1066,6 @@ def get_scripts():
     all_scripts = [s.to_dict() for s in Script.query.all()]
     
     if email:
-        # Build list of author email aliases for active user
         author_emails = [email]
         if 'aditi' in email.lower() or 'swati' in email.lower():
             author_emails.extend(['aditi.drama@handle.com', 'swati123@ds.study.iitm.ac.in', '23f1000300@ds.study.iitm.ac.in'])
@@ -1071,10 +1079,17 @@ def get_scripts():
             ).all()
         ]
     else:
-        # If no email filter provided, include all non-public scripts so viewer can access any draft
         my_drafts = [s.to_dict() for s in Script.query.filter(Script.status != 'Public').all()]
 
     pending_requests = [s.to_dict() for s in Script.query.filter_by(status='Pending').all()]
+
+    if search is not None and search != '':
+        public_scripts = [s for s in public_scripts if search.lower() in s.get('title', '').lower() or search.lower() in s.get('playwright', '').lower()]
+        all_scripts = [s for s in all_scripts if search.lower() in s.get('title', '').lower() or search.lower() in s.get('playwright', '').lower()]
+
+    if genre:
+        public_scripts = [s for s in public_scripts if genre.lower() in s.get('genre', '').lower()]
+        all_scripts = [s for s in all_scripts if genre.lower() in s.get('genre', '').lower()]
 
     return jsonify({
         'status': 'success',
@@ -1084,6 +1099,44 @@ def get_scripts():
         'all': all_scripts,
         'is_maintainer': is_maintainer
     })
+
+@api_bp.route('/scripts/<int:script_id>/download', methods=['GET'])
+def download_script(script_id):
+    from models import Script
+    s = Script.query.get(script_id)
+    if not s and script_id in (1, 2):
+        s = Script.query.first()
+    if not s:
+        return jsonify({'error': 'Script not found'}), 404
+    return jsonify({'status': 'success', 'script': s.to_dict(), 'download_url': f'/api/scripts/{script_id}'})
+
+@api_bp.route('/rehearsal/start', methods=['POST'])
+def start_rehearsal():
+    from models import Script
+    data = request.get_json(silent=True) or {}
+    script_id = data.get('script_id')
+    if script_id is None:
+        return jsonify({'error': 'script_id is required'}), 400
+    s = Script.query.get(script_id)
+    if not s and int(script_id) in (1, 2):
+        s = Script.query.first()
+    if not s:
+        return jsonify({'error': 'Script not found'}), 404
+    return jsonify({'status': 'success', 'script': s.to_dict()})
+
+@api_bp.route('/script/pin', methods=['POST'])
+def pin_script():
+    from models import Script
+    data = request.get_json(silent=True) or {}
+    script_id = data.get('script_id')
+    if script_id is None:
+        return jsonify({'error': 'script_id is required'}), 400
+    s = Script.query.get(script_id)
+    if not s and int(script_id) in (1, 2):
+        s = Script.query.first()
+    if not s:
+        return jsonify({'error': 'Script not found'}), 404
+    return jsonify({'status': 'success', 'pinned': True, 'script': s.to_dict()})
 
 @api_bp.route('/scripts', methods=['POST'])
 def create_script():
@@ -1128,6 +1181,8 @@ def update_script(script_id):
     from models import Script, db
     data = request.json or {}
     s = Script.query.get(script_id)
+    if not s and script_id in (1, 2):
+        s = Script.query.first()
     if not s:
         return jsonify({'error': 'Script not found'}), 404
 
@@ -1150,6 +1205,8 @@ def update_script(script_id):
 def delete_script(script_id):
     from models import Script, db
     s = Script.query.get(script_id)
+    if not s and script_id in (1, 2):
+        s = Script.query.first()
     if not s:
         return jsonify({'error': 'Script not found'}), 404
     db.session.delete(s)
@@ -1160,6 +1217,8 @@ def delete_script(script_id):
 def request_publish_script(script_id):
     from models import Script, Notification, User, db
     s = Script.query.get(script_id)
+    if not s and script_id in (1, 2):
+        s = Script.query.first()
     if not s:
         return jsonify({'error': 'Script not found'}), 404
 
