@@ -3,10 +3,20 @@ import json
 import random
 import jwt
 import datetime
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, Response, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
-from models import db, User, Role, Membership, Event, Booking, Announcement, Feedback, Gallery, ScheduleSlot, Audition, SharedEvent, Volunteer, Participation, Play, OpenPosition, Notification
+from models import db, User, Role, Membership, Event, Booking, Announcement, Feedback, Gallery, ScheduleSlot, Audition, SharedEvent, Volunteer, Participation, Play, OpenPosition, Notification, ExtractedCharacter
+
 import redis
+from dotenv import load_dotenv
+import litellm
+
+load_dotenv()
+
+# LLM provider settings from environment variables (configured for Gemini support via LiteLLM)
+API_BASE = os.getenv("COMPLETIONS_API_BASE", "http://localhost:4000/v1")
+MODEL_NAME = os.getenv("COMPLETIONS_MODEL", "gemini/gemini-3.6-flash")
+API_KEY = os.environ["GEMINI_API_KEY"]
 
 api_bp = Blueprint('api', __name__)
 
@@ -1286,3 +1296,314 @@ def reject_publish_script(script_id):
         print("Notification error:", e)
 
     return jsonify({'status': 'success', 'script': s.to_dict()})
+
+
+# ==========================================
+# Character Extractor & SSE API Endpoints
+# ==========================================
+import queue
+
+sse_queues = []
+
+def extract_characters_from_text(text):
+    if not text or not text.strip():
+        return []
+    
+    prompt = f"""
+    You are an expert novel consultant. Given the following excerpt from a story, identify all characters mentioned in it.
+    For each character, capture:
+    - name (string)
+    - description (a brief description based on the context, string)
+    - traits (a list of 1-3 adjectives describing their personality or appearance, list of strings)
+    - motivation (their apparent goal or what drives them, string)
+    - role (their role in this segment: e.g. Protagonist, Antagonist, Supporting, Minor, string)
+
+    Return the list strictly as a JSON array of character objects, and do not wrap it in markdown codeblocks.
+    Example output format:
+    [
+      {{
+        "name": "Jane",
+        "description": "A clever detective with a quick eye.",
+        "traits": ["clever", "observant"],
+        "motivation": "Solving the mysterious disappearance.",
+        "role": "Protagonist"
+      }}
+    ]
+
+    Story text:
+    ---
+    {text}
+    ---
+    """
+    completion_kwargs = {
+        "model": MODEL_NAME,
+        "messages": [{"role": "user", "content": prompt}],
+        "api_key": API_KEY,
+        "response_format": {"type": "json_object"}
+    }
+    if os.getenv("COMPLETIONS_API_BASE") or not MODEL_NAME.startswith("gemini/"):
+        completion_kwargs["api_base"] = API_BASE
+
+    response = litellm.completion(**completion_kwargs)
+    content = response.choices[0].message.content.strip()
+    if content.startswith("```json"):
+        content = content[7:]
+    if content.endswith("```"):
+        content = content[:-3]
+    content = content.strip()
+    return json.loads(content)
+
+STREAM_ANALYSIS_CACHE = {}
+
+@api_bp.route('/stream', methods=['GET'])
+def stream_events():
+    script_id = request.args.get("script_id") or "global_fallback"
+    def event_generator():
+        q = queue.Queue()
+        sse_queues.append(q)
+        try:
+            # Send connection confirmation event
+            yield f"data: Connected to analysis stream\n\n"
+            
+            # Yield cached analysis results for this script if present
+            cached_payload = STREAM_ANALYSIS_CACHE.get(script_id)
+            if cached_payload:
+                yield cached_payload
+
+            while True:
+                event_data = q.get()
+                yield event_data
+        except GeneratorExit:
+            pass
+        finally:
+            if q in sse_queues:
+                sse_queues.remove(q)
+                
+    return Response(event_generator(), mimetype='text/event-stream')
+
+@api_bp.route('/analyze-text', methods=['POST'])
+def analyze_text():
+    data = request.json or {}
+    text = data.get("text", "")
+    script_id = data.get("script_id") or "global_fallback"
+    if not text.strip():
+        return jsonify({"success": True, "message": "Text is empty."})
+        
+    characters = extract_characters_from_text(text)
+    
+    # Broadcast to SSE queues to simulate streaming character push
+    event_payload = f"event: analysis\ndata: {json.dumps({'characters': characters})}\n\n"
+    
+    # Update cache
+    STREAM_ANALYSIS_CACHE[script_id] = event_payload
+
+    for q in sse_queues:
+        q.put(event_payload)
+        
+    return jsonify({"success": True, "characters": characters})
+
+@api_bp.route('/characters', methods=['GET'])
+def get_characters():
+    chars = ExtractedCharacter.query.all()
+    return jsonify([c.to_dict() for c in chars])
+
+@api_bp.route('/characters', methods=['POST'])
+def save_character():
+    data = request.json or {}
+    name = data.get("name")
+    if not name:
+        return jsonify({"error": "Character name is required"}), 400
+        
+    char_id = data.get("id")
+    char_obj = None
+    if char_id:
+        char_obj = db.session.get(ExtractedCharacter, char_id)
+        
+    if not char_obj:
+        char_obj = ExtractedCharacter.query.filter_by(name=name).first()
+        
+    if not char_obj:
+        char_obj = ExtractedCharacter(name=name)
+        db.session.add(char_obj)
+        
+    char_obj.description = data.get("description", char_obj.description)
+    traits = data.get("traits")
+    if traits is not None:
+        char_obj.traits = json.dumps(traits)
+    char_obj.motivation = data.get("motivation", char_obj.motivation)
+    char_obj.role = data.get("role", char_obj.role)
+    
+    db.session.commit()
+    return jsonify(char_obj.to_dict())
+
+@api_bp.route('/characters', methods=['DELETE'])
+def delete_character():
+    char_id = request.args.get('id')
+    if not char_id:
+        return jsonify({"error": "Character ID is required"}), 400
+        
+    char_obj = db.session.get(ExtractedCharacter, char_id)
+    if not char_obj:
+        return jsonify({"error": "Character not found"}), 404
+        
+    db.session.delete(char_obj)
+    db.session.commit()
+    return jsonify({"success": True})
+
+@api_bp.route('/suggest-character', methods=['POST'])
+def suggest_character():
+    data = request.json or {}
+    prompt = data.get("prompt", "")
+    story_context = data.get("context", "")
+    
+    if not prompt.strip():
+        return jsonify({"error": "Prompt is required"}), 400
+        
+    try:
+        system_instruction = """
+        You are a creative writer's AI assistant. Generate a highly creative and detailed character outline matching the user's prompt, making sure it aligns with and fits the provided story context if any.
+        Provide the details strictly in JSON format with the following fields:
+        - name (string)
+        - description (a rich paragraph describing who they are, string)
+        - traits (a list of 3 personality traits, list of strings)
+        - motivation (their core desires and goals, string)
+        - role (their role, e.g. Protagonist, Antagonist, Supporting, Mentor, Rival, string)
+
+        Return only the raw JSON. Do not include markdown formatting or tags.
+        """
+        user_query = f"""
+        Story Context:
+        ---
+        {story_context}
+        ---
+
+        User Prompt for the new character: {prompt}
+        """
+        completion_kwargs = {
+            "model": MODEL_NAME,
+            "messages": [
+                {"role": "system", "content": system_instruction},
+                {"role": "user", "content": user_query}
+            ],
+            "api_key": API_KEY,
+            "response_format": {"type": "json_object"}
+        }
+        if os.getenv("COMPLETIONS_API_BASE") or not MODEL_NAME.startswith("gemini/"):
+            completion_kwargs["api_base"] = API_BASE
+
+        response = litellm.completion(**completion_kwargs)
+        content = response.choices[0].message.content.strip()
+        # Clean markdown code blocks from response
+        if content.startswith("```json"):
+            content = content[7:]
+        if content.endswith("```"):
+            content = content[:-3]
+        content = content.strip()
+        return jsonify(json.loads(content))
+    except Exception as e:
+        return jsonify({"error": f"Live LLM call failed: {str(e)}"}), 500
+
+
+@api_bp.route('/auto-extract', methods=['POST'])
+def auto_extract():
+    data = request.json or {}
+    text = data.get("text", "")
+    script_id = data.get("script_id")
+    
+    if not text.strip():
+        return jsonify({"error": "Text is required"}), 400
+        
+    try:
+        system_instruction = """
+        You are a professional screenwriter and drama analyst assistant. 
+        Your task is to analyze the user's provided text content.
+        Perform the following operations:
+        1. Determine if the text is structured like a script/play (i.e. lists character names followed by their spoken dialogue/lines).
+        2. If it is already a play-like script, normalize it into neat Markdown dialogue styling (e.g. `**NAME**\nDialogue text...`).
+        3. If it is NOT a play-like script (e.g. it is prose, a summary, or description), rewrite it entirely into a rich theatrical play/script with dialogue between the key characters based on the context and storyline.
+        4. Extract all characters involved in the dialogue script, detailing their:
+           - name (string, capitalized name)
+           - description (string, rich context)
+           - traits (list of personality trait strings, e.g. ["brave", "honest"])
+           - motivation (string, core goal/desire)
+           - role (string, Protagonist, Antagonist, Rival, Supporting)
+        
+        Return the result strictly as a JSON object matching this schema:
+        {
+           "dialogue_script": "The final formatted markdown script",
+           "characters": [
+              {
+                 "name": "...",
+                 "description": "...",
+                 "traits": ["...", "..."],
+                 "motivation": "...",
+                 "role": "..."
+              }
+           ]
+        }
+        Ensure you output only valid, parseable raw JSON. Do not wrap it in markdown formatting (like ```json).
+        """
+        
+        completion_kwargs = {
+            "model": MODEL_NAME,
+            "messages": [
+                {"role": "system", "content": system_instruction},
+                {"role": "user", "content": text}
+            ],
+            "api_key": API_KEY,
+            "response_format": {"type": "json_object"}
+        }
+        if os.getenv("COMPLETIONS_API_BASE") or not MODEL_NAME.startswith("gemini/"):
+            completion_kwargs["api_base"] = API_BASE
+            
+        response = litellm.completion(**completion_kwargs)
+        content = response.choices[0].message.content.strip()
+        if content.startswith("```json"):
+            content = content[7:]
+        if content.endswith("```"):
+            content = content[:-3]
+        content = content.strip()
+        
+        parsed = json.loads(content)
+        dialogue_script = parsed.get("dialogue_script", "")
+        characters = parsed.get("characters", [])
+            
+    except Exception as e:
+        return jsonify({"error": f"Live LLM call failed: {str(e)}"}), 500
+
+    # Save characters to the SQLite database
+    saved_list = []
+    for c in characters:
+        name = c.get("name")
+        if not name:
+            continue
+        try:
+            char_obj = ExtractedCharacter.query.filter_by(name=name).first()
+            if not char_obj:
+                char_obj = ExtractedCharacter(name=name)
+                db.session.add(char_obj)
+            char_obj.description = c.get("description", char_obj.description)
+            char_obj.traits = json.dumps(c.get("traits", []))
+            char_obj.motivation = c.get("motivation", char_obj.motivation)
+            char_obj.role = c.get("role", char_obj.role)
+            db.session.commit()
+            saved_list.append(char_obj.to_dict())
+        except Exception as db_err:
+            db.session.rollback()
+            print(f"Error saving character {name} to db: {db_err}")
+
+    # Also update STREAM_ANALYSIS_CACHE if script_id is provided
+    if script_id:
+        try:
+            event_payload = f"event: analysis\ndata: {json.dumps({'characters': saved_list})}\n\n"
+            STREAM_ANALYSIS_CACHE[script_id] = event_payload
+            for q in sse_queues:
+                q.put(event_payload)
+        except Exception as stream_err:
+            print(f"Stream analysis cache update error: {stream_err}")
+            
+    return jsonify({
+        "dialogue_script": dialogue_script,
+        "characters": saved_list
+    })
+

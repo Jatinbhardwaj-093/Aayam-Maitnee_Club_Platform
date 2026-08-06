@@ -35,3 +35,6 @@ env/
 .env.*
 !.env.example
 inspiration
+
+# Ai specific files
+_agent
