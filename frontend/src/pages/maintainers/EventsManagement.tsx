@@ -243,7 +243,38 @@ export default function EventsManagement() {
       });
     }
 
-    // 2. Detect key domain partnership terms
+    // 2. Frequency analysis of significant words in description
+    const stopWords = new Set([
+      "this", "that", "with", "from", "have", "your", "their", "will", "about", "for",
+      "the", "and", "in", "of", "to", "a", "is", "are", "was", "were", "been", "being",
+      "has", "had", "does", "did", "doing", "an", "or", "by", "on", "at", "be",
+      "as", "it", "its", "into", "through", "during", "before", "after", "above", "below",
+      "official", "partner", "deliverables", "include", "across", "includes"
+    ]);
+
+    const words = desc
+      .replace(/[^\w\s₹$]/gi, ' ')
+      .split(/\s+/)
+      .map((w) => w.trim())
+      .filter((w) => w.length > 3 && !stopWords.has(w.toLowerCase()));
+
+    const freqMap: Record<string, number> = {};
+    words.forEach((w) => {
+      const key = w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
+      freqMap[key] = (freqMap[key] || 0) + 1;
+    });
+
+    const sortedByFreq = Object.entries(freqMap)
+      .sort((a, b) => b[1] - a[1])
+      .map(([word]) => word);
+
+    sortedByFreq.forEach((w) => {
+      if (!keywords.map((k) => k.toLowerCase()).includes(w.toLowerCase()) && keywords.length < 8) {
+        keywords.push(w);
+      }
+    });
+
+    // 3. Detect key domain partnership terms
     const domainTerms = [
       "Exclusive Energy Partner", "Green Room Lounge", "Playbill Cover", "Sampling Counter",
       "VIP Audience Passes", "Title Wardrobe Partner", "Side-Stage Banner", "Foyer Exhibition",
@@ -253,20 +284,10 @@ export default function EventsManagement() {
     ];
 
     domainTerms.forEach((term) => {
-      if (desc.toLowerCase().includes(term.toLowerCase()) && !keywords.includes(term)) {
+      if (desc.toLowerCase().includes(term.toLowerCase()) && !keywords.map((k) => k.toLowerCase()).includes(term.toLowerCase())) {
         keywords.push(term);
       }
     });
-
-    // 3. Fallback NLP extraction: find capitalized key phrases
-    if (keywords.length < 3) {
-      const phrases = desc.split(/[.,;!?]\s+/);
-      phrases.forEach((phrase) => {
-        if (phrase.length > 4 && phrase.length < 32 && !keywords.includes(phrase.trim())) {
-          keywords.push(phrase.trim());
-        }
-      });
-    }
 
     return keywords.slice(0, 6);
   };
@@ -288,6 +309,11 @@ export default function EventsManagement() {
       setExtractedKeywords((prev) => ({ ...prev, [key]: kw }));
       setIsExtractingId(null);
     }, 450);
+  };
+
+  const handleKeywordClick = (keyword: string) => {
+    setSearchTerm(keyword);
+    triggerToast(`Filtering event requests by keyword: "${keyword}"`);
   };
 
   // Form State for Event Creation Studio
@@ -500,9 +526,11 @@ export default function EventsManagement() {
     return proposals.filter((p) => {
       const propName = p.name || p.title || "";
       const submitterName = (p.submitter && p.submitter.name) ? p.submitter.name : "";
+      const desc = p.description || "";
       const matchesSearch =
         propName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        submitterName.toLowerCase().includes(searchTerm.toLowerCase());
+        submitterName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        desc.toLowerCase().includes(searchTerm.toLowerCase());
 
       const matchesStatus = statusFilter === "All" || p.status === statusFilter;
       const matchesSource =
@@ -511,6 +539,21 @@ export default function EventsManagement() {
       return matchesSearch && matchesStatus && matchesSource;
     });
   }, [proposals, searchTerm, statusFilter, proposalSourceFilter]);
+
+  const filteredSponsorAds = useMemo(() => {
+    return sponsorAds.filter((ad) => {
+      const title = ad.ad_title || ad.sponsor_name || "";
+      const target = ad.target_event_name || "";
+      const desc = ad.ad_description || "";
+      const contact = ad.contact_email || ad.contact_person || "";
+      return (
+        title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        target.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        desc.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        contact.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    });
+  }, [sponsorAds, searchTerm]);
 
   const currentProposal = proposals.find((p) => p.id === selectedProposalId) || proposals[0];
 
@@ -826,21 +869,47 @@ export default function EventsManagement() {
         {/* TAB 2: SPONSOR ADS REQUESTS (DATABASE BACKED) */}
         {activeTab === "Sponsor Ads" && (
           <div className="space-y-6">
-            <div className="bg-white border border-[#e6e2dd] p-5 rounded-2xl shadow-xs">
-              <div>
+            <div className="bg-white border border-[#e6e2dd] p-5 rounded-2xl shadow-xs space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <h2 className="font-serif font-bold text-xl text-[#1c1b19] flex items-center gap-2">
                   <Building className="w-5 h-5 text-[#635f41]" /> Corporate Sponsor Ad Requests
                 </h2>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    placeholder="Filter sponsor requests by keyword..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="px-3.5 py-1.5 rounded-xl border border-[#cac6b9]/60 bg-[#fdf9f4] text-xs text-[#1c1b19] focus:outline-none focus:border-[#635f41] w-64"
+                  />
+                  {searchTerm && (
+                    <button
+                      onClick={() => setSearchTerm("")}
+                      className="px-2.5 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-[#466272] text-xs font-semibold"
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
               </div>
+              {searchTerm && (
+                <div className="flex items-center gap-2 text-xs text-[#635f41]">
+                  <span>Active Keyword Filter:</span>
+                  <span className="px-2.5 py-0.5 rounded-full bg-[#635f41] text-white font-bold text-[11px] flex items-center gap-1">
+                    {searchTerm}
+                    <button onClick={() => setSearchTerm("")} className="hover:text-amber-200 ml-1">×</button>
+                  </span>
+                </div>
+              )}
             </div>
 
-            {sponsorAds.length === 0 ? (
+            {filteredSponsorAds.length === 0 ? (
               <div className="bg-white border border-[#e6e2dd] p-8 rounded-2xl text-center text-xs text-[#466272]/70 italic">
-                No sponsor requests recorded in database. Click "+ Add Sponsor Request" to create one.
+                No sponsor requests match your keyword filter "{searchTerm}".
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {sponsorAds.map((ad) => (
+                {filteredSponsorAds.map((ad) => (
                   <div
                     key={ad.id}
                     className="bg-white border border-[#e6e2dd] hover:border-[#635f41] rounded-2xl p-6 shadow-2xs hover:shadow-xs transition-all space-y-4 flex flex-col justify-between"
@@ -895,7 +964,7 @@ export default function EventsManagement() {
                             "{ad.ad_description}"
                           </p>
 
-                          {/* AI Keyword Extraction Button (Icon/Symbol Free & Brief) */}
+                          {/* AI Keyword Extraction Button */}
                           <div className="flex items-center justify-between gap-2 pt-1">
                             <span className="text-[11px] font-bold uppercase tracking-wider text-[#635f41]">
                               AI Key Signals
@@ -905,21 +974,24 @@ export default function EventsManagement() {
                               onClick={() => handleToggleAIKeywords(`sponsor_${ad.id}`, ad.ad_description)}
                               className="px-3 py-1 rounded-lg bg-[#fdf9f4] hover:bg-[#e6e2dd] text-[#635f41] text-[11px] font-bold transition-all border border-[#cac6b9]/60"
                             >
-                              {extractedKeywords[`sponsor_${ad.id}`] ? "Hide Keywords" : "AI Quick Scan"}
+                              {extractedKeywords[`sponsor_${ad.id}`] ? "Hide Keywords" : "Extract & Filter Keywords"}
                             </button>
                           </div>
 
-                          {/* Extracted AI Keyword Badges Panel (Icon/Symbol Free) */}
+                          {/* Extracted AI Keyword Badges Panel */}
                           {extractedKeywords[`sponsor_${ad.id}`] && (
                             <div className="p-3 bg-[#fdf9f4] rounded-xl border border-[#cac6b9]/60 space-y-2">
+                              <div className="text-[10px] text-[#635f41] font-semibold">Click keyword to filter requests:</div>
                               <div className="flex flex-wrap gap-1.5">
                                 {extractedKeywords[`sponsor_${ad.id}`].map((kw, idx) => (
-                                  <span
+                                  <button
                                     key={idx}
-                                    className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-white text-[#1c1b19] border border-[#cac6b9]/50 shadow-2xs"
+                                    type="button"
+                                    onClick={() => handleKeywordClick(kw)}
+                                    className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-white hover:bg-[#635f41] hover:text-white text-[#1c1b19] border border-[#cac6b9]/50 shadow-2xs transition-all cursor-pointer"
                                   >
                                     {kw}
-                                  </span>
+                                  </button>
                                 ))}
                               </div>
                             </div>
@@ -958,6 +1030,40 @@ export default function EventsManagement() {
         {/* TAB 3: EVENT PROPOSALS & PITCHES */}
         {activeTab === "Proposals" && (
           <div className="space-y-6">
+            <div className="bg-white border border-[#e6e2dd] p-5 rounded-2xl shadow-xs space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <h2 className="font-serif font-bold text-xl text-[#1c1b19] flex items-center gap-2">
+                  Event Proposals & Member Pitches
+                </h2>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    placeholder="Filter proposals by keyword..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="px-3.5 py-1.5 rounded-xl border border-[#cac6b9]/60 bg-[#fdf9f4] text-xs text-[#1c1b19] focus:outline-none focus:border-[#635f41] w-64"
+                  />
+                  {searchTerm && (
+                    <button
+                      onClick={() => setSearchTerm("")}
+                      className="px-2.5 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-[#466272] text-xs font-semibold"
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
+              </div>
+              {searchTerm && (
+                <div className="flex items-center gap-2 text-xs text-[#635f41]">
+                  <span>Active Keyword Filter:</span>
+                  <span className="px-2.5 py-0.5 rounded-full bg-[#635f41] text-white font-bold text-[11px] flex items-center gap-1">
+                    {searchTerm}
+                    <button onClick={() => setSearchTerm("")} className="hover:text-amber-200 ml-1">×</button>
+                  </span>
+                </div>
+              )}
+            </div>
+
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
               <div className="lg:col-span-7 bg-white border border-[#e6e2dd] rounded-2xl shadow-xs overflow-hidden">
                 <div className="p-4 border-b border-[#e6e2dd] bg-[#fdf9f4] flex justify-between items-center">
@@ -1053,7 +1159,7 @@ export default function EventsManagement() {
                         "{currentProposal.description || "No description provided."}"
                       </p>
 
-                      {/* AI Keyword Extraction Button (Icon/Symbol Free & Brief) */}
+                      {/* AI Keyword Extraction Button */}
                       <div className="flex items-center justify-between gap-2 pt-1">
                         <span className="text-[11px] font-bold uppercase tracking-wider text-[#635f41]">
                           AI Key Signals
@@ -1063,21 +1169,24 @@ export default function EventsManagement() {
                           onClick={() => handleToggleAIKeywords(`prop_${currentProposal.id}`, currentProposal.description)}
                           className="px-3 py-1 rounded-lg bg-[#fdf9f4] hover:bg-[#e6e2dd] text-[#635f41] text-[11px] font-bold transition-all border border-[#cac6b9]/60"
                         >
-                          {extractedKeywords[`prop_${currentProposal.id}`] ? "Hide Keywords" : "AI Quick Scan"}
+                          {extractedKeywords[`prop_${currentProposal.id}`] ? "Hide Keywords" : "Extract & Filter Keywords"}
                         </button>
                       </div>
 
-                      {/* Extracted AI Keyword Badges Panel (Icon/Symbol Free) */}
+                      {/* Extracted AI Keyword Badges Panel */}
                       {extractedKeywords[`prop_${currentProposal.id}`] && (
                         <div className="p-3 bg-[#fdf9f4] rounded-xl border border-[#cac6b9]/60 space-y-2">
+                          <div className="text-[10px] text-[#635f41] font-semibold">Click keyword to filter requests:</div>
                           <div className="flex flex-wrap gap-1.5">
                             {extractedKeywords[`prop_${currentProposal.id}`].map((kw, idx) => (
-                              <span
+                              <button
                                 key={idx}
-                                className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-white text-[#1c1b19] border border-[#cac6b9]/50 shadow-2xs"
+                                type="button"
+                                onClick={() => handleKeywordClick(kw)}
+                                className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-white hover:bg-[#635f41] hover:text-white text-[#1c1b19] border border-[#cac6b9]/50 shadow-2xs transition-all cursor-pointer"
                               >
                                 {kw}
-                              </span>
+                              </button>
                             ))}
                           </div>
                         </div>
