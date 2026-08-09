@@ -214,12 +214,19 @@ export default function AuditionsManagement() {
   const [scannedAppIds, setScannedAppIds] = useState<number[]>([]);
   const [scanningAppId, setScanningAppId] = useState<number | null>(null);
 
+  // const handleRunScan = (appId: number) => {
+  //   setScanningAppId(appId);
+  //   setTimeout(() => {
+  //     setScannedAppIds((prev) => [...prev, appId]);
+  //     setScanningAppId(null);
+  //   }, 900);
+  // };
   const handleRunScan = (appId: number) => {
-    setScanningAppId(appId);
-    setTimeout(() => {
-      setScannedAppIds((prev) => [...prev, appId]);
-      setScanningAppId(null);
-    }, 900);
+    setScanningAppId(appId);0
+    setScannedAppIds((prev) =>
+        prev.includes(appId) ? prev : [...prev, appId],
+    );
+    setScanningAppId(null);
   };
 
   const triggerToast = (msg: string) => {

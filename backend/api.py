@@ -5,6 +5,7 @@ import jwt
 import datetime
 from flask import Blueprint, request, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
+from ai.audition_analyzer import AuditionAnalyzer
 from models import db, User, Role, Membership, Event, Booking, Announcement, Feedback, Gallery, ScheduleSlot, Audition, SharedEvent, Volunteer, Participation, Play, OpenPosition
 import redis
 
@@ -119,7 +120,6 @@ def join_club():
             pass
     else:
         local_cache.pop('aayam:members_list', None)
-
     return jsonify({
         'status': 'success',
         'member': user.to_dict(),
@@ -1228,3 +1228,18 @@ def reject_publish_script(script_id):
         print("Notification error:", e)
 
     return jsonify({'status': 'success', 'script': s.to_dict()})
+
+
+
+# apis for ai features
+
+analyzer = AuditionAnalyzer()
+@api_bp.route("/upload_audition",methods=["POST"])
+
+def upload():
+    video=request.files["video"]
+    filename = secure_filename(video.filename)
+    path=f"uploads/videos/{video.filename}"
+    video.save(path)
+    report=analyzer.analyze(path)
+    return jsonify(report)

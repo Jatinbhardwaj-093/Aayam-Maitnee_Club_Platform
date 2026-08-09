@@ -584,6 +584,14 @@ class AuditionApplication(db.Model):
 
     position = db.relationship("AuditionPosition", backref="applications")
 
+    video_filename = db.Column(db.String(255), nullable=True)
+
+    ai_transcript = db.Column(db.Text, nullable=True)
+    ai_blur = db.Column(db.Float, nullable=True)
+    ai_brightness = db.Column(db.Float, nullable=True)
+    ai_face_detected = db.Column(db.Boolean, nullable=True)
+    ai_report = db.Column(db.Text, nullable=True)
+
     def to_dict(self):
         return {
             'id': self.id,
@@ -597,7 +605,13 @@ class AuditionApplication(db.Model):
             'notes': self.notes or '',
             'status': self.status or 'Pending Review',
             'audition_date': self.audition_date or 'Aug 25, 2026 @ 4:00 PM',
-            'submitted_at': self.submitted_at.strftime('%b %d, %Y') if self.submitted_at else 'Jul 21, 2026'
+            'submitted_at': self.submitted_at.strftime('%b %d, %Y') if self.submitted_at else 'Jul 21, 2026',
+            'video_filename':self.video_filename,
+            'ai_transcript': self.ai_transcript,
+            'ai_blur': self.ai_blur,
+            'ai_brightness': self.ai_brightness,
+            'ai_face_detected': self.ai_face_detected,
+            'ai_report': self.ai_report,
         }
 
 
