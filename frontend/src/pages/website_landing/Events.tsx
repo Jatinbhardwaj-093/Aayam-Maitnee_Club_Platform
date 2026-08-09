@@ -135,12 +135,8 @@ export default function Events() {
   const [events, setEvents] = useState<Event[]>(fallbackEvents);
   const [filter, setFilter] = useState<"All" | "Plays" | "Workshops" | "Meetups">("All");
   const [statusFilter, setStatusFilter] = useState<"All" | "Soon to Happen" | "Concluded">("All");
-
-  // Request Event Proposal Modal
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
   const [proposalSubmittedToast, setProposalSubmittedToast] = useState<string | null>(null);
-
-  // AI Proposal Assist State
   const [isAiProposalMode, setIsAiProposalMode] = useState(false);
   const [rawAiParagraph, setRawAiParagraph] = useState("");
   const [aiExtractedSuccess, setAiExtractedSuccess] = useState(false);
@@ -156,72 +152,37 @@ export default function Events() {
     description: ""
   });
 
-  const parseAiEventBrief = (rawText: string) => {
+  const parseAiEventBrief = async (rawText: string) => {
     if (!rawText.trim()) return;
 
-    // 1. Email
-    const emailMatch = rawText.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
-    const email = emailMatch ? emailMatch[0] : (proposalForm.submitterEmail || "partner@domain.com");
+    const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005";
+    try {
+      const response = await fetch(`${baseUrl}/api/ai/event-form-helper`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: rawText })
+      });
+      const data = await response.json();
+      const form = data?.form || {};
 
-    // 2. Phone
-    const phoneMatch = rawText.match(/(?:\+?\d{1,3}[\s-]?)?\(?\d{3,5}\)?[\s-]?\d{3,5}[\s-]?\d{3,5}/);
-    const phone = phoneMatch ? phoneMatch[0] : (proposalForm.submitterPhone || "+91 98110 44321");
-
-    // 3. Budget
-    const budgetMatch = rawText.match(/(?:[₹$]\s*[\d,]+|\b\d+[\d,]*\s*(?:rupees|inr|lakhs|k)\b)/i);
-    const budget = budgetMatch ? budgetMatch[0] : "₹75,000";
-
-    // 4. Venue
-    let venue = "";
-    const knownVenues = [
-      "Royal Stage Auditorium", "Main Stage Auditorium", "Main Stage", "Rehearsal Studio B",
-      "VIP Lounge", "Foyer Exhibition", "Open Air Theatre"
-    ];
-    for (const v of knownVenues) {
-      if (rawText.toLowerCase().includes(v.toLowerCase())) {
-        venue = v;
-        break;
-      }
+      setProposalForm({
+        title: form.title || "Extracted Ensemble Event Proposal",
+        proposalType: form.proposal_type || proposalForm.proposalType || "Sponsor Ad Proposal",
+        submitterName: form.submitter_name || proposalForm.submitterName || "Partner Patron / Member",
+        submitterEmail: form.contact_email || proposalForm.submitterEmail || "partner@domain.com",
+        submitterPhone: form.contact_phone || proposalForm.submitterPhone || "+91 98110 44321",
+        sponsorshipTerms: form.sponsorship_terms || proposalForm.sponsorshipTerms || "₹75,000",
+        venue: form.venue || proposalForm.venue || "Main Stage Auditorium",
+        description: form.description || rawText
+      });
+      setAiExtractedSuccess(true);
+    } catch (error) {
+      console.error("AI event helper failed", error);
+      setAiExtractedSuccess(false);
     }
-
-    // 5. Brand Name
-    let submitterName = "";
-    const brandRegex = /(?:by|from|contact|presenting|brand|sponsor|partner):?\s+([A-Z][a-zA-Z0-9\s]{2,25})/i;
-    const bMatch = rawText.match(brandRegex);
-    if (bMatch) {
-      submitterName = bMatch[1].trim();
-    }
-
-    // 6. Title
-    let title = "";
-    const quoteMatch = rawText.match(/"([^"]+)"|'([^']+)'/);
-    if (quoteMatch) {
-      title = quoteMatch[1] || quoteMatch[2];
-    } else {
-      const lines = rawText.split(/[.\n]/).map((l) => l.trim()).filter(Boolean);
-      if (lines.length > 0) {
-        title = lines[0].slice(0, 48);
-      }
-    }
-
-    const isMember = rawText.toLowerCase().includes("member") || rawText.toLowerCase().includes("workshop pitch");
-    const category = isMember ? "Member Pitch" : "Sponsor Ad Proposal";
-
-    setProposalForm({
-      title: title || "Extracted Ensemble Event Proposal",
-      submitterName: submitterName || (proposalForm.submitterName || "Partner Patron / Member"),
-      submitterEmail: email,
-      submitterPhone: phone,
-      venue: venue || "Main Stage Auditorium",
-      sponsorshipTerms: budget,
-      proposalType: category,
-      description: rawText
-    });
-
-    setAiExtractedSuccess(true);
   };
 
-  const loadEventsFromBackend = () => {
+  useEffect(() => {
     const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005";
     fetch(`${baseUrl}/api/events`)
       .then((res) => {
@@ -235,33 +196,30 @@ export default function Events() {
             return {
               id: e.id,
               title: e.title,
-              description: e.description || "Official Matinee Club scheduled event.",
-              category: e.category || "Meetups",
+              description: e.description,
+              category: e.category,
               categoryBg: styles.bg,
               categoryColor: styles.color,
-              date: e.date || "Upcoming",
-              day: e.day || 15,
-              month: e.month || "AUG",
-              image: e.image || "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=600&auto=format&fit=crop",
-              status: e.status === "concluded" ? "concluded" : "upcoming",
-              venue: e.venue || "Prithvi Theatre",
-              timeRange: e.timeRange || "18:00 - 20:00",
-              host: e.host || "Aayam Ensemble",
-              priceInfo: e.priceInfo || "Registration Required",
-              capacity: e.capacity || "150 seats"
+              date: e.date,
+              day: e.day,
+              month: e.month,
+              image: e.image || "/aayam_assets/dddj_user_3.jpg",
+              status: e.status || "upcoming",
+              venue: e.venue,
+              timeRange: e.time_range || e.timeRange || "TBD",
+              host: e.host || "Aayam",
+              priceInfo: e.price_info || "",
+              capacity: e.capacity || ""
             };
           });
           setEvents(mapped);
         }
       })
-      .catch((err) => console.error("Error loading events from backend:", err));
-  };
-
-  useEffect(() => {
-    loadEventsFromBackend();
+      .catch((err) => {
+        console.error("Could not load events from backend", err);
+      });
   }, []);
 
-  // Submit Proposal (Logged in SharedEvent & SponsorAdRequest tables in DB!)
   const handleProposalSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!proposalForm.title) return;
@@ -286,17 +244,13 @@ export default function Events() {
       .then((res) => res.json())
       .then(() => {
         setIsRequestModalOpen(false);
-        setProposalSubmittedToast(
-          `Proposal "${proposalForm.title}" submitted to database! Maintainers can now review it.`
-        );
+        setProposalSubmittedToast(`Proposal "${proposalForm.title}" submitted to database! Maintainers can now review it.`);
         setTimeout(() => setProposalSubmittedToast(null), 5000);
       })
       .catch((err) => {
         console.error("Proposal submit error:", err);
         setIsRequestModalOpen(false);
-        setProposalSubmittedToast(
-          `Proposal "${proposalForm.title}" submitted for maintainer review.`
-        );
+        setProposalSubmittedToast(`Proposal "${proposalForm.title}" submitted for maintainer review.`);
         setTimeout(() => setProposalSubmittedToast(null), 5000);
       });
   };
@@ -316,10 +270,7 @@ export default function Events() {
     <div className="bg-[#fdf9f4] text-[#1c1b19] min-h-screen font-sans selection:bg-[#c6e4f7] pt-8 pb-16">
       <main className="max-w-7xl mx-auto px-6 md:px-12 space-y-10">
         {isRequestModalOpen ? (
-          /* DEDICATED PROPOSE EVENT PAGE VIEW (Only Propose Event Form is Visible) */
           <section className="bg-white border border-[#e6e2dd] p-6 sm:p-10 md:p-12 rounded-3xl shadow-sm space-y-8 animate-in fade-in-50 duration-200">
-            
-            {/* Top Navigation Bar with Back to Events Button */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-[#e6e2dd]">
               <button
                 type="button"
@@ -328,15 +279,12 @@ export default function Events() {
               >
                 Back to Events
               </button>
-
               <div className="flex gap-2 bg-[#fdf9f4] p-1 rounded-xl border border-[#cac6b9]/60">
                 <button
                   type="button"
                   onClick={() => setIsAiProposalMode(false)}
                   className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                    !isAiProposalMode
-                      ? "bg-[#635f41] text-white shadow-xs"
-                      : "text-[#466272] hover:text-[#1c1b19]"
+                    !isAiProposalMode ? "bg-[#635f41] text-white shadow-xs" : "text-[#466272] hover:text-[#1c1b19]"
                   }`}
                 >
                   Manual Form
@@ -345,9 +293,7 @@ export default function Events() {
                   type="button"
                   onClick={() => setIsAiProposalMode(true)}
                   className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                    isAiProposalMode
-                      ? "bg-[#466272] text-white shadow-xs"
-                      : "text-[#466272] hover:text-[#1c1b19]"
+                    isAiProposalMode ? "bg-[#466272] text-white shadow-xs" : "text-[#466272] hover:text-[#1c1b19]"
                   }`}
                 >
                   AI Smart Generator
@@ -366,7 +312,6 @@ export default function Events() {
               </p>
             </div>
 
-            {/* AI RAW PARAGRAPH EXTRACTOR BOX */}
             {isAiProposalMode && (
               <div className="p-6 bg-[#fdf9f4] border border-[#cac6b9]/60 rounded-3xl space-y-4 shadow-xs">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
@@ -412,11 +357,8 @@ export default function Events() {
               </div>
             )}
 
-            {/* Stable 2-Column Form (Zero Layout Shift) */}
             <form onSubmit={handleProposalSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                
-                {/* Column 1: Proposal Category, Title, Target Venue */}
                 <div className="space-y-5">
                   <div className="space-y-1.5 min-h-[66px]">
                     <label className="text-xs font-bold uppercase tracking-wider text-[#635f41] block">
@@ -472,7 +414,6 @@ export default function Events() {
                   </div>
                 </div>
 
-                {/* Column 2: Name/Brand, Contact Info, Fixed Budget Slot */}
                 <div className="space-y-5">
                   <div className="space-y-1.5 min-h-[66px]">
                     <label className="text-xs font-bold uppercase tracking-wider text-[#635f41] block">
@@ -515,7 +456,6 @@ export default function Events() {
                     </div>
                   </div>
 
-                  {/* FIXED HEIGHT BUDGET SLOT (Zero Layout Shift) */}
                   <div className="space-y-1.5 min-h-[66px] flex flex-col justify-end">
                     {proposalForm.proposalType.includes("Sponsor") ? (
                       <>
@@ -543,7 +483,6 @@ export default function Events() {
                 </div>
               </div>
 
-              {/* Description */}
               <div className="space-y-1.5">
                 <label className="text-xs font-bold uppercase tracking-wider text-[#635f41] block">
                   Proposal Description & Deliverables
@@ -558,7 +497,6 @@ export default function Events() {
                 />
               </div>
 
-              {/* Actions */}
               <div className="pt-3 border-t border-[#e6e2dd] flex gap-4 justify-end">
                 <button
                   type="button"
@@ -577,9 +515,7 @@ export default function Events() {
             </form>
           </section>
         ) : (
-          /* NORMAL EVENTS PAGE VIEW (Hero, Calendar, Schedule Roster) */
           <>
-            {/* Hero & Title Section */}
             <section>
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#cac6b9]/25 pb-6">
                 <div>
@@ -593,7 +529,7 @@ export default function Events() {
                     Explore active stage plays, masterclasses, and community meetups at Aayam.
                   </p>
                 </div>
-                
+
                 <div className="flex flex-wrap items-center gap-3 flex-shrink-0 self-start md:self-auto">
                   <button
                     onClick={() => {
@@ -618,9 +554,7 @@ export default function Events() {
               </div>
             </section>
 
-            {/* Bento Grid: Dynamic Calendar + Featured Highlight */}
             <section className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
-              {/* Dynamic Calendar Widget */}
               <div className="lg:col-span-2 bg-white rounded-2xl border border-[#cac6b9]/30 p-8 shadow-xs">
                 <div className="flex items-center justify-between mb-8">
                   <h3 className="font-serif text-2xl font-bold text-[#635f41]">Upcoming Production Calendar</h3>
@@ -629,52 +563,33 @@ export default function Events() {
                   </span>
                 </div>
 
-                {/* Calendar Grid */}
                 <div className="grid grid-cols-7 border-l border-t border-[#cac6b9]/20 text-center text-xs font-bold text-[#49473d] uppercase tracking-wider">
-                  {["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"].map((day) => (
+                  {['SUN','MON','TUE','WED','THU','FRI','SAT'].map((day) => (
                     <div key={day} className="p-3 border-r border-b border-[#cac6b9]/20">
                       {day}
                     </div>
                   ))}
-
                   <div className="h-20 md:h-28 p-2 border-r border-b border-[#cac6b9]/20 bg-[#f7f3ee]/30"></div>
                   <div className="h-20 md:h-28 p-2 border-r border-b border-[#cac6b9]/20 bg-[#f7f3ee]/30"></div>
-
-                  {/* Dynamic event date chips */}
-                  <div className="h-20 md:h-28 p-2 border-r border-b border-[#cac6b9]/20 text-left font-semibold text-gray-500">
-                    1
-                  </div>
-                  <div className="h-20 md:h-28 p-2 border-r border-b border-[#cac6b9]/20 text-left font-semibold text-gray-500">
-                    2
-                  </div>
+                  <div className="h-20 md:h-28 p-2 border-r border-b border-[#cac6b9]/20 text-left font-semibold text-gray-500">1</div>
+                  <div className="h-20 md:h-28 p-2 border-r border-b border-[#cac6b9]/20 text-left font-semibold text-gray-500">2</div>
                   <div className="h-20 md:h-28 p-2 border-r border-b border-[#cac6b9]/20 text-left font-semibold relative text-[#1c1b19]">
                     3
                     <div className="absolute bottom-2 left-2 right-2 bg-[#BFDDF0] p-1 rounded text-[9px] font-bold text-[#2e4a5a] truncate">
                       Rehearsal
                     </div>
                   </div>
-                  <div className="h-20 md:h-28 p-2 border-r border-b border-[#cac6b9]/20 text-left font-semibold text-gray-500">
-                    4
-                  </div>
-                  <div className="h-20 md:h-28 p-2 border-r border-b border-[#cac6b9]/20 text-left font-semibold text-gray-500">
-                    5
-                  </div>
-                  <div className="h-20 md:h-28 p-2 border-r border-b border-[#cac6b9]/20 text-left font-semibold text-gray-500">
-                    6
-                  </div>
-
+                  <div className="h-20 md:h-28 p-2 border-r border-b border-[#cac6b9]/20 text-left font-semibold text-gray-500">4</div>
+                  <div className="h-20 md:h-28 p-2 border-r border-b border-[#cac6b9]/20 text-left font-semibold text-gray-500">5</div>
+                  <div className="h-20 md:h-28 p-2 border-r border-b border-[#cac6b9]/20 text-left font-semibold text-gray-500">6</div>
                   <div className="h-20 md:h-28 p-2 border-r border-b border-[#cac6b9]/20 text-left font-semibold bg-[#fff9d2]/40 ring-1 ring-inset ring-[#635f41]/30 text-[#1c1b19]">
                     12
                     <div className="mt-1 bg-[#635f41] text-white p-1 rounded text-[9px] font-bold truncate">
                       Tughlaq Premiere
                     </div>
                   </div>
-                  <div className="h-20 md:h-28 p-2 border-r border-b border-[#cac6b9]/20 text-left font-semibold text-gray-500">
-                    13
-                  </div>
-                  <div className="h-20 md:h-28 p-2 border-r border-b border-[#cac6b9]/20 text-left font-semibold text-gray-500">
-                    14
-                  </div>
+                  <div className="h-20 md:h-28 p-2 border-r border-b border-[#cac6b9]/20 text-left font-semibold text-gray-500">13</div>
+                  <div className="h-20 md:h-28 p-2 border-r border-b border-[#cac6b9]/20 text-left font-semibold text-gray-500">14</div>
                   <div className="h-20 md:h-28 p-2 border-r border-b border-[#cac6b9]/20 text-left font-semibold bg-[#FFEBCC] text-[#765d00]">
                     19
                     <div className="mt-1 bg-[#765d00] text-white p-1 rounded text-[9px] font-bold truncate">
@@ -684,7 +599,6 @@ export default function Events() {
                 </div>
               </div>
 
-              {/* Dynamic Featured Highlight Card */}
               {featuredEvent && (
                 <div className="bg-[#635f41] text-white rounded-2xl p-8 flex flex-col justify-between relative overflow-hidden shadow-xs border border-[#cac6b9]/25">
                   <div>
@@ -731,7 +645,6 @@ export default function Events() {
               )}
             </section>
 
-            {/* All Events List */}
             <section className="space-y-8">
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 border-b border-[#cac6b9]/30 pb-6">
                 <h2 className="font-serif text-3xl font-bold text-[#1c1b19] tracking-tight">
@@ -745,9 +658,7 @@ export default function Events() {
                         key={cat}
                         onClick={() => setFilter(cat)}
                         className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all uppercase tracking-wider ${
-                          filter === cat
-                            ? "bg-[#635f41] text-white shadow-xs"
-                            : "hover:bg-black/5 text-[#49473d]"
+                          filter === cat ? "bg-[#635f41] text-white shadow-xs" : "hover:bg-black/5 text-[#49473d]"
                         }`}
                       >
                         {cat}
@@ -761,9 +672,7 @@ export default function Events() {
                         key={statusOpt}
                         onClick={() => setStatusFilter(statusOpt)}
                         className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all uppercase tracking-wider ${
-                          statusFilter === statusOpt
-                            ? "bg-[#466272] text-white shadow-xs"
-                            : "hover:bg-black/5 text-[#49473d]"
+                          statusFilter === statusOpt ? "bg-[#466272] text-white shadow-xs" : "hover:bg-black/5 text-[#49473d]"
                         }`}
                       >
                         {statusOpt}
@@ -792,7 +701,6 @@ export default function Events() {
                         <p className="text-[10px] font-bold text-[#466272] uppercase leading-none">{evt.month}</p>
                         <p className="text-lg font-bold text-[#635f41] leading-none mt-0.5">{evt.day}</p>
                       </div>
-
                       <div className="absolute top-4 right-4">
                         <span
                           className={`text-[9px] font-bold px-2.5 py-1 rounded-md shadow-xs uppercase tracking-wider ${
@@ -804,7 +712,6 @@ export default function Events() {
                           {evt.status === "concluded" ? "Concluded" : "Soon to Happen"}
                         </span>
                       </div>
-
                       <div className="absolute bottom-0 left-0 w-full p-3 bg-gradient-to-t from-black/60 to-transparent">
                         <span className={`text-[9px] font-bold px-2.5 py-1 rounded uppercase tracking-wider ${evt.categoryBg}`}>
                           {evt.category}
@@ -856,7 +763,6 @@ export default function Events() {
         )}
       </main>
 
-      {/* Proposal Toast */}
       {proposalSubmittedToast && (
         <div className="fixed bottom-6 right-6 bg-[#31302d] text-white border border-[#cac6b9]/30 rounded-xl px-5 py-3.5 shadow-xl z-50 flex items-center gap-3 text-xs font-semibold max-w-md">
           <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0" />

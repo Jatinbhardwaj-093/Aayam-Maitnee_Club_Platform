@@ -1,6 +1,7 @@
 import os
 import json
 import random
+import re
 import jwt
 import datetime
 from flask import Blueprint, request, jsonify, Response, current_app
@@ -16,7 +17,7 @@ load_dotenv()
 # LLM provider settings from environment variables (configured for Gemini support via LiteLLM)
 API_BASE = os.getenv("COMPLETIONS_API_BASE", "http://localhost:4000/v1")
 MODEL_NAME = os.getenv("COMPLETIONS_MODEL", "gemini/gemini-3.6-flash")
-API_KEY = os.environ["GEMINI_API_KEY"]
+API_KEY = os.getenv("GEMINI_API_KEY", "")
 
 api_bp = Blueprint('api', __name__)
 
@@ -35,6 +36,117 @@ except Exception as e:
 local_cache = {}
 local_sessions = {}
 
+
+def _call_llm_json(prompt, system_instruction=None):
+    completion_kwargs = {
+        "model": MODEL_NAME,
+        "messages": [{"role": "user", "content": prompt}],
+        "api_key": API_KEY,
+        "response_format": {"type": "json_object"}
+    }
+    if system_instruction:
+        completion_kwargs["messages"] = [
+            {"role": "system", "content": system_instruction},
+            {"role": "user", "content": prompt}
+        ]
+    if os.getenv("COMPLETIONS_API_BASE") or not MODEL_NAME.startswith("gemini/"):
+        completion_kwargs["api_base"] = API_BASE
+
+    response = litellm.completion(**completion_kwargs)
+    content = response.choices[0].message.content.strip()
+    if content.startswith("```json"):
+        content = content[7:]
+    if content.endswith("```"):
+        content = content[:-3]
+    content = content.strip()
+    return json.loads(content)
+
+
+def _heuristic_keywords(text):
+    if not text or not text.strip():
+        return []
+
+    stop_words = {
+        "this", "that", "with", "from", "have", "your", "their", "will", "about", "for",
+        "the", "and", "in", "of", "to", "a", "is", "are", "was", "were", "been", "being",
+        "has", "had", "does", "did", "doing", "an", "or", "by", "on", "at", "be",
+        "as", "it", "its", "into", "through", "during", "before", "after", "above", "below",
+        "official", "partner", "deliverables", "include", "across", "includes", "event", "request"
+    }
+
+    candidate_words = re.findall(r"[A-Za-z₹$][A-Za-z0-9/\-₹$]*", text)
+    normalized = []
+    for word in candidate_words:
+        cleaned = word.strip(".,;:!?()[]{}\"")
+        if len(cleaned) > 3 and cleaned.lower() not in stop_words:
+            normalized.append(cleaned)
+
+    freq = {}
+    for word in normalized:
+        key = word.lower()
+        freq[key] = freq.get(key, 0) + 1
+
+    keywords = []
+    for token in sorted(freq, key=lambda item: (-freq[item], item))[:8]:
+        keywords.append(token)
+
+    domain_terms = [
+        "sponsorship", "playbill", "green room", "vip", "audience", "masterclass",
+        "workshop", "costume", "showcase", "lounge", "branding", "festival"
+    ]
+    for term in domain_terms:
+        if term in text.lower() and term not in keywords:
+            keywords.append(term)
+
+    return keywords[:6]
+
+
+def _heuristic_event_form(text):
+    if not text or not text.strip():
+        return {}
+
+    match = re.search(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}", text)
+    email = match.group(0) if match else "partner@domain.com"
+
+    phone_match = re.search(r"(?:\+?\d{1,3}[\s-]?)?(?:\(?\d{3,5}\)?[\s-]?\d{3,5}[\s-]?\d{3,5})", text)
+    phone = phone_match.group(0).strip() if phone_match else "+91 98110 44321"
+
+    budget_match = re.search(r"(?:[₹$]\s*[\d,]+|\b\d+[\d,]*\s*(?:rupees|inr|lakhs|k)\b)", text, re.I)
+    budget = budget_match.group(0).strip() if budget_match else "₹75,000"
+
+    venues = [
+        "Royal Stage Auditorium", "Main Stage Auditorium", "Main Stage", "Rehearsal Studio B",
+        "VIP Lounge", "Foyer Exhibition", "Open Air Theatre"
+    ]
+    venue = next((item for item in venues if item.lower() in text.lower()), "Main Stage Auditorium")
+
+    title = ""
+    quote_match = re.search(r'"([^"]+)"|\'([^\']+)\'', text)
+    if quote_match:
+        title = quote_match.group(1) or quote_match.group(2)
+    else:
+        first_sentence = re.split(r"[.\n]", text)[0].strip()
+        title = first_sentence[:60] if first_sentence else "Extracted Event Proposal"
+
+    submitter_name = ""
+    brand_match = re.search(r"(?:by|from|contact|presenting|brand|sponsor|partner):?\s+([A-Z][A-Za-z0-9\s]{2,30})", text, re.I)
+    if brand_match:
+        submitter_name = brand_match.group(1).strip()
+
+    proposal_type = "Sponsor Ad Proposal" if any(term in text.lower() for term in ["sponsor", "brand", "partner", "budget"]) else "Member Pitch"
+
+    return {
+        "title": title or "Extracted Event Proposal",
+        "submitter_name": submitter_name or "Partner Patron / Member",
+        "contact_email": email,
+        "contact_phone": phone,
+        "venue": venue,
+        "sponsorship_terms": budget,
+        "proposal_type": proposal_type,
+        "description": text.strip()
+    }
+
+
 @api_bp.route('/health', methods=['GET'])
 def health():
     return jsonify({
@@ -42,6 +154,65 @@ def health():
         'database': 'SQLite',
         'redis_connected': r is not None
     })
+
+
+@api_bp.route('/ai/extract-keywords', methods=['POST'])
+def ai_extract_keywords():
+    data = request.json or {}
+    text = data.get('text', '')
+    if not text.strip():
+        return jsonify({'error': 'Text is required'}), 400
+
+    try:
+        system_instruction = """
+        You are a helpful event-planning assistant. Read the request text and extract 4-8 concise, useful keywords that would help filter event requests and proposals.
+        Return JSON with a single key named keywords, containing a list of strings.
+        """
+        prompt = f"Extract concise keywords from this event request:\n\n{text}"
+        payload = _call_llm_json(prompt, system_instruction)
+        keywords = payload.get('keywords', []) if isinstance(payload, dict) else []
+        if isinstance(keywords, list) and keywords:
+            return jsonify({'keywords': keywords, 'source': 'llm'})
+    except Exception:
+        pass
+
+    fallback_keywords = _heuristic_keywords(text)
+    return jsonify({'keywords': fallback_keywords, 'source': 'heuristic'})
+
+
+@api_bp.route('/ai/event-form-helper', methods=['POST'])
+def ai_event_form_helper():
+    data = request.json or {}
+    text = data.get('text', '')
+    if not text.strip():
+        return jsonify({'error': 'Text is required'}), 400
+
+    try:
+        system_instruction = """
+        You are an event proposal assistant. Read the descriptive paragraph and return JSON containing a filled event proposal form.
+        Fields to return: title, submitter_name, contact_email, contact_phone, venue, sponsorship_terms, proposal_type, description.
+        Make sure the response is valid JSON only.
+        """
+        prompt = f"Convert this event description into a proposal form payload:\n\n{text}"
+        payload = _call_llm_json(prompt, system_instruction)
+        form = payload if isinstance(payload, dict) else {}
+        if form:
+            return jsonify({'form': {
+                'title': form.get('title') or 'Extracted Event Proposal',
+                'submitter_name': form.get('submitter_name') or 'Partner Patron / Member',
+                'contact_email': form.get('contact_email') or 'partner@domain.com',
+                'contact_phone': form.get('contact_phone') or '+91 98110 44321',
+                'venue': form.get('venue') or 'Main Stage Auditorium',
+                'sponsorship_terms': form.get('sponsorship_terms') or '₹75,000',
+                'proposal_type': form.get('proposal_type') or 'Member Pitch',
+                'description': form.get('description') or text.strip()
+            }, 'source': 'llm'})
+    except Exception:
+        pass
+
+    fallback_form = _heuristic_event_form(text)
+    return jsonify({'form': fallback_form, 'source': 'heuristic'})
+
 
 @api_bp.route('/join', methods=['POST'])
 def join_club():

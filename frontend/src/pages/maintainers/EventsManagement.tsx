@@ -292,7 +292,7 @@ export default function EventsManagement() {
     return keywords.slice(0, 6);
   };
 
-  const handleToggleAIKeywords = (keyId: string | number, desc: string) => {
+  const handleToggleAIKeywords = async (keyId: string | number, desc: string) => {
     const key = String(keyId);
     if (extractedKeywords[key]) {
       setExtractedKeywords((prev) => {
@@ -304,11 +304,22 @@ export default function EventsManagement() {
     }
 
     setIsExtractingId(keyId);
-    setTimeout(() => {
-      const kw = extractAIKeywords(desc);
+    try {
+      const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005";
+      const response = await fetch(`${baseUrl}/api/ai/extract-keywords`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: desc })
+      });
+      const data = await response.json();
+      const kw = Array.isArray(data?.keywords) ? data.keywords : extractAIKeywords(desc);
       setExtractedKeywords((prev) => ({ ...prev, [key]: kw }));
+    } catch (error) {
+      console.error("AI keyword extraction failed", error);
+      setExtractedKeywords((prev) => ({ ...prev, [key]: extractAIKeywords(desc) }));
+    } finally {
       setIsExtractingId(null);
-    }, 450);
+    }
   };
 
   const handleKeywordClick = (keyword: string) => {
