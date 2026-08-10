@@ -1659,3 +1659,57 @@ Return ONLY valid JSON matching this schema:
         return jsonify({"status": "error", "message": "AI servers are down. Please try again later."}), 503
 
 
+@api_bp.route('/events/autofill-proposal', methods=['POST'])
+def autofill_event_proposal():
+    data = request.get_json() or {}
+    paragraph = data.get('paragraph', '').strip()
+    if not paragraph:
+        return jsonify({"status": "error", "message": "Paragraph description is required"}), 400
+
+    api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY") or API_KEY
+    model = os.getenv("COMPLETIONS_MODEL", "gemini/gemini-3.6-flash")
+
+    if not api_key:
+        return jsonify({"status": "error", "message": "AI servers are down. API key missing."}), 503
+
+    try:
+        prompt = f"""You are an intelligent AI event proposal assistant for Aayam Matinee Club.
+Given the following raw event description/brief or email text:
+
+"{paragraph}"
+
+Extract structured event proposal details. Return ONLY valid JSON matching this schema:
+{{
+  "title": "Short catchy title for the proposed event",
+  "proposalType": "Member Pitch" or "Sponsor Ad Proposal",
+  "submitterName": "Name of contact person or brand name",
+  "submitterEmail": "Email address if mentioned, else empty string",
+  "submitterPhone": "Phone number if mentioned, else empty string",
+  "venue": "Proposed venue/stage (e.g. Royal Stage Auditorium, Main Stage, Rehearsal Hall B)",
+  "sponsorshipTerms": "Monetary budget figure e.g. ₹1,50,000 or empty string",
+  "description": "Clean formatted full event description"
+}}
+"""
+        completion_kwargs = {
+            "model": model,
+            "messages": [{"role": "user", "content": prompt}],
+            "api_key": api_key,
+            "response_format": {"type": "json_object"}
+        }
+        if os.getenv("COMPLETIONS_API_BASE") or not model.startswith("gemini/"):
+            completion_kwargs["api_base"] = API_BASE
+
+        resp = litellm.completion(**completion_kwargs)
+        content = resp.choices[0].message.content.strip()
+        if content.startswith("```json"):
+            content = content[7:]
+        if content.endswith("```"):
+            content = content[:-3]
+        extracted = json.loads(content.strip())
+        return jsonify({"status": "success", "data": extracted}), 200
+    except Exception as err:
+        print(f"Gemini proposal autofill API call error: {err}")
+        return jsonify({"status": "error", "message": "AI servers are down. Please try again later."}), 503
+
+
+

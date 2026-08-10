@@ -144,6 +144,8 @@ export default function Events() {
   const [isAiProposalMode, setIsAiProposalMode] = useState(false);
   const [rawAiParagraph, setRawAiParagraph] = useState("");
   const [aiExtractedSuccess, setAiExtractedSuccess] = useState(false);
+  const [isExtractingAi, setIsExtractingAi] = useState(false);
+  const [aiErrorMessage, setAiErrorMessage] = useState<string | null>(null);
 
   const [proposalForm, setProposalForm] = useState({
     title: "",
@@ -156,69 +158,44 @@ export default function Events() {
     description: ""
   });
 
-  const parseAiEventBrief = (rawText: string) => {
+  const parseAiEventBrief = async (rawText: string) => {
     if (!rawText.trim()) return;
 
-    // 1. Email
-    const emailMatch = rawText.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
-    const email = emailMatch ? emailMatch[0] : (proposalForm.submitterEmail || "partner@domain.com");
+    setIsExtractingAi(true);
+    setAiErrorMessage(null);
+    setAiExtractedSuccess(false);
 
-    // 2. Phone
-    const phoneMatch = rawText.match(/(?:\+?\d{1,3}[\s-]?)?\(?\d{3,5}\)?[\s-]?\d{3,5}[\s-]?\d{3,5}/);
-    const phone = phoneMatch ? phoneMatch[0] : (proposalForm.submitterPhone || "+91 98110 44321");
+    const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005";
+    try {
+      const res = await fetch(`${baseUrl}/api/events/autofill-proposal`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ paragraph: rawText })
+      });
+      const resData = await res.json();
 
-    // 3. Budget
-    const budgetMatch = rawText.match(/(?:[₹$]\s*[\d,]+|\b\d+[\d,]*\s*(?:rupees|inr|lakhs|k)\b)/i);
-    const budget = budgetMatch ? budgetMatch[0] : "₹75,000";
-
-    // 4. Venue
-    let venue = "";
-    const knownVenues = [
-      "Royal Stage Auditorium", "Main Stage Auditorium", "Main Stage", "Rehearsal Studio B",
-      "VIP Lounge", "Foyer Exhibition", "Open Air Theatre"
-    ];
-    for (const v of knownVenues) {
-      if (rawText.toLowerCase().includes(v.toLowerCase())) {
-        venue = v;
-        break;
+      if (res.ok && resData.status === "success" && resData.data) {
+        const d = resData.data;
+        setProposalForm((prev) => ({
+          title: d.title || prev.title,
+          proposalType: d.proposalType || prev.proposalType,
+          submitterName: d.submitterName || prev.submitterName,
+          submitterEmail: d.submitterEmail || prev.submitterEmail,
+          submitterPhone: d.submitterPhone || prev.submitterPhone,
+          venue: d.venue || prev.venue,
+          sponsorshipTerms: d.sponsorshipTerms || prev.sponsorshipTerms,
+          description: d.description || rawText
+        }));
+        setAiExtractedSuccess(true);
+      } else {
+        setAiErrorMessage(resData.message || "AI servers are down. Please try again later.");
       }
+    } catch (err) {
+      console.error("AI autofill extraction error:", err);
+      setAiErrorMessage("AI servers are down. Please try again later.");
+    } finally {
+      setIsExtractingAi(false);
     }
-
-    // 5. Brand Name
-    let submitterName = "";
-    const brandRegex = /(?:by|from|contact|presenting|brand|sponsor|partner):?\s+([A-Z][a-zA-Z0-9\s]{2,25})/i;
-    const bMatch = rawText.match(brandRegex);
-    if (bMatch) {
-      submitterName = bMatch[1].trim();
-    }
-
-    // 6. Title
-    let title = "";
-    const quoteMatch = rawText.match(/"([^"]+)"|'([^']+)'/);
-    if (quoteMatch) {
-      title = quoteMatch[1] || quoteMatch[2];
-    } else {
-      const lines = rawText.split(/[.\n]/).map((l) => l.trim()).filter(Boolean);
-      if (lines.length > 0) {
-        title = lines[0].slice(0, 48);
-      }
-    }
-
-    const isMember = rawText.toLowerCase().includes("member") || rawText.toLowerCase().includes("workshop pitch");
-    const category = isMember ? "Member Pitch" : "Sponsor Ad Proposal";
-
-    setProposalForm({
-      title: title || "Extracted Ensemble Event Proposal",
-      submitterName: submitterName || (proposalForm.submitterName || "Partner Patron / Member"),
-      submitterEmail: email,
-      submitterPhone: phone,
-      venue: venue || "Main Stage Auditorium",
-      sponsorshipTerms: budget,
-      proposalType: category,
-      description: rawText
-    });
-
-    setAiExtractedSuccess(true);
   };
 
   const loadEventsFromBackend = () => {
@@ -397,15 +374,29 @@ export default function Events() {
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-1">
                   <button
                     type="button"
+                    disabled={isExtractingAi}
                     onClick={() => parseAiEventBrief(rawAiParagraph)}
-                    className="px-6 py-2.5 rounded-xl bg-[#466272] hover:bg-[#314652] text-white text-xs font-bold transition-all shadow-sm"
+                    className="px-6 py-2.5 rounded-xl bg-[#466272] hover:bg-[#314652] text-white text-xs font-bold transition-all shadow-sm disabled:opacity-50 flex items-center justify-center gap-2"
                   >
-                    AI Extract & Auto-Fill Form Fields
+                    {isExtractingAi ? (
+                      <>
+                        <Sparkles className="w-3.5 h-3.5 animate-spin" />
+                        AI Extracting...
+                      </>
+                    ) : (
+                      "AI Extract & Auto-Fill Form Fields"
+                    )}
                   </button>
 
                   {aiExtractedSuccess && (
                     <span className="text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-4 py-2 rounded-xl text-center">
                       Successfully extracted key fields into form below! Review & Submit.
+                    </span>
+                  )}
+
+                  {aiErrorMessage && (
+                    <span className="text-xs font-bold text-rose-800 bg-rose-50 border border-rose-200 px-4 py-2 rounded-xl text-center">
+                      {aiErrorMessage}
                     </span>
                   )}
                 </div>
