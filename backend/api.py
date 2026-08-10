@@ -6,6 +6,7 @@ import datetime
 from flask import Blueprint, request, jsonify, Response, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User, Role, Membership, Event, Booking, Announcement, Feedback, Gallery, ScheduleSlot, Audition, SharedEvent, Volunteer, Participation, Play, OpenPosition, Notification, ExtractedCharacter
+from ai_roleplay import RehearsalService
 
 import redis
 from dotenv import load_dotenv
@@ -19,6 +20,7 @@ MODEL_NAME = os.getenv("COMPLETIONS_MODEL", "gemini/gemini-3.6-flash")
 API_KEY = os.environ["GEMINI_API_KEY"]
 
 api_bp = Blueprint('api', __name__)
+rehearsal_service = RehearsalService()
 
 # Redis Config (with graceful fallback)
 REDIS_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
@@ -1123,6 +1125,106 @@ def start_rehearsal():
     if not s:
         return jsonify({'error': 'Script not found'}), 404
     return jsonify({'status': 'success', 'script': s.to_dict()})
+
+@api_bp.route('/rehearsal/parse', methods=['POST'])
+def parse_rehearsal_script():
+    from models import Script
+    data = request.get_json(silent=True) or {}
+    script_id = data.get('script_id')
+    inline_script = data.get('script')
+
+    if script_id is not None:
+        script = Script.query.get(script_id)
+        if not script:
+            return jsonify({'error': 'Script not found'}), 404
+    else:
+        class InlineScript:
+            id = 'inline'
+            title = data.get('title') or 'Untitled Rehearsal'
+            content = inline_script or ''
+            excerpt = inline_script or ''
+
+        script = InlineScript()
+
+    try:
+        scene = rehearsal_service.parse_script(script)
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
+
+    return jsonify({'status': 'success', 'scene': scene})
+
+@api_bp.route('/rehearsal/roleplay/start', methods=['POST'])
+def start_roleplay_rehearsal():
+    from models import Script
+    data = request.get_json(silent=True) or {}
+    script_id = data.get('script_id')
+    inline_script = data.get('script')
+    assignments = data.get('assignments') or {}
+
+    if script_id is not None:
+        script = Script.query.get(script_id)
+        if not script:
+            return jsonify({'error': 'Script not found'}), 404
+    else:
+        class InlineScript:
+            id = 'inline'
+            title = data.get('title') or 'Untitled Rehearsal'
+            content = inline_script or ''
+            excerpt = inline_script or ''
+
+        script = InlineScript()
+
+    try:
+        state = rehearsal_service.start_session(script, assignments)
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
+    return jsonify({'status': 'success', 'session': state})
+
+@api_bp.route('/rehearsal/roleplay/<session_id>/transcript', methods=['POST'])
+def submit_roleplay_transcript(session_id):
+    data = request.get_json(silent=True) or {}
+    try:
+        state = rehearsal_service.submit_human_transcript(
+            session_id,
+            data.get('transcript') or '',
+            bool(data.get('is_final')),
+            int(data.get('silence_ms') or 0)
+        )
+    except KeyError:
+        return jsonify({'error': 'Rehearsal session not found'}), 404
+    return jsonify({'status': 'success', 'session': state})
+
+@api_bp.route('/rehearsal/roleplay/<session_id>/ai-turn', methods=['POST'])
+def prepare_roleplay_ai_turn(session_id):
+    try:
+        state = rehearsal_service.prepare_ai_turn(session_id)
+    except KeyError:
+        return jsonify({'error': 'Rehearsal session not found'}), 404
+    return jsonify({'status': 'success', 'session': state})
+
+@api_bp.route('/rehearsal/roleplay/<session_id>/ai-complete', methods=['POST'])
+def complete_roleplay_ai_turn(session_id):
+    try:
+        state = rehearsal_service.complete_ai_turn(session_id)
+    except KeyError:
+        return jsonify({'error': 'Rehearsal session not found'}), 404
+    return jsonify({'status': 'success', 'session': state})
+
+@api_bp.route('/rehearsal/roleplay/<session_id>/advance', methods=['POST'])
+def advance_roleplay_turn(session_id):
+    try:
+        state = rehearsal_service.advance(session_id)
+    except KeyError:
+        return jsonify({'error': 'Rehearsal session not found'}), 404
+    return jsonify({'status': 'success', 'session': state})
+
+@api_bp.route('/rehearsal/roleplay/<session_id>/stop', methods=['POST'])
+def stop_roleplay_rehearsal(session_id):
+    try:
+        state = rehearsal_service.stop(session_id)
+    except KeyError:
+        return jsonify({'error': 'Rehearsal session not found'}), 404
+    return jsonify({'status': 'success', 'session': state})
 
 @api_bp.route('/script/pin', methods=['POST'])
 def pin_script():
