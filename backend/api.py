@@ -3,6 +3,7 @@ import json
 import random
 import jwt
 import datetime
+import re
 from flask import Blueprint, request, jsonify, Response, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User, Role, Membership, Event, Booking, Announcement, Feedback, Gallery, ScheduleSlot, Audition, SharedEvent, Volunteer, Participation, Play, OpenPosition, Notification, ExtractedCharacter
@@ -15,8 +16,8 @@ load_dotenv()
 
 # LLM provider settings from environment variables (configured for Gemini support via LiteLLM)
 API_BASE = os.getenv("COMPLETIONS_API_BASE", "http://localhost:4000/v1")
-MODEL_NAME = os.getenv("COMPLETIONS_MODEL", "gemini/gemini-3.6-flash")
-API_KEY = os.environ["GEMINI_API_KEY"]
+MODEL_NAME = os.getenv("COMPLETIONS_MODEL", "gemini/gemini-2.0-flash")
+API_KEY = os.getenv("GEMINI_API_KEY", "")
 
 api_bp = Blueprint('api', __name__)
 
@@ -1606,4 +1607,55 @@ def auto_extract():
         "dialogue_script": dialogue_script,
         "characters": saved_list
     })
+
+
+@api_bp.route('/events/extract-keywords', methods=['POST'])
+def extract_event_keywords():
+    data = request.get_json() or {}
+    description = data.get('description', '').strip()
+    if not description:
+        return jsonify({"status": "error", "message": "Description is required"}), 400
+
+    api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY") or API_KEY
+    model = os.getenv("COMPLETIONS_MODEL", "gemini/gemini-3.6-flash")
+
+    if not api_key:
+        return jsonify({"status": "error", "message": "AI servers are down. API key missing."}), 503
+
+    try:
+        prompt = f"""You are an AI assistant for an Event Management system. 
+Extract 4 to 6 concise, highly relevant keywords or short key phrases (e.g. monetary figures like ₹1,50,000, key deliverables, audio equipment, themes, or event categories) from the following description:
+
+"{description}"
+
+Return ONLY valid JSON matching this schema:
+{{
+  "keywords": ["Keyword1", "Keyword2", ...]
+}}
+"""
+        completion_kwargs = {
+            "model": model,
+            "messages": [{"role": "user", "content": prompt}],
+            "api_key": api_key,
+            "response_format": {"type": "json_object"}
+        }
+        if os.getenv("COMPLETIONS_API_BASE") or not model.startswith("gemini/"):
+            completion_kwargs["api_base"] = API_BASE
+
+        resp = litellm.completion(**completion_kwargs)
+        content = resp.choices[0].message.content.strip()
+        if content.startswith("```json"):
+            content = content[7:]
+        if content.endswith("```"):
+            content = content[:-3]
+        res_json = json.loads(content.strip())
+        keywords = res_json.get("keywords", [])
+        if keywords and isinstance(keywords, list):
+            return jsonify({"status": "success", "keywords": keywords[:6], "source": "gemini"}), 200
+        else:
+            return jsonify({"status": "error", "message": "AI servers are down. Failed to extract keywords."}), 503
+    except Exception as err:
+        print(f"Gemini keyword extraction API call error: {err}")
+        return jsonify({"status": "error", "message": "AI servers are down. Please try again later."}), 503
+
 

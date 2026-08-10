@@ -230,69 +230,7 @@ export default function EventsManagement() {
   const [extractedKeywords, setExtractedKeywords] = useState<Record<string, string[]>>({});
   const [isExtractingId, setIsExtractingId] = useState<string | number | null>(null);
 
-  const extractAIKeywords = (desc: string): string[] => {
-    if (!desc) return [];
-    const keywords: string[] = [];
-
-    // 1. Detect monetary figures & quantitative deliverables (e.g. ₹1,50,000, 5,000 Playbills, 200 VIP Passes, 12 Mics)
-    const quantities = desc.match(/(?:[₹$]\s*[\d,]+|\b\d+[\d,]*\s*(?:playbills|passes|vouchers|mics|systems|speakers|shawls|coupons|seats|hours|days|percent|%)\b)/gi);
-    if (quantities) {
-      quantities.forEach((q) => {
-        const clean = q.trim();
-        if (!keywords.includes(clean)) keywords.push(clean);
-      });
-    }
-
-    // 2. Frequency analysis of significant words in description
-    const stopWords = new Set([
-      "this", "that", "with", "from", "have", "your", "their", "will", "about", "for",
-      "the", "and", "in", "of", "to", "a", "is", "are", "was", "were", "been", "being",
-      "has", "had", "does", "did", "doing", "an", "or", "by", "on", "at", "be",
-      "as", "it", "its", "into", "through", "during", "before", "after", "above", "below",
-      "official", "partner", "deliverables", "include", "across", "includes"
-    ]);
-
-    const words = desc
-      .replace(/[^\w\s₹$]/gi, ' ')
-      .split(/\s+/)
-      .map((w) => w.trim())
-      .filter((w) => w.length > 3 && !stopWords.has(w.toLowerCase()));
-
-    const freqMap: Record<string, number> = {};
-    words.forEach((w) => {
-      const key = w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
-      freqMap[key] = (freqMap[key] || 0) + 1;
-    });
-
-    const sortedByFreq = Object.entries(freqMap)
-      .sort((a, b) => b[1] - a[1])
-      .map(([word]) => word);
-
-    sortedByFreq.forEach((w) => {
-      if (!keywords.map((k) => k.toLowerCase()).includes(w.toLowerCase()) && keywords.length < 8) {
-        keywords.push(w);
-      }
-    });
-
-    // 3. Detect key domain partnership terms
-    const domainTerms = [
-      "Exclusive Energy Partner", "Green Room Lounge", "Playbill Cover", "Sampling Counter",
-      "VIP Audience Passes", "Title Wardrobe Partner", "Side-Stage Banner", "Foyer Exhibition",
-      "Acoustic Hardware", "Wireless Lapel Microphones", "Lobby Displays", "Kulhad Chai Stall",
-      "Refreshment Counter", "Ticket Discounts", "Patron Page", "Press Release Attribution",
-      "Handcrafted Silk Shawls", "Soundboard Equipment", "Masterclass", "Open-Mic Registration"
-    ];
-
-    domainTerms.forEach((term) => {
-      if (desc.toLowerCase().includes(term.toLowerCase()) && !keywords.map((k) => k.toLowerCase()).includes(term.toLowerCase())) {
-        keywords.push(term);
-      }
-    });
-
-    return keywords.slice(0, 6);
-  };
-
-  const handleToggleAIKeywords = (keyId: string | number, desc: string) => {
+  const handleToggleAIKeywords = async (keyId: string | number, desc: string) => {
     const key = String(keyId);
     if (extractedKeywords[key]) {
       setExtractedKeywords((prev) => {
@@ -304,11 +242,26 @@ export default function EventsManagement() {
     }
 
     setIsExtractingId(keyId);
-    setTimeout(() => {
-      const kw = extractAIKeywords(desc);
-      setExtractedKeywords((prev) => ({ ...prev, [key]: kw }));
+    const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005";
+    try {
+      const res = await fetch(`${baseUrl}/api/events/extract-keywords`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ description: desc })
+      });
+      const data = await res.json();
+      if (res.ok && data.status === "success" && Array.isArray(data.keywords)) {
+        setExtractedKeywords((prev) => ({ ...prev, [key]: data.keywords }));
+        triggerToast("Keywords extracted via Gemini AI");
+      } else {
+        triggerToast(data.message || "AI servers are down. Please try again later.");
+      }
+    } catch (err) {
+      console.error("Backend AI keyword extraction error:", err);
+      triggerToast("AI servers are down. Please try again later.");
+    } finally {
       setIsExtractingId(null);
-    }, 450);
+    }
   };
 
   const handleKeywordClick = (keyword: string) => {
@@ -373,26 +326,6 @@ export default function EventsManagement() {
       })
       .catch((err) => console.error("Error fetching proposals:", err));
   }, []);
-
-  // Pre-populate AI Key Highlights by default for maintainer overview
-  useEffect(() => {
-    const kwMap: Record<string, string[]> = {};
-    if (Array.isArray(sponsorAds)) {
-      sponsorAds.forEach((ad) => {
-        if (ad.ad_description) {
-          kwMap[`sponsor_${ad.id}`] = extractAIKeywords(ad.ad_description);
-        }
-      });
-    }
-    if (Array.isArray(proposals)) {
-      proposals.forEach((p) => {
-        if (p.description) {
-          kwMap[`prop_${p.id}`] = extractAIKeywords(p.description);
-        }
-      });
-    }
-    setExtractedKeywords((prev) => ({ ...kwMap, ...prev }));
-  }, [sponsorAds, proposals]);
 
   // Sponsor Ad Action Handlers
   const handleUpdateSponsorAdStatus = (adId: number, status: string) => {
