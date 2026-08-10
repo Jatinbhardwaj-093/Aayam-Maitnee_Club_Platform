@@ -36,9 +36,13 @@ interface ScriptItem {
   author_name: string;
   status: string;
   created_at: string;
+  charactersCount?: number;
+  dialogueLines?: number;
+  rehearsalReady?: boolean;
 }
 
 type Assignment = "human" | "ai";
+type VoicePreference = "male" | "female";
 
 const demoScript = `John: Hello Mary, how are you?
 
@@ -51,6 +55,75 @@ Mary: Yes, I'm completely ready.`;
 const normalize = (word: string) => word.toLowerCase().replace(/[^a-z0-9']/g, "");
 
 const wordSpans = (text: string) => text.match(/[\w']+|[^\s\w]/g) || [];
+
+const normalizedTranscript = (text: string) => normalize(text).replace(/\s+/g, " ").trim();
+
+const localMatchSpokenWords = (expectedWords: string[], transcriptText: string) => {
+  const expected = expectedWords.map(normalize);
+  const spoken = (transcriptText.toLowerCase().match(/[\w']+/g) || []).map(normalize).filter(Boolean);
+  const matched = new Set<number>();
+  let cursor = 0;
+
+  spoken.forEach((spokenWord) => {
+    for (let idx = cursor; idx < Math.min(expected.length, cursor + 5); idx += 1) {
+      if (expected[idx] && expected[idx] === spokenWord) {
+        matched.add(idx);
+        cursor = idx + 1;
+        return;
+      }
+    }
+  });
+
+  return {
+    matchedIndices: Array.from(matched).sort((a, b) => a - b),
+    currentWordIndex: matched.size ? Math.max(...matched) : -1,
+  };
+};
+
+const voiceHints: Record<VoicePreference, string[]> = {
+  female: ["female", "woman", "zira", "samantha", "susan", "victoria", "karen", "moira", "tessa"],
+  male: ["male", "man", "david", "mark", "alex", "daniel", "fred", "rishi", "george"],
+};
+
+const selectBrowserVoice = (voices: SpeechSynthesisVoice[], preference?: VoicePreference) => {
+  const englishVoices = voices.filter((voice) => voice.lang?.toLowerCase().startsWith("en"));
+  const candidates = englishVoices.length ? englishVoices : voices;
+  if (!preference) return candidates[0] || null;
+  const hints = voiceHints[preference];
+  return candidates.find((voice) => hints.some((hint) => voice.name.toLowerCase().includes(hint))) || candidates[0] || null;
+};
+
+const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
+
+const ttsControlsFromPerformance = (performance?: any) => {
+  const pace = performance?.pace || "moderate";
+  const tone = `${performance?.tone || ""} ${performance?.emotion || ""}`.toLowerCase();
+  const intensity = typeof performance?.intensity === "number" ? performance.intensity : 0.5;
+
+  let rate = pace === "slow" ? 0.82 : pace === "brisk" ? 1.12 : 0.95;
+  let pitch = 1;
+  let volume = 0.9;
+
+  if (tone.includes("warm") || tone.includes("gentle") || tone.includes("calm")) pitch -= 0.04;
+  if (tone.includes("angry") || tone.includes("frustrated") || tone.includes("confront")) pitch += 0.06;
+  if (tone.includes("sad") || tone.includes("somber")) {
+    pitch -= 0.08;
+    rate -= 0.05;
+  }
+  if (tone.includes("excited") || tone.includes("urgent")) {
+    pitch += 0.08;
+    rate += 0.06;
+  }
+
+  volume += (intensity - 0.5) * 0.28;
+  rate += (intensity - 0.5) * 0.08;
+
+  return {
+    rate: clamp(rate, 0.65, 1.35),
+    pitch: clamp(pitch, 0.7, 1.35),
+    volume: clamp(volume, 0.55, 1),
+  };
+};
 
 export default function AiRehearsalStudio() {
   const { activeUser } = useOutletContext<any>() || {};
@@ -71,6 +144,7 @@ export default function AiRehearsalStudio() {
   const [inlineScript, setInlineScript] = useState(demoScript);
   const [scene, setScene] = useState<any | null>(null);
   const [assignments, setAssignments] = useState<Record<string, Assignment>>({});
+  const [voicePreferences, setVoicePreferences] = useState<Record<string, VoicePreference>>({});
   const [session, setSession] = useState<any | null>(null);
   const [transcript, setTranscript] = useState("");
   const [listening, setListening] = useState(false);
@@ -88,6 +162,10 @@ export default function AiRehearsalStudio() {
   const aiTimerRef = useRef<number | null>(null);
   const aiPreparingRef = useRef(false);
   const lastTranscriptRef = useRef("");
+  const lastSentTranscriptRef = useRef("");
+  const lastSentAtRef = useRef(0);
+  const finalSentTurnRef = useRef<string | null>(null);
+  const transcriptRequestCountRef = useRef<Record<string, number>>({});
   const sessionRef = useRef<any | null>(null);
   const activeTurnRef = useRef<any | null>(null);
   const micBlockedRef = useRef(false);
@@ -124,6 +202,10 @@ export default function AiRehearsalStudio() {
     }
     aiPreparingRef.current = false;
     lastTranscriptRef.current = "";
+    lastSentTranscriptRef.current = "";
+    lastSentAtRef.current = 0;
+    finalSentTurnRef.current = null;
+    transcriptRequestCountRef.current = {};
     sessionRef.current = null;
     activeTurnRef.current = null;
     micBlockedRef.current = false;
@@ -148,23 +230,28 @@ export default function AiRehearsalStudio() {
   }, [pinnedScriptIds]);
 
   useEffect(() => {
+    const email = activeUser?.email || "";
+    if (!email) {
+      setAllScripts([]);
+      if (!scriptId) {
+        setActiveScript(null);
+      }
+      return;
+    }
     if (!scriptId) {
       if (activeScript && location.pathname === "/ai-rehearsal") {
         clearRehearsalState();
       } else {
         setActiveScript(null);
       }
-      return;
     }
-    const email = activeUser?.email || "";
-    fetch(`${baseUrl}/api/scripts?email=${encodeURIComponent(email)}`)
+    fetch(`${baseUrl}/api/rehearsal/scripts?email=${encodeURIComponent(email)}`)
       .then((res) => res.json())
       .then((data) => {
-        const combined = [...(data.public || []), ...(data.drafts || [])];
-        const unique = Array.from(new Map(combined.map((item: ScriptItem) => [item.id, item])).values());
-        setAllScripts(unique);
+        const scripts = data.scripts || [];
+        setAllScripts(scripts);
         if (scriptId) {
-          const found = unique.find((script: ScriptItem) => script.id.toString() === scriptId);
+          const found = scripts.find((script: ScriptItem) => script.id.toString() === scriptId);
           if (found) {
             setActiveScript(found);
             parseScript(found);
@@ -185,6 +272,10 @@ export default function AiRehearsalStudio() {
     setHumanWordIndex(-1);
     setSpokenIndices([]);
     setAiWordIndex(-1);
+    lastTranscriptRef.current = "";
+    lastSentTranscriptRef.current = "";
+    lastSentAtRef.current = 0;
+    finalSentTurnRef.current = null;
 
     if (session.status === "HUMAN_TURN") {
       trace("MIC START REQUESTED", {
@@ -245,7 +336,7 @@ export default function AiRehearsalStudio() {
     micBlockedRef.current = false;
     setAudioStatus("Parsing script");
     const payload = script
-      ? { script_id: script.id }
+      ? { script_id: script.id, user_email: activeUser?.email || "" }
       : { title: inlineOverride?.title || inlineTitle, script: inlineOverride?.script || inlineScript };
 
     try {
@@ -261,11 +352,19 @@ export default function AiRehearsalStudio() {
         return;
       }
       setScene(data.scene);
-      setAssignments(
+    setAssignments(
         Object.fromEntries(
           data.scene.characters.map((character: any, index: number) => [
             character.name,
             index === 0 ? "human" : "ai",
+          ]),
+        ),
+      );
+      setVoicePreferences(
+        Object.fromEntries(
+          data.scene.characters.map((character: any, index: number) => [
+            character.name,
+            index === 0 ? "male" : "female",
           ]),
         ),
       );
@@ -295,6 +394,10 @@ export default function AiRehearsalStudio() {
     }
     aiPreparingRef.current = false;
     lastTranscriptRef.current = "";
+    lastSentTranscriptRef.current = "";
+    lastSentAtRef.current = 0;
+    finalSentTurnRef.current = null;
+    transcriptRequestCountRef.current = {};
     sessionRef.current = null;
     activeTurnRef.current = null;
     micBlockedRef.current = false;
@@ -306,8 +409,8 @@ export default function AiRehearsalStudio() {
     setAudioStatus("Starting rehearsal");
     setSessionStartedAt(Date.now());
     const payload = activeScript
-      ? { script_id: activeScript.id, assignments }
-      : { title: inlineTitle, script: inlineScript, assignments };
+      ? { script_id: activeScript.id, assignments, voice_preferences: voicePreferences, user_email: activeUser?.email || "" }
+      : { title: inlineTitle, script: inlineScript, assignments, voice_preferences: voicePreferences };
     try {
       const res = await fetch(`${baseUrl}/api/rehearsal/roleplay/start`, {
         method: "POST",
@@ -344,6 +447,32 @@ export default function AiRehearsalStudio() {
     const activeSession = sessionRef.current;
     const activeTurn = activeTurnRef.current;
     if (!activeSession?.session_id || !text.trim()) return;
+    const turnId = activeTurn?.id || `${activeSession.session_id}:${activeSession.current_turn}`;
+    const normalized = normalizedTranscript(text);
+    const previousNormalized = normalizedTranscript(lastSentTranscriptRef.current);
+    const now = Date.now();
+
+    if (isFinal && finalSentTurnRef.current === turnId) {
+      trace("SKIPPED DUPLICATE FINAL TRANSCRIPT", { turn: turnId, transcript: text });
+      return;
+    }
+    if (!isFinal) {
+      const repeated = normalized && normalized === previousNormalized;
+      const tooSoon = now - lastSentAtRef.current < 650;
+      const previousWords = previousNormalized ? previousNormalized.split(" ").length : 0;
+      const currentWords = normalized ? normalized.split(" ").length : 0;
+      const littleProgress = currentWords <= previousWords + 1;
+      if (repeated || (tooSoon && littleProgress)) {
+        trace("SKIPPED REDUNDANT PARTIAL TRANSCRIPT", {
+          turn: turnId,
+          repeated,
+          tooSoon,
+          previousWords,
+          currentWords,
+        });
+        return;
+      }
+    }
     if (activeSession.speaker_type !== "human") {
       trace("IGNORED TRANSCRIPT OUTSIDE HUMAN TURN", {
         transcript: text,
@@ -352,11 +481,16 @@ export default function AiRehearsalStudio() {
       });
       return;
     }
+    transcriptRequestCountRef.current[turnId] = (transcriptRequestCountRef.current[turnId] || 0) + 1;
+    lastSentTranscriptRef.current = text;
+    lastSentAtRef.current = now;
+    if (isFinal) finalSentTurnRef.current = turnId;
     trace("TRANSCRIPT SENT", {
       transcript: text,
       isFinal,
       silenceMs,
-      turn: activeTurn?.id,
+      turn: turnId,
+      countForTurn: transcriptRequestCountRef.current[turnId],
     });
     const res = await fetch(`${baseUrl}/api/rehearsal/roleplay/${activeSession.session_id}/transcript`, {
       method: "POST",
@@ -460,12 +594,18 @@ export default function AiRehearsalStudio() {
         combined,
       });
       setTranscript(combined);
+      if (sessionRef.current?.speaker_type === "human" && activeTurnRef.current?.words) {
+        const localMatch = localMatchSpokenWords(activeTurnRef.current.words, combined);
+        setSpokenIndices(localMatch.matchedIndices);
+        setHumanWordIndex(localMatch.currentWordIndex);
+      }
       sendTranscript(combined, false);
       if (finalText) {
         lastTranscriptRef.current = `${lastTranscriptRef.current} ${finalText}`.trim();
         if (silenceTimerRef.current) window.clearTimeout(silenceTimerRef.current);
         silenceTimerRef.current = window.setTimeout(() => {
-          sendTranscript(lastTranscriptRef.current, true, 1100);
+          const finalTranscript = lastTranscriptRef.current;
+          sendTranscript(finalTranscript, true, 1100);
           lastTranscriptRef.current = "";
         }, 1100);
       }
@@ -524,10 +664,19 @@ export default function AiRehearsalStudio() {
     setAiWordIndex(-1);
     setAudioStatus("AI speaking");
     const utterance = new SpeechSynthesisUtterance(payload.text);
-    utterance.rate = 0.95;
-    utterance.pitch = 1;
+    const ttsControls = ttsControlsFromPerformance(payload.performance);
+    utterance.rate = ttsControls.rate;
+    utterance.pitch = ttsControls.pitch;
+    utterance.volume = ttsControls.volume;
+    trace("AI TTS DELIVERY CONTROLS", {
+      performance: payload.performance,
+      rate: utterance.rate,
+      pitch: utterance.pitch,
+      volume: utterance.volume,
+    });
     const voices = window.speechSynthesis.getVoices();
-    const voice = voices.find((item) => item.lang.startsWith("en") || item.lang.startsWith("hi")) || voices[0];
+    const voicePreference = payload.voice as VoicePreference || voicePreferences[nextSession.current_speaker] || voicePreferences[payload.character];
+    const voice = selectBrowserVoice(voices, voicePreference);
     if (voice) utterance.voice = voice;
 
     const words = payload.words || [];
@@ -626,17 +775,32 @@ export default function AiRehearsalStudio() {
                 <div key={character.name} className="flex items-center justify-between gap-3">
                   <div className="min-w-0">
                     <p className="text-sm font-bold text-[#1c1b19] truncate">{character.name}</p>
-                    <p className="text-[11px] text-[#466272]/70 truncate">{character.description || "Scene partner"}</p>
+                    <p className="text-[11px] text-[#466272]/70 truncate">
+                      {assignments[character.name] === "ai" ? `AI voice: ${voicePreferences[character.name] || "female"}` : "Human speaker"}
+                    </p>
                   </div>
-                  <select
-                    disabled={!!session && session.scene_status === "active"}
-                    value={assignments[character.name] || "ai"}
-                    onChange={(event) => setAssignments({ ...assignments, [character.name]: event.target.value as Assignment })}
-                    className="h-8 rounded-[8px] border border-[#cac6b9] bg-[#fdf9f4] px-2 text-xs font-bold"
-                  >
-                    <option value="human">Human</option>
-                    <option value="ai">AI</option>
-                  </select>
+                  <div className="flex items-center gap-2">
+                    <select
+                      disabled={!!session && session.scene_status === "active"}
+                      value={assignments[character.name] || "ai"}
+                      onChange={(event) => setAssignments({ ...assignments, [character.name]: event.target.value as Assignment })}
+                      className="h-8 rounded-[8px] border border-[#cac6b9] bg-[#fdf9f4] px-2 text-xs font-bold"
+                    >
+                      <option value="human">Human</option>
+                      <option value="ai">AI</option>
+                    </select>
+                    {assignments[character.name] === "ai" && (
+                      <select
+                        disabled={!!session && session.scene_status === "active"}
+                        value={voicePreferences[character.name] || "female"}
+                        onChange={(event) => setVoicePreferences({ ...voicePreferences, [character.name]: event.target.value as VoicePreference })}
+                        className="h-8 rounded-[8px] border border-[#cac6b9] bg-[#fdf9f4] px-2 text-xs font-bold"
+                      >
+                        <option value="female">Female</option>
+                        <option value="male">Male</option>
+                      </select>
+                    )}
+                  </div>
                 </div>
               ))}
             </section>
@@ -826,14 +990,26 @@ export default function AiRehearsalStudio() {
               {scene.characters.map((character: any) => (
                 <div key={character.name} className="flex items-center justify-between border border-[#e6e2dd] rounded-[8px] p-3">
                   <span className="font-bold text-[#1c1b19]">{character.name}</span>
-                  <select
-                    value={assignments[character.name] || "ai"}
-                    onChange={(event) => setAssignments({ ...assignments, [character.name]: event.target.value as Assignment })}
-                    className="h-8 rounded-[8px] border border-[#cac6b9] bg-[#fdf9f4] px-2 text-xs font-bold"
-                  >
-                    <option value="human">Human</option>
-                    <option value="ai">AI</option>
-                  </select>
+                  <div className="flex items-center gap-2">
+                    <select
+                      value={assignments[character.name] || "ai"}
+                      onChange={(event) => setAssignments({ ...assignments, [character.name]: event.target.value as Assignment })}
+                      className="h-8 rounded-[8px] border border-[#cac6b9] bg-[#fdf9f4] px-2 text-xs font-bold"
+                    >
+                      <option value="human">Human</option>
+                      <option value="ai">AI</option>
+                    </select>
+                    {assignments[character.name] === "ai" && (
+                      <select
+                        value={voicePreferences[character.name] || "female"}
+                        onChange={(event) => setVoicePreferences({ ...voicePreferences, [character.name]: event.target.value as VoicePreference })}
+                        className="h-8 rounded-[8px] border border-[#cac6b9] bg-[#fdf9f4] px-2 text-xs font-bold"
+                      >
+                        <option value="female">Female</option>
+                        <option value="male">Male</option>
+                      </select>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
@@ -845,9 +1021,9 @@ export default function AiRehearsalStudio() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#e6e2dd] pb-4">
               <div>
                 <h2 className="font-serif text-xl font-bold text-[#635f41] flex items-center gap-2">
-                  <BookOpen className="h-5 w-5" /> Script Directory
+                  <BookOpen className="h-5 w-5" /> Saved Scripts
                 </h2>
-                <p className="text-xs">Open a saved script or rehearse the demo scene.</p>
+                <p className="text-xs">Use scripts saved in your Script Vault.</p>
               </div>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#466272]/50" />
@@ -873,6 +1049,9 @@ export default function AiRehearsalStudio() {
                       <Pin className="h-4 w-4 text-[#635f41] fill-[#635f41]" />
                     </div>
                     <p className="text-xs text-[#466272] mt-1">{script.playwright}</p>
+                    <p className="text-[11px] text-[#466272]/70 mt-2">
+                      {script.charactersCount || 0} characters - {script.dialogueLines || 0} dialogue lines
+                    </p>
                   </button>
                 ))}
               </div>
@@ -884,7 +1063,7 @@ export default function AiRehearsalStudio() {
                   <tr className="border-b border-[#e6e2dd] text-[10px] uppercase tracking-wider text-[#635f41]">
                     <th className="py-3 px-3">Pin</th>
                     <th className="py-3 px-3">Title</th>
-                    <th className="py-3 px-3">Genre</th>
+                    <th className="py-3 px-3">Lines</th>
                     <th className="py-3 px-3 text-right">Action</th>
                   </tr>
                 </thead>
@@ -900,14 +1079,28 @@ export default function AiRehearsalStudio() {
                         <p className="font-serif font-bold text-[#1c1b19]">{script.title}</p>
                         <p className="text-[#466272]/70">{script.playwright}</p>
                       </td>
-                      <td className="py-3 px-3">{script.genre}</td>
+                      <td className="py-3 px-3">
+                        <p>{script.charactersCount || 0} characters</p>
+                        <p className="text-[#466272]/65">{script.dialogueLines || 0} dialogue lines</p>
+                      </td>
                       <td className="py-3 px-3 text-right">
-                        <Button onClick={() => navigate(`/ai-rehearsal/${script.id}`)} className="bg-[#635f41] text-white hover:bg-[#4d4a32]">
-                          Rehearse
+                        <Button
+                          onClick={() => navigate(`/ai-rehearsal/${script.id}`)}
+                          disabled={script.rehearsalReady === false}
+                          className="bg-[#635f41] text-white hover:bg-[#4d4a32]"
+                        >
+                          Use
                         </Button>
                       </td>
                     </tr>
                   ))}
+                  {filteredScripts.length === 0 && (
+                    <tr>
+                      <td colSpan={4} className="py-8 text-center text-sm text-[#466272]/70">
+                        No saved Script Vault scripts found for this account.
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>

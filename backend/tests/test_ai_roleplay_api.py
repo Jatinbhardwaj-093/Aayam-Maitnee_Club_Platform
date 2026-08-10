@@ -1,3 +1,38 @@
+import pytest
+
+
+class FakePerformanceProvider:
+    def __init__(self):
+        self.calls = []
+
+    def analyze_delivery(self, **kwargs):
+        self.calls.append(kwargs)
+        return {
+            "emotion": "calm",
+            "tone": "conversational",
+            "pace": "moderate",
+            "intensity": 0.6,
+            "provider": "gemini",
+            "available": True,
+        }
+
+
+class FailingPerformanceProvider:
+    def analyze_delivery(self, **kwargs):
+        raise TimeoutError("simulated gemini timeout")
+
+
+@pytest.fixture(autouse=True)
+def fake_gemini_provider():
+    import api
+
+    provider = FakePerformanceProvider()
+    previous = api.rehearsal_service.performance_provider
+    api.rehearsal_service.performance_provider = provider
+    yield provider
+    api.rehearsal_service.performance_provider = previous
+
+
 def test_parse_inline_roleplay_script(client):
     response = client.post(
         "/api/rehearsal/parse",
@@ -14,7 +49,7 @@ def test_parse_inline_roleplay_script(client):
     assert scene["turns"][0]["words"] == ["Hello", "Mary", "."]
 
 
-def test_roleplay_john_mary_loop(client):
+def test_roleplay_john_mary_loop(client, fake_gemini_provider):
     script = "\n".join([
         "John: Hello Mary, how are you?",
         "Mary: I'm doing well, John.",
@@ -53,6 +88,9 @@ def test_roleplay_john_mary_loop(client):
     session = ai_turn.get_json()["session"]
     assert session["status"] == "PLAYING_AI_AUDIO"
     assert session["ai_payload"]["text"] == "I'm doing well, John."
+    assert session["ai_payload"]["performance"]["emotion"] == "calm"
+    assert fake_gemini_provider.calls[0]["character"] == "Mary"
+    assert fake_gemini_provider.calls[0]["scripted_dialogue"] == "I'm doing well, John."
     assert session["ai_payload"]["words"][0]["word"] == "I'm"
 
     ai_complete = client.post(f"/api/rehearsal/roleplay/{session['session_id']}/ai-complete")
@@ -140,3 +178,109 @@ def test_late_human_transcript_does_not_break_ai_turn(client):
     session = late_response.get_json()["session"]
     assert session["status"] == "AI_TURN"
     assert session["current_speaker"] == "Mary"
+
+
+def test_gemini_failure_falls_back_without_changing_dialogue(client):
+    import api
+
+    api.rehearsal_service.performance_provider = FailingPerformanceProvider()
+    start = client.post(
+        "/api/rehearsal/roleplay/start",
+        json={
+            "title": "Fallback",
+            "script": "John: Hello Mary.\nMary: Hello John.",
+            "assignments": {"John": "human", "Mary": "ai"},
+        },
+    )
+    session = start.get_json()["session"]
+
+    transcript = client.post(
+        f"/api/rehearsal/roleplay/{session['session_id']}/transcript",
+        json={"transcript": "hello mary", "is_final": True, "silence_ms": 1200},
+    )
+    session = transcript.get_json()["session"]
+
+    ai_turn = client.post(f"/api/rehearsal/roleplay/{session['session_id']}/ai-turn")
+    session = ai_turn.get_json()["session"]
+    assert session["ai_payload"]["text"] == "Hello John."
+    assert session["ai_payload"]["performance"]["provider"] == "default"
+    assert session["ai_payload"]["performance"]["available"] is False
+    assert session["status"] == "PLAYING_AI_AUDIO"
+
+
+def test_voice_preference_is_stored_and_passed_to_ai_payload(client):
+    start = client.post(
+        "/api/rehearsal/roleplay/start",
+        json={
+            "title": "Voice",
+            "script": "John: Hello Mary.\nMary: Hello John.",
+            "assignments": {"John": "human", "Mary": "ai"},
+            "voice_preferences": {"Mary": "female"},
+        },
+    )
+    session = start.get_json()["session"]
+    assert session["voice_preferences"]["Mary"] == "female"
+
+    transcript = client.post(
+        f"/api/rehearsal/roleplay/{session['session_id']}/transcript",
+        json={"transcript": "hello mary", "is_final": True, "silence_ms": 1200},
+    )
+    session = transcript.get_json()["session"]
+
+    ai_turn = client.post(f"/api/rehearsal/roleplay/{session['session_id']}/ai-turn")
+    session = ai_turn.get_json()["session"]
+    assert session["ai_payload"]["voice"] == "female"
+
+
+def test_rehearsal_script_vault_lists_and_blocks_by_owner(client, app):
+    from models import Script, db
+
+    with app.app_context():
+        owned = Script(
+            title="Owner Scene",
+            playwright="Owner",
+            content="John: Hello Mary.\nMary: Hello John.",
+            author_email="owner@example.com",
+            author_name="Owner",
+            status="Draft",
+        )
+        other = Script(
+            title="Other Scene",
+            playwright="Other",
+            content="Alex: Private line.",
+            author_email="other@example.com",
+            author_name="Other",
+            status="Draft",
+        )
+        public = Script(
+            title="Public Static Scene",
+            playwright="Public",
+            content="Guide: Welcome everyone.",
+            author_email="public@example.com",
+            author_name="Public",
+            status="Public",
+        )
+        db.session.add_all([owned, other, public])
+        db.session.commit()
+        owned_id = owned.id
+        other_id = other.id
+        public_id = public.id
+
+    response = client.get("/api/rehearsal/scripts?email=owner@example.com")
+    assert response.status_code == 200
+    scripts = response.get_json()["scripts"]
+    assert any(script["id"] == owned_id and script["dialogueLines"] == 2 for script in scripts)
+    assert any(script["id"] == public_id and script["dialogueLines"] == 1 for script in scripts)
+    assert all(script["id"] != other_id for script in scripts)
+
+    public_parse = client.post(
+        "/api/rehearsal/parse",
+        json={"script_id": public_id, "user_email": "owner@example.com"},
+    )
+    assert public_parse.status_code == 200
+
+    blocked = client.post(
+        "/api/rehearsal/parse",
+        json={"script_id": other_id, "user_email": "owner@example.com"},
+    )
+    assert blocked.status_code == 404

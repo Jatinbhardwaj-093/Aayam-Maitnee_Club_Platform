@@ -136,19 +136,21 @@ class ScriptedDialogueProvider(LLMProvider):
 
 
 class TTSProvider:
-    def synthesize(self, text, voice="default"):
+    def synthesize(self, text, voice="default", performance=None):
         raise NotImplementedError
 
 
 class BrowserTTSProvider(TTSProvider):
-    def synthesize(self, text, voice="default"):
+    def synthesize(self, text, voice="default", performance=None):
         words = split_words(text)
         timings = []
         cursor = 0.08
+        pace = (performance or {}).get("pace", "moderate")
+        pace_multiplier = {"slow": 1.18, "moderate": 1.0, "brisk": 0.86}.get(pace, 1.0)
         for word in words:
-            duration = max(0.18, min(0.58, len(normalize_word(word)) * 0.055 + 0.14))
+            duration = max(0.18, min(0.58, len(normalize_word(word)) * 0.055 + 0.14)) * pace_multiplier
             timings.append({"word": word, "start": round(cursor, 2), "end": round(cursor + duration, 2)})
-            cursor += duration + 0.06
+            cursor += duration + (0.06 * pace_multiplier)
         return {
             "text": text,
             "audio_url": None,
@@ -156,6 +158,7 @@ class BrowserTTSProvider(TTSProvider):
             "words": timings,
             "duration": round(cursor, 2),
             "provider": "browser-speech-synthesis",
+            "performance": performance,
         }
 
 
@@ -206,10 +209,11 @@ def match_spoken_words(expected_words, transcript, start_index=0):
 
 
 class RehearsalService:
-    def __init__(self):
+    def __init__(self, performance_provider=None):
         self.parser = ScriptParser()
         self.stt = BrowserTranscriptProvider()
         self.llm = ScriptedDialogueProvider()
+        self.performance_provider = performance_provider
         self.tts = BrowserTTSProvider()
         self.sessions = {}
 
@@ -217,15 +221,22 @@ class RehearsalService:
         return self.parser.parse(script)
 
     def start_session(self, script, assignments):
+        return self.start_session_with_options(script, assignments)
+
+    def start_session_with_options(self, script, assignments, voice_preferences=None):
         scene = self.parser.parse(script)
         if not any(turn["type"] == "dialogue" for turn in scene["turns"]):
             raise ValueError("No playable dialogue lines found.")
         normalized_assignments = self._normalize_assignments(scene["characters"], assignments)
+        normalized_voices = self._normalize_voice_preferences(scene["characters"], voice_preferences)
         session_id = uuid.uuid4().hex
         session = {
             "session_id": session_id,
             "scene": scene,
             "assignments": normalized_assignments,
+            "voice_preferences": normalized_voices,
+            "transcript_request_counts": {},
+            "gemini_call_counts": {},
             "current_turn": 0,
             "status": REHEARSAL_LOADING,
             "scene_status": "active",
@@ -258,6 +269,14 @@ class RehearsalService:
             )
             return self.public_state(session)
         session["status"] = REHEARSAL_PROCESSING_HUMAN_AUDIO
+        session["transcript_request_counts"][turn["id"]] = session["transcript_request_counts"].get(turn["id"], 0) + 1
+        logger.info(
+            "[REHEARSAL][TRANSCRIPT] session=%s turn=%s count=%s final=%s",
+            session_id,
+            turn["id"],
+            session["transcript_request_counts"][turn["id"]],
+            is_final,
+        )
         match = match_spoken_words(turn["words"], self.stt.transcribe_stream(transcript), 0)
         session["human_progress"][turn["id"]] = match
         session["current_word_index"] = match["current_word_index"]
@@ -279,7 +298,7 @@ class RehearsalService:
         enough_silence = int(silence_ms or 0) >= 850
         if is_final and match["is_complete"] and enough_silence:
             self._record_event(session, "human_turn_completed", {"turn_id": turn["id"]})
-            logger.info("Human turn complete: session=%s turn=%s", session_id, turn["id"])
+            logger.info("[REHEARSAL] human turn complete: session=%s turn=%s", session_id, turn["id"])
             self.advance(session_id)
         else:
             session["status"] = REHEARSAL_HUMAN_TURN
@@ -290,15 +309,39 @@ class RehearsalService:
         turn = self.current_turn(session)
         if not turn:
             return self.public_state(session)
+        logger.info(
+            "[AI REHEARSAL] AI turn started: session=%s character=%s turn=%s",
+            session_id,
+            turn["character"],
+            turn["id"],
+        )
         session["status"] = REHEARSAL_GENERATING_AI_RESPONSE
         previous = session["scene"]["turns"][:session["current_turn"]]
+        session["gemini_call_counts"][turn["id"]] = session["gemini_call_counts"].get(turn["id"], 0) + 1
+        logger.info(
+            "[REHEARSAL][GEMINI] session=%s turn=%s count=%s",
+            session_id,
+            turn["id"],
+            session["gemini_call_counts"][turn["id"]],
+        )
         text = self.llm.generate_dialogue({
             "turn": turn,
             "previous_dialogue": previous[-4:],
             "scene": session["scene"],
             "assignments": session["assignments"],
         })
-        tts_payload = self.tts.synthesize(text, turn["character"])
+        if text != turn["text"]:
+            logger.warning(
+                "[AI REHEARSAL] Dialogue provider attempted to change scripted dialogue; reverting to script source: session=%s turn=%s",
+                session_id,
+                turn["id"],
+            )
+            text = turn["text"]
+        performance = self._analyze_performance(session, turn, previous)
+        voice_preference = session.get("voice_preferences", {}).get(turn["character"], "default")
+        logger.info("[TTS] start")
+        logger.info('[REHEARSAL][TTS] exact script="%s"', text)
+        tts_payload = self.tts.synthesize(text, voice_preference, performance)
         session["status"] = REHEARSAL_PLAYING_AI_AUDIO
         session["ai_payload"] = {"turn_id": turn["id"], **tts_payload}
         session["current_word_index"] = -1
@@ -316,6 +359,12 @@ class RehearsalService:
         session = self._get_session(session_id)
         turn = self.current_turn(session)
         self._record_event(session, "ai_turn_completed", {"turn_id": turn["id"] if turn else None})
+        logger.info(
+            "[AI REHEARSAL] AI turn completed: session=%s character=%s turn=%s",
+            session_id,
+            turn["character"] if turn else None,
+            turn["id"] if turn else None,
+        )
         self.advance(session_id)
         return self.public_state(session)
 
@@ -352,6 +401,9 @@ class RehearsalService:
             "currentTurn": turn,
             "currentWordIndex": session.get("current_word_index", -1),
             "human_progress": session["human_progress"],
+            "voice_preferences": session.get("voice_preferences", {}),
+            "transcript_request_counts": session.get("transcript_request_counts", {}),
+            "gemini_call_counts": session.get("gemini_call_counts", {}),
             "last_human_turn_id": session.get("last_human_turn_id"),
             "ai_payload": session.get("ai_payload"),
             "events": session["events"][-20:],
@@ -404,6 +456,58 @@ class RehearsalService:
             value = provided.get(character["name"], "human" if idx == 0 else "ai")
             result[character["name"]] = "human" if value == "human" else "ai"
         return result
+
+    def _normalize_voice_preferences(self, characters, voice_preferences):
+        provided = voice_preferences or {}
+        result = {}
+        for idx, character in enumerate(characters):
+            raw_value = provided.get(character["name"])
+            if raw_value not in {"male", "female"}:
+                raw_value = "male" if idx == 0 else "female"
+            result[character["name"]] = raw_value
+        return result
+
+    def _analyze_performance(self, session, turn, previous):
+        if not self.performance_provider:
+            return {
+                "emotion": "neutral",
+                "tone": "natural",
+                "pace": "moderate",
+                "intensity": 0.5,
+                "provider": "default",
+                "available": False,
+            }
+        character = next(
+            (item for item in session["scene"]["characters"] if item["name"] == turn["character"]),
+            {},
+        )
+        stage_direction = self._nearest_stage_direction(previous)
+        try:
+            return self.performance_provider.analyze_delivery(
+                character=turn["character"],
+                personality=character.get("description", ""),
+                scene_context=session["scene"].get("title", ""),
+                previous_dialogue=previous[-4:],
+                scripted_dialogue=turn["text"],
+                stage_direction=stage_direction,
+            )
+        except Exception as exc:
+            logger.warning("[REHEARSAL][GEMINI] provider failed; using default performance metadata: %s", exc)
+            return {
+                "emotion": "neutral",
+                "tone": "natural",
+                "pace": "moderate",
+                "intensity": 0.5,
+                "provider": "default",
+                "available": False,
+                "error": "gemini_unavailable",
+            }
+
+    def _nearest_stage_direction(self, previous):
+        for turn in reversed(previous):
+            if turn.get("type") == "stage_direction":
+                return turn.get("text", "")
+        return ""
 
     def _get_session(self, session_id):
         if session_id not in self.sessions:

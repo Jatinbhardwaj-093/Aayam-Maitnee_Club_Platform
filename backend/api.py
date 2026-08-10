@@ -4,9 +4,11 @@ import random
 import jwt
 import datetime
 from flask import Blueprint, request, jsonify, Response, current_app
+from sqlalchemy import or_
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User, Role, Membership, Event, Booking, Announcement, Feedback, Gallery, ScheduleSlot, Audition, SharedEvent, Volunteer, Participation, Play, OpenPosition, Notification, ExtractedCharacter
 from ai_roleplay import RehearsalService
+from gemini_service import GeminiPerformanceProvider
 
 import redis
 from dotenv import load_dotenv
@@ -20,7 +22,7 @@ MODEL_NAME = os.getenv("COMPLETIONS_MODEL", "gemini/gemini-3.6-flash")
 API_KEY = os.environ["GEMINI_API_KEY"]
 
 api_bp = Blueprint('api', __name__)
-rehearsal_service = RehearsalService()
+rehearsal_service = RehearsalService(performance_provider=GeminiPerformanceProvider())
 
 # Redis Config (with graceful fallback)
 REDIS_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
@@ -1035,6 +1037,72 @@ def get_maintainer_stats():
 
 # --- SCRIPT VAULT ENDPOINTS ---
 
+def _script_owner_filters(Script, User, email):
+    if not email:
+        return []
+    user = User.query.filter_by(email=email).first()
+    author_emails = [email]
+    if user:
+        author_emails.append(user.email)
+    filters = [Script.author_email.in_(list(set(author_emails)))]
+    if user and user.name:
+        filters.append(Script.author_name.ilike(f"%{user.name}%"))
+    return filters
+
+
+def _is_script_maintainer(User, email):
+    user = User.query.filter_by(email=email).first() if email else None
+    if user:
+        return (user.roles and any('maintainer' in r.name.lower() for r in user.roles)) or (user.email in ['swati123@ds.study.iitm.ac.in', '23f2000668@ds.study.iitm.ac.in', 'aditi.drama@handle.com', '23f1000300@ds.study.iitm.ac.in'])
+    return email in ['swati123@ds.study.iitm.ac.in', '23f2000668@ds.study.iitm.ac.in']
+
+
+def _script_vault_accessible_query(Script, User, email):
+    owner_filters = _script_owner_filters(Script, User, email)
+    filters = [Script.status == 'Public']
+    if owner_filters:
+        filters.extend(owner_filters)
+    if _is_script_maintainer(User, email):
+        filters.append(Script.status == 'Pending')
+    return Script.query.filter(or_(*filters))
+
+
+def _get_accessible_script_or_response(script_id, email):
+    from models import Script, User
+    script = Script.query.get(script_id)
+    if not script:
+        return None, (jsonify({'error': 'Script not found'}), 404)
+    allowed = _script_vault_accessible_query(Script, User, email).filter(Script.id == script_id).first()
+    if not allowed:
+        return None, (jsonify({'error': 'Script not found'}), 404)
+    return script, None
+
+
+def _script_rehearsal_summary(script):
+    data = script.to_dict()
+    try:
+        scene = rehearsal_service.parse_script(script)
+        data["charactersCount"] = len(scene["characters"])
+        data["dialogueLines"] = len([turn for turn in scene["turns"] if turn["type"] == "dialogue"])
+        data["rehearsalReady"] = True
+    except ValueError:
+        data["charactersCount"] = 0
+        data["dialogueLines"] = 0
+        data["rehearsalReady"] = False
+    return data
+
+
+@api_bp.route('/rehearsal/scripts', methods=['GET'])
+def get_rehearsal_scripts():
+    from models import Script, User
+    email = request.args.get('email')
+    scripts = _script_vault_accessible_query(Script, User, email).order_by(Script.created_at.desc()).all()
+    unique = {script.id: script for script in scripts}.values()
+    return jsonify({
+        'status': 'success',
+        'scripts': [_script_rehearsal_summary(script) for script in unique],
+    })
+
 @api_bp.route('/scripts', methods=['GET'])
 def get_scripts():
     from models import Script, User
@@ -1132,11 +1200,12 @@ def parse_rehearsal_script():
     data = request.get_json(silent=True) or {}
     script_id = data.get('script_id')
     inline_script = data.get('script')
+    user_email = data.get('user_email') or data.get('email')
 
     if script_id is not None:
-        script = Script.query.get(script_id)
-        if not script:
-            return jsonify({'error': 'Script not found'}), 404
+        script, error_response = _get_accessible_script_or_response(script_id, user_email)
+        if error_response:
+            return error_response
     else:
         class InlineScript:
             id = 'inline'
@@ -1160,11 +1229,13 @@ def start_roleplay_rehearsal():
     script_id = data.get('script_id')
     inline_script = data.get('script')
     assignments = data.get('assignments') or {}
+    voice_preferences = data.get('voice_preferences') or {}
+    user_email = data.get('user_email') or data.get('email')
 
     if script_id is not None:
-        script = Script.query.get(script_id)
-        if not script:
-            return jsonify({'error': 'Script not found'}), 404
+        script, error_response = _get_accessible_script_or_response(script_id, user_email)
+        if error_response:
+            return error_response
     else:
         class InlineScript:
             id = 'inline'
@@ -1175,7 +1246,7 @@ def start_roleplay_rehearsal():
         script = InlineScript()
 
     try:
-        state = rehearsal_service.start_session(script, assignments)
+        state = rehearsal_service.start_session_with_options(script, assignments, voice_preferences)
     except ValueError as e:
         return jsonify({'error': str(e)}), 400
     return jsonify({'status': 'success', 'session': state})
