@@ -5,9 +5,11 @@ import jwt
 import datetime
 from flask import Blueprint, request, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 from ai.audition_analyzer import AuditionAnalyzer
 from models import db, User, Role, Membership, Event, Booking, Announcement, Feedback, Gallery, ScheduleSlot, Audition, SharedEvent, Volunteer, Participation, Play, OpenPosition
 import redis
+
 
 api_bp = Blueprint('api', __name__)
 
@@ -1235,11 +1237,16 @@ def reject_publish_script(script_id):
 
 analyzer = AuditionAnalyzer()
 @api_bp.route("/upload_audition",methods=["POST"])
-
 def upload():
     video=request.files["video"]
     filename = secure_filename(video.filename)
-    path=f"uploads/videos/{video.filename}"
+    os.makedirs("uploads/videos", exist_ok=True)
+
+    path=f"uploads/videos/{filename}"
     video.save(path)
+
+    print("Starting AI audition analysis...")
     report=analyzer.analyze(path)
+    print("AI audition analysis completed!")
+
     return jsonify(report)

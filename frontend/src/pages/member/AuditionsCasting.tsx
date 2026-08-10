@@ -218,7 +218,7 @@ export default function AuditionsCasting() {
         const updatedApps = [newApp, ...applications];
         setApplications(updatedApps);
         setSelectedAppId(newApp.id);
-        setApplyOpen(false);
+        // setApplyOpen(false);
         fetchMyAuditions();
       }
     } catch(err) {
@@ -530,9 +530,12 @@ export default function AuditionsCasting() {
                 <Button type="button" variant="outline" onClick={() => setApplyOpen(false)} className="border-2 border-[#8CC0EB] text-[#8CC0EB] hover:bg-[#8CC0EB]/5 rounded-[8px] text-xs">
                   Cancel
                 </Button>
-                <Button type="submit" className="bg-[#8CC0EB] text-[#1c1b19] hover:bg-[#8CC0EB]/90 rounded-[8px] font-semibold text-xs">
-                  Submit Application
-                </Button>
+                <Button type="submit"
+                disabled={analyzing}
+                className="bg-[#8CC0EB] text-[#1c1b19] hover:bg-[#8CC0EB]/90 rounded-[8px] font-semibold text-xs"
+              >
+                {analyzing ? "Analyzing..." : "Submit Application"}
+              </Button>
               </DialogFooter>
              </form>
           </DialogContent>
