@@ -56,7 +56,7 @@ const normalize = (word: string) => word.toLowerCase().replace(/[^a-z0-9']/g, ""
 
 const wordSpans = (text: string) => text.match(/[\w']+|[^\s\w]/g) || [];
 
-const normalizedTranscript = (text: string) => normalize(text).replace(/\s+/g, " ").trim();
+const normalizedTranscript = (text: string) => text.toLowerCase().replace(/[^a-z0-9'\s]/g, "").replace(/\s+/g, " ").trim();
 
 const localMatchSpokenWords = (expectedWords: string[], transcriptText: string) => {
   const expected = expectedWords.map(normalize);
@@ -599,7 +599,9 @@ export default function AiRehearsalStudio() {
         setSpokenIndices(localMatch.matchedIndices);
         setHumanWordIndex(localMatch.currentWordIndex);
       }
-      sendTranscript(combined, false);
+      if (!finalText) {
+        sendTranscript(combined, false);
+      }
       if (finalText) {
         lastTranscriptRef.current = `${lastTranscriptRef.current} ${finalText}`.trim();
         if (silenceTimerRef.current) window.clearTimeout(silenceTimerRef.current);
@@ -962,9 +964,9 @@ export default function AiRehearsalStudio() {
       <div className="max-w-6xl mx-auto px-4 sm:px-8 py-6 space-y-6">
         <section className="bg-white border border-[#e6e2dd] rounded-[8px] p-6 sm:p-8 flex flex-col lg:flex-row justify-between gap-6">
           <div className="space-y-2 max-w-2xl">
-            <Badge className="bg-[#8CC0EB]/25 text-[#001e2c] border border-[#8CC0EB]/50">
+            {/* <Badge className="bg-[#8CC0EB]/25 text-[#001e2c] border border-[#8CC0EB]/50">
               GenAI Rehearsal MVP
-            </Badge>
+            </Badge> */}
             <h1 className="font-serif text-3xl font-bold text-[#1c1b19]">AI Drama Roleplay Studio</h1>
             <p className="text-sm leading-relaxed">
               Assign roles, rehearse against AI scene partners, and follow word-level highlighting for human and AI turns.
