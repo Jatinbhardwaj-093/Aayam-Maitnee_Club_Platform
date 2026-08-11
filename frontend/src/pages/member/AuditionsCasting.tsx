@@ -4,14 +4,6 @@ import { Search, FileText, Video, Upload, ChevronRight, ListChecks, Check, Alert
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 
 interface OpenPosition {
   id: string;
@@ -328,53 +320,69 @@ export default function AuditionsCasting() {
         )}
       </div>
 
-      {/* Full-Page Apply Position Dialog Window */}
-      {activePosition && (
-        <Dialog open={applyOpen} onOpenChange={setApplyOpen}>
-          <DialogContent className="bg-[#fdf9f4] border border-[#cac6b9] text-[#466272] max-w-4xl w-full p-8 rounded-2xl max-h-[92vh] overflow-y-auto">
-            <form onSubmit={handleFormSubmit} className="space-y-6">
-              <DialogHeader className="space-y-2 border-b border-[#e6e2dd] pb-4">
-                <div className="flex flex-wrap items-center gap-2">
-                  <Badge className="bg-[#635f41] text-white font-mono text-xs font-bold px-3 py-0.5">
-                    {activePosition.category}
-                  </Badge>
-                  <Badge className="bg-[#8CC0EB]/20 text-[#1c1b19] border-[#8CC0EB]/40 font-semibold text-xs">
-                    Deadline: {activePosition.deadline || 'Sep 25, 2026'}
-                  </Badge>
-                  <Badge className="bg-emerald-100 text-emerald-800 font-semibold text-xs">
-                    Slots: {activePosition.slots_available || 1} Openings
-                  </Badge>
-                </div>
-                <DialogTitle className="font-serif text-[#635f41] text-2xl font-bold pt-1">
-                  Apply for Audition: {activePosition.title}
-                </DialogTitle>
-                <DialogDescription className="text-xs text-[#466272] leading-relaxed">
-                  Review the full role requirements, character specifications, and complete your official audition application submission below.
-                </DialogDescription>
-              </DialogHeader>
+      {/* Full-Window Apply Position View (Sidebar visible on left) */}
+      {activePosition && applyOpen && (
+        <div className="fixed top-0 bottom-0 right-0 left-0 md:left-64 z-50 bg-[#fdf9f4] overflow-y-auto p-6 md:p-10 border-l border-[#cac6b9]/40 shadow-2xl animate-in fade-in-50 slide-in-from-right-4 duration-200">
+          <div className="max-w-6xl mx-auto space-y-8">
+            {/* Top Navigation & Action Bar */}
+            <div className="flex items-center justify-between border-b border-[#e6e2dd] pb-5">
+              <button
+                type="button"
+                onClick={() => setApplyOpen(false)}
+                className="flex items-center gap-2 text-xs font-bold text-[#635f41] hover:text-[#1c1b19] bg-white border border-[#cac6b9]/60 px-4 py-2 rounded-xl transition-all shadow-2xs cursor-pointer"
+              >
+                ← Back to Auditions List
+              </button>
 
-              {/* 2-Column Main Section */}
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-8 text-left py-2">
-                {/* Left Column: Full Role & Character Specifications (col-span-6) */}
-                <div className="md:col-span-6 space-y-5 border-b md:border-b-0 md:border-r border-[#e6e2dd] md:pr-8 pb-6 md:pb-0">
+              <div className="flex items-center gap-2">
+                <Badge className="bg-[#635f41] text-white font-mono text-xs font-bold px-3 py-1">
+                  {activePosition.category}
+                </Badge>
+                <Badge className="bg-[#8CC0EB]/20 text-[#1c1b19] border-[#8CC0EB]/40 font-semibold text-xs py-1">
+                  Deadline: {activePosition.deadline || 'Sep 25, 2026'}
+                </Badge>
+                <Badge className="bg-emerald-100 text-emerald-800 font-semibold text-xs py-1">
+                  Slots: {activePosition.slots_available || 1} Openings
+                </Badge>
+              </div>
+            </div>
+
+            {/* Page Header */}
+            <div>
+              <span className="text-xs uppercase tracking-widest text-[#9B1C31] font-bold block mb-1">
+                Official Ensemble Audition Portal
+              </span>
+              <h1 className="font-serif text-[#635f41] text-3xl md:text-4xl font-bold">
+                Apply for Audition: {activePosition.title}
+              </h1>
+              <p className="text-xs md:text-sm text-[#466272] mt-1 leading-relaxed">
+                Review complete role specifications, character requirements, and submit your audition portfolio materials directly to the director.
+              </p>
+            </div>
+
+            {/* Form & Specs Grid */}
+            <form onSubmit={handleFormSubmit} className="space-y-8">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 text-left">
+                {/* Left Column: Full Role Specs & Requirements (col-span-6) */}
+                <div className="lg:col-span-6 space-y-6 bg-white p-6 md:p-8 rounded-2xl border border-[#cac6b9]/40 shadow-xs">
                   <div className="space-y-2">
                     <strong className="text-xs font-bold text-[#635f41] uppercase tracking-wider block">
                       Character & Role Description
                     </strong>
-                    <p className="text-xs text-[#1c1b19] bg-white p-4 rounded-xl border border-[#cac6b9]/40 leading-relaxed">
+                    <p className="text-xs md:text-sm text-[#1c1b19] leading-relaxed font-light">
                       {activePosition.description || "Seeking dedicated ensemble member with strong stage presence, dramatic projection, and commitment to rehearsal schedules."}
                     </p>
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="space-y-2 pt-2 border-t border-[#e6e2dd]">
                     <strong className="text-xs font-bold text-[#635f41] uppercase tracking-wider block flex items-center gap-1">
-                      <ListChecks className="w-4 h-4 text-[#8CC0EB]" /> Role Requirements & Skill Benchmark
+                      <ListChecks className="w-4 h-4 text-[#8CC0EB]" /> Audition Requirements & Skill Benchmark
                     </strong>
-                    <div className="text-xs text-[#1c1b19] bg-white p-4 rounded-xl border border-[#cac6b9]/40 space-y-2">
+                    <div className="text-xs md:text-sm text-[#1c1b19] space-y-2">
                       <p className="leading-relaxed font-medium">
                         {activePosition.requirements || "Audition monologue clip / Technical PDF portfolio submission."}
                       </p>
-                      <ul className="list-disc pl-4 text-[11px] text-[#466272] space-y-1 pt-1 border-t border-gray-100">
+                      <ul className="list-disc pl-4 text-xs text-[#466272] space-y-1.5 pt-2">
                         <li>High commitment to scheduled ensemble table-reads & stage rehearsals</li>
                         <li>Audition slate or portfolio file review by maintainer creative board</li>
                         <li>Selected candidates will be notified via email for call-back auditions</li>
@@ -382,17 +390,17 @@ export default function AuditionsCasting() {
                     </div>
                   </div>
 
-                  <div className="bg-[#8CC0EB]/10 p-4 rounded-xl border border-[#8CC0EB]/30 space-y-1">
-                    <span className="text-[11px] font-bold text-[#635f41] block">Casting Process Note:</span>
-                    <p className="text-[11px] text-[#466272]">
+                  <div className="bg-[#8CC0EB]/10 p-4 rounded-xl border border-[#8CC0EB]/30 space-y-1 mt-4">
+                    <span className="text-xs font-bold text-[#635f41] block">Casting Process Note:</span>
+                    <p className="text-xs text-[#466272] leading-relaxed">
                       Applications submit directly to the maintainer review portal. Maintainers perform automated portfolio & video quality verification scans during review.
                     </p>
                   </div>
                 </div>
 
                 {/* Right Column: Applicant Details Form (col-span-6) */}
-                <div className="md:col-span-6 space-y-4">
-                  <strong className="text-xs font-bold text-[#635f41] uppercase tracking-wider block">
+                <div className="lg:col-span-6 space-y-5 bg-white p-6 md:p-8 rounded-2xl border border-[#cac6b9]/40 shadow-xs">
+                  <strong className="text-xs font-bold text-[#635f41] uppercase tracking-wider block border-b border-[#e6e2dd] pb-3">
                     Applicant Information Form
                   </strong>
 
@@ -401,7 +409,7 @@ export default function AuditionsCasting() {
                     <Input 
                       value={applicantName}
                       onChange={(e) => setApplicantName(e.target.value)}
-                      className="border-[#cac6b9]/60 focus-visible:ring-[#8CC0EB] text-xs h-10 bg-white rounded-xl"
+                      className="border-[#cac6b9]/60 focus-visible:ring-[#8CC0EB] text-xs h-10 bg-[#fdf9f4] rounded-xl"
                       placeholder="e.g. Aarav Varma"
                       required
                     />
@@ -413,7 +421,7 @@ export default function AuditionsCasting() {
                       type="email"
                       value={applicantEmail}
                       onChange={(e) => setApplicantEmail(e.target.value)}
-                      className="border-[#cac6b9]/60 focus-visible:ring-[#8CC0EB] text-xs h-10 bg-white rounded-xl"
+                      className="border-[#cac6b9]/60 focus-visible:ring-[#8CC0EB] text-xs h-10 bg-[#fdf9f4] rounded-xl"
                       placeholder="e.g. member@aayam.org"
                       required
                     />
@@ -421,13 +429,13 @@ export default function AuditionsCasting() {
 
                   {/* File Upload Section */}
                   {activePosition.category === "Performer" ? (
-                    <div className="space-y-3 pt-1">
+                    <div className="space-y-4 pt-1">
                       <div className="space-y-1.5">
                         <label className="text-xs font-semibold text-[#635f41] flex items-center gap-1">
                           <Video className="w-3.5 h-3.5 text-[#8CC0EB]" /> Audition Monologue Video (.mp4 / .mov)
                         </label>
-                        <div className="border border-dashed border-[#cac6b9] rounded-xl bg-white p-3 flex items-center justify-between text-xs">
-                          <span className="text-[#466272]/80 truncate max-w-[200px]">
+                        <div className="border border-dashed border-[#cac6b9] rounded-xl bg-[#fdf9f4] p-3.5 flex items-center justify-between text-xs">
+                          <span className="text-[#466272]/80 truncate max-w-[240px]">
                             {fileName1 || "Upload monologue video clip"}
                           </span>
                           <label className="cursor-pointer bg-[#8CC0EB]/20 hover:bg-[#8CC0EB]/30 text-[#1c1b19] px-3 py-1.5 rounded-lg border border-[#8CC0EB]/40 transition-all font-semibold flex items-center gap-1">
@@ -449,8 +457,8 @@ export default function AuditionsCasting() {
                         <label className="text-xs font-semibold text-[#635f41] flex items-center gap-1">
                           <FileText className="w-3.5 h-3.5 text-[#8CC0EB]" /> Headshot & Theatrical Resume PDF
                         </label>
-                        <div className="border border-dashed border-[#cac6b9] rounded-xl bg-white p-3 flex items-center justify-between text-xs">
-                          <span className="text-[#466272]/80 truncate max-w-[200px]">
+                        <div className="border border-dashed border-[#cac6b9] rounded-xl bg-[#fdf9f4] p-3.5 flex items-center justify-between text-xs">
+                          <span className="text-[#466272]/80 truncate max-w-[240px]">
                             {fileName2 || "Upload resume PDF"}
                           </span>
                           <label className="cursor-pointer bg-[#8CC0EB]/20 hover:bg-[#8CC0EB]/30 text-[#1c1b19] px-3 py-1.5 rounded-lg border border-[#8CC0EB]/40 transition-all font-semibold flex items-center gap-1">
@@ -466,13 +474,13 @@ export default function AuditionsCasting() {
                       </div>
                     </div>
                   ) : (
-                    <div className="space-y-3 pt-1">
+                    <div className="space-y-4 pt-1">
                       <div className="space-y-1.5">
                         <label className="text-xs font-semibold text-[#635f41] flex items-center gap-1">
                           <FileText className="w-3.5 h-3.5 text-[#8CC0EB]" /> Creative / Technical Portfolio PDF
                         </label>
-                        <div className="border border-dashed border-[#cac6b9] rounded-xl bg-white p-3 flex items-center justify-between text-xs">
-                          <span className="text-[#466272]/80 truncate max-w-[200px]">
+                        <div className="border border-dashed border-[#cac6b9] rounded-xl bg-[#fdf9f4] p-3.5 flex items-center justify-between text-xs">
+                          <span className="text-[#466272]/80 truncate max-w-[240px]">
                             {fileName1 || "Upload portfolio PDF"}
                           </span>
                           <label className="cursor-pointer bg-[#8CC0EB]/20 hover:bg-[#8CC0EB]/30 text-[#1c1b19] px-3 py-1.5 rounded-lg border border-[#8CC0EB]/40 transition-all font-semibold flex items-center gap-1">
@@ -491,8 +499,8 @@ export default function AuditionsCasting() {
                         <label className="text-xs font-semibold text-[#635f41] flex items-center gap-1">
                           <FileText className="w-3.5 h-3.5 text-[#8CC0EB]" /> Experience Resume PDF
                         </label>
-                        <div className="border border-dashed border-[#cac6b9] rounded-xl bg-white p-3 flex items-center justify-between text-xs">
-                          <span className="text-[#466272]/80 truncate max-w-[200px]">
+                        <div className="border border-dashed border-[#cac6b9] rounded-xl bg-[#fdf9f4] p-3.5 flex items-center justify-between text-xs">
+                          <span className="text-[#466272]/80 truncate max-w-[240px]">
                             {fileName2 || "Upload resume PDF"}
                           </span>
                           <label className="cursor-pointer bg-[#8CC0EB]/20 hover:bg-[#8CC0EB]/30 text-[#1c1b19] px-3 py-1.5 rounded-lg border border-[#8CC0EB]/40 transition-all font-semibold flex items-center gap-1">
@@ -515,31 +523,31 @@ export default function AuditionsCasting() {
                       value={coverNote}
                       onChange={(e) => setCoverNote(e.target.value)}
                       placeholder="Mention past theatrical productions, classical training, or specific role preparation..."
-                      className="w-full border border-[#cac6b9]/60 rounded-xl bg-white text-xs p-3 h-24 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#8CC0EB]"
+                      className="w-full border border-[#cac6b9]/60 rounded-xl bg-[#fdf9f4] text-xs p-3 h-28 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#8CC0EB]"
                     />
                   </div>
                 </div>
               </div>
 
-              <DialogFooter className="gap-3 border-t border-[#e6e2dd] pt-4">
+              <div className="flex items-center justify-end gap-4 border-t border-[#e6e2dd] pt-6">
                 <Button 
                   type="button" 
                   variant="outline" 
                   onClick={() => setApplyOpen(false)} 
-                  className="border-2 border-[#cac6b9] text-[#635f41] hover:bg-gray-100 rounded-xl text-xs font-bold px-6 h-10"
+                  className="border-2 border-[#cac6b9] text-[#635f41] hover:bg-gray-100 rounded-xl text-xs font-bold px-8 h-11"
                 >
                   Cancel
                 </Button>
                 <Button 
                   type="submit"
-                  className="bg-[#635f41] hover:bg-[#4d4a32] text-white rounded-xl font-bold text-xs px-8 h-10 shadow-sm"
+                  className="bg-[#635f41] hover:bg-[#4d4a32] text-white rounded-xl font-bold text-xs px-10 h-11 shadow-md"
                 >
                   Submit Official Audition Application
                 </Button>
-              </DialogFooter>
+              </div>
             </form>
-          </DialogContent>
-        </Dialog>
+          </div>
+        </div>
       )}
 
       {/* Floating Status Bar / Application Tracker (Bottom Fixed Container) */}
