@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
-import { Search, FileText, Video, Upload, ChevronRight, ListChecks, Check, AlertCircle } from "lucide-react";
+import { Search, FileText, Video, Upload, ChevronRight, ListChecks, Check, AlertCircle, Trash2, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -35,7 +35,6 @@ export default function AuditionsCasting() {
   
   const [openPositions, setOpenPositions] = useState<OpenPosition[]>([]);
   const [applications, setApplications] = useState<Application[]>([]);
-  const [selectedAppId, setSelectedAppId] = useState<string>("");
   
   const [applyOpen, setApplyOpen] = useState(false);
   const [activePosition, setActivePosition] = useState<OpenPosition | null>(null);
@@ -123,9 +122,6 @@ export default function AuditionsCasting() {
       if (res.ok) {
         const apps = await res.json();
         setApplications(apps);
-        if (apps.length > 0 && !selectedAppId) {
-          setSelectedAppId(apps[0].id);
-        }
       }
     } catch (e) {
       console.error(e);
@@ -146,6 +142,11 @@ export default function AuditionsCasting() {
     setFileName2("");
     setCoverNote("");
     setApplyOpen(true);
+  };
+
+  const handleWithdrawApplication = (appId: string, positionTitle: string) => {
+    if (!confirm(`Are you sure you want to withdraw your audition application for "${positionTitle}"?`)) return;
+    setApplications(prev => prev.filter(a => a.id !== appId && a.positionTitle !== positionTitle));
   };
 
   const handleFormSubmit = async (e: React.FormEvent) => {
@@ -187,9 +188,7 @@ export default function AuditionsCasting() {
           files: filesUploaded,
         };
 
-        const updatedApps = [newApp, ...applications];
-        setApplications(updatedApps);
-        setSelectedAppId(newApp.id);
+        setApplications(prev => [newApp, ...prev]);
         setApplyOpen(false);
         fetchMyAuditions();
       }
@@ -205,9 +204,8 @@ export default function AuditionsCasting() {
     return matchesSearch && matchesCategory;
   });
 
-  const selectedApp = applications.find(a => a.id === selectedAppId) || applications[0];
+  const steps = ["Applied", "Reviewing", "Interview/Audition", "Casting Decision"];
 
-  // Helper to determine progress state step index
   const getStepIndex = (status: string) => {
     switch (status) {
       case "Applied": return 0;
@@ -218,110 +216,10 @@ export default function AuditionsCasting() {
     }
   };
 
-  const currentStepIndex = selectedApp ? getStepIndex(selectedApp.status) : 0;
-  const steps = ["Applied", "Reviewing", "Interview/Audition", "Casting Decision"];
-
-  return (
-    <div className="space-y-[32px] font-sans text-[#466272] pb-[120px]">
-      {/* Overview Block */}
-      <div className="bg-[#f7f3ee] border border-[#e6e2dd] rounded-[8px] p-[24px] md:p-[32px] flex flex-col md:flex-row justify-between items-start md:items-center gap-[24px]">
-        <div className="space-y-1">
-          <span className="text-xs uppercase tracking-widest text-[#466272]/70 font-semibold">Club Staging</span>
-          <h2 className="text-[32px] font-bold font-serif text-[#635f41]">Open Auditions &amp; Positions</h2>
-          <p className="text-sm text-[#466272]">
-            Browse and apply for acting ensemble understudies, crew operations, or creative production designs.
-          </p>
-        </div>
-      </div>
-
-      {/* Filter and Search Bar */}
-      <div className="bg-white border border-[#e6e2dd] rounded-[8px] p-4 flex flex-col md:flex-row gap-4 items-center justify-between shadow-xs">
-        <div className="flex flex-wrap gap-2 w-full md:w-auto">
-          {(["All", "Performer", "Technical Crew", "Creative Designer", "Director"] as const).map((cat) => (
-            <Button
-              key={cat}
-              variant={selectedCategory === cat ? "default" : "outline"}
-              onClick={() => setSelectedCategory(cat)}
-              className={`rounded-[6px] text-xs py-1.5 px-4 font-semibold transition-all ${
-                selectedCategory === cat
-                  ? "bg-[#8CC0EB] text-[#1c1b19] hover:bg-[#8CC0EB]/95"
-                  : "border border-[#e6e2dd] text-[#466272] hover:bg-[#f7f3ee]"
-              }`}
-            >
-              {cat}s
-            </Button>
-          ))}
-        </div>
-        <div className="relative w-full md:w-80">
-          <Search className="absolute left-3 top-2.5 h-4 w-4 text-[#466272]/50" />
-          <Input
-            placeholder="Search open positions..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-9 border-[#e6e2dd] focus-visible:ring-[#8CC0EB] h-9 text-xs"
-          />
-        </div>
-      </div>
-
-      {/* Open Positions Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {filteredPositions.map((pos) => {
-          const isClosed = pos.status === "Casting Closed" || pos.status === "In Review";
-          return (
-            <div key={pos.id} className="bg-white border border-[#e6e2dd] rounded-[8px] p-6 flex flex-col justify-between space-y-4 hover:shadow-md hover:border-[#8CC0EB]/30 transition-all">
-              <div className="space-y-2">
-                <div className="flex justify-between items-start">
-                  <Badge className="bg-[#635f41]/10 text-[#635f41] border-[#635f41]/20 font-semibold rounded-[4px] text-[10px] uppercase">
-                    {pos.category}
-                  </Badge>
-                  {isClosed ? (
-                    <Badge className="bg-red-100 text-red-700 border-red-200 font-bold rounded-[4px] text-[10px]">
-                      {pos.status || "Casting Closed"}
-                    </Badge>
-                  ) : (
-                    <span className="text-[10px] text-red-600/80 font-medium">Deadline: {pos.deadline || 'Aug 25, 2026'}</span>
-                  )}
-                </div>
-                <h3 className="font-bold text-[18px] text-[#635f41] font-serif">{pos.title}</h3>
-                <p className="text-xs text-[#466272]/85 leading-relaxed">{pos.description}</p>
-              </div>
-              
-              <div className="border-t border-[#e6e2dd]/60 pt-4 flex flex-col gap-3">
-                <div className="flex flex-col text-[11px] text-[#466272]/70 bg-[#f7f3ee]/40 rounded p-2.5">
-                  <strong className="text-[#635f41] mb-1 font-semibold flex items-center gap-1">
-                    <ListChecks className="w-3.5 h-3.5 text-[#8CC0EB]" /> Required Submissions:
-                  </strong>
-                  <span>{pos.requirements}</span>
-                </div>
-                {isClosed ? (
-                  <Button 
-                    disabled
-                    className="bg-gray-200 text-gray-500 font-semibold rounded-[8px] text-xs py-2 w-full cursor-not-allowed border border-gray-300"
-                  >
-                    Casting Closed
-                  </Button>
-                ) : (
-                  <Button 
-                    onClick={() => handleApplyClick(pos)}
-                    className="bg-[#8CC0EB] text-[#1c1b19] hover:bg-[#8CC0EB]/90 font-semibold rounded-[8px] text-xs py-2 w-full transition-all flex items-center justify-center gap-1"
-                  >
-                    Apply for Position <ChevronRight className="w-3.5 h-3.5" />
-                  </Button>
-                )}
-              </div>
-            </div>
-          );
-        })}
-        {filteredPositions.length === 0 && (
-          <div className="col-span-1 md:col-span-2 text-center py-12 bg-white border border-[#e6e2dd] rounded-[8px]">
-            <AlertCircle className="w-8 h-8 text-[#466272]/40 mx-auto mb-2" />
-            <p className="text-xs text-[#466272]/70">No positions found matching "{searchTerm}" in this category.</p>
-          </div>
-        )}
-      </div>
-
-  {activePosition && applyOpen && (
-    <div className="space-y-6 font-sans text-[#466272] animate-in fade-in-50 duration-200 pb-16">
+  // FULL IN-PAGE VIEW WHEN APPLYING FOR A ROLE
+  if (activePosition && applyOpen) {
+    return (
+      <div className="space-y-6 font-sans text-[#466272] animate-in fade-in-50 duration-200 pb-16">
         {/* Navigation & Status Header */}
         <div className="bg-[#f7f3ee] border border-[#e6e2dd] rounded-2xl p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div className="space-y-1">
@@ -543,104 +441,190 @@ export default function AuditionsCasting() {
           </div>
         </form>
       </div>
-  )}
+    );
+  }
 
-      {/* Floating Status Bar / Application Tracker (Bottom Fixed Container) */}
-      {selectedApp && (
-        <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#fdf9f4] border-t border-[#e6e2dd] shadow-lg p-4 md:py-6 md:px-8">
-          <div className="max-w-[1280px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
-            
-            {/* Left Column: Application Details (col-span-3) */}
-            <div className="lg:col-span-3 text-left w-full space-y-1.5 pb-3 lg:pb-0 lg:border-r border-[#e6e2dd]/80 lg:pr-6">
-              <span className="text-[9px] uppercase font-bold text-[#9B1C31] tracking-wider block">Application Pipeline</span>
-              <div className="flex items-center gap-2">
-                <select 
-                  value={selectedAppId} 
-                  onChange={(e) => setSelectedAppId(e.target.value)}
-                  className="text-sm font-bold font-serif text-[#635f41] bg-transparent border-0 hover:underline focus:ring-0 focus:outline-none cursor-pointer p-0 max-w-[180px] truncate"
-                >
-                  {applications.map(app => (
-                    <option key={app.id} value={app.id} className="bg-white text-[#466272]">
-                      {app.positionTitle}
-                    </option>
-                  ))}
-                </select>
-                <Badge className="bg-[#635f41]/10 text-[#635f41] border-[#635f41]/20 font-normal rounded-[4px] text-[9px] py-0.5 whitespace-nowrap">
-                  {selectedApp.category}
-                </Badge>
-              </div>
-              <p className="text-[10px] text-[#466272]/70 truncate">
-                <strong className="text-[#635f41] font-medium">Files:</strong> {selectedApp.files.join(", ")}
-              </p>
-            </div>
-
-            {/* Middle Column: Visual Status Progress Bar (col-span-5) */}
-            <div className="lg:col-span-5 w-full py-2 px-2 md:px-4">
-              <div className="relative w-full">
-                
-                {/* Horizontal connector lines wrapper (perfectly aligned with circle centers) */}
-                <div className="absolute left-[35px] right-[35px] top-[12px] -translate-y-1/2 h-[2px]">
-                  {/* Background line (full width of wrapper) */}
-                  <div className="w-full h-full bg-gray-200" />
-                  {/* Active progress line (percentage of wrapper) */}
-                  <div 
-                    className="absolute left-0 top-0 h-full bg-[#8CC0EB] transition-all duration-500" 
-                    style={{ width: `${(currentStepIndex / (steps.length - 1)) * 100}%` }}
-                  />
-                </div>
-
-                {/* Steps Nodes */}
-                <div className="flex items-center justify-between w-full relative z-10">
-                  {steps.map((step, idx) => {
-                    const isCompleted = idx < currentStepIndex;
-                    const isActive = idx === currentStepIndex;
-                    
-                    return (
-                      <div key={idx} className="flex flex-col items-center min-w-[70px]">
-                        <div 
-                          className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold border transition-all ${
-                            isCompleted ? "bg-[#8CC0EB] border-[#8CC0EB] text-[#1c1b19]" :
-                            isActive ? "bg-white border-[#8CC0EB] text-[#8CC0EB] ring-2 ring-[#8CC0EB]/20 scale-110" :
-                            "bg-white border-gray-200 text-gray-400"
-                          }`}
-                        >
-                          {isCompleted ? (
-                            <Check className="w-3.5 h-3.5" />
-                          ) : (
-                            <span>{idx + 1}</span>
-                          )}
-                        </div>
-                        <span className={`text-[9px] mt-1.5 font-semibold text-center whitespace-nowrap ${
-                          isActive ? "text-[#8CC0EB] font-bold" : 
-                          isCompleted ? "text-[#8CC0EB]/90 font-medium" : "text-[#466272]/60"
-                        }`}>
-                          {step}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-
-            {/* Right Column: Status Summary & Notes (col-span-4) */}
-            <div className="lg:col-span-4 flex flex-row items-center gap-4 justify-between lg:justify-end w-full border-t lg:border-t-0 lg:border-l border-[#e6e2dd]/80 pt-3 lg:pt-0 lg:pl-6">
-              <div className="text-left lg:text-right max-w-[200px]">
-                <span className="text-[9px] text-[#466272]/60 uppercase block">Director Updates</span>
-                <p className="text-[11px] text-[#466272]/95 italic font-serif leading-snug mt-0.5">{selectedApp.notes}</p>
-              </div>
-              <Badge className={`px-3 py-1.5 text-[10px] font-semibold tracking-wider rounded-[4px] uppercase whitespace-nowrap flex-shrink-0 ${
-                selectedApp.status === "Casting Decision" ? "bg-[#8CC0EB] text-[#1c1b19]" :
-                selectedApp.status === "Interview/Audition" ? "bg-[#8CC0EB] text-[#1c1b19]" :
-                "bg-[#f7f3ee] text-[#635f41]"
-              }`}>
-                {selectedApp.status}
-              </Badge>
-            </div>
-
-          </div>
+  // STANDARD AUDITIONS PAGE GRID
+  return (
+    <div className="space-y-[32px] font-sans text-[#466272] pb-12">
+      {/* Overview Block */}
+      <div className="bg-[#f7f3ee] border border-[#e6e2dd] rounded-2xl p-[24px] md:p-[32px] flex flex-col md:flex-row justify-between items-start md:items-center gap-[24px]">
+        <div className="space-y-1">
+          <span className="text-xs uppercase tracking-widest text-[#466272]/70 font-semibold">Club Staging</span>
+          <h2 className="text-[32px] font-bold font-serif text-[#635f41]">Open Auditions &amp; Positions</h2>
+          <p className="text-sm text-[#466272]">
+            Browse and apply for acting ensemble understudies, crew operations, or creative production designs.
+          </p>
         </div>
-      )}
+      </div>
+
+      {/* Filter and Search Bar */}
+      <div className="bg-white border border-[#e6e2dd] rounded-2xl p-4 flex flex-col md:flex-row gap-4 items-center justify-between shadow-xs">
+        <div className="flex flex-wrap gap-2 w-full md:w-auto">
+          {(["All", "Performer", "Technical Crew", "Creative Designer", "Director"] as const).map((cat) => (
+            <Button
+              key={cat}
+              variant={selectedCategory === cat ? "default" : "outline"}
+              onClick={() => setSelectedCategory(cat)}
+              className={`rounded-xl text-xs py-1.5 px-4 font-semibold transition-all ${
+                selectedCategory === cat
+                  ? "bg-[#635f41] text-white hover:bg-[#4d4a32]"
+                  : "border border-[#e6e2dd] text-[#466272] hover:bg-[#f7f3ee]"
+              }`}
+            >
+              {cat}s
+            </Button>
+          ))}
+        </div>
+        <div className="relative w-full md:w-64">
+          <Search className="absolute left-3 top-2.5 h-4 w-4 text-[#466272]/50" />
+          <Input
+            placeholder="Search roles..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-9 border-[#e6e2dd] focus-visible:ring-[#8CC0EB] h-9 text-xs rounded-xl"
+          />
+        </div>
+      </div>
+
+      {/* Open Positions Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {filteredPositions.map((pos) => {
+          const isClosed = pos.status === "Casting Closed" || pos.status === "In Review";
+          
+          // Check if user has already submitted an application for this position
+          const existingApp = applications.find(
+            app => app.positionId === pos.id || app.positionTitle === pos.title
+          );
+          const currentStepIndex = existingApp ? getStepIndex(existingApp.status) : 0;
+
+          return (
+            <div key={pos.id} className="bg-white border border-[#e6e2dd] rounded-2xl p-6 flex flex-col justify-between space-y-4 hover:shadow-md hover:border-[#8CC0EB]/30 transition-all">
+              <div className="space-y-2">
+                <div className="flex justify-between items-start">
+                  <Badge className="bg-[#635f41]/10 text-[#635f41] border-[#635f41]/20 font-semibold rounded-md text-[10px] uppercase">
+                    {pos.category}
+                  </Badge>
+                  {existingApp ? (
+                    <Badge className="bg-emerald-100 text-emerald-800 border-emerald-300 font-bold rounded-md text-[10px] flex items-center gap-1">
+                      <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Application Submitted
+                    </Badge>
+                  ) : isClosed ? (
+                    <Badge className="bg-red-100 text-red-700 border-red-200 font-bold rounded-md text-[10px]">
+                      {pos.status || "Casting Closed"}
+                    </Badge>
+                  ) : (
+                    <span className="text-[10px] text-red-600/80 font-medium">Deadline: {pos.deadline || 'Sep 25, 2026'}</span>
+                  )}
+                </div>
+                <h3 className="font-bold text-[18px] text-[#635f41] font-serif">{pos.title}</h3>
+                <p className="text-xs text-[#466272]/85 leading-relaxed">{pos.description}</p>
+              </div>
+
+              {/* IN-CARD APPLICATION TRACKING BAR (Shown if applied) */}
+              {existingApp ? (
+                <div className="bg-[#fdf9f4] border border-[#cac6b9]/50 rounded-xl p-4 space-y-3">
+                  <div className="flex items-center justify-between text-xs border-b border-[#e6e2dd] pb-2">
+                    <span className="font-bold text-[#635f41] text-[11px] uppercase tracking-wider">
+                      Application Status Pipeline
+                    </span>
+                    <span className="text-[10px] text-gray-500 font-mono">
+                      Submitted: {existingApp.submittedAt}
+                    </span>
+                  </div>
+
+                  {/* 4-Step In-Card Progress Bar */}
+                  <div className="relative w-full py-2">
+                    <div className="absolute left-[30px] right-[30px] top-[12px] -translate-y-1/2 h-[2px]">
+                      <div className="w-full h-full bg-gray-200" />
+                      <div 
+                        className="absolute left-0 top-0 h-full bg-[#8CC0EB] transition-all duration-500" 
+                        style={{ width: `${(currentStepIndex / (steps.length - 1)) * 100}%` }}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between w-full relative z-10">
+                      {steps.map((step, idx) => {
+                        const isCompleted = idx < currentStepIndex;
+                        const isActive = idx === currentStepIndex;
+                        return (
+                          <div key={idx} className="flex flex-col items-center">
+                            <div 
+                              className={`w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold border transition-all ${
+                                isCompleted ? "bg-[#8CC0EB] border-[#8CC0EB] text-[#1c1b19]" :
+                                isActive ? "bg-white border-[#8CC0EB] text-[#8CC0EB] ring-2 ring-[#8CC0EB]/20 scale-110" :
+                                "bg-white border-gray-200 text-gray-400"
+                              }`}
+                            >
+                              {isCompleted ? <Check className="w-3 h-3" /> : idx + 1}
+                            </div>
+                            <span className={`text-[8px] mt-1 font-semibold text-center whitespace-nowrap ${
+                              isActive ? "text-[#8CC0EB] font-bold" : 
+                              isCompleted ? "text-[#8CC0EB]/90 font-medium" : "text-[#466272]/60"
+                            }`}>
+                              {step}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {existingApp.notes && (
+                    <div className="text-[11px] text-[#466272] bg-white p-2.5 rounded-lg border border-[#cac6b9]/40 italic">
+                      <strong className="text-[#635f41] not-italic block text-[10px]">Director Note:</strong>
+                      "{existingApp.notes}"
+                    </div>
+                  )}
+
+                  <div className="flex items-center justify-between pt-1">
+                    <span className="text-[10px] text-gray-500 truncate max-w-[200px]">
+                      Files: {existingApp.files.join(", ")}
+                    </span>
+                    <Button 
+                      variant="outline"
+                      onClick={() => handleWithdrawApplication(existingApp.id, pos.title)}
+                      className="border-red-200 text-red-600 hover:bg-red-50 text-[11px] font-bold h-7 px-3 rounded-lg flex items-center gap-1"
+                    >
+                      <Trash2 className="w-3 h-3" /> Withdraw
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="border-t border-[#e6e2dd]/60 pt-4 flex flex-col gap-3">
+                  <div className="flex flex-col text-[11px] text-[#466272]/70 bg-[#f7f3ee]/40 rounded p-2.5">
+                    <strong className="text-[#635f41] mb-1 font-semibold flex items-center gap-1">
+                      <ListChecks className="w-3.5 h-3.5 text-[#8CC0EB]" /> Required Submissions:
+                    </strong>
+                    <span>{pos.requirements}</span>
+                  </div>
+                  {isClosed ? (
+                    <Button 
+                      disabled
+                      className="bg-gray-200 text-gray-500 font-semibold rounded-xl text-xs py-2 w-full cursor-not-allowed border border-gray-300"
+                    >
+                      Casting Closed
+                    </Button>
+                  ) : (
+                    <Button 
+                      onClick={() => handleApplyClick(pos)}
+                      className="bg-[#635f41] hover:bg-[#4d4a32] text-white font-semibold rounded-xl text-xs py-2.5 w-full transition-all flex items-center justify-center gap-1 shadow-xs"
+                    >
+                      Apply for Position <ChevronRight className="w-3.5 h-3.5" />
+                    </Button>
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        })}
+        {filteredPositions.length === 0 && (
+          <div className="col-span-1 md:col-span-2 text-center py-12 bg-white border border-[#e6e2dd] rounded-2xl">
+            <AlertCircle className="w-8 h-8 text-[#466272]/40 mx-auto mb-2" />
+            <p className="text-xs text-[#466272]/70">No positions found matching "{searchTerm}" in this category.</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
