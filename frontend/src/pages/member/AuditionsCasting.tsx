@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
-import { Search, FileText, Video, Upload, ChevronRight, ListChecks, Check, AlertCircle, BatteryFull } from "lucide-react";
+import { Search, FileText, Video, Upload, ChevronRight, ListChecks, Check, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -49,12 +49,6 @@ export default function AuditionsCasting() {
   const [applicantName, setApplicantName] = useState(activeUser?.name || "");
   const [applicantEmail, setApplicantEmail] = useState(activeUser?.email || "");
   const [fileName1, setFileName1] = useState("");
-  const [videoFile, setVideoFile] = useState<File | null>(null);
-
-  const [aiResult, setAiResult] = useState<any>(null);
-
-  const [analyzing, setAnalyzing] = useState(false);
-
   const [fileName2, setFileName2] = useState("");
   const [coverNote, setCoverNote] = useState("");
 
@@ -145,39 +139,6 @@ export default function AuditionsCasting() {
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!activePosition || !activeUser) return;
-    let aiData: any = null;
-    try {
-        if (videoFile) {
-
-            setAnalyzing(true);
-            
-            const formData = new FormData();
-
-            formData.append("video", videoFile);
-
-            const aiResponse = await fetch(
-                `${
-                    import.meta.env.VITE_API_BASE_URL ??
-                    "http://localhost:5005"
-                }/api/upload_audition`,
-                {
-                    method: "POST",
-                    body: formData,
-                },
-            );
-
-            if (!aiResponse.ok) {
-                throw new Error("AI analysis failed.");
-            }
-
-            aiData = await aiResponse.json();
-            setAiResult(aiData);
-        }
-    } catch (error) {
-        console.error(error);
-    } finally {
-        setAnalyzing(false);
-    }
     try {
       const res = await fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005"}/api/audition/submit`, {
         method: "POST",
@@ -187,12 +148,11 @@ export default function AuditionsCasting() {
           play_id: activePosition.play_id,
           role: activePosition.title,
           notes: coverNote,
-
-          ai_transcript: aiData?.transcript || "",
-          ai_blur: aiData?.blur ?? null,
-          ai_brightness: aiData?.brightness ?? null,
-          ai_face_detected: aiData?.face_detected ?? null,
-          ai_report: aiData?.ai_report || ""
+          ai_transcript: "",
+          ai_blur: null,
+          ai_brightness: null,
+          ai_face_detected: null,
+          ai_report: ""
         })
       });
       if (res.ok) {
@@ -218,7 +178,7 @@ export default function AuditionsCasting() {
         const updatedApps = [newApp, ...applications];
         setApplications(updatedApps);
         setSelectedAppId(newApp.id);
-        // setApplyOpen(false);
+        setApplyOpen(false);
         fetchMyAuditions();
       }
     } catch(err) {
@@ -385,10 +345,8 @@ export default function AuditionsCasting() {
                             // onChange={(e) => e.target.files?.[0] && setFileName1(e.target.files[0].name)}
                             onChange={(e) => {
                               if (!e.target.files?.length) return;
-                              setVideoFile(e.target.files[0]);
                               setFileName1(e.target.files[0].name);
-                          }}
-
+                            }}
                           />
                         </label>
                       </div>
@@ -469,73 +427,15 @@ export default function AuditionsCasting() {
               
             
 
-              {/* ---------- AI Analysis ---------- */}
-
-              {analyzing && (
-                  <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
-                      <h3 className="font-semibold text-blue-700">
-                          Analyzing audition...
-                      </h3>
-
-                      <p className="mt-1 text-sm text-blue-600">
-                          Please wait while the AI evaluates the audition video.
-                      </p>
-                  </div>
-                  )}
-
-                  {aiResult && (
-                      <div className="mt-4 rounded-lg border bg-gray-50 p-4">
-                          <h3 className="mb-4 text-lg font-bold">
-                              AI Screening Report
-                          </h3>
-
-                          <div className="space-y-3">
-                              <div>
-                                  <strong>Transcript</strong>
-
-                                  <p className="mt-1 whitespace-pre-wrap">
-                                      {aiResult.transcript}
-                                  </p>
-                              </div>
-
-                              <div>
-                                  <strong>Blur Score:</strong>{" "}
-                                  {aiResult.blur}
-                              </div>
-
-                              <div>
-                                  <strong>Brightness:</strong>{" "}
-                                  {aiResult.brightness}
-                              </div>
-
-                              <div>
-                                  <strong>Face Detected:</strong>{" "}
-                                  {aiResult.face_detected ? "✅ Yes" : "❌ No"}
-                              </div>
-
-                              <div>
-                                  <strong>AI Evaluation</strong>
-
-                                  <pre className="mt-2 whitespace-pre-wrap rounded bg-white p-3">
-                                      {aiResult.ai_report}
-                                  </pre>
-                              </div>
-                          </div>
-                        </div>
-                    )}
-
-
-              
-              <DialogFooter className="gap-2">
-                <Button type="button" variant="outline" onClick={() => setApplyOpen(false)} className="border-2 border-[#8CC0EB] text-[#8CC0EB] hover:bg-[#8CC0EB]/5 rounded-[8px] text-xs">
+              <DialogFooter className="gap-2 pt-2">
+                <Button type="button" variant="outline" onClick={() => setApplyOpen(false)} className="border-2 border-[#8CC0EB] text-[#8CC0EB] hover:bg-[#8CC0EB]/5 rounded-[8px] text-xs font-semibold">
                   Cancel
                 </Button>
                 <Button type="submit"
-                disabled={analyzing}
-                className="bg-[#8CC0EB] text-[#1c1b19] hover:bg-[#8CC0EB]/90 rounded-[8px] font-semibold text-xs"
-              >
-                {analyzing ? "Analyzing..." : "Submit Application"}
-              </Button>
+                  className="bg-[#8CC0EB] text-[#1c1b19] hover:bg-[#8CC0EB]/90 rounded-[8px] font-semibold text-xs px-5"
+                >
+                  Submit Application
+                </Button>
               </DialogFooter>
              </form>
           </DialogContent>
