@@ -99,7 +99,7 @@ const DEFAULT_APPLICATIONS = [
     portfolio_link: "https://youtube.com/watch?v=aarav_tughlaq_slate",
     notes: "Performed lead roles in 'Ashadh Ka Ek Din' and 'Court Martial'. Specializing in intense classical monologues and voice modulation.",
     status: "Shortlisted",
-    audition_date: "Aug 22, 2026 @ 4:30 PM",
+    audition_date: "Sep 22, 2026 @ 4:30 PM",
     submitted_at: "Jul 21, 2026"
   },
   {
@@ -113,7 +113,7 @@ const DEFAULT_APPLICATIONS = [
     portfolio_link: "https://drive.google.com/file/d/vikram_audition_reel",
     notes: "Keen interest in playing tragic historical figures. Dedicated to daily rehearsal schedules and script memorization.",
     status: "Pending Review",
-    audition_date: "Aug 23, 2026 @ 5:00 PM",
+    audition_date: "Sep 23, 2026 @ 5:00 PM",
     submitted_at: "Jul 21, 2026"
   },
   {
@@ -127,7 +127,7 @@ const DEFAULT_APPLICATIONS = [
     portfolio_link: "https://vimeo.com/kabir_dramatic_monologue",
     notes: "Trained under National School of Drama workshop mentors. Strong physical theatre posture and projection.",
     status: "Selected",
-    audition_date: "Aug 22, 2026 @ 3:00 PM",
+    audition_date: "Sep 22, 2026 @ 3:00 PM",
     submitted_at: "Jul 21, 2026"
   },
   {
@@ -141,7 +141,7 @@ const DEFAULT_APPLICATIONS = [
     portfolio_link: "https://youtube.com/watch?v=sunita_dramatic_slate",
     notes: "Experienced in antagonist roles. Eager to bring regal gravity and sharp diction to this iconic character.",
     status: "Shortlisted",
-    audition_date: "Aug 24, 2026 @ 4:00 PM",
+    audition_date: "Sep 24, 2026 @ 4:00 PM",
     submitted_at: "Jul 21, 2026"
   },
   {
@@ -155,7 +155,7 @@ const DEFAULT_APPLICATIONS = [
     portfolio_link: "https://instagram.com/ananyasen_sfx_makeup",
     notes: "Certified SFX makeup artist with portfolio in battle scars, prosthetic noses, and historical contours.",
     status: "Selected",
-    audition_date: "Aug 25, 2026 @ 2:00 PM",
+    audition_date: "Sep 25, 2026 @ 2:00 PM",
     submitted_at: "Jul 21, 2026"
   },
   {
@@ -169,7 +169,7 @@ const DEFAULT_APPLICATIONS = [
     portfolio_link: "https://drive.google.com/folder/pooja_makeup_portfolio",
     notes: "Specializing in period wigs, hair styling, and theatrical blush contours.",
     status: "Pending Review",
-    audition_date: "Aug 25, 2026 @ 3:00 PM",
+    audition_date: "Sep 25, 2026 @ 3:00 PM",
     submitted_at: "Jul 21, 2026"
   },
   {
@@ -183,7 +183,7 @@ const DEFAULT_APPLICATIONS = [
     portfolio_link: "https://soundcloud.com/devansh_stage_soundtracks",
     notes: "Experienced with Allen & Heath audio consoles, QLab cue triggering, and multi-mic balancing.",
     status: "Selected",
-    audition_date: "Aug 26, 2026 @ 5:00 PM",
+    audition_date: "Sep 26, 2026 @ 5:00 PM",
     submitted_at: "Jul 21, 2026"
   },
   {
@@ -197,7 +197,7 @@ const DEFAULT_APPLICATIONS = [
     portfolio_link: "https://drive.google.com/file/d/riya_costume_design_portfolio",
     notes: "Skilled in quick backstage costume changes, silk draping, and garment fitting for large ensembles.",
     status: "Shortlisted",
-    audition_date: "Aug 27, 2026 @ 3:30 PM",
+    audition_date: "Sep 27, 2026 @ 3:30 PM",
     submitted_at: "Jul 21, 2026"
   }
 ];

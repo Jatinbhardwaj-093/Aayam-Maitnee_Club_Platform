@@ -946,7 +946,7 @@ def get_audition_positions():
                 "character_description": "Technical audio operator responsible for live sound mixing, ambient folk instrument amplification, cue playback, and wireless microphone balancing during live mainstage runs.",
                 "requirements": "Audio staging portfolio PDF & work resume",
                 "slots_available": 1,
-                "status": "Casting Closed"
+                "status": "Open Calling"
             },
             {
                 "production_name": "Andha Yug",

@@ -82,7 +82,7 @@ export default function AuditionsCasting() {
         category: "Performer",
         description: "Complex, vision-driven 14th-century ruler torn between idealism and ruthlessness. Requires powerful vocal presence & Hindustani diction.",
         requirements: "Audition monologue video clip & theatrical resume",
-        deadline: "Aug 25, 2026"
+        deadline: "Sep 25, 2026"
       },
       {
         id: "2",
@@ -91,7 +91,7 @@ export default function AuditionsCasting() {
         category: "Performer",
         description: "Sharp-witted, politically calculating royal matriarch who challenges Tughlaq's court decrees.",
         requirements: "Classical drama monologue video & portfolio",
-        deadline: "Aug 25, 2026"
+        deadline: "Sep 25, 2026"
       },
       {
         id: "3",
@@ -100,7 +100,7 @@ export default function AuditionsCasting() {
         category: "Creative Designer",
         description: "Head makeup artist responsible for period prosthetics, battle scars, dark theatrical contours, and quick backstage transformations.",
         requirements: "Technical SFX makeup portfolio PDF & sketch samples",
-        deadline: "Aug 25, 2026"
+        deadline: "Sep 28, 2026"
       },
       {
         id: "4",
@@ -109,7 +109,7 @@ export default function AuditionsCasting() {
         category: "Technical Crew",
         description: "Technical audio operator responsible for live sound mixing, ambient folk instrument amplification, and microphone balancing.",
         requirements: "Audio staging portfolio PDF & work resume",
-        deadline: "Aug 10, 2026"
+        deadline: "Sep 22, 2026"
       },
       {
         id: "5",
@@ -118,7 +118,7 @@ export default function AuditionsCasting() {
         category: "Creative Designer",
         description: "Backstage wardrobe assistant managing heritage drape costumes, armor fitting, quick-change coordination, and textile maintenance.",
         requirements: "Costume design portfolio PDF & resume",
-        deadline: "Aug 25, 2026"
+        deadline: "Sep 30, 2026"
       }
     ]);
   };

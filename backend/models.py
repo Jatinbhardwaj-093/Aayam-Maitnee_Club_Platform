@@ -568,7 +568,7 @@ class AuditionPosition(db.Model):
             'requirements': self.requirements or '',
             'slots_available': self.slots_available or 1,
             'status': self.status or 'Open Calling',
-            'deadline': 'Aug 25, 2026',
+            'deadline': 'Sep 25, 2026',
             'created_at': self.created_at.strftime('%b %d, %Y') if self.created_at else 'Jul 20, 2026'
         }
 
@@ -585,7 +585,7 @@ class AuditionApplication(db.Model):
     portfolio_link = db.Column(db.String(255), nullable=True)
     notes = db.Column(db.Text)
     status = db.Column(db.String(50), default="Pending Review") # Pending Review, Shortlisted, Selected, Rejected
-    audition_date = db.Column(db.String(100), default="Aug 25, 2026 @ 4:00 PM")
+    audition_date = db.Column(db.String(100), default="Sep 25, 2026 @ 4:00 PM")
     submitted_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     position = db.relationship("AuditionPosition", backref="applications")
@@ -610,7 +610,7 @@ class AuditionApplication(db.Model):
             'portfolio_link': self.portfolio_link or 'https://youtube.com/watch?v=sample_slate',
             'notes': self.notes or '',
             'status': self.status or 'Pending Review',
-            'audition_date': self.audition_date or 'Aug 25, 2026 @ 4:00 PM',
+            'audition_date': self.audition_date or 'Sep 25, 2026 @ 4:00 PM',
             'submitted_at': self.submitted_at.strftime('%b %d, %Y') if self.submitted_at else 'Jul 21, 2026',
             'video_filename':self.video_filename,
             'ai_transcript': self.ai_transcript,
