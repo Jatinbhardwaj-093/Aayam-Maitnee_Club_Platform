@@ -4,3 +4,4 @@ __pycache__/
 aayam.db
 .env
 instance/
+uploads/

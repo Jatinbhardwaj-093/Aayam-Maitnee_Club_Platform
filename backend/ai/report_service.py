@@ -1,224 +1,66 @@
-import requests
-
-from config import OPENROUTER_API_KEY
+import json
+from google import genai
+from config import GEMINI_API_KEY, GEMINI_MODEL
 
 
 class ReportService:
 
     def __init__(self):
-
-        self.url = "https://openrouter.ai/api/v1/chat/completions"
-
-        self.headers = {
-
-            "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-
-            "Content-Type": "application/json",
-
-            "HTTP-Referer": "http://localhost",
-
-            "X-Title": "Aayam Drama Club"
-
-        }
+        self.client = genai.Client(api_key=GEMINI_API_KEY)
+        self.model = GEMINI_MODEL
 
     def generate_report(
-
         self,
-
         transcript,
-
         blur,
-
         brightness,
-
         face_detected
-
     ):
-
         prompt = f"""
-
 You are an AI audition screening assistant.
 
 Below are the technical measurements of an audition recording.
 
 Transcript:
-
 {transcript}
 
 Blur Score:
-
 {blur}
 
 Brightness:
-
 {brightness}
 
 Face Detected:
-
 {face_detected}
 
 Evaluate ONLY the technical quality.
-
 Do NOT judge acting ability.
 
 Return JSON in this format:
-
 {{
-"overall_score":0-100,
-"lighting":"",
-"camera_quality":"",
-"face_visibility":"",
-"audio_quality":"",
-"recommendation":"",
-"feedback":""
+  "overall_score": 85,
+  "lighting": "good",
+  "camera_quality": "clear",
+  "face_visibility": "high",
+  "audio_quality": "good",
+  "recommendation": "accept",
+  "feedback": "Technical setup is clear and well lit."
 }}
-
 """
-
-        payload = {
-
-            "model": "openai/gpt-oss-20b:free",
-
-            "messages": [
-
-                {
-
-                    "role": "user",
-
-                    "content": prompt
-
-                }
-
-            ]
-
-        }
-
-        response = requests.post(
-
-            self.url,
-
-            headers=self.headers,
-
-            json=payload
-
+        response = self.client.models.generate_content(
+            model=self.model,
+            contents=prompt
         )
-
-        response.raise_for_status()
-
-        return response.json()["choices"][0]["message"]["content"]
-        return json.loads(content)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
+        content = response.text.strip()
+        if content.startswith("```"):
+            lines = content.splitlines()
+            if lines[0].startswith("```"):
+                lines = lines[1:]
+            if lines and lines[-1].startswith("```"):
+                lines = lines[:-1]
+            content = "\n".join(lines).strip()
+
+        try:
+            return json.loads(content)
+        except Exception:
+            return content
