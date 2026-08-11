@@ -21,6 +21,7 @@ interface OpenPosition {
   description: string;
   requirements: string;
   deadline: string;
+  status?: string;
 }
 
 interface Application {
@@ -61,7 +62,7 @@ export default function AuditionsCasting() {
 
   const fetchOpenPositions = async () => {
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005"}/api/open-positions`);
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005"}/api/audition-positions`);
       if (res.ok) {
         const positions = await res.json();
         if (Array.isArray(positions) && positions.length > 0) {
@@ -72,34 +73,52 @@ export default function AuditionsCasting() {
     } catch (e) {
       console.error(e);
     }
-    // Fallback Positions
+    // Fallback Positions synchronized with Maintainer side
     setOpenPositions([
       {
-        id: "1_Performer_1",
+        id: "1",
         play_id: 1,
-        title: "Tamashbin Kathputliya - Lead Street Performer",
+        title: "Tughlaq - Sultan Muhammad bin Tughlaq (Lead)",
         category: "Performer",
-        description: "Seeking energetic street theatre actor with strong vocal projection and rhythmic dialogue delivery.",
+        description: "Complex, vision-driven 14th-century ruler torn between idealism and ruthlessness. Requires powerful vocal presence & Hindustani diction.",
         requirements: "Audition monologue video clip & theatrical resume",
-        deadline: "Aug 15, 2026"
+        deadline: "Sep 25, 2026"
       },
       {
-        id: "2_TechnicalCrew_2",
+        id: "2",
         play_id: 2,
-        title: "DDDJ Showcase - Technical Stage Director",
-        category: "Technical Crew",
-        description: "Overseeing stage cues, sound mix balancing, and lighting transitions for the annual showcase.",
-        requirements: "Technical staging portfolio PDF & work resume",
-        deadline: "Aug 20, 2026"
+        title: "Tughlaq - Step-Mother / Queen Consort (Antagonist)",
+        category: "Performer",
+        description: "Sharp-witted, politically calculating royal matriarch who challenges Tughlaq's court decrees.",
+        requirements: "Classical drama monologue video & portfolio",
+        deadline: "Sep 25, 2026"
       },
       {
-        id: "3_CreativeDesigner_3",
+        id: "3",
         play_id: 3,
-        title: "Karn Ki Yachika - Classical Costume Designer",
+        title: "Macbeth - Lead Stage Makeup & Special Effects Stylist",
         category: "Creative Designer",
-        description: "Designing period-accurate Indian classical drama costumes and headpieces.",
-        requirements: "Design portfolio PDF & sketch samples",
-        deadline: "Sep 01, 2026"
+        description: "Head makeup artist responsible for period prosthetics, battle scars, dark theatrical contours, and quick backstage transformations.",
+        requirements: "Technical SFX makeup portfolio PDF & sketch samples",
+        deadline: "Sep 28, 2026"
+      },
+      {
+        id: "4",
+        play_id: 4,
+        title: "Tamashbin Kathputliya - Soundboard & Acoustic Design Operator",
+        category: "Technical Crew",
+        description: "Technical audio operator responsible for live sound mixing, ambient folk instrument amplification, and microphone balancing.",
+        requirements: "Audio staging portfolio PDF & work resume",
+        deadline: "Sep 22, 2026"
+      },
+      {
+        id: "5",
+        play_id: 5,
+        title: "Andha Yug - Costume Assistant & Wardrobe Master",
+        category: "Creative Designer",
+        description: "Backstage wardrobe assistant managing heritage drape costumes, armor fitting, quick-change coordination, and textile maintenance.",
+        requirements: "Costume design portfolio PDF & resume",
+        deadline: "Sep 30, 2026"
       }
     ]);
   };
@@ -139,7 +158,6 @@ export default function AuditionsCasting() {
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!activePosition || !activeUser) return;
-    
     try {
       const res = await fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005"}/api/audition/submit`, {
         method: "POST",
@@ -148,7 +166,12 @@ export default function AuditionsCasting() {
           email: activeUser.email,
           play_id: activePosition.play_id,
           role: activePosition.title,
-          notes: coverNote
+          notes: coverNote,
+          ai_transcript: "",
+          ai_blur: null,
+          ai_brightness: null,
+          ai_face_detected: null,
+          ai_report: ""
         })
       });
       if (res.ok) {
@@ -249,35 +272,53 @@ export default function AuditionsCasting() {
 
       {/* Open Positions Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {filteredPositions.map((pos) => (
-          <div key={pos.id} className="bg-white border border-[#e6e2dd] rounded-[8px] p-6 flex flex-col justify-between space-y-4 hover:shadow-md hover:border-[#8CC0EB]/30 transition-all">
-            <div className="space-y-2">
-              <div className="flex justify-between items-start">
-                <Badge className="bg-[#635f41]/10 text-[#635f41] border-[#635f41]/20 font-semibold rounded-[4px] text-[10px] uppercase">
-                  {pos.category}
-                </Badge>
-                <span className="text-[10px] text-red-600/80 font-medium">Deadline: {pos.deadline}</span>
+        {filteredPositions.map((pos) => {
+          const isClosed = pos.status === "Casting Closed" || pos.status === "In Review";
+          return (
+            <div key={pos.id} className="bg-white border border-[#e6e2dd] rounded-[8px] p-6 flex flex-col justify-between space-y-4 hover:shadow-md hover:border-[#8CC0EB]/30 transition-all">
+              <div className="space-y-2">
+                <div className="flex justify-between items-start">
+                  <Badge className="bg-[#635f41]/10 text-[#635f41] border-[#635f41]/20 font-semibold rounded-[4px] text-[10px] uppercase">
+                    {pos.category}
+                  </Badge>
+                  {isClosed ? (
+                    <Badge className="bg-red-100 text-red-700 border-red-200 font-bold rounded-[4px] text-[10px]">
+                      {pos.status || "Casting Closed"}
+                    </Badge>
+                  ) : (
+                    <span className="text-[10px] text-red-600/80 font-medium">Deadline: {pos.deadline || 'Aug 25, 2026'}</span>
+                  )}
+                </div>
+                <h3 className="font-bold text-[18px] text-[#635f41] font-serif">{pos.title}</h3>
+                <p className="text-xs text-[#466272]/85 leading-relaxed">{pos.description}</p>
               </div>
-              <h3 className="font-bold text-[18px] text-[#635f41] font-serif">{pos.title}</h3>
-              <p className="text-xs text-[#466272]/85 leading-relaxed">{pos.description}</p>
-            </div>
-            
-            <div className="border-t border-[#e6e2dd]/60 pt-4 flex flex-col gap-3">
-              <div className="flex flex-col text-[11px] text-[#466272]/70 bg-[#f7f3ee]/40 rounded p-2.5">
-                <strong className="text-[#635f41] mb-1 font-semibold flex items-center gap-1">
-                  <ListChecks className="w-3.5 h-3.5 text-[#8CC0EB]" /> Required Submissions:
-                </strong>
-                <span>{pos.requirements}</span>
+              
+              <div className="border-t border-[#e6e2dd]/60 pt-4 flex flex-col gap-3">
+                <div className="flex flex-col text-[11px] text-[#466272]/70 bg-[#f7f3ee]/40 rounded p-2.5">
+                  <strong className="text-[#635f41] mb-1 font-semibold flex items-center gap-1">
+                    <ListChecks className="w-3.5 h-3.5 text-[#8CC0EB]" /> Required Submissions:
+                  </strong>
+                  <span>{pos.requirements}</span>
+                </div>
+                {isClosed ? (
+                  <Button 
+                    disabled
+                    className="bg-gray-200 text-gray-500 font-semibold rounded-[8px] text-xs py-2 w-full cursor-not-allowed border border-gray-300"
+                  >
+                    Casting Closed
+                  </Button>
+                ) : (
+                  <Button 
+                    onClick={() => handleApplyClick(pos)}
+                    className="bg-[#8CC0EB] text-[#1c1b19] hover:bg-[#8CC0EB]/90 font-semibold rounded-[8px] text-xs py-2 w-full transition-all flex items-center justify-center gap-1"
+                  >
+                    Apply for Position <ChevronRight className="w-3.5 h-3.5" />
+                  </Button>
+                )}
               </div>
-              <Button 
-                onClick={() => handleApplyClick(pos)}
-                className="bg-[#8CC0EB] text-[#1c1b19] hover:bg-[#8CC0EB]/90 font-semibold rounded-[8px] text-xs py-2 w-full transition-all flex items-center justify-center gap-1"
-              >
-                Apply for Position <ChevronRight className="w-3.5 h-3.5" />
-              </Button>
             </div>
-          </div>
-        ))}
+          );
+        })}
         {filteredPositions.length === 0 && (
           <div className="col-span-1 md:col-span-2 text-center py-12 bg-white border border-[#e6e2dd] rounded-[8px]">
             <AlertCircle className="w-8 h-8 text-[#466272]/40 mx-auto mb-2" />
@@ -338,7 +379,11 @@ export default function AuditionsCasting() {
                             type="file" 
                             accept="video/*" 
                             className="hidden" 
-                            onChange={(e) => e.target.files?.[0] && setFileName1(e.target.files[0].name)}
+                            // onChange={(e) => e.target.files?.[0] && setFileName1(e.target.files[0].name)}
+                            onChange={(e) => {
+                              if (!e.target.files?.length) return;
+                              setFileName1(e.target.files[0].name);
+                            }}
                           />
                         </label>
                       </div>
@@ -415,16 +460,21 @@ export default function AuditionsCasting() {
                   />
                 </div>
               </div>
+
               
-              <DialogFooter className="gap-2">
-                <Button type="button" variant="outline" onClick={() => setApplyOpen(false)} className="border-2 border-[#8CC0EB] text-[#8CC0EB] hover:bg-[#8CC0EB]/5 rounded-[8px] text-xs">
+            
+
+              <DialogFooter className="gap-2 pt-2">
+                <Button type="button" variant="outline" onClick={() => setApplyOpen(false)} className="border-2 border-[#8CC0EB] text-[#8CC0EB] hover:bg-[#8CC0EB]/5 rounded-[8px] text-xs font-semibold">
                   Cancel
                 </Button>
-                <Button type="submit" className="bg-[#8CC0EB] text-[#1c1b19] hover:bg-[#8CC0EB]/90 rounded-[8px] font-semibold text-xs">
+                <Button type="submit"
+                  className="bg-[#8CC0EB] text-[#1c1b19] hover:bg-[#8CC0EB]/90 rounded-[8px] font-semibold text-xs px-5"
+                >
                   Submit Application
                 </Button>
               </DialogFooter>
-            </form>
+             </form>
           </DialogContent>
         </Dialog>
       )}

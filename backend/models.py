@@ -554,15 +554,21 @@ class AuditionPosition(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def to_dict(self):
+        title_str = f"{self.production_name} - {self.role_name}" if self.production_name else self.role_name
         return {
-            'id': self.id,
+            'id': str(self.id),
+            'play_id': self.id,
+            'title': title_str,
             'production_name': self.production_name,
             'role_name': self.role_name,
             'role_category': self.role_category,
+            'category': self.role_category,
             'character_description': self.character_description or '',
+            'description': self.character_description or '',
             'requirements': self.requirements or '',
             'slots_available': self.slots_available or 1,
             'status': self.status or 'Open Calling',
+            'deadline': 'Sep 25, 2026',
             'created_at': self.created_at.strftime('%b %d, %Y') if self.created_at else 'Jul 20, 2026'
         }
 
@@ -579,10 +585,18 @@ class AuditionApplication(db.Model):
     portfolio_link = db.Column(db.String(255), nullable=True)
     notes = db.Column(db.Text)
     status = db.Column(db.String(50), default="Pending Review") # Pending Review, Shortlisted, Selected, Rejected
-    audition_date = db.Column(db.String(100), default="Aug 25, 2026 @ 4:00 PM")
+    audition_date = db.Column(db.String(100), default="Sep 25, 2026 @ 4:00 PM")
     submitted_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     position = db.relationship("AuditionPosition", backref="applications")
+
+    video_filename = db.Column(db.String(255), nullable=True)
+
+    ai_transcript = db.Column(db.Text, nullable=True)
+    ai_blur = db.Column(db.Float, nullable=True)
+    ai_brightness = db.Column(db.Float, nullable=True)
+    ai_face_detected = db.Column(db.Boolean, nullable=True)
+    ai_report = db.Column(db.Text, nullable=True)
 
     def to_dict(self):
         return {
@@ -596,8 +610,14 @@ class AuditionApplication(db.Model):
             'portfolio_link': self.portfolio_link or 'https://youtube.com/watch?v=sample_slate',
             'notes': self.notes or '',
             'status': self.status or 'Pending Review',
-            'audition_date': self.audition_date or 'Aug 25, 2026 @ 4:00 PM',
-            'submitted_at': self.submitted_at.strftime('%b %d, %Y') if self.submitted_at else 'Jul 21, 2026'
+            'audition_date': self.audition_date or 'Sep 25, 2026 @ 4:00 PM',
+            'submitted_at': self.submitted_at.strftime('%b %d, %Y') if self.submitted_at else 'Jul 21, 2026',
+            'video_filename':self.video_filename,
+            'ai_transcript': self.ai_transcript,
+            'ai_blur': self.ai_blur,
+            'ai_brightness': self.ai_brightness,
+            'ai_face_detected': self.ai_face_detected,
+            'ai_report': self.ai_report,
         }
 
 
