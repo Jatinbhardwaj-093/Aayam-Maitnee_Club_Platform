@@ -987,6 +987,32 @@ def create_audition_position():
     db.session.commit()
     return jsonify({'status': 'success', 'position': new_pos.to_dict()})
 
+@api_bp.route('/audition-positions/<int:pos_id>', methods=['PUT', 'POST'])
+def update_audition_position(pos_id):
+    from models import AuditionPosition, db
+    data = request.json or {}
+    pos = AuditionPosition.query.get(pos_id)
+    if not pos:
+        return jsonify({'error': 'Position not found'}), 404
+        
+    if 'production_name' in data:
+        pos.production_name = data['production_name']
+    if 'role_name' in data:
+        pos.role_name = data['role_name']
+    if 'role_category' in data:
+        pos.role_category = data['role_category']
+    if 'character_description' in data:
+        pos.character_description = data['character_description']
+    if 'requirements' in data:
+        pos.requirements = data['requirements']
+    if 'slots_available' in data:
+        pos.slots_available = int(data['slots_available'])
+    if 'status' in data:
+        pos.status = data['status']
+        
+    db.session.commit()
+    return jsonify({'status': 'success', 'position': pos.to_dict()})
+
 @api_bp.route('/audition-applications', methods=['GET'])
 def get_audition_applications():
     from models import AuditionApplication
@@ -1008,6 +1034,66 @@ def update_audition_application_status(app_id):
         app_record.status = data['status']
         db.session.commit()
     return jsonify({'status': 'success', 'application': app_record.to_dict()})
+
+@api_bp.route('/ai/portfolio_scan', methods=['POST'])
+def run_portfolio_ai_scan():
+    """
+    Runs Gemini 3.6 Flash portfolio AI scan matching applicant background/resume against role requirements.
+    """
+    import json
+    from ai.report_service import ReportService
+    from models import AuditionPosition, AuditionApplication, db
+    
+    data = request.json or {}
+    app_id = data.get('application_id')
+    
+    role_name = data.get('role_name') or "Audition Position"
+    role_category = data.get('role_category') or "Character Role"
+    character_description = data.get('character_description') or ""
+    role_requirements = data.get('role_requirements') or ""
+    
+    applicant_name = data.get('applicant_name') or "Applicant"
+    applicant_experience = data.get('experience_level') or "Ensemble Specialist"
+    applicant_notes = data.get('notes') or ""
+    portfolio_link = data.get('portfolio_link') or ""
+    
+    if app_id:
+        app_record = AuditionApplication.query.get(app_id)
+        if app_record:
+            applicant_name = app_record.applicant_name
+            applicant_experience = app_record.experience_level or applicant_experience
+            applicant_notes = app_record.notes or applicant_notes
+            portfolio_link = app_record.portfolio_link or portfolio_link
+            role_name = app_record.role_name or role_name
+            
+            if app_record.position:
+                role_category = app_record.position.role_category or role_category
+                character_description = app_record.position.character_description or character_description
+                role_requirements = app_record.position.requirements or role_requirements
+
+    print(f"Running AI Portfolio & Requirement Scan for {applicant_name} applying for {role_name}...")
+    service = ReportService()
+    result = service.analyze_portfolio_role_fit(
+        role_name=role_name,
+        role_category=role_category,
+        character_description=character_description,
+        role_requirements=role_requirements,
+        applicant_name=applicant_name,
+        applicant_experience=applicant_experience,
+        applicant_notes=applicant_notes,
+        portfolio_link=portfolio_link
+    )
+    
+    if app_id:
+        try:
+            app_record = AuditionApplication.query.get(app_id)
+            if app_record:
+                app_record.ai_report = json.dumps(result)
+                db.session.commit()
+        except Exception:
+            pass
+            
+    return jsonify(result)
 
 # --- FINANCIAL LEDGER & MAINTAINER STATS ENDPOINTS ---
 
