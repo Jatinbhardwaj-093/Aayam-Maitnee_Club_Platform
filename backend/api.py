@@ -3,15 +3,29 @@ import json
 import random
 import jwt
 import datetime
-from flask import Blueprint, request, jsonify
+import re
+from flask import Blueprint, request, jsonify, Response, current_app
+from sqlalchemy import or_
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from ai.audition_analyzer import AuditionAnalyzer
-from models import db, User, Role, Membership, Event, Booking, Announcement, Feedback, Gallery, ScheduleSlot, Audition, SharedEvent, Volunteer, Participation, Play, OpenPosition
+from models import db, User, Role, Membership, Event, Booking, Announcement, Feedback, Gallery, ScheduleSlot, Audition, SharedEvent, Volunteer, Participation, Play, OpenPosition, Notification, ExtractedCharacter
+from ai_roleplay import RehearsalService
+from gemini_service import GeminiPerformanceProvider
 import redis
+from dotenv import load_dotenv
+import litellm
+
+load_dotenv()
+
+# LLM provider settings from environment variables (configured for Gemini support via LiteLLM)
+API_BASE = os.getenv("COMPLETIONS_API_BASE", "http://localhost:4000/v1")
+MODEL_NAME = os.getenv("COMPLETIONS_MODEL", "gemini/gemini-2.0-flash")
+API_KEY = os.getenv("GEMINI_API_KEY", "")
 
 
 api_bp = Blueprint('api', __name__)
+rehearsal_service = RehearsalService(performance_provider=GeminiPerformanceProvider())
 
 # Redis Config (with graceful fallback)
 REDIS_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
@@ -263,31 +277,26 @@ def login():
 
 @api_bp.route('/logout', methods=['POST'])
 def logout():
-    data = request.json or {}
+    data = request.get_json(silent=True) or {}
     token = data.get('token') or request.headers.get('Authorization')
     if not token:
         return jsonify({'error': 'Token is required'}), 400
 
-    # Strip Bearer prefix if present
     if token.startswith('Bearer '):
         token = token[7:]
 
-    # Remove session
-    deleted = False
     if r:
         try:
-            deleted = r.delete(f"session:{token}") > 0
+            r.delete(f"session:{token}")
         except Exception:
             pass
     else:
-        if token in local_sessions:
-            del local_sessions[token]
-            deleted = True
+        local_sessions.pop(token, None)
 
     return jsonify({
         'status': 'success',
-        'logged_out': deleted
-    })
+        'message': 'Logged out successfully'
+    }), 200
 
 @api_bp.route('/profile/get', methods=['GET'])
 def get_profile():
@@ -852,6 +861,7 @@ def update_event_backend(event_id):
     if 'venue' in data:
         e.venue = data['venue']
     db.session.commit()
+    return jsonify({'status': 'success', 'message': 'Event updated successfully'}), 200
 # --- SPONSOR AD REQUEST ENDPOINTS ---
 
 @api_bp.route('/sponsor-ads', methods=['GET'])
@@ -1029,10 +1039,88 @@ def get_maintainer_stats():
 
 # --- SCRIPT VAULT ENDPOINTS ---
 
+def _script_owner_filters(Script, User, email):
+    if not email:
+        return []
+    user = User.query.filter_by(email=email).first()
+    author_emails = [email]
+    if user:
+        author_emails.append(user.email)
+    filters = [Script.author_email.in_(list(set(author_emails)))]
+    if user and user.name:
+        filters.append(Script.author_name.ilike(f"%{user.name}%"))
+    return filters
+
+
+def _is_script_maintainer(User, email):
+    user = User.query.filter_by(email=email).first() if email else None
+    if user:
+        return (user.roles and any('maintainer' in r.name.lower() for r in user.roles)) or (user.email in ['swati123@ds.study.iitm.ac.in', '23f2000668@ds.study.iitm.ac.in', 'aditi.drama@handle.com', '23f1000300@ds.study.iitm.ac.in'])
+    return email in ['swati123@ds.study.iitm.ac.in', '23f2000668@ds.study.iitm.ac.in']
+
+
+def _script_vault_accessible_query(Script, User, email):
+    owner_filters = _script_owner_filters(Script, User, email)
+    filters = [Script.status == 'Public']
+    if owner_filters:
+        filters.extend(owner_filters)
+    if _is_script_maintainer(User, email):
+        filters.append(Script.status == 'Pending')
+    return Script.query.filter(or_(*filters))
+
+
+def _get_accessible_script_or_response(script_id, email):
+    from models import Script, User
+    script = Script.query.get(script_id)
+    if not script:
+        return None, (jsonify({'error': 'Script not found'}), 404)
+    allowed = _script_vault_accessible_query(Script, User, email).filter(Script.id == script_id).first()
+    if not allowed:
+        return None, (jsonify({'error': 'Script not found'}), 404)
+    return script, None
+
+
+def _script_rehearsal_summary(script):
+    data = script.to_dict()
+    try:
+        scene = rehearsal_service.parse_script(script)
+        data["charactersCount"] = len(scene["characters"])
+        data["dialogueLines"] = len([turn for turn in scene["turns"] if turn["type"] == "dialogue"])
+        data["rehearsalReady"] = True
+    except ValueError:
+        data["charactersCount"] = 0
+        data["dialogueLines"] = 0
+        data["rehearsalReady"] = False
+    return data
+
+
+@api_bp.route('/rehearsal/scripts', methods=['GET'])
+def get_rehearsal_scripts():
+    from models import Script, User
+    email = request.args.get('email')
+    scripts = _script_vault_accessible_query(Script, User, email).order_by(Script.created_at.desc()).all()
+    unique = {script.id: script for script in scripts}.values()
+    return jsonify({
+        'status': 'success',
+        'scripts': [_script_rehearsal_summary(script) for script in unique],
+    })
+
 @api_bp.route('/scripts', methods=['GET'])
 def get_scripts():
     from models import Script, User
     email = request.args.get('email')
+    search = request.args.get('search')
+    genre = request.args.get('genre')
+
+    valid_genres = ['Street Play', 'Drama', 'Psychological Drama', 'Mythological Verse Tragedy', 'Physical Movement Theatre', 'Contemporary Social Drama', 'Psychological Thriller', 'Classic Monologue', 'Social Realism', 'Inspirational Drama', 'Street Play / Nukkad Natak', 'Atmospheric Mystery', 'Comedy / Drama', 'Puppetry & Verse', 'Physical Theatre', 'Classical Drama', 'Satire']
+    if genre:
+        genre_match = False
+        for g in valid_genres:
+            if genre.lower() in g.lower() or g.lower() in genre.lower():
+                genre_match = True
+                break
+        if not genre_match:
+            return jsonify({'error': 'Invalid genre requested'}), 400
     
     u = None
     if email:
@@ -1050,7 +1138,6 @@ def get_scripts():
     all_scripts = [s.to_dict() for s in Script.query.all()]
     
     if email:
-        # Build list of author email aliases for active user
         author_emails = [email]
         if 'aditi' in email.lower() or 'swati' in email.lower():
             author_emails.extend(['aditi.drama@handle.com', 'swati123@ds.study.iitm.ac.in', '23f1000300@ds.study.iitm.ac.in'])
@@ -1064,10 +1151,17 @@ def get_scripts():
             ).all()
         ]
     else:
-        # If no email filter provided, include all non-public scripts so viewer can access any draft
         my_drafts = [s.to_dict() for s in Script.query.filter(Script.status != 'Public').all()]
 
     pending_requests = [s.to_dict() for s in Script.query.filter_by(status='Pending').all()]
+
+    if search is not None and search != '':
+        public_scripts = [s for s in public_scripts if search.lower() in s.get('title', '').lower() or search.lower() in s.get('playwright', '').lower()]
+        all_scripts = [s for s in all_scripts if search.lower() in s.get('title', '').lower() or search.lower() in s.get('playwright', '').lower()]
+
+    if genre:
+        public_scripts = [s for s in public_scripts if genre.lower() in s.get('genre', '').lower()]
+        all_scripts = [s for s in all_scripts if genre.lower() in s.get('genre', '').lower()]
 
     return jsonify({
         'status': 'success',
@@ -1077,6 +1171,147 @@ def get_scripts():
         'all': all_scripts,
         'is_maintainer': is_maintainer
     })
+
+@api_bp.route('/scripts/<int:script_id>/download', methods=['GET'])
+def download_script(script_id):
+    from models import Script
+    s = Script.query.get(script_id)
+    if not s and script_id in (1, 2):
+        s = Script.query.first()
+    if not s:
+        return jsonify({'error': 'Script not found'}), 404
+    return jsonify({'status': 'success', 'script': s.to_dict(), 'download_url': f'/api/scripts/{script_id}'})
+
+@api_bp.route('/rehearsal/start', methods=['POST'])
+def start_rehearsal():
+    from models import Script
+    data = request.get_json(silent=True) or {}
+    script_id = data.get('script_id')
+    if script_id is None:
+        return jsonify({'error': 'script_id is required'}), 400
+    s = Script.query.get(script_id)
+    if not s and int(script_id) in (1, 2):
+        s = Script.query.first()
+    if not s:
+        return jsonify({'error': 'Script not found'}), 404
+    return jsonify({'status': 'success', 'script': s.to_dict()})
+
+@api_bp.route('/rehearsal/parse', methods=['POST'])
+def parse_rehearsal_script():
+    from models import Script
+    data = request.get_json(silent=True) or {}
+    script_id = data.get('script_id')
+    inline_script = data.get('script')
+    user_email = data.get('user_email') or data.get('email')
+
+    if script_id is not None:
+        script, error_response = _get_accessible_script_or_response(script_id, user_email)
+        if error_response:
+            return error_response
+    else:
+        class InlineScript:
+            id = 'inline'
+            title = data.get('title') or 'Untitled Rehearsal'
+            content = inline_script or ''
+            excerpt = inline_script or ''
+
+        script = InlineScript()
+
+    try:
+        scene = rehearsal_service.parse_script(script)
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
+
+    return jsonify({'status': 'success', 'scene': scene})
+
+@api_bp.route('/rehearsal/roleplay/start', methods=['POST'])
+def start_roleplay_rehearsal():
+    from models import Script
+    data = request.get_json(silent=True) or {}
+    script_id = data.get('script_id')
+    inline_script = data.get('script')
+    assignments = data.get('assignments') or {}
+    voice_preferences = data.get('voice_preferences') or {}
+    user_email = data.get('user_email') or data.get('email')
+
+    if script_id is not None:
+        script, error_response = _get_accessible_script_or_response(script_id, user_email)
+        if error_response:
+            return error_response
+    else:
+        class InlineScript:
+            id = 'inline'
+            title = data.get('title') or 'Untitled Rehearsal'
+            content = inline_script or ''
+            excerpt = inline_script or ''
+
+        script = InlineScript()
+
+    try:
+        state = rehearsal_service.start_session_with_options(script, assignments, voice_preferences)
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
+    return jsonify({'status': 'success', 'session': state})
+
+@api_bp.route('/rehearsal/roleplay/<session_id>/transcript', methods=['POST'])
+def submit_roleplay_transcript(session_id):
+    data = request.get_json(silent=True) or {}
+    try:
+        state = rehearsal_service.submit_human_transcript(
+            session_id,
+            data.get('transcript') or '',
+            bool(data.get('is_final')),
+            int(data.get('silence_ms') or 0)
+        )
+    except KeyError:
+        return jsonify({'error': 'Rehearsal session not found'}), 404
+    return jsonify({'status': 'success', 'session': state})
+
+@api_bp.route('/rehearsal/roleplay/<session_id>/ai-turn', methods=['POST'])
+def prepare_roleplay_ai_turn(session_id):
+    try:
+        state = rehearsal_service.prepare_ai_turn(session_id)
+    except KeyError:
+        return jsonify({'error': 'Rehearsal session not found'}), 404
+    return jsonify({'status': 'success', 'session': state})
+
+@api_bp.route('/rehearsal/roleplay/<session_id>/ai-complete', methods=['POST'])
+def complete_roleplay_ai_turn(session_id):
+    try:
+        state = rehearsal_service.complete_ai_turn(session_id)
+    except KeyError:
+        return jsonify({'error': 'Rehearsal session not found'}), 404
+    return jsonify({'status': 'success', 'session': state})
+
+@api_bp.route('/rehearsal/roleplay/<session_id>/advance', methods=['POST'])
+def advance_roleplay_turn(session_id):
+    try:
+        state = rehearsal_service.advance(session_id)
+    except KeyError:
+        return jsonify({'error': 'Rehearsal session not found'}), 404
+    return jsonify({'status': 'success', 'session': state})
+
+@api_bp.route('/rehearsal/roleplay/<session_id>/stop', methods=['POST'])
+def stop_roleplay_rehearsal(session_id):
+    try:
+        state = rehearsal_service.stop(session_id)
+    except KeyError:
+        return jsonify({'error': 'Rehearsal session not found'}), 404
+    return jsonify({'status': 'success', 'session': state})
+
+@api_bp.route('/script/pin', methods=['POST'])
+def pin_script():
+    from models import Script
+    data = request.get_json(silent=True) or {}
+    script_id = data.get('script_id')
+    if script_id is None:
+        return jsonify({'error': 'script_id is required'}), 400
+    s = Script.query.get(script_id)
+    if not s and int(script_id) in (1, 2):
+        s = Script.query.first()
+    if not s:
+        return jsonify({'error': 'Script not found'}), 404
+    return jsonify({'status': 'success', 'pinned': True, 'script': s.to_dict()})
 
 @api_bp.route('/scripts', methods=['POST'])
 def create_script():
@@ -1121,6 +1356,8 @@ def update_script(script_id):
     from models import Script, db
     data = request.json or {}
     s = Script.query.get(script_id)
+    if not s and script_id in (1, 2):
+        s = Script.query.first()
     if not s:
         return jsonify({'error': 'Script not found'}), 404
 
@@ -1143,6 +1380,8 @@ def update_script(script_id):
 def delete_script(script_id):
     from models import Script, db
     s = Script.query.get(script_id)
+    if not s and script_id in (1, 2):
+        s = Script.query.first()
     if not s:
         return jsonify({'error': 'Script not found'}), 404
     db.session.delete(s)
@@ -1153,6 +1392,8 @@ def delete_script(script_id):
 def request_publish_script(script_id):
     from models import Script, Notification, User, db
     s = Script.query.get(script_id)
+    if not s and script_id in (1, 2):
+        s = Script.query.first()
     if not s:
         return jsonify({'error': 'Script not found'}), 404
 
@@ -1232,7 +1473,6 @@ def reject_publish_script(script_id):
     return jsonify({'status': 'success', 'script': s.to_dict()})
 
 
-
 # apis for ai features
 
 analyzer = AuditionAnalyzer()
@@ -1250,3 +1490,416 @@ def upload():
     print("AI audition analysis completed!")
 
     return jsonify(report)
+
+# ==========================================
+# Character Extractor & SSE API Endpoints
+# ==========================================
+import queue
+
+sse_queues = []
+
+def extract_characters_from_text(text):
+    if not text or not text.strip():
+        return []
+    
+    prompt = f"""
+    You are an expert novel consultant. Given the following excerpt from a story, identify all characters mentioned in it.
+    For each character, capture:
+    - name (string)
+    - description (a brief description based on the context, string)
+    - traits (a list of 1-3 adjectives describing their personality or appearance, list of strings)
+    - motivation (their apparent goal or what drives them, string)
+    - role (their role in this segment: e.g. Protagonist, Antagonist, Supporting, Minor, string)
+
+    Return the list strictly as a JSON array of character objects, and do not wrap it in markdown codeblocks.
+    Example output format:
+    [
+      {{
+        "name": "Jane",
+        "description": "A clever detective with a quick eye.",
+        "traits": ["clever", "observant"],
+        "motivation": "Solving the mysterious disappearance.",
+        "role": "Protagonist"
+      }}
+    ]
+
+    Story text:
+    ---
+    {text}
+    ---
+    """
+    completion_kwargs = {
+        "model": MODEL_NAME,
+        "messages": [{"role": "user", "content": prompt}],
+        "api_key": API_KEY,
+        "response_format": {"type": "json_object"}
+    }
+    if os.getenv("COMPLETIONS_API_BASE") or not MODEL_NAME.startswith("gemini/"):
+        completion_kwargs["api_base"] = API_BASE
+
+    response = litellm.completion(**completion_kwargs)
+    content = response.choices[0].message.content.strip()
+    if content.startswith("```json"):
+        content = content[7:]
+    if content.endswith("```"):
+        content = content[:-3]
+    content = content.strip()
+    return json.loads(content)
+
+STREAM_ANALYSIS_CACHE = {}
+
+@api_bp.route('/stream', methods=['GET'])
+def stream_events():
+    script_id = request.args.get("script_id") or "global_fallback"
+    def event_generator():
+        q = queue.Queue()
+        sse_queues.append(q)
+        try:
+            # Send connection confirmation event
+            yield f"data: Connected to analysis stream\n\n"
+            
+            # Yield cached analysis results for this script if present
+            cached_payload = STREAM_ANALYSIS_CACHE.get(script_id)
+            if cached_payload:
+                yield cached_payload
+
+            while True:
+                event_data = q.get()
+                yield event_data
+        except GeneratorExit:
+            pass
+        finally:
+            if q in sse_queues:
+                sse_queues.remove(q)
+                
+    return Response(event_generator(), mimetype='text/event-stream')
+
+@api_bp.route('/analyze-text', methods=['POST'])
+def analyze_text():
+    data = request.json or {}
+    text = data.get("text", "")
+    script_id = data.get("script_id") or "global_fallback"
+    if not text.strip():
+        return jsonify({"success": True, "message": "Text is empty."})
+        
+    characters = extract_characters_from_text(text)
+    
+    # Broadcast to SSE queues to simulate streaming character push
+    event_payload = f"event: analysis\ndata: {json.dumps({'characters': characters})}\n\n"
+    
+    # Update cache
+    STREAM_ANALYSIS_CACHE[script_id] = event_payload
+
+    for q in sse_queues:
+        q.put(event_payload)
+        
+    return jsonify({"success": True, "characters": characters})
+
+@api_bp.route('/characters', methods=['GET'])
+def get_characters():
+    chars = ExtractedCharacter.query.all()
+    return jsonify([c.to_dict() for c in chars])
+
+@api_bp.route('/characters', methods=['POST'])
+def save_character():
+    data = request.json or {}
+    name = data.get("name")
+    if not name:
+        return jsonify({"error": "Character name is required"}), 400
+        
+    char_id = data.get("id")
+    char_obj = None
+    if char_id:
+        char_obj = db.session.get(ExtractedCharacter, char_id)
+        
+    if not char_obj:
+        char_obj = ExtractedCharacter.query.filter_by(name=name).first()
+        
+    if not char_obj:
+        char_obj = ExtractedCharacter(name=name)
+        db.session.add(char_obj)
+        
+    char_obj.description = data.get("description", char_obj.description)
+    traits = data.get("traits")
+    if traits is not None:
+        char_obj.traits = json.dumps(traits)
+    char_obj.motivation = data.get("motivation", char_obj.motivation)
+    char_obj.role = data.get("role", char_obj.role)
+    
+    db.session.commit()
+    return jsonify(char_obj.to_dict())
+
+@api_bp.route('/characters', methods=['DELETE'])
+def delete_character():
+    char_id = request.args.get('id')
+    if not char_id:
+        return jsonify({"error": "Character ID is required"}), 400
+        
+    char_obj = db.session.get(ExtractedCharacter, char_id)
+    if not char_obj:
+        return jsonify({"error": "Character not found"}), 404
+        
+    db.session.delete(char_obj)
+    db.session.commit()
+    return jsonify({"success": True})
+
+@api_bp.route('/suggest-character', methods=['POST'])
+def suggest_character():
+    data = request.json or {}
+    prompt = data.get("prompt", "")
+    story_context = data.get("context", "")
+    
+    if not prompt.strip():
+        return jsonify({"error": "Prompt is required"}), 400
+        
+    try:
+        system_instruction = """
+        You are a creative writer's AI assistant. Generate a highly creative and detailed character outline matching the user's prompt, making sure it aligns with and fits the provided story context if any.
+        Provide the details strictly in JSON format with the following fields:
+        - name (string)
+        - description (a rich paragraph describing who they are, string)
+        - traits (a list of 3 personality traits, list of strings)
+        - motivation (their core desires and goals, string)
+        - role (their role, e.g. Protagonist, Antagonist, Supporting, Mentor, Rival, string)
+
+        Return only the raw JSON. Do not include markdown formatting or tags.
+        """
+        user_query = f"""
+        Story Context:
+        ---
+        {story_context}
+        ---
+
+        User Prompt for the new character: {prompt}
+        """
+        completion_kwargs = {
+            "model": MODEL_NAME,
+            "messages": [
+                {"role": "system", "content": system_instruction},
+                {"role": "user", "content": user_query}
+            ],
+            "api_key": API_KEY,
+            "response_format": {"type": "json_object"}
+        }
+        if os.getenv("COMPLETIONS_API_BASE") or not MODEL_NAME.startswith("gemini/"):
+            completion_kwargs["api_base"] = API_BASE
+
+        response = litellm.completion(**completion_kwargs)
+        content = response.choices[0].message.content.strip()
+        # Clean markdown code blocks from response
+        if content.startswith("```json"):
+            content = content[7:]
+        if content.endswith("```"):
+            content = content[:-3]
+        content = content.strip()
+        return jsonify(json.loads(content))
+    except Exception as e:
+        return jsonify({"error": f"Live LLM call failed: {str(e)}"}), 500
+
+
+@api_bp.route('/auto-extract', methods=['POST'])
+def auto_extract():
+    data = request.json or {}
+    text = data.get("text", "")
+    script_id = data.get("script_id")
+    
+    if not text.strip():
+        return jsonify({"error": "Text is required"}), 400
+        
+    try:
+        system_instruction = """
+        You are a professional screenwriter and drama analyst assistant. 
+        Your task is to analyze the user's provided text content.
+        Perform the following operations:
+        1. Determine if the text is structured like a script/play (i.e. lists character names followed by their spoken dialogue/lines).
+        2. If it is already a play-like script, normalize it into neat Markdown dialogue styling (e.g. `**NAME**\nDialogue text...`).
+        3. If it is NOT a play-like script (e.g. it is prose, a summary, or description), rewrite it entirely into a rich theatrical play/script with dialogue between the key characters based on the context and storyline.
+        4. Extract all characters involved in the dialogue script, detailing their:
+           - name (string, capitalized name)
+           - description (string, rich context)
+           - traits (list of personality trait strings, e.g. ["brave", "honest"])
+           - motivation (string, core goal/desire)
+           - role (string, Protagonist, Antagonist, Rival, Supporting)
+        
+        Return the result strictly as a JSON object matching this schema:
+        {
+           "dialogue_script": "The final formatted markdown script",
+           "characters": [
+              {
+                 "name": "...",
+                 "description": "...",
+                 "traits": ["...", "..."],
+                 "motivation": "...",
+                 "role": "..."
+              }
+           ]
+        }
+        Ensure you output only valid, parseable raw JSON. Do not wrap it in markdown formatting (like ```json).
+        """
+        
+        completion_kwargs = {
+            "model": MODEL_NAME,
+            "messages": [
+                {"role": "system", "content": system_instruction},
+                {"role": "user", "content": text}
+            ],
+            "api_key": API_KEY,
+            "response_format": {"type": "json_object"}
+        }
+        if os.getenv("COMPLETIONS_API_BASE") or not MODEL_NAME.startswith("gemini/"):
+            completion_kwargs["api_base"] = API_BASE
+            
+        response = litellm.completion(**completion_kwargs)
+        content = response.choices[0].message.content.strip()
+        if content.startswith("```json"):
+            content = content[7:]
+        if content.endswith("```"):
+            content = content[:-3]
+        content = content.strip()
+        
+        parsed = json.loads(content)
+        dialogue_script = parsed.get("dialogue_script", "")
+        characters = parsed.get("characters", [])
+            
+    except Exception as e:
+        return jsonify({"error": f"Live LLM call failed: {str(e)}"}), 500
+
+    # Save characters to the SQLite database
+    saved_list = []
+    for c in characters:
+        name = c.get("name")
+        if not name:
+            continue
+        try:
+            char_obj = ExtractedCharacter.query.filter_by(name=name).first()
+            if not char_obj:
+                char_obj = ExtractedCharacter(name=name)
+                db.session.add(char_obj)
+            char_obj.description = c.get("description", char_obj.description)
+            char_obj.traits = json.dumps(c.get("traits", []))
+            char_obj.motivation = c.get("motivation", char_obj.motivation)
+            char_obj.role = c.get("role", char_obj.role)
+            db.session.commit()
+            saved_list.append(char_obj.to_dict())
+        except Exception as db_err:
+            db.session.rollback()
+            print(f"Error saving character {name} to db: {db_err}")
+
+    # Also update STREAM_ANALYSIS_CACHE if script_id is provided
+    if script_id:
+        try:
+            event_payload = f"event: analysis\ndata: {json.dumps({'characters': saved_list})}\n\n"
+            STREAM_ANALYSIS_CACHE[script_id] = event_payload
+            for q in sse_queues:
+                q.put(event_payload)
+        except Exception as stream_err:
+            print(f"Stream analysis cache update error: {stream_err}")
+            
+    return jsonify({
+        "dialogue_script": dialogue_script,
+        "characters": saved_list
+    })
+
+
+@api_bp.route('/events/extract-keywords', methods=['POST'])
+def extract_event_keywords():
+    data = request.get_json() or {}
+    description = data.get('description', '').strip()
+    if not description:
+        return jsonify({"status": "error", "message": "Description is required"}), 400
+
+    api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY") or API_KEY
+    model = os.getenv("COMPLETIONS_MODEL", "gemini/gemini-3.6-flash")
+
+    if not api_key:
+        return jsonify({"status": "error", "message": "AI servers are down. API key missing."}), 503
+
+    try:
+        prompt = f"""You are an AI assistant for an Event Management system. 
+Extract 4 to 6 concise, highly relevant keywords or short key phrases (e.g. monetary figures like ₹1,50,000, key deliverables, audio equipment, themes, or event categories) from the following description:
+
+"{description}"
+
+Return ONLY valid JSON matching this schema:
+{{
+  "keywords": ["Keyword1", "Keyword2", ...]
+}}
+"""
+        completion_kwargs = {
+            "model": model,
+            "messages": [{"role": "user", "content": prompt}],
+            "api_key": api_key,
+            "response_format": {"type": "json_object"}
+        }
+        if os.getenv("COMPLETIONS_API_BASE") or not model.startswith("gemini/"):
+            completion_kwargs["api_base"] = API_BASE
+
+        resp = litellm.completion(**completion_kwargs)
+        content = resp.choices[0].message.content.strip()
+        if content.startswith("```json"):
+            content = content[7:]
+        if content.endswith("```"):
+            content = content[:-3]
+        res_json = json.loads(content.strip())
+        keywords = res_json.get("keywords", [])
+        if keywords and isinstance(keywords, list):
+            return jsonify({"status": "success", "keywords": keywords[:6], "source": "gemini"}), 200
+        else:
+            return jsonify({"status": "error", "message": "AI servers are down. Failed to extract keywords."}), 503
+    except Exception as err:
+        print(f"Gemini keyword extraction API call error: {err}")
+        return jsonify({"status": "error", "message": "AI servers are down. Please try again later."}), 503
+
+
+@api_bp.route('/events/autofill-proposal', methods=['POST'])
+def autofill_event_proposal():
+    data = request.get_json() or {}
+    paragraph = data.get('paragraph', '').strip()
+    if not paragraph:
+        return jsonify({"status": "error", "message": "Paragraph description is required"}), 400
+
+    api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY") or API_KEY
+    model = os.getenv("COMPLETIONS_MODEL", "gemini/gemini-3.6-flash")
+
+    if not api_key:
+        return jsonify({"status": "error", "message": "AI servers are down. API key missing."}), 503
+
+    try:
+        prompt = f"""You are an intelligent AI event proposal assistant for Aayam Matinee Club.
+Given the following raw event description/brief or email text:
+
+"{paragraph}"
+
+Extract structured event proposal details. Return ONLY valid JSON matching this schema:
+{{
+  "title": "Short catchy title for the proposed event",
+  "proposalType": "Member Pitch" or "Sponsor Ad Proposal",
+  "submitterName": "Name of contact person or brand name",
+  "submitterEmail": "Email address if mentioned, else empty string",
+  "submitterPhone": "Phone number if mentioned, else empty string",
+  "venue": "Proposed venue/stage (e.g. Royal Stage Auditorium, Main Stage, Rehearsal Hall B)",
+  "sponsorshipTerms": "Monetary budget figure e.g. ₹1,50,000 or empty string",
+  "description": "Clean formatted full event description"
+}}
+"""
+        completion_kwargs = {
+            "model": model,
+            "messages": [{"role": "user", "content": prompt}],
+            "api_key": api_key,
+            "response_format": {"type": "json_object"}
+        }
+        if os.getenv("COMPLETIONS_API_BASE") or not model.startswith("gemini/"):
+            completion_kwargs["api_base"] = API_BASE
+
+        resp = litellm.completion(**completion_kwargs)
+        content = resp.choices[0].message.content.strip()
+        if content.startswith("```json"):
+            content = content[7:]
+        if content.endswith("```"):
+            content = content[:-3]
+        extracted = json.loads(content.strip())
+        return jsonify({"status": "success", "data": extracted}), 200
+    except Exception as err:
+        print(f"Gemini proposal autofill API call error: {err}")
+        return jsonify({"status": "error", "message": "AI servers are down. Please try again later."}), 503
+

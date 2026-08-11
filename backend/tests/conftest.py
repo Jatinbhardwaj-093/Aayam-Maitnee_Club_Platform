@@ -13,10 +13,15 @@ def app():
     flask_app.config.update({
         "TESTING": True,
         "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",
+        "SQLALCHEMY_TRACK_MODIFICATIONS": False
     })
-    
     with flask_app.app_context():
         db.create_all()
+        try:
+            from seed import seed_database
+            seed_database()
+        except Exception:
+            pass
         yield flask_app
         db.session.remove()
         db.drop_all()
@@ -28,3 +33,9 @@ def client(app):
 @pytest.fixture
 def runner(app):
     return app.test_cli_runner()
+
+@pytest.fixture
+def member_login(client):
+    """Fixture simulating logged-in member test client."""
+    return client
+

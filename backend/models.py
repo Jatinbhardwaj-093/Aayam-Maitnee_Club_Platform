@@ -639,6 +639,32 @@ class FinancialRecord(db.Model):
             'notes': self.notes or '',
             'created_at': self.created_at.strftime('%b %d, %Y') if self.created_at else 'Jul 20, 2026'
         }
+class ExtractedCharacter(db.Model):
+    __tablename__ = "extracted_character"
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(150), nullable=False)
+    description = db.Column(db.Text, nullable=True)
+    traits = db.Column(db.Text, nullable=True) # JSON list serialized as text
+    motivation = db.Column(db.String(255), nullable=True)
+    role = db.Column(db.String(50), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def to_dict(self):
+        import json
+        try:
+            parsed_traits = json.loads(self.traits) if self.traits else []
+        except Exception:
+            parsed_traits = [t.strip() for t in self.traits.split(",")] if self.traits else []
+        return {
+            'id': str(self.id),
+            'name': self.name,
+            'description': self.description or '',
+            'traits': parsed_traits,
+            'motivation': self.motivation or '',
+            'role': self.role or 'Minor',
+            'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S') if self.created_at else ''
+        }
 
 
 event.listen(User, 'after_insert', user_after_insert)
