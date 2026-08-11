@@ -488,6 +488,284 @@ export default function AuditionsManagement() {
       })
     : [];
 
+  if (createModalOpen) {
+    return (
+      <div className="bg-[#fdf9f4] min-h-screen text-[#1c1b19] font-sans space-y-6 max-w-6xl mx-auto animate-in fade-in-50 duration-200 pb-16">
+        {/* Top Header */}
+        <div className="bg-[#f7f3ee] border border-[#e6e2dd] rounded-2xl p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div className="space-y-1">
+            <button
+              type="button"
+              onClick={() => setCreateModalOpen(false)}
+              className="text-xs font-bold text-[#635f41] hover:underline flex items-center gap-1 mb-2 cursor-pointer"
+            >
+              ← Back to Auditions Management
+            </button>
+            <span className="text-xs uppercase tracking-widest text-[#9B1C31] font-bold block">
+              Production Calling Setup
+            </span>
+            <h2 className="text-2xl md:text-3xl font-bold font-serif text-[#635f41]">
+              Publish New Audition Calling
+            </h2>
+            <p className="text-xs md:text-sm text-[#466272]">
+              Create an open character role or technical crew position with full specifications & casting benchmarks.
+            </p>
+          </div>
+
+          <Badge className="bg-[#635f41] text-white font-mono text-xs font-bold px-3 py-1">
+            Audition Creator Portal
+          </Badge>
+        </div>
+
+        {/* Form Container */}
+        <form onSubmit={handleCreatePositionSubmit} className="space-y-6 bg-white p-6 md:p-8 rounded-2xl border border-[#e6e2dd] shadow-xs text-xs text-left">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div>
+              <label className="font-bold text-[#635f41] block mb-1">Target Production Name *</label>
+              <Input
+                required
+                value={newPositionForm.production_name}
+                onChange={(e) => setNewPositionForm({ ...newPositionForm, production_name: e.target.value })}
+                placeholder="e.g. Tughlaq - Ensemble Production"
+                className="bg-[#fdf9f4] border-[#cac6b9]/60 h-10 text-xs rounded-xl"
+              />
+            </div>
+
+            <div>
+              <label className="font-bold text-[#635f41] block mb-1">Role Title / Position Name *</label>
+              <Input
+                required
+                value={newPositionForm.role_name}
+                onChange={(e) => setNewPositionForm({ ...newPositionForm, role_name: e.target.value })}
+                placeholder="e.g. Sultan Muhammad bin Tughlaq (Lead)"
+                className="bg-[#fdf9f4] border-[#cac6b9]/60 h-10 text-xs rounded-xl"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div>
+              <label className="font-bold text-[#635f41] block mb-1">Role Classification</label>
+              <select
+                value={newPositionForm.role_category}
+                onChange={(e) => setNewPositionForm({ ...newPositionForm, role_category: e.target.value })}
+                className="w-full bg-[#fdf9f4] border border-[#cac6b9]/60 h-10 px-3 text-xs font-bold rounded-xl text-[#1c1b19] focus:outline-none"
+              >
+                <option value="Character Role">Character Role (Performer)</option>
+                <option value="Performer">Performer / Lead Acting</option>
+                <option value="Makeup & Hair">Makeup & Hair Stylist</option>
+                <option value="Backstage Technical">Backstage Technical / Sound Operator</option>
+                <option value="Costume">Costume & Wardrobe Master</option>
+                <option value="Stage Management">Stage Management</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="font-bold text-[#635f41] block mb-1">Open Slots Available</label>
+              <Input
+                type="number"
+                min={1}
+                value={newPositionForm.slots_available}
+                onChange={(e) => setNewPositionForm({ ...newPositionForm, slots_available: parseInt(e.target.value) || 1 })}
+                className="bg-[#fdf9f4] border-[#cac6b9]/60 h-10 text-xs rounded-xl"
+              />
+            </div>
+
+            <div>
+              <label className="font-bold text-[#635f41] block mb-1">Audition Calling Status</label>
+              <select
+                value={newPositionForm.status}
+                onChange={(e) => setNewPositionForm({ ...newPositionForm, status: e.target.value })}
+                className="w-full bg-[#fdf9f4] border border-[#cac6b9]/60 h-10 px-3 text-xs font-bold rounded-xl text-[#1c1b19] focus:outline-none"
+              >
+                <option value="Open Calling">Open Calling</option>
+                <option value="In Review">In Review</option>
+                <option value="Casting Closed">Casting Closed</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label className="font-bold text-[#635f41] block mb-1">Character & Role Specifications (Full Description)</label>
+            <textarea
+              rows={4}
+              value={newPositionForm.character_description}
+              onChange={(e) => setNewPositionForm({ ...newPositionForm, character_description: e.target.value })}
+              placeholder="Describe character archetype, age bracket, vocal projection, emotional beats, and stage posture expected..."
+              className="w-full bg-[#fdf9f4] border border-[#cac6b9]/60 p-3.5 rounded-xl text-xs text-[#1c1b19] focus:outline-none"
+            />
+          </div>
+
+          <div>
+            <label className="font-bold text-[#635f41] block mb-1">Detailed Audition & Portfolio Requirements</label>
+            <textarea
+              rows={3}
+              value={newPositionForm.requirements}
+              onChange={(e) => setNewPositionForm({ ...newPositionForm, requirements: e.target.value })}
+              placeholder="List required submissions: e.g. 2-minute Hindustani drama monologue video, headshot PDF, or SFX portfolio..."
+              className="w-full bg-[#fdf9f4] border border-[#cac6b9]/60 p-3.5 rounded-xl text-xs text-[#1c1b19] focus:outline-none"
+            />
+          </div>
+
+          <div className="flex items-center justify-end gap-4 border-t border-[#cac6b9]/40 pt-5">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setCreateModalOpen(false)}
+              className="border-2 border-[#cac6b9] text-[#635f41] hover:bg-gray-100 rounded-xl text-xs font-bold px-8 h-11"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              className="bg-[#635f41] hover:bg-[#4d4a32] text-white font-bold text-xs rounded-xl px-10 h-11 shadow-md"
+            >
+              Publish Audition Calling
+            </Button>
+          </div>
+        </form>
+      </div>
+    );
+  }
+
+  if (editingRoleForm && editRoleModalOpen) {
+    return (
+      <div className="bg-[#fdf9f4] min-h-screen text-[#1c1b19] font-sans space-y-6 max-w-6xl mx-auto animate-in fade-in-50 duration-200 pb-16">
+        {/* Top Header */}
+        <div className="bg-[#f7f3ee] border border-[#e6e2dd] rounded-2xl p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div className="space-y-1">
+            <button
+              type="button"
+              onClick={() => setEditRoleModalOpen(false)}
+              className="text-xs font-bold text-[#635f41] hover:underline flex items-center gap-1 mb-2 cursor-pointer"
+            >
+              ← Back to Auditions Management
+            </button>
+            <span className="text-xs uppercase tracking-widest text-[#9B1C31] font-bold block">
+              Role Details Editor
+            </span>
+            <h2 className="text-2xl md:text-3xl font-bold font-serif text-[#635f41]">
+              Edit Audition Role: {editingRoleForm.role_name}
+            </h2>
+            <p className="text-xs md:text-sm text-[#466272]">
+              Update character specifications, role descriptions, and required benchmarks saved in the database.
+            </p>
+          </div>
+
+          <Badge className="bg-[#635f41] text-white font-mono text-xs font-bold px-3 py-1">
+            Maintainer Role Editor
+          </Badge>
+        </div>
+
+        {/* Form Container */}
+        <form onSubmit={handleSaveRoleDetailsSubmit} className="space-y-6 bg-white p-6 md:p-8 rounded-2xl border border-[#e6e2dd] shadow-xs text-xs text-left">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div>
+              <label className="font-bold text-[#635f41] block mb-1">Production Name *</label>
+              <Input
+                required
+                value={editingRoleForm.production_name}
+                onChange={(e) => setEditingRoleForm({ ...editingRoleForm, production_name: e.target.value })}
+                className="bg-[#fdf9f4] border-[#cac6b9]/60 h-10 text-xs rounded-xl"
+              />
+            </div>
+
+            <div>
+              <label className="font-bold text-[#635f41] block mb-1">Role Title / Position Name *</label>
+              <Input
+                required
+                value={editingRoleForm.role_name}
+                onChange={(e) => setEditingRoleForm({ ...editingRoleForm, role_name: e.target.value })}
+                className="bg-[#fdf9f4] border-[#cac6b9]/60 h-10 text-xs rounded-xl"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div>
+              <label className="font-bold text-[#635f41] block mb-1">Role Classification</label>
+              <select
+                value={editingRoleForm.role_category}
+                onChange={(e) => setEditingRoleForm({ ...editingRoleForm, role_category: e.target.value })}
+                className="w-full bg-[#fdf9f4] border border-[#cac6b9]/60 h-10 px-3 text-xs font-bold rounded-xl text-[#1c1b19] focus:outline-none"
+              >
+                <option value="Character Role">Character Role (Performer)</option>
+                <option value="Performer">Performer / Lead Acting</option>
+                <option value="Makeup & Hair">Makeup & Hair Stylist</option>
+                <option value="Backstage Technical">Backstage Technical / Sound Operator</option>
+                <option value="Costume">Costume & Wardrobe Master</option>
+                <option value="Stage Management">Stage Management</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="font-bold text-[#635f41] block mb-1">Open Slots Available</label>
+              <Input
+                type="number"
+                min={1}
+                value={editingRoleForm.slots_available}
+                onChange={(e) => setEditingRoleForm({ ...editingRoleForm, slots_available: parseInt(e.target.value) || 1 })}
+                className="bg-[#fdf9f4] border-[#cac6b9]/60 h-10 text-xs rounded-xl"
+              />
+            </div>
+
+            <div>
+              <label className="font-bold text-[#635f41] block mb-1">Audition Status</label>
+              <select
+                value={editingRoleForm.status}
+                onChange={(e) => setEditingRoleForm({ ...editingRoleForm, status: e.target.value })}
+                className="w-full bg-[#fdf9f4] border border-[#cac6b9]/60 h-10 px-3 text-xs font-bold rounded-xl text-[#1c1b19] focus:outline-none"
+              >
+                <option value="Open Calling">Open Calling</option>
+                <option value="In Review">In Review</option>
+                <option value="Casting Closed">Casting Closed</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label className="font-bold text-[#635f41] block mb-1">Character & Role Specifications (Full Description)</label>
+            <textarea
+              rows={4}
+              value={editingRoleForm.character_description || ""}
+              onChange={(e) => setEditingRoleForm({ ...editingRoleForm, character_description: e.target.value })}
+              placeholder="Describe character archetype, age bracket, vocal projection, emotional beats, and stage posture expected..."
+              className="w-full bg-[#fdf9f4] border border-[#cac6b9]/60 p-3.5 rounded-xl text-xs text-[#1c1b19] focus:outline-none"
+            />
+          </div>
+
+          <div>
+            <label className="font-bold text-[#635f41] block mb-1">Detailed Audition & Portfolio Requirements</label>
+            <textarea
+              rows={3}
+              value={editingRoleForm.requirements || ""}
+              onChange={(e) => setEditingRoleForm({ ...editingRoleForm, requirements: e.target.value })}
+              placeholder="List required submissions: e.g. 2-minute Hindustani drama monologue video, headshot PDF, or SFX portfolio..."
+              className="w-full bg-[#fdf9f4] border border-[#cac6b9]/60 p-3.5 rounded-xl text-xs text-[#1c1b19] focus:outline-none"
+            />
+          </div>
+
+          <div className="flex items-center justify-end gap-4 border-t border-[#cac6b9]/40 pt-5">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setEditRoleModalOpen(false)}
+              className="border-2 border-[#cac6b9] text-[#635f41] hover:bg-gray-100 rounded-xl text-xs font-bold px-8 h-11"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              className="bg-[#635f41] hover:bg-[#4d4a32] text-white font-bold text-xs rounded-xl px-10 h-11 shadow-md"
+            >
+              Save Role Details
+            </Button>
+          </div>
+        </form>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-[#fdf9f4] min-h-screen text-[#1c1b19] p-6 md:p-10 font-sans space-y-8 max-w-6xl mx-auto">
       

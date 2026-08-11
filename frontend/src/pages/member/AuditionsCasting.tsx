@@ -320,235 +320,230 @@ export default function AuditionsCasting() {
         )}
       </div>
 
-      {/* Full-Window Apply Position View (Sidebar visible on left) */}
-      {activePosition && applyOpen && (
-        <div className="fixed top-0 bottom-0 right-0 left-0 md:left-64 z-50 bg-[#fdf9f4] overflow-y-auto p-6 md:p-10 border-l border-[#cac6b9]/40 shadow-2xl animate-in fade-in-50 slide-in-from-right-4 duration-200">
-          <div className="max-w-6xl mx-auto space-y-8">
-            {/* Top Navigation & Action Bar */}
-            <div className="flex items-center justify-between border-b border-[#e6e2dd] pb-5">
-              <button
-                type="button"
-                onClick={() => setApplyOpen(false)}
-                className="flex items-center gap-2 text-xs font-bold text-[#635f41] hover:text-[#1c1b19] bg-white border border-[#cac6b9]/60 px-4 py-2 rounded-xl transition-all shadow-2xs cursor-pointer"
-              >
-                ← Back to Auditions List
-              </button>
+  {activePosition && applyOpen && (
+    <div className="space-y-6 font-sans text-[#466272] animate-in fade-in-50 duration-200 pb-16">
+        {/* Navigation & Status Header */}
+        <div className="bg-[#f7f3ee] border border-[#e6e2dd] rounded-2xl p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div className="space-y-1">
+            <button
+              type="button"
+              onClick={() => setApplyOpen(false)}
+              className="text-xs font-bold text-[#635f41] hover:underline flex items-center gap-1 mb-2 cursor-pointer"
+            >
+              ← Back to Open Auditions
+            </button>
+            <span className="text-xs uppercase tracking-widest text-[#9B1C31] font-bold block">
+              Ensemble Casting Application
+            </span>
+            <h2 className="text-2xl md:text-3xl font-bold font-serif text-[#635f41]">
+              Apply: {activePosition.title}
+            </h2>
+            <p className="text-xs md:text-sm text-[#466272]">
+              Production: <strong>{activePosition.title}</strong> • Classification: <strong>{activePosition.category}</strong>
+            </p>
+          </div>
 
-              <div className="flex items-center gap-2">
-                <Badge className="bg-[#635f41] text-white font-mono text-xs font-bold px-3 py-1">
-                  {activePosition.category}
-                </Badge>
-                <Badge className="bg-[#8CC0EB]/20 text-[#1c1b19] border-[#8CC0EB]/40 font-semibold text-xs py-1">
-                  Deadline: {activePosition.deadline || 'Sep 25, 2026'}
-                </Badge>
-                <Badge className="bg-emerald-100 text-emerald-800 font-semibold text-xs py-1">
-                  Slots: {activePosition.slots_available || 1} Openings
-                </Badge>
-              </div>
-            </div>
-
-            {/* Page Header */}
-            <div>
-              <span className="text-xs uppercase tracking-widest text-[#9B1C31] font-bold block mb-1">
-                Official Ensemble Audition Portal
-              </span>
-              <h1 className="font-serif text-[#635f41] text-3xl md:text-4xl font-bold">
-                Apply for Audition: {activePosition.title}
-              </h1>
-              <p className="text-xs md:text-sm text-[#466272] mt-1 leading-relaxed">
-                Review complete role specifications, character requirements, and submit your audition portfolio materials directly to the director.
-              </p>
-            </div>
-
-            {/* Form & Specs Grid */}
-            <form onSubmit={handleFormSubmit} className="space-y-8">
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 text-left">
-                {/* Left Column: Full Role Specs & Requirements (col-span-6) */}
-                <div className="lg:col-span-6 space-y-6 bg-white p-6 md:p-8 rounded-2xl border border-[#cac6b9]/40 shadow-xs">
-                  <div className="space-y-2">
-                    <strong className="text-xs font-bold text-[#635f41] uppercase tracking-wider block">
-                      Character & Role Description
-                    </strong>
-                    <p className="text-xs md:text-sm text-[#1c1b19] leading-relaxed font-light">
-                      {activePosition.description || "Seeking dedicated ensemble member with strong stage presence, dramatic projection, and commitment to rehearsal schedules."}
-                    </p>
-                  </div>
-
-                  <div className="space-y-2 pt-2 border-t border-[#e6e2dd]">
-                    <strong className="text-xs font-bold text-[#635f41] uppercase tracking-wider block flex items-center gap-1">
-                      <ListChecks className="w-4 h-4 text-[#8CC0EB]" /> Audition Requirements & Skill Benchmark
-                    </strong>
-                    <div className="text-xs md:text-sm text-[#1c1b19] space-y-2">
-                      <p className="leading-relaxed font-medium">
-                        {activePosition.requirements || "Audition monologue clip / Technical PDF portfolio submission."}
-                      </p>
-                      <ul className="list-disc pl-4 text-xs text-[#466272] space-y-1.5 pt-2">
-                        <li>High commitment to scheduled ensemble table-reads & stage rehearsals</li>
-                        <li>Audition slate or portfolio file review by maintainer creative board</li>
-                        <li>Selected candidates will be notified via email for call-back auditions</li>
-                      </ul>
-                    </div>
-                  </div>
-
-                  <div className="bg-[#8CC0EB]/10 p-4 rounded-xl border border-[#8CC0EB]/30 space-y-1 mt-4">
-                    <span className="text-xs font-bold text-[#635f41] block">Casting Process Note:</span>
-                    <p className="text-xs text-[#466272] leading-relaxed">
-                      Applications submit directly to the maintainer review portal. Maintainers perform automated portfolio & video quality verification scans during review.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Right Column: Applicant Details Form (col-span-6) */}
-                <div className="lg:col-span-6 space-y-5 bg-white p-6 md:p-8 rounded-2xl border border-[#cac6b9]/40 shadow-xs">
-                  <strong className="text-xs font-bold text-[#635f41] uppercase tracking-wider block border-b border-[#e6e2dd] pb-3">
-                    Applicant Information Form
-                  </strong>
-
-                  <div className="space-y-1">
-                    <label className="text-xs font-semibold text-[#635f41]">Full Name *</label>
-                    <Input 
-                      value={applicantName}
-                      onChange={(e) => setApplicantName(e.target.value)}
-                      className="border-[#cac6b9]/60 focus-visible:ring-[#8CC0EB] text-xs h-10 bg-[#fdf9f4] rounded-xl"
-                      placeholder="e.g. Aarav Varma"
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="text-xs font-semibold text-[#635f41]">Email Address *</label>
-                    <Input 
-                      type="email"
-                      value={applicantEmail}
-                      onChange={(e) => setApplicantEmail(e.target.value)}
-                      className="border-[#cac6b9]/60 focus-visible:ring-[#8CC0EB] text-xs h-10 bg-[#fdf9f4] rounded-xl"
-                      placeholder="e.g. member@aayam.org"
-                      required
-                    />
-                  </div>
-
-                  {/* File Upload Section */}
-                  {activePosition.category === "Performer" ? (
-                    <div className="space-y-4 pt-1">
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-semibold text-[#635f41] flex items-center gap-1">
-                          <Video className="w-3.5 h-3.5 text-[#8CC0EB]" /> Audition Monologue Video (.mp4 / .mov)
-                        </label>
-                        <div className="border border-dashed border-[#cac6b9] rounded-xl bg-[#fdf9f4] p-3.5 flex items-center justify-between text-xs">
-                          <span className="text-[#466272]/80 truncate max-w-[240px]">
-                            {fileName1 || "Upload monologue video clip"}
-                          </span>
-                          <label className="cursor-pointer bg-[#8CC0EB]/20 hover:bg-[#8CC0EB]/30 text-[#1c1b19] px-3 py-1.5 rounded-lg border border-[#8CC0EB]/40 transition-all font-semibold flex items-center gap-1">
-                            <Upload className="w-3.5 h-3.5" /> File
-                            <input 
-                              type="file" 
-                              accept="video/*" 
-                              className="hidden" 
-                              onChange={(e) => {
-                                if (!e.target.files?.length) return;
-                                setFileName1(e.target.files[0].name);
-                              }}
-                            />
-                          </label>
-                        </div>
-                      </div>
-
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-semibold text-[#635f41] flex items-center gap-1">
-                          <FileText className="w-3.5 h-3.5 text-[#8CC0EB]" /> Headshot & Theatrical Resume PDF
-                        </label>
-                        <div className="border border-dashed border-[#cac6b9] rounded-xl bg-[#fdf9f4] p-3.5 flex items-center justify-between text-xs">
-                          <span className="text-[#466272]/80 truncate max-w-[240px]">
-                            {fileName2 || "Upload resume PDF"}
-                          </span>
-                          <label className="cursor-pointer bg-[#8CC0EB]/20 hover:bg-[#8CC0EB]/30 text-[#1c1b19] px-3 py-1.5 rounded-lg border border-[#8CC0EB]/40 transition-all font-semibold flex items-center gap-1">
-                            <Upload className="w-3.5 h-3.5" /> File
-                            <input 
-                              type="file" 
-                              accept=".pdf,image/*" 
-                              className="hidden" 
-                              onChange={(e) => e.target.files?.[0] && setFileName2(e.target.files[0].name)}
-                            />
-                          </label>
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="space-y-4 pt-1">
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-semibold text-[#635f41] flex items-center gap-1">
-                          <FileText className="w-3.5 h-3.5 text-[#8CC0EB]" /> Creative / Technical Portfolio PDF
-                        </label>
-                        <div className="border border-dashed border-[#cac6b9] rounded-xl bg-[#fdf9f4] p-3.5 flex items-center justify-between text-xs">
-                          <span className="text-[#466272]/80 truncate max-w-[240px]">
-                            {fileName1 || "Upload portfolio PDF"}
-                          </span>
-                          <label className="cursor-pointer bg-[#8CC0EB]/20 hover:bg-[#8CC0EB]/30 text-[#1c1b19] px-3 py-1.5 rounded-lg border border-[#8CC0EB]/40 transition-all font-semibold flex items-center gap-1">
-                            <Upload className="w-3.5 h-3.5" /> File
-                            <input 
-                              type="file" 
-                              accept=".pdf,.zip" 
-                              className="hidden" 
-                              onChange={(e) => e.target.files?.[0] && setFileName1(e.target.files[0].name)}
-                            />
-                          </label>
-                        </div>
-                      </div>
-
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-semibold text-[#635f41] flex items-center gap-1">
-                          <FileText className="w-3.5 h-3.5 text-[#8CC0EB]" /> Experience Resume PDF
-                        </label>
-                        <div className="border border-dashed border-[#cac6b9] rounded-xl bg-[#fdf9f4] p-3.5 flex items-center justify-between text-xs">
-                          <span className="text-[#466272]/80 truncate max-w-[240px]">
-                            {fileName2 || "Upload resume PDF"}
-                          </span>
-                          <label className="cursor-pointer bg-[#8CC0EB]/20 hover:bg-[#8CC0EB]/30 text-[#1c1b19] px-3 py-1.5 rounded-lg border border-[#8CC0EB]/40 transition-all font-semibold flex items-center gap-1">
-                            <Upload className="w-3.5 h-3.5" /> File
-                            <input 
-                              type="file" 
-                              accept=".pdf" 
-                              className="hidden" 
-                              onChange={(e) => e.target.files?.[0] && setFileName2(e.target.files[0].name)}
-                            />
-                          </label>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="space-y-1">
-                    <label className="text-xs font-semibold text-[#635f41]">Candidate Experience Notes / Message to Director</label>
-                    <textarea 
-                      value={coverNote}
-                      onChange={(e) => setCoverNote(e.target.value)}
-                      placeholder="Mention past theatrical productions, classical training, or specific role preparation..."
-                      className="w-full border border-[#cac6b9]/60 rounded-xl bg-[#fdf9f4] text-xs p-3 h-28 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#8CC0EB]"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-end gap-4 border-t border-[#e6e2dd] pt-6">
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  onClick={() => setApplyOpen(false)} 
-                  className="border-2 border-[#cac6b9] text-[#635f41] hover:bg-gray-100 rounded-xl text-xs font-bold px-8 h-11"
-                >
-                  Cancel
-                </Button>
-                <Button 
-                  type="submit"
-                  className="bg-[#635f41] hover:bg-[#4d4a32] text-white rounded-xl font-bold text-xs px-10 h-11 shadow-md"
-                >
-                  Submit Official Audition Application
-                </Button>
-              </div>
-            </form>
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge className="bg-[#635f41] text-white font-mono text-xs font-bold px-3 py-1">
+              {activePosition.category}
+            </Badge>
+            <Badge className="bg-[#8CC0EB]/20 text-[#1c1b19] border-[#8CC0EB]/40 font-semibold text-xs py-1">
+              Deadline: {activePosition.deadline || 'Sep 25, 2026'}
+            </Badge>
+            <Badge className="bg-emerald-100 text-emerald-800 font-semibold text-xs py-1">
+              Slots: {activePosition.slots_available || 1} Openings
+            </Badge>
           </div>
         </div>
-      )}
+
+        {/* 2-Column Application Form & Specifications */}
+        <form onSubmit={handleFormSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 text-left">
+            {/* Left Column: Role & Character Specifications (col-span-6) */}
+            <div className="lg:col-span-6 space-y-6 bg-white p-6 md:p-8 rounded-2xl border border-[#e6e2dd] shadow-xs">
+              <div className="space-y-2">
+                <strong className="text-xs font-bold text-[#635f41] uppercase tracking-wider block">
+                  Character & Role Specifications
+                </strong>
+                <p className="text-xs md:text-sm text-[#1c1b19] leading-relaxed font-light bg-[#fdf9f4] p-4 rounded-xl border border-[#cac6b9]/40">
+                  {activePosition.description || "Seeking dedicated ensemble member with strong stage presence, dramatic projection, and commitment to rehearsal schedules."}
+                </p>
+              </div>
+
+              <div className="space-y-2 pt-2 border-t border-[#e6e2dd]">
+                <strong className="text-xs font-bold text-[#635f41] uppercase tracking-wider block flex items-center gap-1">
+                  <ListChecks className="w-4 h-4 text-[#8CC0EB]" /> Audition Requirements & Skill Benchmark
+                </strong>
+                <div className="text-xs md:text-sm text-[#1c1b19] bg-[#fdf9f4] p-4 rounded-xl border border-[#cac6b9]/40 space-y-2">
+                  <p className="leading-relaxed font-medium">
+                    {activePosition.requirements || "Audition monologue clip / Technical PDF portfolio submission."}
+                  </p>
+                  <ul className="list-disc pl-4 text-xs text-[#466272] space-y-1.5 pt-2 border-t border-[#e6e2dd]">
+                    <li>High commitment to scheduled ensemble table-reads & stage rehearsals</li>
+                    <li>Audition slate or portfolio file review by maintainer creative board</li>
+                    <li>Selected candidates will be notified via email for call-back auditions</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="bg-[#8CC0EB]/10 p-4 rounded-xl border border-[#8CC0EB]/30 space-y-1">
+                <span className="text-xs font-bold text-[#635f41] block">Casting Process Note:</span>
+                <p className="text-xs text-[#466272] leading-relaxed">
+                  Applications submit directly to the maintainer review portal. Maintainers perform automated portfolio & video quality verification scans during review.
+                </p>
+              </div>
+            </div>
+
+            {/* Right Column: Applicant Details Form (col-span-6) */}
+            <div className="lg:col-span-6 space-y-5 bg-white p-6 md:p-8 rounded-2xl border border-[#e6e2dd] shadow-xs">
+              <strong className="text-xs font-bold text-[#635f41] uppercase tracking-wider block border-b border-[#e6e2dd] pb-3">
+                Applicant Information Form
+              </strong>
+
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-[#635f41]">Full Name *</label>
+                <Input 
+                  value={applicantName}
+                  onChange={(e) => setApplicantName(e.target.value)}
+                  className="border-[#cac6b9]/60 focus-visible:ring-[#8CC0EB] text-xs h-10 bg-[#fdf9f4] rounded-xl"
+                  placeholder="e.g. Aarav Varma"
+                  required
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-[#635f41]">Email Address *</label>
+                <Input 
+                  type="email"
+                  value={applicantEmail}
+                  onChange={(e) => setApplicantEmail(e.target.value)}
+                  className="border-[#cac6b9]/60 focus-visible:ring-[#8CC0EB] text-xs h-10 bg-[#fdf9f4] rounded-xl"
+                  placeholder="e.g. member@aayam.org"
+                  required
+                />
+              </div>
+
+              {/* File Upload Section */}
+              {activePosition.category === "Performer" ? (
+                <div className="space-y-4 pt-1">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-[#635f41] flex items-center gap-1">
+                      <Video className="w-3.5 h-3.5 text-[#8CC0EB]" /> Audition Monologue Video (.mp4 / .mov)
+                    </label>
+                    <div className="border border-dashed border-[#cac6b9] rounded-xl bg-[#fdf9f4] p-3.5 flex items-center justify-between text-xs">
+                      <span className="text-[#466272]/80 truncate max-w-[240px]">
+                        {fileName1 || "Upload monologue video clip"}
+                      </span>
+                      <label className="cursor-pointer bg-[#8CC0EB]/20 hover:bg-[#8CC0EB]/30 text-[#1c1b19] px-3 py-1.5 rounded-lg border border-[#8CC0EB]/40 transition-all font-semibold flex items-center gap-1">
+                        <Upload className="w-3.5 h-3.5" /> File
+                        <input 
+                          type="file" 
+                          accept="video/*" 
+                          className="hidden" 
+                          onChange={(e) => {
+                            if (!e.target.files?.length) return;
+                            setFileName1(e.target.files[0].name);
+                          }}
+                        />
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-[#635f41] flex items-center gap-1">
+                      <FileText className="w-3.5 h-3.5 text-[#8CC0EB]" /> Headshot & Theatrical Resume PDF
+                    </label>
+                    <div className="border border-dashed border-[#cac6b9] rounded-xl bg-[#fdf9f4] p-3.5 flex items-center justify-between text-xs">
+                      <span className="text-[#466272]/80 truncate max-w-[240px]">
+                        {fileName2 || "Upload resume PDF"}
+                      </span>
+                      <label className="cursor-pointer bg-[#8CC0EB]/20 hover:bg-[#8CC0EB]/30 text-[#1c1b19] px-3 py-1.5 rounded-lg border border-[#8CC0EB]/40 transition-all font-semibold flex items-center gap-1">
+                        <Upload className="w-3.5 h-3.5" /> File
+                        <input 
+                          type="file" 
+                          accept=".pdf,image/*" 
+                          className="hidden" 
+                          onChange={(e) => e.target.files?.[0] && setFileName2(e.target.files[0].name)}
+                        />
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-4 pt-1">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-[#635f41] flex items-center gap-1">
+                      <FileText className="w-3.5 h-3.5 text-[#8CC0EB]" /> Creative / Technical Portfolio PDF
+                    </label>
+                    <div className="border border-dashed border-[#cac6b9] rounded-xl bg-[#fdf9f4] p-3.5 flex items-center justify-between text-xs">
+                      <span className="text-[#466272]/80 truncate max-w-[240px]">
+                        {fileName1 || "Upload portfolio PDF"}
+                      </span>
+                      <label className="cursor-pointer bg-[#8CC0EB]/20 hover:bg-[#8CC0EB]/30 text-[#1c1b19] px-3 py-1.5 rounded-lg border border-[#8CC0EB]/40 transition-all font-semibold flex items-center gap-1">
+                        <Upload className="w-3.5 h-3.5" /> File
+                        <input 
+                          type="file" 
+                          accept=".pdf,.zip" 
+                          className="hidden" 
+                          onChange={(e) => e.target.files?.[0] && setFileName1(e.target.files[0].name)}
+                        />
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-[#635f41] flex items-center gap-1">
+                      <FileText className="w-3.5 h-3.5 text-[#8CC0EB]" /> Experience Resume PDF
+                    </label>
+                    <div className="border border-dashed border-[#cac6b9] rounded-xl bg-[#fdf9f4] p-3.5 flex items-center justify-between text-xs">
+                      <span className="text-[#466272]/80 truncate max-w-[240px]">
+                        {fileName2 || "Upload resume PDF"}
+                      </span>
+                      <label className="cursor-pointer bg-[#8CC0EB]/20 hover:bg-[#8CC0EB]/30 text-[#1c1b19] px-3 py-1.5 rounded-lg border border-[#8CC0EB]/40 transition-all font-semibold flex items-center gap-1">
+                        <Upload className="w-3.5 h-3.5" /> File
+                        <input 
+                          type="file" 
+                          accept=".pdf" 
+                          className="hidden" 
+                          onChange={(e) => e.target.files?.[0] && setFileName2(e.target.files[0].name)}
+                        />
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-[#635f41]">Candidate Experience Notes / Message to Director</label>
+                <textarea 
+                  value={coverNote}
+                  onChange={(e) => setCoverNote(e.target.value)}
+                  placeholder="Mention past theatrical productions, classical training, or specific role preparation..."
+                  className="w-full border border-[#cac6b9]/60 rounded-xl bg-[#fdf9f4] text-xs p-3 h-28 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#8CC0EB]"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-end gap-4 border-t border-[#e6e2dd] pt-6 bg-white p-4 rounded-2xl">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => setApplyOpen(false)} 
+              className="border-2 border-[#cac6b9] text-[#635f41] hover:bg-gray-100 rounded-xl text-xs font-bold px-8 h-11"
+            >
+              Cancel
+            </Button>
+            <Button 
+              type="submit"
+              className="bg-[#635f41] hover:bg-[#4d4a32] text-white rounded-xl font-bold text-xs px-10 h-11 shadow-md"
+            >
+              Submit Official Audition Application
+            </Button>
+          </div>
+        </form>
+      </div>
+  )}
 
       {/* Floating Status Bar / Application Tracker (Bottom Fixed Container) */}
       {selectedApp && (
