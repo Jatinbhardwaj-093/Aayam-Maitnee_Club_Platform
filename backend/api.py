@@ -987,6 +987,32 @@ def create_audition_position():
     db.session.commit()
     return jsonify({'status': 'success', 'position': new_pos.to_dict()})
 
+@api_bp.route('/audition-positions/<int:pos_id>', methods=['PUT', 'POST'])
+def update_audition_position(pos_id):
+    from models import AuditionPosition, db
+    data = request.json or {}
+    pos = AuditionPosition.query.get(pos_id)
+    if not pos:
+        return jsonify({'error': 'Position not found'}), 404
+        
+    if 'production_name' in data:
+        pos.production_name = data['production_name']
+    if 'role_name' in data:
+        pos.role_name = data['role_name']
+    if 'role_category' in data:
+        pos.role_category = data['role_category']
+    if 'character_description' in data:
+        pos.character_description = data['character_description']
+    if 'requirements' in data:
+        pos.requirements = data['requirements']
+    if 'slots_available' in data:
+        pos.slots_available = int(data['slots_available'])
+    if 'status' in data:
+        pos.status = data['status']
+        
+    db.session.commit()
+    return jsonify({'status': 'success', 'position': pos.to_dict()})
+
 @api_bp.route('/audition-applications', methods=['GET'])
 def get_audition_applications():
     from models import AuditionApplication
