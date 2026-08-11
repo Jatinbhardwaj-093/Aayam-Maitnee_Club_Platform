@@ -908,8 +908,61 @@ def update_sponsor_ad_status(ad_id):
 
 @api_bp.route('/audition-positions', methods=['GET'])
 def get_audition_positions():
-    from models import AuditionPosition, AuditionApplication
+    from models import AuditionPosition, AuditionApplication, db
     positions = AuditionPosition.query.order_by(AuditionPosition.created_at.desc()).all()
+    if not positions:
+        defaults = [
+            {
+                "production_name": "Tughlaq - Ensemble Production",
+                "role_name": "Sultan Muhammad bin Tughlaq (Lead)",
+                "role_category": "Performer",
+                "character_description": "Complex, vision-driven 14th-century ruler torn between idealism and ruthlessness. Requires powerful vocal presence, command over classical Hindustani diction, dramatic intensity, and emotional range.",
+                "requirements": "Audition monologue video clip & theatrical resume",
+                "slots_available": 2,
+                "status": "Open Calling"
+            },
+            {
+                "production_name": "Tughlaq - Ensemble Production",
+                "role_name": "Step-Mother / Queen Consort (Antagonist)",
+                "role_category": "Performer",
+                "character_description": "Sharp-witted, politically calculating royal matriarch who challenges Tughlaq's court decrees. Requires sharp eye contact, royal posture, and crisp monologue delivery.",
+                "requirements": "Classical drama monologue video & portfolio",
+                "slots_available": 1,
+                "status": "Open Calling"
+            },
+            {
+                "production_name": "Macbeth - Mainstage Production",
+                "role_name": "Lead Stage Makeup & Special Effects Stylist",
+                "role_category": "Creative Designer",
+                "character_description": "Head makeup artist responsible for period prosthetics, battle scars, dark theatrical contours, and quick backstage transformations for Macbeth, Lady Macbeth, and the Three Witches.",
+                "requirements": "Technical SFX makeup portfolio PDF & sketch samples",
+                "slots_available": 2,
+                "status": "Open Calling"
+            },
+            {
+                "production_name": "Tamashbin Kathputliya",
+                "role_name": "Soundboard & Acoustic Design Operator",
+                "role_category": "Technical Crew",
+                "character_description": "Technical audio operator responsible for live sound mixing, ambient folk instrument amplification, cue playback, and wireless microphone balancing during live mainstage runs.",
+                "requirements": "Audio staging portfolio PDF & work resume",
+                "slots_available": 1,
+                "status": "Casting Closed"
+            },
+            {
+                "production_name": "Andha Yug",
+                "role_name": "Costume Assistant & Wardrobe Master",
+                "role_category": "Creative Designer",
+                "character_description": "Backstage wardrobe assistant managing heritage drape costumes, armor fitting, quick-change coordination, and textile maintenance for a 25-person ensemble cast.",
+                "requirements": "Costume design portfolio PDF & resume",
+                "slots_available": 3,
+                "status": "Open Calling"
+            }
+        ]
+        for d in defaults:
+            db.session.add(AuditionPosition(**d))
+        db.session.commit()
+        positions = AuditionPosition.query.order_by(AuditionPosition.created_at.desc()).all()
+
     result = []
     for p in positions:
         p_dict = p.to_dict()

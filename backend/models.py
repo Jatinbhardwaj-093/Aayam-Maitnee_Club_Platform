@@ -554,15 +554,21 @@ class AuditionPosition(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def to_dict(self):
+        title_str = f"{self.production_name} - {self.role_name}" if self.production_name else self.role_name
         return {
-            'id': self.id,
+            'id': str(self.id),
+            'play_id': self.id,
+            'title': title_str,
             'production_name': self.production_name,
             'role_name': self.role_name,
             'role_category': self.role_category,
+            'category': self.role_category,
             'character_description': self.character_description or '',
+            'description': self.character_description or '',
             'requirements': self.requirements or '',
             'slots_available': self.slots_available or 1,
             'status': self.status or 'Open Calling',
+            'deadline': 'Aug 25, 2026',
             'created_at': self.created_at.strftime('%b %d, %Y') if self.created_at else 'Jul 20, 2026'
         }
 
