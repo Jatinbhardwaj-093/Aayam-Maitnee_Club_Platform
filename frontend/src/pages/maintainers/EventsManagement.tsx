@@ -495,21 +495,21 @@ export default function EventsManagement() {
      ==================================================================== */
   if (isCreatingEvent) {
     return (
-      <div className="flex-1 bg-[#fdf9f4] text-[#1c1b19] font-sans pb-16 space-y-6">
+      <div className="flex-1 bg-[#E7DDD3] text-[#232323] font-sans pb-16 space-y-6">
         <div className="max-w-7xl mx-auto space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#e6e2dd]">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#DDD8CE]">
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setIsCreatingEvent(false)}
-                className="p-2 rounded-xl border border-[#cac6b9]/60 bg-white text-[#466272] hover:bg-[#f7f3ee] transition-all flex items-center gap-1.5 text-xs font-semibold"
+                className="p-2 rounded-xl border border-[#D5C9BE]/60 bg-white text-[#666361] hover:bg-[#EFE8E1] transition-all flex items-center gap-1.5 text-xs font-semibold"
               >
                 <ArrowLeft className="w-4 h-4" /> Back
               </button>
               <div>
-                <h1 className="font-serif text-2xl md:text-3xl font-bold text-[#635f41] leading-tight">
+                <h1 className="font-serif text-2xl md:text-3xl font-bold text-[#353535] leading-tight">
                   Create Production Event
                 </h1>
-                <p className="text-xs text-[#466272]">Configure event details and publish to roster.</p>
+                <p className="text-xs text-[#666361]">Configure event details and publish to roster.</p>
               </div>
             </div>
 
@@ -517,14 +517,14 @@ export default function EventsManagement() {
               <button
                 type="button"
                 onClick={() => triggerToast("Draft saved locally.")}
-                className="px-4 py-2 rounded-xl border border-[#cac6b9] bg-white text-[#466272] hover:bg-[#f7f3ee] text-xs font-semibold transition-all flex items-center gap-1.5"
+                className="px-4 py-2 rounded-xl border border-[#D5C9BE] bg-white text-[#666361] hover:bg-[#EFE8E1] text-xs font-semibold transition-all flex items-center gap-1.5"
               >
                 <Save className="w-4 h-4" /> Save Draft
               </button>
               <button
                 type="button"
                 onClick={() => handlePublishEventSubmit()}
-                className="px-5 py-2 rounded-xl bg-[#635f41] text-white hover:bg-[#635f41]/90 text-xs font-bold shadow-xs transition-all flex items-center gap-1.5"
+                className="px-5 py-2 rounded-xl bg-[#353535] text-white hover:bg-[#353535]/90 text-xs font-bold shadow-xs transition-all flex items-center gap-1.5"
               >
                 <Send className="w-4 h-4" /> Publish Event
               </button>
@@ -533,12 +533,12 @@ export default function EventsManagement() {
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             <div className="lg:col-span-4 space-y-6">
-              <div className="bg-white border border-[#e6e2dd] rounded-2xl p-5 shadow-xs space-y-3">
+              <div className="bg-white border border-[#DDD8CE] rounded-2xl p-5 shadow-xs space-y-3">
                 <div className="flex items-center justify-between border-b border-gray-100 pb-2">
-                  <span className="text-xs font-bold text-[#635f41] uppercase tracking-wider">
+                  <span className="text-xs font-bold text-[#353535] uppercase tracking-wider">
                     Select Event Template
                   </span>
-                  <span className="text-[10px] text-[#466272]/70 font-semibold">3 Options</span>
+                  <span className="text-[10px] text-[#666361]/70 font-semibold">3 Options</span>
                 </div>
 
                 <div className="space-y-2">
@@ -549,16 +549,16 @@ export default function EventsManagement() {
                       onClick={() => handleSelectTemplate(tmpl.id)}
                       className={`w-full p-3 rounded-xl border text-left transition-all flex items-center justify-between ${
                         selectedTemplateId === tmpl.id
-                          ? "border-[#635f41] bg-[#635f41]/10 font-bold"
-                          : "border-gray-200 bg-white hover:border-[#cac6b9] hover:bg-[#fdf9f4]"
+                          ? "border-[#353535] bg-[#353535]/10 font-bold"
+                          : "border-gray-200 bg-white hover:border-[#D5C9BE] hover:bg-[#E7DDD3]"
                       }`}
                     >
                       <div className="min-w-0 flex-1">
-                        <div className="text-xs font-bold text-[#1c1b19] truncate">{tmpl.name}</div>
-                        <div className="text-[10px] text-[#466272]/70 truncate">{tmpl.category}</div>
+                        <div className="text-xs font-bold text-[#232323] truncate">{tmpl.name}</div>
+                        <div className="text-[10px] text-[#666361]/70 truncate">{tmpl.category}</div>
                       </div>
                       {selectedTemplateId === tmpl.id && (
-                        <span className="w-2 h-2 rounded-full bg-[#635f41]" />
+                        <span className="w-2 h-2 rounded-full bg-[#353535]" />
                       )}
                     </button>
                   ))}
@@ -567,50 +567,50 @@ export default function EventsManagement() {
             </div>
 
             <div className="lg:col-span-8 space-y-6">
-              <div className="bg-white border border-[#e6e2dd] rounded-2xl p-6 shadow-xs space-y-5">
-                <h3 className="font-serif font-bold text-lg text-[#635f41] border-b border-gray-100 pb-3">
+              <div className="bg-white border border-[#DDD8CE] rounded-2xl p-6 shadow-xs space-y-5">
+                <h3 className="font-serif font-bold text-lg text-[#353535] border-b border-gray-100 pb-3">
                   Event Details Configuration
                 </h3>
 
                 <div className="space-y-4 text-xs">
                   <div>
-                    <label className="font-bold text-[#466272] block mb-1">Event Title</label>
+                    <label className="font-bold text-[#666361] block mb-1">Event Title</label>
                     <Input
                       value={newEventForm.title}
                       onChange={(e) => setNewEventForm({ ...newEventForm, title: e.target.value })}
                       placeholder="e.g. Macbeth - Gala Opening Night"
-                      className="bg-[#fdf9f4] border-[#cac6b9]/60 h-10 text-xs rounded-xl"
+                      className="bg-[#E7DDD3] border-[#D5C9BE]/60 h-10 text-xs rounded-xl"
                     />
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="font-bold text-[#466272] block mb-1">Date</label>
+                      <label className="font-bold text-[#666361] block mb-1">Date</label>
                       <Input
                         type="date"
                         value={newEventForm.date}
                         onChange={(e) => setNewEventForm({ ...newEventForm, date: e.target.value })}
-                        className="bg-[#fdf9f4] border-[#cac6b9]/60 h-10 text-xs rounded-xl"
+                        className="bg-[#E7DDD3] border-[#D5C9BE]/60 h-10 text-xs rounded-xl"
                       />
                     </div>
                     <div>
-                      <label className="font-bold text-[#466272] block mb-1">Venue</label>
+                      <label className="font-bold text-[#666361] block mb-1">Venue</label>
                       <Input
                         value={newEventForm.venue}
                         onChange={(e) => setNewEventForm({ ...newEventForm, venue: e.target.value })}
                         placeholder="Main Auditorium"
-                        className="bg-[#fdf9f4] border-[#cac6b9]/60 h-10 text-xs rounded-xl"
+                        className="bg-[#E7DDD3] border-[#D5C9BE]/60 h-10 text-xs rounded-xl"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="font-bold text-[#466272] block mb-1">Event Description</label>
+                    <label className="font-bold text-[#666361] block mb-1">Event Description</label>
                     <textarea
                       value={newEventForm.description}
                       onChange={(e) => setNewEventForm({ ...newEventForm, description: e.target.value })}
                       rows={4}
-                      className="w-full bg-[#fdf9f4] border border-[#cac6b9]/60 p-3 rounded-xl text-xs text-[#1c1b19] focus:outline-none"
+                      className="w-full bg-[#E7DDD3] border border-[#D5C9BE]/60 p-3 rounded-xl text-xs text-[#232323] focus:outline-none"
                       placeholder="Provide event details..."
                     />
                   </div>
@@ -627,21 +627,21 @@ export default function EventsManagement() {
      DEFAULT DASHBOARD VIEW (UPCOMING / PAST / PROPOSALS / SPONSOR ADS)
      ==================================================================== */
   return (
-    <div className="flex-1 bg-[#fdf9f4] text-[#1c1b19] font-sans pb-16">
+    <div className="flex-1 bg-[#E7DDD3] text-[#232323] font-sans pb-16">
       <div className="max-w-7xl mx-auto space-y-8">
         
         {/* Page Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-[#e6e2dd]">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-[#DDD8CE]">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="px-2.5 py-0.5 rounded-full bg-[#635f41]/10 text-[#635f41] text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
-                <Shield className="w-3 h-3 text-[#635f41]" /> Maintainer Operations
+              <span className="px-2.5 py-0.5 rounded-full bg-[#353535]/10 text-[#353535] text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
+                <Shield className="w-3 h-3 text-[#353535]" /> Maintainer Operations
               </span>
             </div>
-            <h1 className="font-serif text-3xl md:text-4xl font-bold text-[#635f41] tracking-tight">
+            <h1 className="font-serif text-3xl md:text-4xl font-bold text-[#353535] tracking-tight">
               Events & Sponsor Portal
             </h1>
-            <p className="text-xs md:text-sm text-[#466272] mt-1 max-w-2xl">
+            <p className="text-xs md:text-sm text-[#666361] mt-1 max-w-2xl">
               Manage club productions, review member pitches, and curate corporate sponsor ad requests in the database.
             </p>
           </div>
@@ -653,7 +653,7 @@ export default function EventsManagement() {
                 handleSelectTemplate("template-play");
                 setIsCreatingEvent(true);
               }}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#635f41] text-white hover:bg-[#635f41]/90 text-xs font-bold shadow-xs transition-all active:scale-95"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#353535] text-white hover:bg-[#353535]/90 text-xs font-bold shadow-xs transition-all active:scale-95"
             >
               <Plus className="w-4 h-4" />
               Create Event
@@ -663,53 +663,53 @@ export default function EventsManagement() {
 
         {/* Maintainer Executive Summary Bar */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-white border border-[#e6e2dd] rounded-2xl p-5 shadow-xs flex items-center justify-between">
+          <div className="bg-white border border-[#DDD8CE] rounded-2xl p-5 shadow-xs flex items-center justify-between">
             <div>
-              <span className="text-[11px] font-bold uppercase tracking-wider text-[#466272]">Upcoming Events</span>
-              <div className="text-2xl font-serif font-bold text-[#635f41] mt-0.5">{upcomingEvents.length}</div>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-[#666361]">Upcoming Events</span>
+              <div className="text-2xl font-serif font-bold text-[#353535] mt-0.5">{upcomingEvents.length}</div>
             </div>
           </div>
 
-          <div className="bg-white border border-[#e6e2dd] rounded-2xl p-5 shadow-xs flex items-center justify-between">
+          <div className="bg-white border border-[#DDD8CE] rounded-2xl p-5 shadow-xs flex items-center justify-between">
             <div>
-              <span className="text-[11px] font-bold uppercase tracking-wider text-[#466272]">Pending Proposals</span>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-[#666361]">Pending Proposals</span>
               <div className="text-2xl font-serif font-bold text-amber-700 mt-0.5">
                 {proposals.filter((p) => p.status === "Reviewing").length}
               </div>
             </div>
           </div>
 
-          <div className="bg-white border border-[#e6e2dd] rounded-2xl p-5 shadow-xs flex items-center justify-between">
+          <div className="bg-white border border-[#DDD8CE] rounded-2xl p-5 shadow-xs flex items-center justify-between">
             <div>
-              <span className="text-[11px] font-bold uppercase tracking-wider text-[#466272]">Sponsor Ads in DB</span>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-[#666361]">Sponsor Ads in DB</span>
               <div className="text-2xl font-serif font-bold text-[#1e4463] mt-0.5">
                 {sponsorAds.length} Requests
               </div>
             </div>
           </div>
 
-          <div className="bg-white border border-[#e6e2dd] rounded-2xl p-5 shadow-xs flex items-center justify-between">
+          <div className="bg-white border border-[#DDD8CE] rounded-2xl p-5 shadow-xs flex items-center justify-between">
             <div>
-              <span className="text-[11px] font-bold uppercase tracking-wider text-[#466272]">Past Productions</span>
-              <div className="text-2xl font-serif font-bold text-[#635f41] mt-0.5">{pastEvents.length}</div>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-[#666361]">Past Productions</span>
+              <div className="text-2xl font-serif font-bold text-[#353535] mt-0.5">{pastEvents.length}</div>
             </div>
           </div>
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex items-center justify-between border-b border-[#e6e2dd]">
+        <div className="flex items-center justify-between border-b border-[#DDD8CE]">
           <div className="flex gap-8 overflow-x-auto no-scrollbar">
             <button
               onClick={() => setActiveTab("Upcoming")}
               className={`pb-3 text-xs font-bold uppercase tracking-wider transition-all relative ${
                 activeTab === "Upcoming"
-                  ? "text-[#635f41]"
-                  : "text-[#466272]/60 hover:text-[#635f41]"
+                  ? "text-[#353535]"
+                  : "text-[#666361]/60 hover:text-[#353535]"
               }`}
             >
               Upcoming Events ({upcomingEvents.length})
               {activeTab === "Upcoming" && (
-                <span className="absolute bottom-0 left-0 w-full h-[3px] bg-[#635f41] rounded-t-md" />
+                <span className="absolute bottom-0 left-0 w-full h-[3px] bg-[#353535] rounded-t-md" />
               )}
             </button>
 
@@ -717,8 +717,8 @@ export default function EventsManagement() {
               onClick={() => setActiveTab("Sponsor Ads")}
               className={`pb-3 text-xs font-bold uppercase tracking-wider transition-all relative flex items-center gap-1.5 ${
                 activeTab === "Sponsor Ads"
-                  ? "text-[#635f41]"
-                  : "text-[#466272]/60 hover:text-[#635f41]"
+                  ? "text-[#353535]"
+                  : "text-[#666361]/60 hover:text-[#353535]"
               }`}
             >
               Sponsor Ads Requests
@@ -726,7 +726,7 @@ export default function EventsManagement() {
                 {sponsorAds.filter((a) => a.status === "Pending").length} Pending
               </span>
               {activeTab === "Sponsor Ads" && (
-                <span className="absolute bottom-0 left-0 w-full h-[3px] bg-[#635f41] rounded-t-md" />
+                <span className="absolute bottom-0 left-0 w-full h-[3px] bg-[#353535] rounded-t-md" />
               )}
             </button>
 
@@ -734,13 +734,13 @@ export default function EventsManagement() {
               onClick={() => setActiveTab("Proposals")}
               className={`pb-3 text-xs font-bold uppercase tracking-wider transition-all relative flex items-center gap-1.5 ${
                 activeTab === "Proposals"
-                  ? "text-[#635f41]"
-                  : "text-[#466272]/60 hover:text-[#635f41]"
+                  ? "text-[#353535]"
+                  : "text-[#666361]/60 hover:text-[#353535]"
               }`}
             >
               Event Proposals & Pitches
               {activeTab === "Proposals" && (
-                <span className="absolute bottom-0 left-0 w-full h-[3px] bg-[#635f41] rounded-t-md" />
+                <span className="absolute bottom-0 left-0 w-full h-[3px] bg-[#353535] rounded-t-md" />
               )}
             </button>
 
@@ -748,13 +748,13 @@ export default function EventsManagement() {
               onClick={() => setActiveTab("Past")}
               className={`pb-3 text-xs font-bold uppercase tracking-wider transition-all relative ${
                 activeTab === "Past"
-                  ? "text-[#635f41]"
-                  : "text-[#466272]/60 hover:text-[#635f41]"
+                  ? "text-[#353535]"
+                  : "text-[#666361]/60 hover:text-[#353535]"
               }`}
             >
               Past Events ({pastEvents.length})
               {activeTab === "Past" && (
-                <span className="absolute bottom-0 left-0 w-full h-[3px] bg-[#635f41] rounded-t-md" />
+                <span className="absolute bottom-0 left-0 w-full h-[3px] bg-[#353535] rounded-t-md" />
               )}
             </button>
           </div>
@@ -766,7 +766,7 @@ export default function EventsManagement() {
             {upcomingEvents.map((evt) => (
               <div
                 key={evt.id}
-                className="bg-white border border-[#e6e2dd] rounded-2xl overflow-hidden shadow-2xs hover:shadow-md transition-all flex flex-col justify-between"
+                className="bg-white border border-[#DDD8CE] rounded-2xl overflow-hidden shadow-2xs hover:shadow-md transition-all flex flex-col justify-between"
               >
                 <div className="h-40 relative">
                   <img
@@ -774,23 +774,23 @@ export default function EventsManagement() {
                     alt={evt.title}
                     className="w-full h-full object-cover"
                   />
-                  <div className="absolute top-3 left-3 bg-white/90 text-[#635f41] text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase border border-[#cac6b9]">
+                  <div className="absolute top-3 left-3 bg-white/90 text-[#353535] text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase border border-[#D5C9BE]">
                     {evt.category || "Mainstage"}
                   </div>
                 </div>
 
                 <div className="p-5 space-y-3 flex-1 flex flex-col justify-between">
                   <div className="space-y-1.5">
-                    <h3 className="font-serif font-bold text-lg text-[#1c1b19]">{evt.title}</h3>
-                    <p className="text-xs text-[#466272]/80 line-clamp-2">{evt.description}</p>
+                    <h3 className="font-serif font-bold text-lg text-[#232323]">{evt.title}</h3>
+                    <p className="text-xs text-[#666361]/80 line-clamp-2">{evt.description}</p>
                   </div>
 
-                  <div className="pt-3 border-t border-[#e6e2dd]/70 text-xs text-[#466272] space-y-1">
+                  <div className="pt-3 border-t border-[#DDD8CE]/70 text-xs text-[#666361] space-y-1">
                     <div className="flex items-center gap-1.5">
-                      <Calendar className="w-3.5 h-3.5 text-[#635f41]" /> {evt.date}
+                      <Calendar className="w-3.5 h-3.5 text-[#353535]" /> {evt.date}
                     </div>
                     <div className="flex items-center gap-1.5">
-                      <MapPin className="w-3.5 h-3.5 text-[#635f41]" /> {evt.venue}
+                      <MapPin className="w-3.5 h-3.5 text-[#353535]" /> {evt.venue}
                     </div>
                   </div>
                 </div>
@@ -802,10 +802,10 @@ export default function EventsManagement() {
         {/* TAB 2: SPONSOR ADS REQUESTS (DATABASE BACKED) */}
         {activeTab === "Sponsor Ads" && (
           <div className="space-y-6">
-            <div className="bg-white border border-[#e6e2dd] p-5 rounded-2xl shadow-xs space-y-4">
+            <div className="bg-white border border-[#DDD8CE] p-5 rounded-2xl shadow-xs space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <h2 className="font-serif font-bold text-xl text-[#1c1b19] flex items-center gap-2">
-                  <Building className="w-5 h-5 text-[#635f41]" /> Corporate Sponsor Ad Requests
+                <h2 className="font-serif font-bold text-xl text-[#232323] flex items-center gap-2">
+                  <Building className="w-5 h-5 text-[#353535]" /> Corporate Sponsor Ad Requests
                 </h2>
                 <div className="flex items-center gap-2">
                   <input
@@ -813,12 +813,12 @@ export default function EventsManagement() {
                     placeholder="Filter sponsor requests by keyword..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="px-3.5 py-1.5 rounded-xl border border-[#cac6b9]/60 bg-[#fdf9f4] text-xs text-[#1c1b19] focus:outline-none focus:border-[#635f41] w-64"
+                    className="px-3.5 py-1.5 rounded-xl border border-[#D5C9BE]/60 bg-[#E7DDD3] text-xs text-[#232323] focus:outline-none focus:border-[#353535] w-64"
                   />
                   {searchTerm && (
                     <button
                       onClick={() => setSearchTerm("")}
-                      className="px-2.5 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-[#466272] text-xs font-semibold"
+                      className="px-2.5 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-[#666361] text-xs font-semibold"
                     >
                       Clear
                     </button>
@@ -826,9 +826,9 @@ export default function EventsManagement() {
                 </div>
               </div>
               {searchTerm && (
-                <div className="flex items-center gap-2 text-xs text-[#635f41]">
+                <div className="flex items-center gap-2 text-xs text-[#353535]">
                   <span>Active Keyword Filter:</span>
-                  <span className="px-2.5 py-0.5 rounded-full bg-[#635f41] text-white font-bold text-[11px] flex items-center gap-1">
+                  <span className="px-2.5 py-0.5 rounded-full bg-[#353535] text-white font-bold text-[11px] flex items-center gap-1">
                     {searchTerm}
                     <button onClick={() => setSearchTerm("")} className="hover:text-amber-200 ml-1">×</button>
                   </span>
@@ -837,7 +837,7 @@ export default function EventsManagement() {
             </div>
 
             {filteredSponsorAds.length === 0 ? (
-              <div className="bg-white border border-[#e6e2dd] p-8 rounded-2xl text-center text-xs text-[#466272]/70 italic">
+              <div className="bg-white border border-[#DDD8CE] p-8 rounded-2xl text-center text-xs text-[#666361]/70 italic">
                 No sponsor requests match your keyword filter "{searchTerm}".
               </div>
             ) : (
@@ -845,11 +845,11 @@ export default function EventsManagement() {
                 {filteredSponsorAds.map((ad) => (
                   <div
                     key={ad.id}
-                    className="bg-white border border-[#e6e2dd] hover:border-[#635f41] rounded-2xl p-6 shadow-2xs hover:shadow-xs transition-all space-y-4 flex flex-col justify-between"
+                    className="bg-white border border-[#DDD8CE] hover:border-[#353535] rounded-2xl p-6 shadow-2xs hover:shadow-xs transition-all space-y-4 flex flex-col justify-between"
                   >
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
-                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#635f41]/10 text-[#635f41] border border-[#635f41]/20">
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#353535]/10 text-[#353535] border border-[#353535]/20">
                           {ad.ad_category}
                         </span>
 
@@ -867,45 +867,45 @@ export default function EventsManagement() {
                       </div>
 
                       <div>
-                        <h3 className="font-serif font-bold text-lg text-[#1c1b19] leading-snug">{ad.ad_title}</h3>
-                        <p className="text-xs text-[#635f41] font-semibold flex items-center gap-1 mt-0.5">
+                        <h3 className="font-serif font-bold text-lg text-[#232323] leading-snug">{ad.ad_title}</h3>
+                        <p className="text-xs text-[#353535] font-semibold flex items-center gap-1 mt-0.5">
                           <Building className="w-3.5 h-3.5" /> {ad.sponsor_name}
                         </p>
                       </div>
 
-                      <div className="p-3.5 bg-[#fdf9f4] rounded-xl border border-[#e6e2dd] space-y-2 text-xs">
-                        <div className="flex items-center justify-between text-[#466272]">
+                      <div className="p-3.5 bg-[#E7DDD3] rounded-xl border border-[#DDD8CE] space-y-2 text-xs">
+                        <div className="flex items-center justify-between text-[#666361]">
                           <span>Contact: <strong>{ad.contact_person}</strong></span>
                           <span className="text-emerald-700 font-bold">{ad.budget_offered}</span>
                         </div>
-                        <div className="text-[#466272] truncate">
-                          Email: <a href={`mailto:${ad.contact_email}`} className="underline text-[#635f41]">{ad.contact_email}</a>
+                        <div className="text-[#666361] truncate">
+                          Email: <a href={`mailto:${ad.contact_email}`} className="underline text-[#353535]">{ad.contact_email}</a>
                         </div>
                         {ad.contact_phone && (
-                          <div className="text-[#466272]">
+                          <div className="text-[#666361]">
                             Phone: <strong>{ad.contact_phone}</strong>
                           </div>
                         )}
-                        <div className="pt-1.5 border-t border-[#e6e2dd] text-[11px] text-[#1c1b19]">
+                        <div className="pt-1.5 border-t border-[#DDD8CE] text-[11px] text-[#232323]">
                           Target Event: <strong>{ad.target_event_name}</strong>
                         </div>
                       </div>
 
                       {ad.ad_description && (
                         <div className="space-y-2.5">
-                          <p className="text-xs text-[#466272]/90 leading-relaxed italic bg-gray-50 p-3.5 rounded-xl border border-gray-100">
+                          <p className="text-xs text-[#666361]/90 leading-relaxed italic bg-gray-50 p-3.5 rounded-xl border border-gray-100">
                             "{ad.ad_description}"
                           </p>
 
                           {/* AI Keyword Extraction Button */}
                           <div className="flex items-center justify-between gap-2 pt-1">
-                            <span className="text-[11px] font-bold uppercase tracking-wider text-[#635f41]">
+                            <span className="text-[11px] font-bold uppercase tracking-wider text-[#353535]">
                               AI Key Signals
                             </span>
                             <button
                               type="button"
                               onClick={() => handleToggleAIKeywords(`sponsor_${ad.id}`, ad.ad_description)}
-                              className="px-3 py-1 rounded-lg bg-[#fdf9f4] hover:bg-[#e6e2dd] text-[#635f41] text-[11px] font-bold transition-all border border-[#cac6b9]/60"
+                              className="px-3 py-1 rounded-lg bg-[#E7DDD3] hover:bg-[#DDD8CE] text-[#353535] text-[11px] font-bold transition-all border border-[#D5C9BE]/60"
                             >
                               {extractedKeywords[`sponsor_${ad.id}`] ? "Hide Keywords" : "Extract & Filter Keywords"}
                             </button>
@@ -913,15 +913,15 @@ export default function EventsManagement() {
 
                           {/* Extracted AI Keyword Badges Panel */}
                           {extractedKeywords[`sponsor_${ad.id}`] && (
-                            <div className="p-3 bg-[#fdf9f4] rounded-xl border border-[#cac6b9]/60 space-y-2">
-                              <div className="text-[10px] text-[#635f41] font-semibold">Click keyword to filter requests:</div>
+                            <div className="p-3 bg-[#E7DDD3] rounded-xl border border-[#D5C9BE]/60 space-y-2">
+                              <div className="text-[10px] text-[#353535] font-semibold">Click keyword to filter requests:</div>
                               <div className="flex flex-wrap gap-1.5">
                                 {extractedKeywords[`sponsor_${ad.id}`].map((kw, idx) => (
                                   <button
                                     key={idx}
                                     type="button"
                                     onClick={() => handleKeywordClick(kw)}
-                                    className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-white hover:bg-[#635f41] hover:text-white text-[#1c1b19] border border-[#cac6b9]/50 shadow-2xs transition-all cursor-pointer"
+                                    className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-white hover:bg-[#353535] hover:text-white text-[#232323] border border-[#D5C9BE]/50 shadow-2xs transition-all cursor-pointer"
                                   >
                                     {kw}
                                   </button>
@@ -933,7 +933,7 @@ export default function EventsManagement() {
                       )}
                     </div>
 
-                    <div className="pt-3 border-t border-[#e6e2dd] flex items-center justify-between gap-3 text-xs font-bold">
+                    <div className="pt-3 border-t border-[#DDD8CE] flex items-center justify-between gap-3 text-xs font-bold">
                       <span className="text-[10px] text-gray-400 font-normal">{ad.submitted_at}</span>
                       
                       <div className="flex items-center gap-2">
@@ -947,7 +947,7 @@ export default function EventsManagement() {
                         <button
                           onClick={() => handleUpdateSponsorAdStatus(ad.id, "Approved")}
                           disabled={ad.status === "Approved"}
-                          className="px-3 py-1.5 rounded-lg bg-[#635f41] text-white hover:bg-[#4d4a32] text-xs transition-all disabled:opacity-50"
+                          className="px-3 py-1.5 rounded-lg bg-[#353535] text-white hover:bg-[#4d4a32] text-xs transition-all disabled:opacity-50"
                         >
                           Approve Ad
                         </button>
@@ -963,9 +963,9 @@ export default function EventsManagement() {
         {/* TAB 3: EVENT PROPOSALS & PITCHES */}
         {activeTab === "Proposals" && (
           <div className="space-y-6">
-            <div className="bg-white border border-[#e6e2dd] p-5 rounded-2xl shadow-xs space-y-4">
+            <div className="bg-white border border-[#DDD8CE] p-5 rounded-2xl shadow-xs space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <h2 className="font-serif font-bold text-xl text-[#1c1b19] flex items-center gap-2">
+                <h2 className="font-serif font-bold text-xl text-[#232323] flex items-center gap-2">
                   Event Proposals & Member Pitches
                 </h2>
                 <div className="flex items-center gap-2">
@@ -974,12 +974,12 @@ export default function EventsManagement() {
                     placeholder="Filter proposals by keyword..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="px-3.5 py-1.5 rounded-xl border border-[#cac6b9]/60 bg-[#fdf9f4] text-xs text-[#1c1b19] focus:outline-none focus:border-[#635f41] w-64"
+                    className="px-3.5 py-1.5 rounded-xl border border-[#D5C9BE]/60 bg-[#E7DDD3] text-xs text-[#232323] focus:outline-none focus:border-[#353535] w-64"
                   />
                   {searchTerm && (
                     <button
                       onClick={() => setSearchTerm("")}
-                      className="px-2.5 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-[#466272] text-xs font-semibold"
+                      className="px-2.5 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-[#666361] text-xs font-semibold"
                     >
                       Clear
                     </button>
@@ -987,9 +987,9 @@ export default function EventsManagement() {
                 </div>
               </div>
               {searchTerm && (
-                <div className="flex items-center gap-2 text-xs text-[#635f41]">
+                <div className="flex items-center gap-2 text-xs text-[#353535]">
                   <span>Active Keyword Filter:</span>
-                  <span className="px-2.5 py-0.5 rounded-full bg-[#635f41] text-white font-bold text-[11px] flex items-center gap-1">
+                  <span className="px-2.5 py-0.5 rounded-full bg-[#353535] text-white font-bold text-[11px] flex items-center gap-1">
                     {searchTerm}
                     <button onClick={() => setSearchTerm("")} className="hover:text-amber-200 ml-1">×</button>
                   </span>
@@ -998,9 +998,9 @@ export default function EventsManagement() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-              <div className="lg:col-span-7 bg-white border border-[#e6e2dd] rounded-2xl shadow-xs overflow-hidden">
-                <div className="p-4 border-b border-[#e6e2dd] bg-[#fdf9f4] flex justify-between items-center">
-                  <h3 className="font-serif font-bold text-base text-[#635f41]">
+              <div className="lg:col-span-7 bg-white border border-[#DDD8CE] rounded-2xl shadow-xs overflow-hidden">
+                <div className="p-4 border-b border-[#DDD8CE] bg-[#E7DDD3] flex justify-between items-center">
+                  <h3 className="font-serif font-bold text-base text-[#353535]">
                     Submitted Proposals ({filteredProposals.length})
                   </h3>
                 </div>
@@ -1010,16 +1010,16 @@ export default function EventsManagement() {
                     <div
                       key={prop.id}
                       onClick={() => setSelectedProposalId(prop.id)}
-                      className={`p-4 hover:bg-[#fdf9f4]/60 transition-all cursor-pointer flex items-start justify-between gap-4 ${
+                      className={`p-4 hover:bg-[#E7DDD3]/60 transition-all cursor-pointer flex items-start justify-between gap-4 ${
                         selectedProposalId === prop.id
-                          ? "bg-[#fdf9f4] border-l-4 border-[#8CC0EB]"
+                          ? "bg-[#E7DDD3] border-l-4 border-[#E85F57]"
                           : "border-l-4 border-transparent"
                       }`}
                     >
                       <div className="space-y-1.5 flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-2">
                           <div className="flex items-center gap-2">
-                            <span className="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-[#635f41]/10 text-[#635f41]">
+                            <span className="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-[#353535]/10 text-[#353535]">
                               {prop.proposalType || prop.sourceType || "Proposal"}
                             </span>
                             <span className="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-amber-50 text-amber-800 border border-amber-200">
@@ -1028,8 +1028,8 @@ export default function EventsManagement() {
                           </div>
                           <span className="text-[10px] text-emerald-700 font-bold">{prop.budget || prop.sponsorshipDeal || "₹50,000"}</span>
                         </div>
-                        <h4 className="font-bold text-sm text-[#1c1b19] truncate">{prop.name}</h4>
-                        <div className="text-[11px] text-[#466272] flex flex-wrap gap-x-2 gap-y-0.5 items-center">
+                        <h4 className="font-bold text-sm text-[#232323] truncate">{prop.name}</h4>
+                        <div className="text-[11px] text-[#666361] flex flex-wrap gap-x-2 gap-y-0.5 items-center">
                           <span>By <strong>{prop.submitter?.name || prop.submitter_name || "Ensemble Member"}</strong></span>
                           <span>•</span>
                           <span>{prop.contact_email || prop.submitter?.email}</span>
@@ -1044,7 +1044,7 @@ export default function EventsManagement() {
                           Stage: <strong>{prop.venue}</strong>
                         </div>
                         {prop.description && (
-                          <p className="text-[11px] text-[#466272]/85 line-clamp-2 italic mt-1 bg-gray-50/70 p-2 rounded-lg border border-gray-100">
+                          <p className="text-[11px] text-[#666361]/85 line-clamp-2 italic mt-1 bg-gray-50/70 p-2 rounded-lg border border-gray-100">
                             "{prop.description}"
                           </p>
                         )}
@@ -1054,11 +1054,11 @@ export default function EventsManagement() {
                 </div>
               </div>
 
-              <div className="lg:col-span-5 bg-white border border-[#e6e2dd] rounded-2xl shadow-xs p-6 flex flex-col justify-between space-y-6">
+              <div className="lg:col-span-5 bg-white border border-[#DDD8CE] rounded-2xl shadow-xs p-6 flex flex-col justify-between space-y-6">
                 {currentProposal && (
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#635f41]/10 text-[#635f41]">
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#353535]/10 text-[#353535]">
                         {currentProposal.proposalType || currentProposal.sourceType || "Proposal Pitch"}
                       </span>
                       <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-50 text-amber-800 border border-amber-200">
@@ -1066,41 +1066,41 @@ export default function EventsManagement() {
                       </span>
                     </div>
 
-                    <h3 className="font-serif text-xl font-bold text-[#1c1b19] leading-snug">{currentProposal.name}</h3>
+                    <h3 className="font-serif text-xl font-bold text-[#232323] leading-snug">{currentProposal.name}</h3>
 
-                    <div className="p-3.5 bg-[#fdf9f4] rounded-xl border border-[#e6e2dd] space-y-2 text-xs">
-                      <div className="flex items-center justify-between text-[#466272]">
+                    <div className="p-3.5 bg-[#E7DDD3] rounded-xl border border-[#DDD8CE] space-y-2 text-xs">
+                      <div className="flex items-center justify-between text-[#666361]">
                         <span>Submitter: <strong>{currentProposal.submitter?.name || "Ensemble Member"}</strong></span>
                         <span className="text-emerald-700 font-bold">{currentProposal.budget || currentProposal.sponsorshipDeal || "₹50,000"}</span>
                       </div>
-                      <div className="text-[#466272] truncate">
-                        Email: <a href={`mailto:${currentProposal.contact_email || currentProposal.submitter?.email}`} className="underline text-[#635f41]">{currentProposal.contact_email || currentProposal.submitter?.email || "partner@aayam.org"}</a>
+                      <div className="text-[#666361] truncate">
+                        Email: <a href={`mailto:${currentProposal.contact_email || currentProposal.submitter?.email}`} className="underline text-[#353535]">{currentProposal.contact_email || currentProposal.submitter?.email || "partner@aayam.org"}</a>
                       </div>
                       {currentProposal.contact_phone && (
-                        <div className="text-[#466272]">
+                        <div className="text-[#666361]">
                           Phone: <strong>{currentProposal.contact_phone}</strong>
                         </div>
                       )}
-                      <div className="pt-1.5 border-t border-[#e6e2dd] text-[11px] text-[#1c1b19]">
+                      <div className="pt-1.5 border-t border-[#DDD8CE] text-[11px] text-[#232323]">
                         Target Stage / Venue: <strong>{currentProposal.venue}</strong>
                       </div>
                     </div>
 
                     <div className="space-y-2">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-[#635f41] block">Proposal Description & Objectives</span>
-                      <p className="text-xs text-[#466272] bg-gray-50 p-3.5 rounded-xl border border-gray-100 leading-relaxed italic">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-[#353535] block">Proposal Description & Objectives</span>
+                      <p className="text-xs text-[#666361] bg-gray-50 p-3.5 rounded-xl border border-gray-100 leading-relaxed italic">
                         "{currentProposal.description || "No description provided."}"
                       </p>
 
                       {/* AI Keyword Extraction Button */}
                       <div className="flex items-center justify-between gap-2 pt-1">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-[#635f41]">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-[#353535]">
                           AI Key Signals
                         </span>
                         <button
                           type="button"
                           onClick={() => handleToggleAIKeywords(`prop_${currentProposal.id}`, currentProposal.description)}
-                          className="px-3 py-1 rounded-lg bg-[#fdf9f4] hover:bg-[#e6e2dd] text-[#635f41] text-[11px] font-bold transition-all border border-[#cac6b9]/60"
+                          className="px-3 py-1 rounded-lg bg-[#E7DDD3] hover:bg-[#DDD8CE] text-[#353535] text-[11px] font-bold transition-all border border-[#D5C9BE]/60"
                         >
                           {extractedKeywords[`prop_${currentProposal.id}`] ? "Hide Keywords" : "Extract & Filter Keywords"}
                         </button>
@@ -1108,15 +1108,15 @@ export default function EventsManagement() {
 
                       {/* Extracted AI Keyword Badges Panel */}
                       {extractedKeywords[`prop_${currentProposal.id}`] && (
-                        <div className="p-3 bg-[#fdf9f4] rounded-xl border border-[#cac6b9]/60 space-y-2">
-                          <div className="text-[10px] text-[#635f41] font-semibold">Click keyword to filter requests:</div>
+                        <div className="p-3 bg-[#E7DDD3] rounded-xl border border-[#D5C9BE]/60 space-y-2">
+                          <div className="text-[10px] text-[#353535] font-semibold">Click keyword to filter requests:</div>
                           <div className="flex flex-wrap gap-1.5">
                             {extractedKeywords[`prop_${currentProposal.id}`].map((kw, idx) => (
                               <button
                                 key={idx}
                                 type="button"
                                 onClick={() => handleKeywordClick(kw)}
-                                className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-white hover:bg-[#635f41] hover:text-white text-[#1c1b19] border border-[#cac6b9]/50 shadow-2xs transition-all cursor-pointer"
+                                className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-white hover:bg-[#353535] hover:text-white text-[#232323] border border-[#D5C9BE]/50 shadow-2xs transition-all cursor-pointer"
                               >
                                 {kw}
                               </button>
@@ -1135,7 +1135,7 @@ export default function EventsManagement() {
                       </button>
                       <button
                         onClick={() => handleApproveProposal(currentProposal.id)}
-                        className="flex-1 bg-[#635f41] text-white hover:bg-[#4d4a32] text-xs font-bold py-2.5 rounded-xl transition-all shadow-xs"
+                        className="flex-1 bg-[#353535] text-white hover:bg-[#4d4a32] text-xs font-bold py-2.5 rounded-xl transition-all shadow-xs"
                       >
                         Approve & Schedule Event
                       </button>
@@ -1151,9 +1151,9 @@ export default function EventsManagement() {
         {activeTab === "Past" && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {pastEvents.map((evt) => (
-              <div key={evt.id} className="bg-white border border-[#e6e2dd] rounded-2xl p-5 shadow-2xs space-y-2 opacity-80">
-                <h3 className="font-serif font-bold text-base text-[#1c1b19]">{evt.title}</h3>
-                <p className="text-xs text-[#466272]">{evt.date} • {evt.venue}</p>
+              <div key={evt.id} className="bg-white border border-[#DDD8CE] rounded-2xl p-5 shadow-2xs space-y-2 opacity-80">
+                <h3 className="font-serif font-bold text-base text-[#232323]">{evt.title}</h3>
+                <p className="text-xs text-[#666361]">{evt.date} • {evt.venue}</p>
               </div>
             ))}
           </div>
@@ -1163,7 +1163,7 @@ export default function EventsManagement() {
 
       {/* Global Toast */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 bg-[#31302d] text-white border border-[#cac6b9]/30 rounded-xl px-4 py-3 shadow-xl z-50 flex items-center gap-3 text-xs font-semibold">
+        <div className="fixed bottom-6 right-6 bg-[#31302d] text-white border border-[#D5C9BE]/30 rounded-xl px-4 py-3 shadow-xl z-50 flex items-center gap-3 text-xs font-semibold">
           <CheckCircle2 className="w-4 h-4 text-emerald-400" />
           {toastMessage}
         </div>

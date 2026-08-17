@@ -219,33 +219,33 @@ export default function AuditionsCasting() {
   // FULL IN-PAGE VIEW WHEN APPLYING FOR A ROLE
   if (activePosition && applyOpen) {
     return (
-      <div className="space-y-6 font-sans text-[#466272] animate-in fade-in-50 duration-200 pb-16">
+      <div className="space-y-6 font-sans text-[#666361] animate-in fade-in-50 duration-200 pb-16">
         {/* Navigation & Status Header */}
-        <div className="bg-[#f7f3ee] border border-[#e6e2dd] rounded-2xl p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div className="bg-[#EFE8E1] border border-[#DDD8CE] rounded-2xl p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div className="space-y-1">
             <button
               type="button"
               onClick={() => setApplyOpen(false)}
-              className="text-xs font-bold text-[#635f41] hover:underline flex items-center gap-1 mb-2 cursor-pointer"
+              className="text-xs font-bold text-[#353535] hover:underline flex items-center gap-1 mb-2 cursor-pointer"
             >
               ← Back to Open Auditions
             </button>
             <span className="text-xs uppercase tracking-widest text-[#9B1C31] font-bold block">
               Ensemble Casting Application
             </span>
-            <h2 className="text-2xl md:text-3xl font-bold font-serif text-[#635f41]">
+            <h2 className="text-2xl md:text-3xl font-bold font-serif text-[#353535]">
               Apply: {activePosition.title}
             </h2>
-            <p className="text-xs md:text-sm text-[#466272]">
+            <p className="text-xs md:text-sm text-[#666361]">
               Production: <strong>{activePosition.title}</strong> • Classification: <strong>{activePosition.category}</strong>
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <Badge className="bg-[#635f41] text-white font-mono text-xs font-bold px-3 py-1">
+            <Badge className="bg-[#353535] text-white font-mono text-xs font-bold px-3 py-1">
               {activePosition.category}
             </Badge>
-            <Badge className="bg-[#8CC0EB]/20 text-[#1c1b19] border-[#8CC0EB]/40 font-semibold text-xs py-1">
+            <Badge className="bg-[#E85F57]/20 text-[#232323] border-[#E85F57]/40 font-semibold text-xs py-1">
               Deadline: {activePosition.deadline || 'Sep 25, 2026'}
             </Badge>
             <Badge className="bg-emerald-100 text-emerald-800 font-semibold text-xs py-1">
@@ -258,25 +258,25 @@ export default function AuditionsCasting() {
         <form onSubmit={handleFormSubmit} className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 text-left">
             {/* Left Column: Role & Character Specifications (col-span-6) */}
-            <div className="lg:col-span-6 space-y-6 bg-white p-6 md:p-8 rounded-2xl border border-[#e6e2dd] shadow-xs">
+            <div className="lg:col-span-6 space-y-6 bg-white p-6 md:p-8 rounded-2xl border border-[#DDD8CE] shadow-xs">
               <div className="space-y-2">
-                <strong className="text-xs font-bold text-[#635f41] uppercase tracking-wider block">
+                <strong className="text-xs font-bold text-[#353535] uppercase tracking-wider block">
                   Character & Role Specifications
                 </strong>
-                <p className="text-xs md:text-sm text-[#1c1b19] leading-relaxed font-light bg-[#fdf9f4] p-4 rounded-xl border border-[#cac6b9]/40">
+                <p className="text-xs md:text-sm text-[#232323] leading-relaxed font-light bg-[#E7DDD3] p-4 rounded-xl border border-[#D5C9BE]/40">
                   {activePosition.description || "Seeking dedicated ensemble member with strong stage presence, dramatic projection, and commitment to rehearsal schedules."}
                 </p>
               </div>
 
-              <div className="space-y-2 pt-2 border-t border-[#e6e2dd]">
-                <strong className="text-xs font-bold text-[#635f41] uppercase tracking-wider block flex items-center gap-1">
-                  <ListChecks className="w-4 h-4 text-[#8CC0EB]" /> Audition Requirements & Skill Benchmark
+              <div className="space-y-2 pt-2 border-t border-[#DDD8CE]">
+                <strong className="text-xs font-bold text-[#353535] uppercase tracking-wider block flex items-center gap-1">
+                  <ListChecks className="w-4 h-4 text-[#E85F57]" /> Audition Requirements & Skill Benchmark
                 </strong>
-                <div className="text-xs md:text-sm text-[#1c1b19] bg-[#fdf9f4] p-4 rounded-xl border border-[#cac6b9]/40 space-y-2">
+                <div className="text-xs md:text-sm text-[#232323] bg-[#E7DDD3] p-4 rounded-xl border border-[#D5C9BE]/40 space-y-2">
                   <p className="leading-relaxed font-medium">
                     {activePosition.requirements || "Audition monologue clip / Technical PDF portfolio submission."}
                   </p>
-                  <ul className="list-disc pl-4 text-xs text-[#466272] space-y-1.5 pt-2 border-t border-[#e6e2dd]">
+                  <ul className="list-disc pl-4 text-xs text-[#666361] space-y-1.5 pt-2 border-t border-[#DDD8CE]">
                     <li>High commitment to scheduled ensemble table-reads & stage rehearsals</li>
                     <li>Audition slate or portfolio file review by maintainer creative board</li>
                     <li>Selected candidates will be notified via email for call-back auditions</li>
@@ -284,38 +284,38 @@ export default function AuditionsCasting() {
                 </div>
               </div>
 
-              <div className="bg-[#8CC0EB]/10 p-4 rounded-xl border border-[#8CC0EB]/30 space-y-1">
-                <span className="text-xs font-bold text-[#635f41] block">Casting Process Note:</span>
-                <p className="text-xs text-[#466272] leading-relaxed">
+              <div className="bg-[#E85F57]/10 p-4 rounded-xl border border-[#E85F57]/30 space-y-1">
+                <span className="text-xs font-bold text-[#353535] block">Casting Process Note:</span>
+                <p className="text-xs text-[#666361] leading-relaxed">
                   Applications submit directly to the maintainer review portal. Maintainers perform automated portfolio & video quality verification scans during review.
                 </p>
               </div>
             </div>
 
             {/* Right Column: Applicant Details Form (col-span-6) */}
-            <div className="lg:col-span-6 space-y-5 bg-white p-6 md:p-8 rounded-2xl border border-[#e6e2dd] shadow-xs">
-              <strong className="text-xs font-bold text-[#635f41] uppercase tracking-wider block border-b border-[#e6e2dd] pb-3">
+            <div className="lg:col-span-6 space-y-5 bg-white p-6 md:p-8 rounded-2xl border border-[#DDD8CE] shadow-xs">
+              <strong className="text-xs font-bold text-[#353535] uppercase tracking-wider block border-b border-[#DDD8CE] pb-3">
                 Applicant Information Form
               </strong>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-[#635f41]">Full Name *</label>
+                <label className="text-xs font-semibold text-[#353535]">Full Name *</label>
                 <Input 
                   value={applicantName}
                   onChange={(e) => setApplicantName(e.target.value)}
-                  className="border-[#cac6b9]/60 focus-visible:ring-[#8CC0EB] text-xs h-10 bg-[#fdf9f4] rounded-xl"
+                  className="border-[#D5C9BE]/60 focus-visible:ring-[#E85F57] text-xs h-10 bg-[#E7DDD3] rounded-xl"
                   placeholder="e.g. Aarav Varma"
                   required
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-[#635f41]">Email Address *</label>
+                <label className="text-xs font-semibold text-[#353535]">Email Address *</label>
                 <Input 
                   type="email"
                   value={applicantEmail}
                   onChange={(e) => setApplicantEmail(e.target.value)}
-                  className="border-[#cac6b9]/60 focus-visible:ring-[#8CC0EB] text-xs h-10 bg-[#fdf9f4] rounded-xl"
+                  className="border-[#D5C9BE]/60 focus-visible:ring-[#E85F57] text-xs h-10 bg-[#E7DDD3] rounded-xl"
                   placeholder="e.g. member@aayam.org"
                   required
                 />
@@ -325,14 +325,14 @@ export default function AuditionsCasting() {
               {activePosition.category === "Performer" ? (
                 <div className="space-y-4 pt-1">
                   <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-[#635f41] flex items-center gap-1">
-                      <Video className="w-3.5 h-3.5 text-[#8CC0EB]" /> Audition Monologue Video (.mp4 / .mov)
+                    <label className="text-xs font-semibold text-[#353535] flex items-center gap-1">
+                      <Video className="w-3.5 h-3.5 text-[#E85F57]" /> Audition Monologue Video (.mp4 / .mov)
                     </label>
-                    <div className="border border-dashed border-[#cac6b9] rounded-xl bg-[#fdf9f4] p-3.5 flex items-center justify-between text-xs">
-                      <span className="text-[#466272]/80 truncate max-w-[240px]">
+                    <div className="border border-dashed border-[#D5C9BE] rounded-xl bg-[#E7DDD3] p-3.5 flex items-center justify-between text-xs">
+                      <span className="text-[#666361]/80 truncate max-w-[240px]">
                         {fileName1 || "Upload monologue video clip"}
                       </span>
-                      <label className="cursor-pointer bg-[#8CC0EB]/20 hover:bg-[#8CC0EB]/30 text-[#1c1b19] px-3 py-1.5 rounded-lg border border-[#8CC0EB]/40 transition-all font-semibold flex items-center gap-1">
+                      <label className="cursor-pointer bg-[#E85F57]/20 hover:bg-[#E85F57]/30 text-[#232323] px-3 py-1.5 rounded-lg border border-[#E85F57]/40 transition-all font-semibold flex items-center gap-1">
                         <Upload className="w-3.5 h-3.5" /> File
                         <input 
                           type="file" 
@@ -348,14 +348,14 @@ export default function AuditionsCasting() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-[#635f41] flex items-center gap-1">
-                      <FileText className="w-3.5 h-3.5 text-[#8CC0EB]" /> Headshot & Theatrical Resume PDF
+                    <label className="text-xs font-semibold text-[#353535] flex items-center gap-1">
+                      <FileText className="w-3.5 h-3.5 text-[#E85F57]" /> Headshot & Theatrical Resume PDF
                     </label>
-                    <div className="border border-dashed border-[#cac6b9] rounded-xl bg-[#fdf9f4] p-3.5 flex items-center justify-between text-xs">
-                      <span className="text-[#466272]/80 truncate max-w-[240px]">
+                    <div className="border border-dashed border-[#D5C9BE] rounded-xl bg-[#E7DDD3] p-3.5 flex items-center justify-between text-xs">
+                      <span className="text-[#666361]/80 truncate max-w-[240px]">
                         {fileName2 || "Upload resume PDF"}
                       </span>
-                      <label className="cursor-pointer bg-[#8CC0EB]/20 hover:bg-[#8CC0EB]/30 text-[#1c1b19] px-3 py-1.5 rounded-lg border border-[#8CC0EB]/40 transition-all font-semibold flex items-center gap-1">
+                      <label className="cursor-pointer bg-[#E85F57]/20 hover:bg-[#E85F57]/30 text-[#232323] px-3 py-1.5 rounded-lg border border-[#E85F57]/40 transition-all font-semibold flex items-center gap-1">
                         <Upload className="w-3.5 h-3.5" /> File
                         <input 
                           type="file" 
@@ -370,14 +370,14 @@ export default function AuditionsCasting() {
               ) : (
                 <div className="space-y-4 pt-1">
                   <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-[#635f41] flex items-center gap-1">
-                      <FileText className="w-3.5 h-3.5 text-[#8CC0EB]" /> Creative / Technical Portfolio PDF
+                    <label className="text-xs font-semibold text-[#353535] flex items-center gap-1">
+                      <FileText className="w-3.5 h-3.5 text-[#E85F57]" /> Creative / Technical Portfolio PDF
                     </label>
-                    <div className="border border-dashed border-[#cac6b9] rounded-xl bg-[#fdf9f4] p-3.5 flex items-center justify-between text-xs">
-                      <span className="text-[#466272]/80 truncate max-w-[240px]">
+                    <div className="border border-dashed border-[#D5C9BE] rounded-xl bg-[#E7DDD3] p-3.5 flex items-center justify-between text-xs">
+                      <span className="text-[#666361]/80 truncate max-w-[240px]">
                         {fileName1 || "Upload portfolio PDF"}
                       </span>
-                      <label className="cursor-pointer bg-[#8CC0EB]/20 hover:bg-[#8CC0EB]/30 text-[#1c1b19] px-3 py-1.5 rounded-lg border border-[#8CC0EB]/40 transition-all font-semibold flex items-center gap-1">
+                      <label className="cursor-pointer bg-[#E85F57]/20 hover:bg-[#E85F57]/30 text-[#232323] px-3 py-1.5 rounded-lg border border-[#E85F57]/40 transition-all font-semibold flex items-center gap-1">
                         <Upload className="w-3.5 h-3.5" /> File
                         <input 
                           type="file" 
@@ -390,14 +390,14 @@ export default function AuditionsCasting() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-[#635f41] flex items-center gap-1">
-                      <FileText className="w-3.5 h-3.5 text-[#8CC0EB]" /> Experience Resume PDF
+                    <label className="text-xs font-semibold text-[#353535] flex items-center gap-1">
+                      <FileText className="w-3.5 h-3.5 text-[#E85F57]" /> Experience Resume PDF
                     </label>
-                    <div className="border border-dashed border-[#cac6b9] rounded-xl bg-[#fdf9f4] p-3.5 flex items-center justify-between text-xs">
-                      <span className="text-[#466272]/80 truncate max-w-[240px]">
+                    <div className="border border-dashed border-[#D5C9BE] rounded-xl bg-[#E7DDD3] p-3.5 flex items-center justify-between text-xs">
+                      <span className="text-[#666361]/80 truncate max-w-[240px]">
                         {fileName2 || "Upload resume PDF"}
                       </span>
-                      <label className="cursor-pointer bg-[#8CC0EB]/20 hover:bg-[#8CC0EB]/30 text-[#1c1b19] px-3 py-1.5 rounded-lg border border-[#8CC0EB]/40 transition-all font-semibold flex items-center gap-1">
+                      <label className="cursor-pointer bg-[#E85F57]/20 hover:bg-[#E85F57]/30 text-[#232323] px-3 py-1.5 rounded-lg border border-[#E85F57]/40 transition-all font-semibold flex items-center gap-1">
                         <Upload className="w-3.5 h-3.5" /> File
                         <input 
                           type="file" 
@@ -412,29 +412,29 @@ export default function AuditionsCasting() {
               )}
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-[#635f41]">Candidate Experience Notes / Message to Director</label>
+                <label className="text-xs font-semibold text-[#353535]">Candidate Experience Notes / Message to Director</label>
                 <textarea 
                   value={coverNote}
                   onChange={(e) => setCoverNote(e.target.value)}
                   placeholder="Mention past theatrical productions, classical training, or specific role preparation..."
-                  className="w-full border border-[#cac6b9]/60 rounded-xl bg-[#fdf9f4] text-xs p-3 h-28 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#8CC0EB]"
+                  className="w-full border border-[#D5C9BE]/60 rounded-xl bg-[#E7DDD3] text-xs p-3 h-28 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#E85F57]"
                 />
               </div>
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-4 border-t border-[#e6e2dd] pt-6 bg-white p-4 rounded-2xl">
+          <div className="flex items-center justify-end gap-4 border-t border-[#DDD8CE] pt-6 bg-white p-4 rounded-2xl">
             <Button 
               type="button" 
               variant="outline" 
               onClick={() => setApplyOpen(false)} 
-              className="border-2 border-[#cac6b9] text-[#635f41] hover:bg-gray-100 rounded-xl text-xs font-bold px-8 h-11"
+              className="border-2 border-[#D5C9BE] text-[#353535] hover:bg-gray-100 rounded-xl text-xs font-bold px-8 h-11"
             >
               Cancel
             </Button>
             <Button 
               type="submit"
-              className="bg-[#635f41] hover:bg-[#4d4a32] text-white rounded-xl font-bold text-xs px-10 h-11 shadow-md"
+              className="bg-[#353535] hover:bg-[#4d4a32] text-white rounded-xl font-bold text-xs px-10 h-11 shadow-md"
             >
               Submit Official Audition Application
             </Button>
@@ -446,20 +446,20 @@ export default function AuditionsCasting() {
 
   // STANDARD AUDITIONS PAGE GRID
   return (
-    <div className="space-y-[32px] font-sans text-[#466272] pb-12">
+    <div className="space-y-[32px] font-sans text-[#666361] pb-12">
       {/* Overview Block */}
-      <div className="bg-[#f7f3ee] border border-[#e6e2dd] rounded-2xl p-[24px] md:p-[32px] flex flex-col md:flex-row justify-between items-start md:items-center gap-[24px]">
+      <div className="bg-[#EFE8E1] border border-[#DDD8CE] rounded-2xl p-[24px] md:p-[32px] flex flex-col md:flex-row justify-between items-start md:items-center gap-[24px]">
         <div className="space-y-1">
-          <span className="text-xs uppercase tracking-widest text-[#466272]/70 font-semibold">Club Staging</span>
-          <h2 className="text-[32px] font-bold font-serif text-[#635f41]">Open Auditions &amp; Positions</h2>
-          <p className="text-sm text-[#466272]">
+          <span className="text-xs uppercase tracking-widest text-[#666361]/70 font-semibold">Club Staging</span>
+          <h2 className="text-[32px] font-bold font-serif text-[#353535]">Open Auditions &amp; Positions</h2>
+          <p className="text-sm text-[#666361]">
             Browse and apply for acting ensemble understudies, crew operations, or creative production designs.
           </p>
         </div>
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="bg-white border border-[#e6e2dd] rounded-2xl p-4 flex flex-col md:flex-row gap-4 items-center justify-between shadow-xs">
+      <div className="bg-white border border-[#DDD8CE] rounded-2xl p-4 flex flex-col md:flex-row gap-4 items-center justify-between shadow-xs">
         <div className="flex flex-wrap gap-2 w-full md:w-auto">
           {(["All", "Performer", "Technical Crew", "Creative Designer", "Director"] as const).map((cat) => (
             <Button
@@ -468,8 +468,8 @@ export default function AuditionsCasting() {
               onClick={() => setSelectedCategory(cat)}
               className={`rounded-xl text-xs py-1.5 px-4 font-semibold transition-all ${
                 selectedCategory === cat
-                  ? "bg-[#635f41] text-white hover:bg-[#4d4a32]"
-                  : "border border-[#e6e2dd] text-[#466272] hover:bg-[#f7f3ee]"
+                  ? "bg-[#353535] text-white hover:bg-[#4d4a32]"
+                  : "border border-[#DDD8CE] text-[#666361] hover:bg-[#EFE8E1]"
               }`}
             >
               {cat}s
@@ -477,12 +477,12 @@ export default function AuditionsCasting() {
           ))}
         </div>
         <div className="relative w-full md:w-64">
-          <Search className="absolute left-3 top-2.5 h-4 w-4 text-[#466272]/50" />
+          <Search className="absolute left-3 top-2.5 h-4 w-4 text-[#666361]/50" />
           <Input
             placeholder="Search roles..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-9 border-[#e6e2dd] focus-visible:ring-[#8CC0EB] h-9 text-xs rounded-xl"
+            className="pl-9 border-[#DDD8CE] focus-visible:ring-[#E85F57] h-9 text-xs rounded-xl"
           />
         </div>
       </div>
@@ -499,10 +499,10 @@ export default function AuditionsCasting() {
           const currentStepIndex = existingApp ? getStepIndex(existingApp.status) : 0;
 
           return (
-            <div key={pos.id} className="bg-white border border-[#e6e2dd] rounded-2xl p-6 flex flex-col justify-between space-y-4 hover:shadow-md hover:border-[#8CC0EB]/30 transition-all">
+            <div key={pos.id} className="bg-white border border-[#DDD8CE] rounded-2xl p-6 flex flex-col justify-between space-y-4 hover:shadow-md hover:border-[#E85F57]/30 transition-all">
               <div className="space-y-2">
                 <div className="flex justify-between items-start">
-                  <Badge className="bg-[#635f41]/10 text-[#635f41] border-[#635f41]/20 font-semibold rounded-md text-[10px] uppercase">
+                  <Badge className="bg-[#353535]/10 text-[#353535] border-[#353535]/20 font-semibold rounded-md text-[10px] uppercase">
                     {pos.category}
                   </Badge>
                   {existingApp ? (
@@ -517,15 +517,15 @@ export default function AuditionsCasting() {
                     <span className="text-[10px] text-red-600/80 font-medium">Deadline: {pos.deadline || 'Sep 25, 2026'}</span>
                   )}
                 </div>
-                <h3 className="font-bold text-[18px] text-[#635f41] font-serif">{pos.title}</h3>
-                <p className="text-xs text-[#466272]/85 leading-relaxed">{pos.description}</p>
+                <h3 className="font-bold text-[18px] text-[#353535] font-serif">{pos.title}</h3>
+                <p className="text-xs text-[#666361]/85 leading-relaxed">{pos.description}</p>
               </div>
 
               {/* IN-CARD APPLICATION TRACKING BAR (Shown if applied) */}
               {existingApp ? (
-                <div className="bg-[#fdf9f4] border border-[#cac6b9]/50 rounded-xl p-4 space-y-3">
-                  <div className="flex items-center justify-between text-xs border-b border-[#e6e2dd] pb-2">
-                    <span className="font-bold text-[#635f41] text-[11px] uppercase tracking-wider">
+                <div className="bg-[#E7DDD3] border border-[#D5C9BE]/50 rounded-xl p-4 space-y-3">
+                  <div className="flex items-center justify-between text-xs border-b border-[#DDD8CE] pb-2">
+                    <span className="font-bold text-[#353535] text-[11px] uppercase tracking-wider">
                       Application Status Pipeline
                     </span>
                     <span className="text-[10px] text-gray-500 font-mono">
@@ -538,7 +538,7 @@ export default function AuditionsCasting() {
                     <div className="absolute left-[30px] right-[30px] top-[12px] -translate-y-1/2 h-[2px]">
                       <div className="w-full h-full bg-gray-200" />
                       <div 
-                        className="absolute left-0 top-0 h-full bg-[#8CC0EB] transition-all duration-500" 
+                        className="absolute left-0 top-0 h-full bg-[#E85F57] transition-all duration-500" 
                         style={{ width: `${(currentStepIndex / (steps.length - 1)) * 100}%` }}
                       />
                     </div>
@@ -551,16 +551,16 @@ export default function AuditionsCasting() {
                           <div key={idx} className="flex flex-col items-center">
                             <div 
                               className={`w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold border transition-all ${
-                                isCompleted ? "bg-[#8CC0EB] border-[#8CC0EB] text-[#1c1b19]" :
-                                isActive ? "bg-white border-[#8CC0EB] text-[#8CC0EB] ring-2 ring-[#8CC0EB]/20 scale-110" :
+                                isCompleted ? "bg-[#E85F57] border-[#E85F57] text-[#232323]" :
+                                isActive ? "bg-white border-[#E85F57] text-[#E85F57] ring-2 ring-[#E85F57]/20 scale-110" :
                                 "bg-white border-gray-200 text-gray-400"
                               }`}
                             >
                               {isCompleted ? <Check className="w-3 h-3" /> : idx + 1}
                             </div>
                             <span className={`text-[8px] mt-1 font-semibold text-center whitespace-nowrap ${
-                              isActive ? "text-[#8CC0EB] font-bold" : 
-                              isCompleted ? "text-[#8CC0EB]/90 font-medium" : "text-[#466272]/60"
+                              isActive ? "text-[#E85F57] font-bold" : 
+                              isCompleted ? "text-[#E85F57]/90 font-medium" : "text-[#666361]/60"
                             }`}>
                               {step}
                             </span>
@@ -571,8 +571,8 @@ export default function AuditionsCasting() {
                   </div>
 
                   {existingApp.notes && (
-                    <div className="text-[11px] text-[#466272] bg-white p-2.5 rounded-lg border border-[#cac6b9]/40 italic">
-                      <strong className="text-[#635f41] not-italic block text-[10px]">Director Note:</strong>
+                    <div className="text-[11px] text-[#666361] bg-white p-2.5 rounded-lg border border-[#D5C9BE]/40 italic">
+                      <strong className="text-[#353535] not-italic block text-[10px]">Director Note:</strong>
                       "{existingApp.notes}"
                     </div>
                   )}
@@ -591,10 +591,10 @@ export default function AuditionsCasting() {
                   </div>
                 </div>
               ) : (
-                <div className="border-t border-[#e6e2dd]/60 pt-4 flex flex-col gap-3">
-                  <div className="flex flex-col text-[11px] text-[#466272]/70 bg-[#f7f3ee]/40 rounded p-2.5">
-                    <strong className="text-[#635f41] mb-1 font-semibold flex items-center gap-1">
-                      <ListChecks className="w-3.5 h-3.5 text-[#8CC0EB]" /> Required Submissions:
+                <div className="border-t border-[#DDD8CE]/60 pt-4 flex flex-col gap-3">
+                  <div className="flex flex-col text-[11px] text-[#666361]/70 bg-[#EFE8E1]/40 rounded p-2.5">
+                    <strong className="text-[#353535] mb-1 font-semibold flex items-center gap-1">
+                      <ListChecks className="w-3.5 h-3.5 text-[#E85F57]" /> Required Submissions:
                     </strong>
                     <span>{pos.requirements}</span>
                   </div>
@@ -608,7 +608,7 @@ export default function AuditionsCasting() {
                   ) : (
                     <Button 
                       onClick={() => handleApplyClick(pos)}
-                      className="bg-[#635f41] hover:bg-[#4d4a32] text-white font-semibold rounded-xl text-xs py-2.5 w-full transition-all flex items-center justify-center gap-1 shadow-xs"
+                      className="bg-[#353535] hover:bg-[#4d4a32] text-white font-semibold rounded-xl text-xs py-2.5 w-full transition-all flex items-center justify-center gap-1 shadow-xs"
                     >
                       Apply for Position <ChevronRight className="w-3.5 h-3.5" />
                     </Button>
@@ -619,9 +619,9 @@ export default function AuditionsCasting() {
           );
         })}
         {filteredPositions.length === 0 && (
-          <div className="col-span-1 md:col-span-2 text-center py-12 bg-white border border-[#e6e2dd] rounded-2xl">
-            <AlertCircle className="w-8 h-8 text-[#466272]/40 mx-auto mb-2" />
-            <p className="text-xs text-[#466272]/70">No positions found matching "{searchTerm}" in this category.</p>
+          <div className="col-span-1 md:col-span-2 text-center py-12 bg-white border border-[#DDD8CE] rounded-2xl">
+            <AlertCircle className="w-8 h-8 text-[#666361]/40 mx-auto mb-2" />
+            <p className="text-xs text-[#666361]/70">No positions found matching "{searchTerm}" in this category.</p>
           </div>
         )}
       </div>

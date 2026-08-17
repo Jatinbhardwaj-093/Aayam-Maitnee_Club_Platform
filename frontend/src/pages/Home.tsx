@@ -53,29 +53,29 @@ const team: Member[] = [
 
 export default function Home() {
   return (
-    <div className="space-y-[48px] font-sans text-[#466272]">
+    <div className="space-y-[48px] font-sans text-[#666361]">
       {/* Hero Section */}
-      <section className="relative rounded-[8px] overflow-hidden bg-[#f7f3ee] border border-[#e6e2dd] p-[32px] md:p-[64px] flex flex-col items-center text-center space-y-[24px]">
-        <div className="absolute inset-0 bg-gradient-to-tr from-[#8CC0EB]/10 via-transparent to-transparent pointer-events-none" />
-        <Badge className="bg-[#635f41]/10 text-[#635f41] border-[#e6e2dd] hover:bg-[#635f41]/20 px-[12px] py-[4px] text-xs font-semibold rounded-[4px]">
+      <section className="relative rounded-[8px] overflow-hidden bg-[#EFE8E1] border border-[#DDD8CE] p-[32px] md:p-[64px] flex flex-col items-center text-center space-y-[24px]">
+        <div className="absolute inset-0 bg-gradient-to-tr from-[#E85F57]/10 via-transparent to-transparent pointer-events-none" />
+        <Badge className="bg-[#353535]/10 text-[#353535] border-[#DDD8CE] hover:bg-[#353535]/20 px-[12px] py-[4px] text-xs font-semibold rounded-[4px]">
           Aayam Creative Network
         </Badge>
-        <h1 className="text-[40px] md:text-[56px] font-bold font-serif text-[#635f41] leading-[1.1] tracking-tight max-w-3xl mb-[16px]">
-          Where Stories <span className="italic text-[#8CC0EB]">Come Alive</span>
+        <h1 className="text-[40px] md:text-[56px] font-bold font-serif text-[#353535] leading-[1.1] tracking-tight max-w-3xl mb-[16px]">
+          Where Stories <span className="italic text-[#E85F57]">Come Alive</span>
         </h1>
-        <p className="text-[16px] md:text-[18px] text-[#466272] max-w-2xl font-normal leading-relaxed">
+        <p className="text-[16px] md:text-[18px] text-[#666361] max-w-2xl font-normal leading-relaxed">
           Step behind the velvet curtain. Experience high-stakes theatrical elegance, cutting-edge stagecraft, and members-only exclusivity at The Matinee Club.
         </p>
         <div className="flex flex-wrap gap-[16px] justify-center pt-[16px]">
           <Link 
             to="/member" 
-            className={buttonVariants({ size: "lg", className: "bg-[#8CC0EB] hover:bg-[#8CC0EB]/90 text-[#1c1b19] font-semibold rounded-[8px] px-[40px] py-[16px] shadow-md transition-all active:scale-95" })}
+            className={buttonVariants({ size: "lg", className: "bg-[#E85F57] hover:bg-[#E85F57]/90 text-[#232323] font-semibold rounded-[8px] px-[40px] py-[16px] shadow-md transition-all active:scale-95" })}
           >
             Enter Aayam <ArrowRight className="w-4 h-4 ml-2" />
           </Link>
           <Link 
             to="/auditions" 
-            className={buttonVariants({ variant: "outline", size: "lg", className: "border-2 border-[#8CC0EB] text-[#8CC0EB] hover:bg-[#8CC0EB]/5 font-semibold rounded-[8px] px-[40px] py-[16px] transition-all active:scale-95" })}
+            className={buttonVariants({ variant: "outline", size: "lg", className: "border-2 border-[#E85F57] text-[#E85F57] hover:bg-[#E85F57]/5 font-semibold rounded-[8px] px-[40px] py-[16px] transition-all active:scale-95" })}
           >
             View Open Castings
           </Link>
@@ -84,21 +84,21 @@ export default function Home() {
 
       {/* Feature Sections */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-[24px]">
-        <div className="bg-[#f7f3ee] border border-[#e6e2dd] p-[32px] rounded-[8px] space-y-[16px]">
-          <span className="w-[40px] h-[40px] rounded-[4px] bg-[#635f41]/10 flex items-center justify-center text-[#635f41]">
-            <Star className="w-5 h-5 text-[#635f41]" />
+        <div className="bg-[#EFE8E1] border border-[#DDD8CE] p-[32px] rounded-[8px] space-y-[16px]">
+          <span className="w-[40px] h-[40px] rounded-[4px] bg-[#353535]/10 flex items-center justify-center text-[#353535]">
+            <Star className="w-5 h-5 text-[#353535]" />
           </span>
-          <h2 className="text-[28px] font-bold font-serif text-[#635f41] mb-[8px]">Illuminating the Human Experience</h2>
-          <p className="text-[16px] text-[#466272] leading-relaxed">
+          <h2 className="text-[28px] font-bold font-serif text-[#353535] mb-[8px]">Illuminating the Human Experience</h2>
+          <p className="text-[16px] text-[#666361] leading-relaxed">
             Our creative strategy balances editorial flair with technical precision. By bridging traditional stage sets with modern digital interfaces, we build worlds that are immersive, emotional, and unforgettable.
           </p>
         </div>
-        <div className="bg-[#f7f3ee] border border-[#e6e2dd] p-[32px] rounded-[8px] space-y-[16px]">
-          <span className="w-[40px] h-[40px] rounded-[4px] bg-[#635f41]/10 flex items-center justify-center text-[#635f41]">
-            <ShieldCheck className="w-5 h-5 text-[#635f41]" />
+        <div className="bg-[#EFE8E1] border border-[#DDD8CE] p-[32px] rounded-[8px] space-y-[16px]">
+          <span className="w-[40px] h-[40px] rounded-[4px] bg-[#353535]/10 flex items-center justify-center text-[#353535]">
+            <ShieldCheck className="w-5 h-5 text-[#353535]" />
           </span>
-          <h2 className="text-[28px] font-bold font-serif text-[#635f41] mb-[8px]">Behind the Velvet Curtain</h2>
-          <p className="text-[16px] text-[#466272] leading-relaxed">
+          <h2 className="text-[28px] font-bold font-serif text-[#353535] mb-[8px]">Behind the Velvet Curtain</h2>
+          <p className="text-[16px] text-[#666361] leading-relaxed">
             Whether you are a Lead Actor managing rehearsals, an Administrator logging prop transfers, or a Sponsor reservation lead, Aayam secures and aligns every detail from backstage to spotlight.
           </p>
         </div>
@@ -108,20 +108,20 @@ export default function Home() {
       <section className="space-y-[24px]">
         <div className="flex justify-between items-end mb-[32px]">
           <div>
-            <h2 className="text-[32px] font-bold font-serif text-[#635f41]">Upcoming Performances</h2>
-            <p className="text-[14px] text-[#466272]/75">Tickets and reservations available for current season</p>
+            <h2 className="text-[32px] font-bold font-serif text-[#353535]">Upcoming Performances</h2>
+            <p className="text-[14px] text-[#666361]/75">Tickets and reservations available for current season</p>
           </div>
-          <Button variant="ghost" className="text-[#8CC0EB] hover:text-[#8CC0EB]/80 hover:bg-[#f7f3ee] hidden sm:flex font-semibold">
+          <Button variant="ghost" className="text-[#E85F57] hover:text-[#E85F57]/80 hover:bg-[#EFE8E1] hidden sm:flex font-semibold">
             View Full Season <ArrowRight className="w-4 h-4 ml-1" />
           </Button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-[24px]">
           {performances.map((perf) => (
-            <div key={perf.id} className="bg-[#f7f3ee] border border-[#e6e2dd] rounded-[8px] overflow-hidden flex flex-col justify-between p-[24px] space-y-[24px] transition-all hover:shadow-md hover:border-[#8CC0EB]/40">
+            <div key={perf.id} className="bg-[#EFE8E1] border border-[#DDD8CE] rounded-[8px] overflow-hidden flex flex-col justify-between p-[24px] space-y-[24px] transition-all hover:shadow-md hover:border-[#E85F57]/40">
               <div className="space-y-[16px]">
                 <div className="flex justify-between items-start">
-                  <Badge variant="outline" className="border-[#635f41]/25 text-[#635f41] bg-[#635f41]/5 rounded-[4px]">
+                  <Badge variant="outline" className="border-[#353535]/25 text-[#353535] bg-[#353535]/5 rounded-[4px]">
                     {perf.type}
                   </Badge>
                   <Badge className={`rounded-[4px] ${
@@ -132,20 +132,20 @@ export default function Home() {
                     {perf.status}
                   </Badge>
                 </div>
-                <h3 className="text-[28px] font-bold font-serif text-[#635f41]">{perf.title}</h3>
-                <p className="text-[14px] text-[#466272]/80 leading-relaxed">{perf.description}</p>
+                <h3 className="text-[28px] font-bold font-serif text-[#353535]">{perf.title}</h3>
+                <p className="text-[14px] text-[#666361]/80 leading-relaxed">{perf.description}</p>
               </div>
 
-              <div className="border-t border-[#e6e2dd] pt-[16px] flex flex-col gap-[8px]">
-                <div className="flex items-center gap-[8px] text-[14px] text-[#466272]/70">
-                  <Calendar className="w-4 h-4 text-[#8CC0EB]" />
+              <div className="border-t border-[#DDD8CE] pt-[16px] flex flex-col gap-[8px]">
+                <div className="flex items-center gap-[8px] text-[14px] text-[#666361]/70">
+                  <Calendar className="w-4 h-4 text-[#E85F57]" />
                   <span>{perf.date} &bull; {perf.time}</span>
                 </div>
-                <div className="flex items-center gap-[8px] text-[14px] text-[#466272]/70 pb-[8px]">
-                  <Ticket className="w-4 h-4 text-[#8CC0EB]" />
+                <div className="flex items-center gap-[8px] text-[14px] text-[#666361]/70 pb-[8px]">
+                  <Ticket className="w-4 h-4 text-[#E85F57]" />
                   <span>Location: {perf.location}</span>
                 </div>
-                <Button size="sm" className="w-full bg-[#8CC0EB] text-[#1c1b19] hover:bg-[#8CC0EB]/90 font-semibold rounded-[8px] py-[10px]">
+                <Button size="sm" className="w-full bg-[#E85F57] text-[#232323] hover:bg-[#E85F57]/90 font-semibold rounded-[8px] py-[10px]">
                   Book Tickets
                 </Button>
               </div>
@@ -157,21 +157,21 @@ export default function Home() {
       {/* Core Team Section */}
       <section className="space-y-[24px]">
         <div className="text-center mb-[32px]">
-          <h2 className="text-[32px] font-bold font-serif text-[#635f41]">Meet Our Core Team</h2>
-          <p className="text-[14px] text-[#466272]/75 max-w-lg mx-auto">The directors, artists, and patrons bringing the Aayam experience to life.</p>
+          <h2 className="text-[32px] font-bold font-serif text-[#353535]">Meet Our Core Team</h2>
+          <p className="text-[14px] text-[#666361]/75 max-w-lg mx-auto">The directors, artists, and patrons bringing the Aayam experience to life.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-[24px]">
           {team.map((member, idx) => (
-            <div key={idx} className="bg-[#f7f3ee] border border-[#e6e2dd] rounded-[8px] p-[32px] text-center flex flex-col items-center space-y-[16px]">
-              <div className="w-[64px] h-[64px] rounded-full overflow-hidden border border-[#635f41]/30 flex-shrink-0 bg-gray-200">
+            <div key={idx} className="bg-[#EFE8E1] border border-[#DDD8CE] rounded-[8px] p-[32px] text-center flex flex-col items-center space-y-[16px]">
+              <div className="w-[64px] h-[64px] rounded-full overflow-hidden border border-[#353535]/30 flex-shrink-0 bg-gray-200">
                 <img src={member.avatarUrl} alt={member.name} className="w-full h-full object-cover" />
               </div>
               <div>
-                <h3 className="font-bold text-[18px] text-[#635f41]">{member.name}</h3>
-                <p className="text-[12px] text-[#466272]/70 font-semibold uppercase tracking-wider">{member.role}</p>
+                <h3 className="font-bold text-[18px] text-[#353535]">{member.name}</h3>
+                <p className="text-[12px] text-[#666361]/70 font-semibold uppercase tracking-wider">{member.role}</p>
               </div>
-              <p className="text-[14px] text-[#466272]/85 leading-relaxed italic">
+              <p className="text-[14px] text-[#666361]/85 leading-relaxed italic">
                 "{member.bio}"
               </p>
             </div>

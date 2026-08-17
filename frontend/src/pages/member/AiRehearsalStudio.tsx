@@ -740,24 +740,24 @@ export default function AiRehearsalStudio() {
 
   if (((scriptId && activeScript) || session) && displayScene) {
     return (
-      <div className="min-h-screen bg-[#fbf8f2] text-[#466272] pb-16">
-        <header className="sticky top-0 z-30 bg-white/95 border-b border-[#e6e2dd] px-4 py-3">
+      <div className="min-h-screen bg-[#fbf8f2] text-[#666361] pb-16">
+        <header className="sticky top-0 z-30 bg-white/95 border-b border-[#DDD8CE] px-4 py-3">
           <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <button
                 onClick={returnToStudio}
-                className="h-9 w-9 rounded-[8px] border border-[#cac6b9] flex items-center justify-center hover:bg-[#f7f3ee]"
+                className="h-9 w-9 rounded-[8px] border border-[#D5C9BE] flex items-center justify-center hover:bg-[#EFE8E1]"
                 title="Back to rehearsal studio"
               >
                 <ArrowLeft className="h-4 w-4" />
               </button>
               <div>
-                <p className="text-[10px] uppercase tracking-widest font-bold text-[#635f41]">AI Drama Roleplay</p>
-                <h1 className="font-serif text-xl font-bold text-[#1c1b19]">{currentTitle}</h1>
+                <p className="text-[10px] uppercase tracking-widest font-bold text-[#353535]">AI Drama Roleplay</p>
+                <h1 className="font-serif text-xl font-bold text-[#232323]">{currentTitle}</h1>
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <Badge className="bg-[#8CC0EB]/25 text-[#001e2c] border border-[#8CC0EB]/50">
+              <Badge className="bg-[#E85F57]/25 text-[#001e2c] border border-[#E85F57]/50">
                 {session?.status || "ASSIGN ROLES"}
               </Badge>
               {session?.scene_status === "complete" && (
@@ -771,13 +771,13 @@ export default function AiRehearsalStudio() {
 
         <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-6">
           <aside className="space-y-4">
-            <section className="bg-white border border-[#e6e2dd] rounded-[8px] p-4 space-y-3">
-              <h2 className="font-serif text-lg font-bold text-[#635f41]">Characters</h2>
+            <section className="bg-white border border-[#DDD8CE] rounded-[8px] p-4 space-y-3">
+              <h2 className="font-serif text-lg font-bold text-[#353535]">Characters</h2>
               {displayScene.characters.map((character: any) => (
                 <div key={character.name} className="flex items-center justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="text-sm font-bold text-[#1c1b19] truncate">{character.name}</p>
-                    <p className="text-[11px] text-[#466272]/70 truncate">
+                    <p className="text-sm font-bold text-[#232323] truncate">{character.name}</p>
+                    <p className="text-[11px] text-[#666361]/70 truncate">
                       {assignments[character.name] === "ai" ? `AI voice: ${voicePreferences[character.name] || "female"}` : "Human speaker"}
                     </p>
                   </div>
@@ -786,7 +786,7 @@ export default function AiRehearsalStudio() {
                       disabled={!!session && session.scene_status === "active"}
                       value={assignments[character.name] || "ai"}
                       onChange={(event) => setAssignments({ ...assignments, [character.name]: event.target.value as Assignment })}
-                      className="h-8 rounded-[8px] border border-[#cac6b9] bg-[#fdf9f4] px-2 text-xs font-bold"
+                      className="h-8 rounded-[8px] border border-[#D5C9BE] bg-[#E7DDD3] px-2 text-xs font-bold"
                     >
                       <option value="human">Human</option>
                       <option value="ai">AI</option>
@@ -796,7 +796,7 @@ export default function AiRehearsalStudio() {
                         disabled={!!session && session.scene_status === "active"}
                         value={voicePreferences[character.name] || "female"}
                         onChange={(event) => setVoicePreferences({ ...voicePreferences, [character.name]: event.target.value as VoicePreference })}
-                        className="h-8 rounded-[8px] border border-[#cac6b9] bg-[#fdf9f4] px-2 text-xs font-bold"
+                        className="h-8 rounded-[8px] border border-[#D5C9BE] bg-[#E7DDD3] px-2 text-xs font-bold"
                       >
                         <option value="female">Female</option>
                         <option value="male">Male</option>
@@ -807,21 +807,21 @@ export default function AiRehearsalStudio() {
               ))}
             </section>
 
-            <section className="bg-white border border-[#e6e2dd] rounded-[8px] p-4 space-y-4">
+            <section className="bg-white border border-[#DDD8CE] rounded-[8px] p-4 space-y-4">
               <div>
-                <p className="text-[10px] uppercase tracking-widest font-bold text-[#635f41]">Turn State</p>
-                <h3 className="text-2xl font-serif font-bold text-[#1c1b19]">{activeTurn?.character || "Ready"}</h3>
-                <p className="text-xs text-[#466272]/75">
+                <p className="text-[10px] uppercase tracking-widest font-bold text-[#353535]">Turn State</p>
+                <h3 className="text-2xl font-serif font-bold text-[#232323]">{activeTurn?.character || "Ready"}</h3>
+                <p className="text-xs text-[#666361]/75">
                     {activeTurn ? `${session.speaker_type === "human" ? "Human speaker" : "AI scene partner"} - line ${session.current_turn + 1} of ${session.scene.turns.length}` : "Assign roles and start."}
                 </p>
-                <p className="text-[11px] text-[#466272]/70 mt-1">Audio: {audioStatus}</p>
+                <p className="text-[11px] text-[#666361]/70 mt-1">Audio: {audioStatus}</p>
               </div>
-              <div className="h-2 rounded-full bg-[#e6e2dd] overflow-hidden">
-                <div className="h-full bg-[#635f41]" style={{ width: `${progressPercent}%` }} />
+              <div className="h-2 rounded-full bg-[#DDD8CE] overflow-hidden">
+                <div className="h-full bg-[#353535]" style={{ width: `${progressPercent}%` }} />
               </div>
               <div className="flex gap-2">
                 {!session || session.scene_status !== "active" ? (
-                  <Button onClick={startSession} className="flex-1 bg-[#635f41] text-white hover:bg-[#4d4a32]">
+                  <Button onClick={startSession} className="flex-1 bg-[#353535] text-white hover:bg-[#4d4a32]">
                     <Play className="h-4 w-4 mr-1" /> Start
                   </Button>
                 ) : (
@@ -836,7 +836,7 @@ export default function AiRehearsalStudio() {
                     else parseScript();
                   }}
                   variant="outline"
-                  className="border-[#cac6b9]"
+                  className="border-[#D5C9BE]"
                   title="Restart setup"
                 >
                   <RotateCcw className="h-4 w-4" />
@@ -853,11 +853,11 @@ export default function AiRehearsalStudio() {
           </aside>
 
           <section className="space-y-4">
-            <div className="bg-white border border-[#e6e2dd] rounded-[8px] p-5 sm:p-7">
-              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#e6e2dd] pb-4 mb-6">
+            <div className="bg-white border border-[#DDD8CE] rounded-[8px] p-5 sm:p-7">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#DDD8CE] pb-4 mb-6">
                 <div>
-                  <p className="text-[10px] uppercase tracking-widest font-bold text-[#635f41]">Current Dialogue</p>
-                  <h2 className="font-serif text-2xl font-bold text-[#1c1b19]">{activeTurn?.character || "Scene setup"}</h2>
+                  <p className="text-[10px] uppercase tracking-widest font-bold text-[#353535]">Current Dialogue</p>
+                  <h2 className="font-serif text-2xl font-bold text-[#232323]">{activeTurn?.character || "Scene setup"}</h2>
                 </div>
                 <div className="flex items-center gap-2 text-xs font-bold">
                   {session?.status === "HUMAN_TURN" && (
@@ -866,7 +866,7 @@ export default function AiRehearsalStudio() {
                     </span>
                   )}
                   {session?.status === "PLAYING_AI_AUDIO" && (
-                    <span className="inline-flex items-center gap-2 text-[#001e2c] bg-[#8CC0EB]/20 border border-[#8CC0EB]/50 rounded-full px-3 py-1">
+                    <span className="inline-flex items-center gap-2 text-[#001e2c] bg-[#E85F57]/20 border border-[#E85F57]/50 rounded-full px-3 py-1">
                       <Volume2 className="h-3.5 w-3.5" /> AI speaking
                     </span>
                   )}
@@ -875,7 +875,7 @@ export default function AiRehearsalStudio() {
 
               {activeTurn ? (
                 <div className="space-y-5">
-                  <div className="font-serif text-3xl sm:text-4xl leading-relaxed text-[#1c1b19]">
+                  <div className="font-serif text-3xl sm:text-4xl leading-relaxed text-[#232323]">
                     {activeTurn.words.map((word: string, index: number) => {
                       const isHuman = session.speaker_type === "human";
                       const activeIndex = isHuman ? humanWordIndex : aiWordIndex;
@@ -886,10 +886,10 @@ export default function AiRehearsalStudio() {
                           key={`${word}-${index}`}
                           className={`inline-block mr-2 rounded-[6px] px-1 transition-colors ${
                             active
-                              ? "bg-[#8CC0EB] text-[#001e2c]"
+                              ? "bg-[#E85F57] text-[#001e2c]"
                               : spoken
                                 ? "bg-emerald-50 text-emerald-800"
-                                : "text-[#1c1b19]"
+                                : "text-[#232323]"
                           }`}
                         >
                           {word}
@@ -904,7 +904,7 @@ export default function AiRehearsalStudio() {
                         <p className="text-xs font-bold uppercase tracking-wider text-amber-900">Live transcript</p>
                         {!speechSupported && <Badge className="bg-red-100 text-red-700">Unsupported browser</Badge>}
                       </div>
-                      <p className="text-sm text-[#1c1b19] min-h-6">{transcript || "Speak the line when the mic indicator is active."}</p>
+                      <p className="text-sm text-[#232323] min-h-6">{transcript || "Speak the line when the mic indicator is active."}</p>
                       <div className="flex flex-wrap gap-2">
                         <Button onClick={startListening} variant="outline" className="border-amber-300 text-amber-900">
                           <Mic className="h-4 w-4 mr-1" /> Listen
@@ -924,14 +924,14 @@ export default function AiRehearsalStudio() {
               ) : (
                 <div className="text-center py-16 space-y-3">
                   <CheckCircle2 className="h-12 w-12 text-emerald-600 mx-auto" />
-                  <h2 className="font-serif text-3xl font-bold text-[#1c1b19]">Scene Complete</h2>
-                  <p className="text-sm text-[#466272]">Session ran for about {elapsedMins} minute(s).</p>
+                  <h2 className="font-serif text-3xl font-bold text-[#232323]">Scene Complete</h2>
+                  <p className="text-sm text-[#666361]">Session ran for about {elapsedMins} minute(s).</p>
                 </div>
               )}
             </div>
 
-            <div className="bg-white border border-[#e6e2dd] rounded-[8px] p-5 space-y-3">
-              <h2 className="font-serif text-lg font-bold text-[#635f41]">Parsed Script</h2>
+            <div className="bg-white border border-[#DDD8CE] rounded-[8px] p-5 space-y-3">
+              <h2 className="font-serif text-lg font-bold text-[#353535]">Parsed Script</h2>
               <div className="space-y-2 max-h-[420px] overflow-y-auto pr-1">
                 {displayScene.turns.map((turn: any, index: number) => {
                   const current = session?.current_turn === index;
@@ -940,14 +940,14 @@ export default function AiRehearsalStudio() {
                       key={turn.id}
                       type="button"
                       className={`w-full text-left rounded-[8px] border p-3 transition-colors ${
-                        current ? "border-[#635f41] bg-[#f4efe8]" : "border-[#e6e2dd] bg-white hover:bg-[#fdf9f4]"
+                        current ? "border-[#353535] bg-[#f4efe8]" : "border-[#DDD8CE] bg-white hover:bg-[#E7DDD3]"
                       }`}
                     >
                       <div className="flex items-center justify-between gap-2">
-                        <span className="text-xs font-bold uppercase tracking-wider text-[#635f41]">{turn.character}</span>
-                        <span className="text-[10px] text-[#466272]/60">{assignments[turn.character] || turn.type}</span>
+                        <span className="text-xs font-bold uppercase tracking-wider text-[#353535]">{turn.character}</span>
+                        <span className="text-[10px] text-[#666361]/60">{assignments[turn.character] || turn.type}</span>
                       </div>
-                      <p className="font-serif text-sm text-[#1c1b19] mt-1">{turn.text}</p>
+                      <p className="font-serif text-sm text-[#232323] mt-1">{turn.text}</p>
                     </button>
                   );
                 })}
@@ -960,43 +960,43 @@ export default function AiRehearsalStudio() {
   }
 
   return (
-    <div className="min-h-screen bg-[#fdf9f4] text-[#466272] pb-16">
+    <div className="min-h-screen bg-[#E7DDD3] text-[#666361] pb-16">
       <div className="max-w-6xl mx-auto px-4 sm:px-8 py-6 space-y-6">
-        <section className="bg-white border border-[#e6e2dd] rounded-[8px] p-6 sm:p-8 flex flex-col lg:flex-row justify-between gap-6">
+        <section className="bg-white border border-[#DDD8CE] rounded-[8px] p-6 sm:p-8 flex flex-col lg:flex-row justify-between gap-6">
           <div className="space-y-2 max-w-2xl">
-            {/* <Badge className="bg-[#8CC0EB]/25 text-[#001e2c] border border-[#8CC0EB]/50">
+            {/* <Badge className="bg-[#E85F57]/25 text-[#001e2c] border border-[#E85F57]/50">
               GenAI Rehearsal MVP
             </Badge> */}
-            <h1 className="font-serif text-3xl font-bold text-[#1c1b19]">AI Drama Roleplay Studio</h1>
+            <h1 className="font-serif text-3xl font-bold text-[#232323]">AI Drama Roleplay Studio</h1>
             <p className="text-sm leading-relaxed">
               Assign roles, rehearse against AI scene partners, and follow word-level highlighting for human and AI turns.
             </p>
           </div>
-          <Button onClick={parseDemoScript} disabled={parsing} className="bg-[#635f41] text-white hover:bg-[#4d4a32] self-start">
+          <Button onClick={parseDemoScript} disabled={parsing} className="bg-[#353535] text-white hover:bg-[#4d4a32] self-start">
             <Wand2 className="h-4 w-4 mr-1" /> {parsing ? "Parsing..." : "Parse Demo Script"}
           </Button>
         </section>
 
         {scene && !activeScript && (
-          <section className="bg-white border border-[#e6e2dd] rounded-[8px] p-5 space-y-4">
+          <section className="bg-white border border-[#DDD8CE] rounded-[8px] p-5 space-y-4">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <h2 className="font-serif text-xl font-bold text-[#635f41]">{scene.title}</h2>
+                <h2 className="font-serif text-xl font-bold text-[#353535]">{scene.title}</h2>
                 <p className="text-xs">Characters parsed: {scene.characters.map((item: any) => item.name).join(", ")}</p>
               </div>
-              <Button onClick={startSession} className="bg-[#635f41] text-white hover:bg-[#4d4a32]">
+              <Button onClick={startSession} className="bg-[#353535] text-white hover:bg-[#4d4a32]">
                 <Play className="h-4 w-4 mr-1" /> Start Demo
               </Button>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {scene.characters.map((character: any) => (
-                <div key={character.name} className="flex items-center justify-between border border-[#e6e2dd] rounded-[8px] p-3">
-                  <span className="font-bold text-[#1c1b19]">{character.name}</span>
+                <div key={character.name} className="flex items-center justify-between border border-[#DDD8CE] rounded-[8px] p-3">
+                  <span className="font-bold text-[#232323]">{character.name}</span>
                   <div className="flex items-center gap-2">
                     <select
                       value={assignments[character.name] || "ai"}
                       onChange={(event) => setAssignments({ ...assignments, [character.name]: event.target.value as Assignment })}
-                      className="h-8 rounded-[8px] border border-[#cac6b9] bg-[#fdf9f4] px-2 text-xs font-bold"
+                      className="h-8 rounded-[8px] border border-[#D5C9BE] bg-[#E7DDD3] px-2 text-xs font-bold"
                     >
                       <option value="human">Human</option>
                       <option value="ai">AI</option>
@@ -1005,7 +1005,7 @@ export default function AiRehearsalStudio() {
                       <select
                         value={voicePreferences[character.name] || "female"}
                         onChange={(event) => setVoicePreferences({ ...voicePreferences, [character.name]: event.target.value as VoicePreference })}
-                        className="h-8 rounded-[8px] border border-[#cac6b9] bg-[#fdf9f4] px-2 text-xs font-bold"
+                        className="h-8 rounded-[8px] border border-[#D5C9BE] bg-[#E7DDD3] px-2 text-xs font-bold"
                       >
                         <option value="female">Female</option>
                         <option value="male">Male</option>
@@ -1019,21 +1019,21 @@ export default function AiRehearsalStudio() {
         )}
 
         <section className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6">
-          <div className="bg-white border border-[#e6e2dd] rounded-[8px] p-5 space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#e6e2dd] pb-4">
+          <div className="bg-white border border-[#DDD8CE] rounded-[8px] p-5 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#DDD8CE] pb-4">
               <div>
-                <h2 className="font-serif text-xl font-bold text-[#635f41] flex items-center gap-2">
+                <h2 className="font-serif text-xl font-bold text-[#353535] flex items-center gap-2">
                   <BookOpen className="h-5 w-5" /> Saved Scripts
                 </h2>
                 <p className="text-xs">Use scripts saved in your Script Vault.</p>
               </div>
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#466272]/50" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#666361]/50" />
                 <Input
                   value={searchQuery}
                   onChange={(event) => setSearchQuery(event.target.value)}
                   placeholder="Filter scripts"
-                  className="pl-8 h-9 rounded-[8px] border-[#e6e2dd]"
+                  className="pl-8 h-9 rounded-[8px] border-[#DDD8CE]"
                 />
               </div>
             </div>
@@ -1044,14 +1044,14 @@ export default function AiRehearsalStudio() {
                   <button
                     key={script.id}
                     onClick={() => navigate(`/ai-rehearsal/${script.id}`)}
-                    className="text-left border border-[#e6e2dd] rounded-[8px] p-4 bg-[#fdf9f4] hover:border-[#635f41]"
+                    className="text-left border border-[#DDD8CE] rounded-[8px] p-4 bg-[#E7DDD3] hover:border-[#353535]"
                   >
                     <div className="flex items-start justify-between gap-3">
-                      <h3 className="font-serif font-bold text-[#1c1b19]">{script.title}</h3>
-                      <Pin className="h-4 w-4 text-[#635f41] fill-[#635f41]" />
+                      <h3 className="font-serif font-bold text-[#232323]">{script.title}</h3>
+                      <Pin className="h-4 w-4 text-[#353535] fill-[#353535]" />
                     </div>
-                    <p className="text-xs text-[#466272] mt-1">{script.playwright}</p>
-                    <p className="text-[11px] text-[#466272]/70 mt-2">
+                    <p className="text-xs text-[#666361] mt-1">{script.playwright}</p>
+                    <p className="text-[11px] text-[#666361]/70 mt-2">
                       {script.charactersCount || 0} characters - {script.dialogueLines || 0} dialogue lines
                     </p>
                   </button>
@@ -1062,34 +1062,34 @@ export default function AiRehearsalStudio() {
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
                 <thead>
-                  <tr className="border-b border-[#e6e2dd] text-[10px] uppercase tracking-wider text-[#635f41]">
+                  <tr className="border-b border-[#DDD8CE] text-[10px] uppercase tracking-wider text-[#353535]">
                     <th className="py-3 px-3">Pin</th>
                     <th className="py-3 px-3">Title</th>
                     <th className="py-3 px-3">Lines</th>
                     <th className="py-3 px-3 text-right">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#e6e2dd]/70">
+                <tbody className="divide-y divide-[#DDD8CE]/70">
                   {filteredScripts.map((script) => (
-                    <tr key={script.id} className="hover:bg-[#fdf9f4]">
+                    <tr key={script.id} className="hover:bg-[#E7DDD3]">
                       <td className="py-3 px-3">
                         <button onClick={(event) => togglePinScript(script.id, event)} title="Pin script">
-                          <Pin className={`h-4 w-4 ${pinnedScriptIds.includes(script.id) ? "fill-[#635f41] text-[#635f41]" : "text-[#466272]/35"}`} />
+                          <Pin className={`h-4 w-4 ${pinnedScriptIds.includes(script.id) ? "fill-[#353535] text-[#353535]" : "text-[#666361]/35"}`} />
                         </button>
                       </td>
                       <td className="py-3 px-3">
-                        <p className="font-serif font-bold text-[#1c1b19]">{script.title}</p>
-                        <p className="text-[#466272]/70">{script.playwright}</p>
+                        <p className="font-serif font-bold text-[#232323]">{script.title}</p>
+                        <p className="text-[#666361]/70">{script.playwright}</p>
                       </td>
                       <td className="py-3 px-3">
                         <p>{script.charactersCount || 0} characters</p>
-                        <p className="text-[#466272]/65">{script.dialogueLines || 0} dialogue lines</p>
+                        <p className="text-[#666361]/65">{script.dialogueLines || 0} dialogue lines</p>
                       </td>
                       <td className="py-3 px-3 text-right">
                         <Button
                           onClick={() => navigate(`/ai-rehearsal/${script.id}`)}
                           disabled={script.rehearsalReady === false}
-                          className="bg-[#635f41] text-white hover:bg-[#4d4a32]"
+                          className="bg-[#353535] text-white hover:bg-[#4d4a32]"
                         >
                           Use
                         </Button>
@@ -1098,7 +1098,7 @@ export default function AiRehearsalStudio() {
                   ))}
                   {filteredScripts.length === 0 && (
                     <tr>
-                      <td colSpan={4} className="py-8 text-center text-sm text-[#466272]/70">
+                      <td colSpan={4} className="py-8 text-center text-sm text-[#666361]/70">
                         No saved Script Vault scripts found for this account.
                       </td>
                     </tr>
@@ -1108,21 +1108,21 @@ export default function AiRehearsalStudio() {
             </div>
           </div>
 
-          <div className="bg-white border border-[#e6e2dd] rounded-[8px] p-5 space-y-4">
-            <h2 className="font-serif text-xl font-bold text-[#635f41]">Upload / Paste Script</h2>
+          <div className="bg-white border border-[#DDD8CE] rounded-[8px] p-5 space-y-4">
+            <h2 className="font-serif text-xl font-bold text-[#353535]">Upload / Paste Script</h2>
             <Input
               value={inlineTitle}
               onChange={(event) => setInlineTitle(event.target.value)}
-              className="rounded-[8px] border-[#e6e2dd]"
+              className="rounded-[8px] border-[#DDD8CE]"
               placeholder="Scene title"
             />
             <textarea
               value={inlineScript}
               onChange={(event) => setInlineScript(event.target.value)}
               rows={12}
-              className="w-full resize-none rounded-[8px] border border-[#e6e2dd] bg-[#fdf9f4] p-3 font-serif text-sm text-[#1c1b19] focus:outline-none focus:ring-2 focus:ring-[#635f41]/30"
+              className="w-full resize-none rounded-[8px] border border-[#DDD8CE] bg-[#E7DDD3] p-3 font-serif text-sm text-[#232323] focus:outline-none focus:ring-2 focus:ring-[#353535]/30"
             />
-            <Button onClick={() => parseScript()} disabled={parsing} className="w-full bg-[#635f41] text-white hover:bg-[#4d4a32]">
+            <Button onClick={() => parseScript()} disabled={parsing} className="w-full bg-[#353535] text-white hover:bg-[#4d4a32]">
               <Loader2 className={`${parsing ? "animate-spin" : "hidden"} h-4 w-4 mr-1`} /> {parsing ? "Parsing..." : "Parse Characters"}
             </Button>
             {error && (

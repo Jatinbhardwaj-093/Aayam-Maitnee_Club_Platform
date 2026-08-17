@@ -490,66 +490,66 @@ export default function AuditionsManagement() {
 
   if (createModalOpen) {
     return (
-      <div className="bg-[#fdf9f4] min-h-screen text-[#1c1b19] font-sans space-y-6 max-w-6xl mx-auto animate-in fade-in-50 duration-200 pb-16">
+      <div className="bg-[#E7DDD3] min-h-screen text-[#232323] font-sans space-y-6 max-w-6xl mx-auto animate-in fade-in-50 duration-200 pb-16">
         {/* Top Header */}
-        <div className="bg-[#f7f3ee] border border-[#e6e2dd] rounded-2xl p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div className="bg-[#EFE8E1] border border-[#DDD8CE] rounded-2xl p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div className="space-y-1">
             <button
               type="button"
               onClick={() => setCreateModalOpen(false)}
-              className="text-xs font-bold text-[#635f41] hover:underline flex items-center gap-1 mb-2 cursor-pointer"
+              className="text-xs font-bold text-[#353535] hover:underline flex items-center gap-1 mb-2 cursor-pointer"
             >
               ← Back to Auditions Management
             </button>
             <span className="text-xs uppercase tracking-widest text-[#9B1C31] font-bold block">
               Production Calling Setup
             </span>
-            <h2 className="text-2xl md:text-3xl font-bold font-serif text-[#635f41]">
+            <h2 className="text-2xl md:text-3xl font-bold font-serif text-[#353535]">
               Publish New Audition Calling
             </h2>
-            <p className="text-xs md:text-sm text-[#466272]">
+            <p className="text-xs md:text-sm text-[#666361]">
               Create an open character role or technical crew position with full specifications & casting benchmarks.
             </p>
           </div>
 
-          <Badge className="bg-[#635f41] text-white font-mono text-xs font-bold px-3 py-1">
+          <Badge className="bg-[#353535] text-white font-mono text-xs font-bold px-3 py-1">
             Audition Creator Portal
           </Badge>
         </div>
 
         {/* Form Container */}
-        <form onSubmit={handleCreatePositionSubmit} className="space-y-6 bg-white p-6 md:p-8 rounded-2xl border border-[#e6e2dd] shadow-xs text-xs text-left">
+        <form onSubmit={handleCreatePositionSubmit} className="space-y-6 bg-white p-6 md:p-8 rounded-2xl border border-[#DDD8CE] shadow-xs text-xs text-left">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
-              <label className="font-bold text-[#635f41] block mb-1">Target Production Name *</label>
+              <label className="font-bold text-[#353535] block mb-1">Target Production Name *</label>
               <Input
                 required
                 value={newPositionForm.production_name}
                 onChange={(e) => setNewPositionForm({ ...newPositionForm, production_name: e.target.value })}
                 placeholder="e.g. Tughlaq - Ensemble Production"
-                className="bg-[#fdf9f4] border-[#cac6b9]/60 h-10 text-xs rounded-xl"
+                className="bg-[#E7DDD3] border-[#D5C9BE]/60 h-10 text-xs rounded-xl"
               />
             </div>
 
             <div>
-              <label className="font-bold text-[#635f41] block mb-1">Role Title / Position Name *</label>
+              <label className="font-bold text-[#353535] block mb-1">Role Title / Position Name *</label>
               <Input
                 required
                 value={newPositionForm.role_name}
                 onChange={(e) => setNewPositionForm({ ...newPositionForm, role_name: e.target.value })}
                 placeholder="e.g. Sultan Muhammad bin Tughlaq (Lead)"
-                className="bg-[#fdf9f4] border-[#cac6b9]/60 h-10 text-xs rounded-xl"
+                className="bg-[#E7DDD3] border-[#D5C9BE]/60 h-10 text-xs rounded-xl"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             <div>
-              <label className="font-bold text-[#635f41] block mb-1">Role Classification</label>
+              <label className="font-bold text-[#353535] block mb-1">Role Classification</label>
               <select
                 value={newPositionForm.role_category}
                 onChange={(e) => setNewPositionForm({ ...newPositionForm, role_category: e.target.value })}
-                className="w-full bg-[#fdf9f4] border border-[#cac6b9]/60 h-10 px-3 text-xs font-bold rounded-xl text-[#1c1b19] focus:outline-none"
+                className="w-full bg-[#E7DDD3] border border-[#D5C9BE]/60 h-10 px-3 text-xs font-bold rounded-xl text-[#232323] focus:outline-none"
               >
                 <option value="Character Role">Character Role (Performer)</option>
                 <option value="Performer">Performer / Lead Acting</option>
@@ -561,22 +561,22 @@ export default function AuditionsManagement() {
             </div>
 
             <div>
-              <label className="font-bold text-[#635f41] block mb-1">Open Slots Available</label>
+              <label className="font-bold text-[#353535] block mb-1">Open Slots Available</label>
               <Input
                 type="number"
                 min={1}
                 value={newPositionForm.slots_available}
                 onChange={(e) => setNewPositionForm({ ...newPositionForm, slots_available: parseInt(e.target.value) || 1 })}
-                className="bg-[#fdf9f4] border-[#cac6b9]/60 h-10 text-xs rounded-xl"
+                className="bg-[#E7DDD3] border-[#D5C9BE]/60 h-10 text-xs rounded-xl"
               />
             </div>
 
             <div>
-              <label className="font-bold text-[#635f41] block mb-1">Audition Calling Status</label>
+              <label className="font-bold text-[#353535] block mb-1">Audition Calling Status</label>
               <select
                 value={newPositionForm.status}
                 onChange={(e) => setNewPositionForm({ ...newPositionForm, status: e.target.value })}
-                className="w-full bg-[#fdf9f4] border border-[#cac6b9]/60 h-10 px-3 text-xs font-bold rounded-xl text-[#1c1b19] focus:outline-none"
+                className="w-full bg-[#E7DDD3] border border-[#D5C9BE]/60 h-10 px-3 text-xs font-bold rounded-xl text-[#232323] focus:outline-none"
               >
                 <option value="Open Calling">Open Calling</option>
                 <option value="In Review">In Review</option>
@@ -586,39 +586,39 @@ export default function AuditionsManagement() {
           </div>
 
           <div>
-            <label className="font-bold text-[#635f41] block mb-1">Character & Role Specifications (Full Description)</label>
+            <label className="font-bold text-[#353535] block mb-1">Character & Role Specifications (Full Description)</label>
             <textarea
               rows={4}
               value={newPositionForm.character_description}
               onChange={(e) => setNewPositionForm({ ...newPositionForm, character_description: e.target.value })}
               placeholder="Describe character archetype, age bracket, vocal projection, emotional beats, and stage posture expected..."
-              className="w-full bg-[#fdf9f4] border border-[#cac6b9]/60 p-3.5 rounded-xl text-xs text-[#1c1b19] focus:outline-none"
+              className="w-full bg-[#E7DDD3] border border-[#D5C9BE]/60 p-3.5 rounded-xl text-xs text-[#232323] focus:outline-none"
             />
           </div>
 
           <div>
-            <label className="font-bold text-[#635f41] block mb-1">Detailed Audition & Portfolio Requirements</label>
+            <label className="font-bold text-[#353535] block mb-1">Detailed Audition & Portfolio Requirements</label>
             <textarea
               rows={3}
               value={newPositionForm.requirements}
               onChange={(e) => setNewPositionForm({ ...newPositionForm, requirements: e.target.value })}
               placeholder="List required submissions: e.g. 2-minute Hindustani drama monologue video, headshot PDF, or SFX portfolio..."
-              className="w-full bg-[#fdf9f4] border border-[#cac6b9]/60 p-3.5 rounded-xl text-xs text-[#1c1b19] focus:outline-none"
+              className="w-full bg-[#E7DDD3] border border-[#D5C9BE]/60 p-3.5 rounded-xl text-xs text-[#232323] focus:outline-none"
             />
           </div>
 
-          <div className="flex items-center justify-end gap-4 border-t border-[#cac6b9]/40 pt-5">
+          <div className="flex items-center justify-end gap-4 border-t border-[#D5C9BE]/40 pt-5">
             <Button
               type="button"
               variant="outline"
               onClick={() => setCreateModalOpen(false)}
-              className="border-2 border-[#cac6b9] text-[#635f41] hover:bg-gray-100 rounded-xl text-xs font-bold px-8 h-11"
+              className="border-2 border-[#D5C9BE] text-[#353535] hover:bg-gray-100 rounded-xl text-xs font-bold px-8 h-11"
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              className="bg-[#635f41] hover:bg-[#4d4a32] text-white font-bold text-xs rounded-xl px-10 h-11 shadow-md"
+              className="bg-[#353535] hover:bg-[#4d4a32] text-white font-bold text-xs rounded-xl px-10 h-11 shadow-md"
             >
               Publish Audition Calling
             </Button>
@@ -630,64 +630,64 @@ export default function AuditionsManagement() {
 
   if (editingRoleForm && editRoleModalOpen) {
     return (
-      <div className="bg-[#fdf9f4] min-h-screen text-[#1c1b19] font-sans space-y-6 max-w-6xl mx-auto animate-in fade-in-50 duration-200 pb-16">
+      <div className="bg-[#E7DDD3] min-h-screen text-[#232323] font-sans space-y-6 max-w-6xl mx-auto animate-in fade-in-50 duration-200 pb-16">
         {/* Top Header */}
-        <div className="bg-[#f7f3ee] border border-[#e6e2dd] rounded-2xl p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div className="bg-[#EFE8E1] border border-[#DDD8CE] rounded-2xl p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div className="space-y-1">
             <button
               type="button"
               onClick={() => setEditRoleModalOpen(false)}
-              className="text-xs font-bold text-[#635f41] hover:underline flex items-center gap-1 mb-2 cursor-pointer"
+              className="text-xs font-bold text-[#353535] hover:underline flex items-center gap-1 mb-2 cursor-pointer"
             >
               ← Back to Auditions Management
             </button>
             <span className="text-xs uppercase tracking-widest text-[#9B1C31] font-bold block">
               Role Details Editor
             </span>
-            <h2 className="text-2xl md:text-3xl font-bold font-serif text-[#635f41]">
+            <h2 className="text-2xl md:text-3xl font-bold font-serif text-[#353535]">
               Edit Audition Role: {editingRoleForm.role_name}
             </h2>
-            <p className="text-xs md:text-sm text-[#466272]">
+            <p className="text-xs md:text-sm text-[#666361]">
               Update character specifications, role descriptions, and required benchmarks saved in the database.
             </p>
           </div>
 
-          <Badge className="bg-[#635f41] text-white font-mono text-xs font-bold px-3 py-1">
+          <Badge className="bg-[#353535] text-white font-mono text-xs font-bold px-3 py-1">
             Maintainer Role Editor
           </Badge>
         </div>
 
         {/* Form Container */}
-        <form onSubmit={handleSaveRoleDetailsSubmit} className="space-y-6 bg-white p-6 md:p-8 rounded-2xl border border-[#e6e2dd] shadow-xs text-xs text-left">
+        <form onSubmit={handleSaveRoleDetailsSubmit} className="space-y-6 bg-white p-6 md:p-8 rounded-2xl border border-[#DDD8CE] shadow-xs text-xs text-left">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
-              <label className="font-bold text-[#635f41] block mb-1">Production Name *</label>
+              <label className="font-bold text-[#353535] block mb-1">Production Name *</label>
               <Input
                 required
                 value={editingRoleForm.production_name}
                 onChange={(e) => setEditingRoleForm({ ...editingRoleForm, production_name: e.target.value })}
-                className="bg-[#fdf9f4] border-[#cac6b9]/60 h-10 text-xs rounded-xl"
+                className="bg-[#E7DDD3] border-[#D5C9BE]/60 h-10 text-xs rounded-xl"
               />
             </div>
 
             <div>
-              <label className="font-bold text-[#635f41] block mb-1">Role Title / Position Name *</label>
+              <label className="font-bold text-[#353535] block mb-1">Role Title / Position Name *</label>
               <Input
                 required
                 value={editingRoleForm.role_name}
                 onChange={(e) => setEditingRoleForm({ ...editingRoleForm, role_name: e.target.value })}
-                className="bg-[#fdf9f4] border-[#cac6b9]/60 h-10 text-xs rounded-xl"
+                className="bg-[#E7DDD3] border-[#D5C9BE]/60 h-10 text-xs rounded-xl"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             <div>
-              <label className="font-bold text-[#635f41] block mb-1">Role Classification</label>
+              <label className="font-bold text-[#353535] block mb-1">Role Classification</label>
               <select
                 value={editingRoleForm.role_category}
                 onChange={(e) => setEditingRoleForm({ ...editingRoleForm, role_category: e.target.value })}
-                className="w-full bg-[#fdf9f4] border border-[#cac6b9]/60 h-10 px-3 text-xs font-bold rounded-xl text-[#1c1b19] focus:outline-none"
+                className="w-full bg-[#E7DDD3] border border-[#D5C9BE]/60 h-10 px-3 text-xs font-bold rounded-xl text-[#232323] focus:outline-none"
               >
                 <option value="Character Role">Character Role (Performer)</option>
                 <option value="Performer">Performer / Lead Acting</option>
@@ -699,22 +699,22 @@ export default function AuditionsManagement() {
             </div>
 
             <div>
-              <label className="font-bold text-[#635f41] block mb-1">Open Slots Available</label>
+              <label className="font-bold text-[#353535] block mb-1">Open Slots Available</label>
               <Input
                 type="number"
                 min={1}
                 value={editingRoleForm.slots_available}
                 onChange={(e) => setEditingRoleForm({ ...editingRoleForm, slots_available: parseInt(e.target.value) || 1 })}
-                className="bg-[#fdf9f4] border-[#cac6b9]/60 h-10 text-xs rounded-xl"
+                className="bg-[#E7DDD3] border-[#D5C9BE]/60 h-10 text-xs rounded-xl"
               />
             </div>
 
             <div>
-              <label className="font-bold text-[#635f41] block mb-1">Audition Status</label>
+              <label className="font-bold text-[#353535] block mb-1">Audition Status</label>
               <select
                 value={editingRoleForm.status}
                 onChange={(e) => setEditingRoleForm({ ...editingRoleForm, status: e.target.value })}
-                className="w-full bg-[#fdf9f4] border border-[#cac6b9]/60 h-10 px-3 text-xs font-bold rounded-xl text-[#1c1b19] focus:outline-none"
+                className="w-full bg-[#E7DDD3] border border-[#D5C9BE]/60 h-10 px-3 text-xs font-bold rounded-xl text-[#232323] focus:outline-none"
               >
                 <option value="Open Calling">Open Calling</option>
                 <option value="In Review">In Review</option>
@@ -724,39 +724,39 @@ export default function AuditionsManagement() {
           </div>
 
           <div>
-            <label className="font-bold text-[#635f41] block mb-1">Character & Role Specifications (Full Description)</label>
+            <label className="font-bold text-[#353535] block mb-1">Character & Role Specifications (Full Description)</label>
             <textarea
               rows={4}
               value={editingRoleForm.character_description || ""}
               onChange={(e) => setEditingRoleForm({ ...editingRoleForm, character_description: e.target.value })}
               placeholder="Describe character archetype, age bracket, vocal projection, emotional beats, and stage posture expected..."
-              className="w-full bg-[#fdf9f4] border border-[#cac6b9]/60 p-3.5 rounded-xl text-xs text-[#1c1b19] focus:outline-none"
+              className="w-full bg-[#E7DDD3] border border-[#D5C9BE]/60 p-3.5 rounded-xl text-xs text-[#232323] focus:outline-none"
             />
           </div>
 
           <div>
-            <label className="font-bold text-[#635f41] block mb-1">Detailed Audition & Portfolio Requirements</label>
+            <label className="font-bold text-[#353535] block mb-1">Detailed Audition & Portfolio Requirements</label>
             <textarea
               rows={3}
               value={editingRoleForm.requirements || ""}
               onChange={(e) => setEditingRoleForm({ ...editingRoleForm, requirements: e.target.value })}
               placeholder="List required submissions: e.g. 2-minute Hindustani drama monologue video, headshot PDF, or SFX portfolio..."
-              className="w-full bg-[#fdf9f4] border border-[#cac6b9]/60 p-3.5 rounded-xl text-xs text-[#1c1b19] focus:outline-none"
+              className="w-full bg-[#E7DDD3] border border-[#D5C9BE]/60 p-3.5 rounded-xl text-xs text-[#232323] focus:outline-none"
             />
           </div>
 
-          <div className="flex items-center justify-end gap-4 border-t border-[#cac6b9]/40 pt-5">
+          <div className="flex items-center justify-end gap-4 border-t border-[#D5C9BE]/40 pt-5">
             <Button
               type="button"
               variant="outline"
               onClick={() => setEditRoleModalOpen(false)}
-              className="border-2 border-[#cac6b9] text-[#635f41] hover:bg-gray-100 rounded-xl text-xs font-bold px-8 h-11"
+              className="border-2 border-[#D5C9BE] text-[#353535] hover:bg-gray-100 rounded-xl text-xs font-bold px-8 h-11"
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              className="bg-[#635f41] hover:bg-[#4d4a32] text-white font-bold text-xs rounded-xl px-10 h-11 shadow-md"
+              className="bg-[#353535] hover:bg-[#4d4a32] text-white font-bold text-xs rounded-xl px-10 h-11 shadow-md"
             >
               Save Role Details
             </Button>
@@ -767,18 +767,18 @@ export default function AuditionsManagement() {
   }
 
   return (
-    <div className="bg-[#fdf9f4] min-h-screen text-[#1c1b19] p-6 md:p-10 font-sans space-y-8 max-w-6xl mx-auto">
+    <div className="bg-[#E7DDD3] min-h-screen text-[#232323] p-6 md:p-10 font-sans space-y-8 max-w-6xl mx-auto">
       
       {/* Top Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-[#e6e2dd] pb-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-[#DDD8CE] pb-6">
         <div>
-          <span className="text-[10px] font-bold text-[#635f41] uppercase tracking-[0.25em] block mb-1">
+          <span className="text-[10px] font-bold text-[#353535] uppercase tracking-[0.25em] block mb-1">
             Ensemble Audition Portal
           </span>
-          <h1 className="font-serif text-3xl font-bold text-[#1c1b19] tracking-tight">
+          <h1 className="font-serif text-3xl font-bold text-[#232323] tracking-tight">
             {activeViewRole ? activeViewRole.role_name : "Open Audition Roles"}
           </h1>
-          <p className="text-xs md:text-sm text-[#466272] mt-1 font-light">
+          <p className="text-xs md:text-sm text-[#666361] mt-1 font-light">
             {activeViewRole
               ? `Reviewing submitted audition requests for ${activeViewRole.production_name}`
               : "Minimal open roles dashboard. Select a role to inspect member audition requests."}
@@ -788,14 +788,14 @@ export default function AuditionsManagement() {
         {activeViewRole ? (
           <Button
             onClick={() => setActiveViewRole(null)}
-            className="bg-white border border-[#cac6b9] text-[#635f41] hover:text-[#1c1b19] hover:bg-[#fdf9f4] font-bold text-xs rounded-xl px-4 h-10 shadow-2xs flex items-center gap-2"
+            className="bg-white border border-[#D5C9BE] text-[#353535] hover:text-[#232323] hover:bg-[#E7DDD3] font-bold text-xs rounded-xl px-4 h-10 shadow-2xs flex items-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" /> Back to All Roles
           </Button>
         ) : (
           <Button
             onClick={() => setCreateModalOpen(true)}
-            className="bg-[#635f41] hover:bg-[#4d4a32] text-white font-bold text-xs rounded-xl px-5 h-10 shadow-xs flex items-center gap-2"
+            className="bg-[#353535] hover:bg-[#4d4a32] text-white font-bold text-xs rounded-xl px-5 h-10 shadow-xs flex items-center gap-2"
           >
             <Plus className="w-4 h-4" /> Add Open Role
           </Button>
@@ -806,27 +806,27 @@ export default function AuditionsManagement() {
       {!activeViewRole ? (
         <div className="space-y-6">
           {/* Search & Category Filter Bar */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-[#e6e2dd] shadow-xs">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-[#DDD8CE] shadow-xs">
             <div className="relative flex-1">
               <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
               <Input
                 placeholder="Filter open roles or production..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 bg-[#fdf9f4] border-[#cac6b9]/60 text-xs h-10 rounded-xl"
+                className="pl-10 bg-[#E7DDD3] border-[#D5C9BE]/60 text-xs h-10 rounded-xl"
               />
             </div>
 
             <div className="flex flex-wrap gap-2 items-center">
-              <span className="text-xs font-bold text-[#635f41] uppercase tracking-wider">Category:</span>
+              <span className="text-xs font-bold text-[#353535] uppercase tracking-wider">Category:</span>
               {["All", "Character Role", "Makeup & Hair", "Backstage Technical", "Costume"].map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setCategoryFilter(cat)}
                   className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
                     categoryFilter === cat
-                      ? "bg-[#635f41] text-white shadow-xs"
-                      : "bg-[#fdf9f4] text-[#466272] hover:bg-[#e6e2dd]"
+                      ? "bg-[#353535] text-white shadow-xs"
+                      : "bg-[#E7DDD3] text-[#666361] hover:bg-[#DDD8CE]"
                   }`}
                 >
                   {cat}
@@ -843,41 +843,41 @@ export default function AuditionsManagement() {
                 <div
                   key={pos.id}
                   onClick={() => setActiveViewRole(pos)}
-                  className="bg-white border border-[#e6e2dd] hover:border-[#635f41] p-5 rounded-2xl shadow-xs hover:shadow-sm transition-all cursor-pointer space-y-3 flex flex-col justify-between"
+                  className="bg-white border border-[#DDD8CE] hover:border-[#353535] p-5 rounded-2xl shadow-xs hover:shadow-sm transition-all cursor-pointer space-y-3 flex flex-col justify-between"
                 >
                   <div className="space-y-2">
                     <div className="flex items-center justify-between gap-2">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-[#635f41] bg-[#635f41]/10 px-2.5 py-0.5 rounded-full">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-[#353535] bg-[#353535]/10 px-2.5 py-0.5 rounded-full">
                         {pos.role_category}
                       </span>
-                      <span className="text-xs font-bold px-3 py-1 rounded-xl bg-[#8CC0EB]/20 text-[#1e4866]">
+                      <span className="text-xs font-bold px-3 py-1 rounded-xl bg-[#E85F57]/20 text-[#1e4866]">
                         {reqCount} {reqCount === 1 ? "Request" : "Requests"}
                       </span>
                     </div>
 
                     <div>
-                      <h3 className="font-serif text-lg font-bold text-[#1c1b19]">
+                      <h3 className="font-serif text-lg font-bold text-[#232323]">
                         {pos.role_name}
                       </h3>
-                      <p className="text-xs text-[#466272] font-medium">{pos.production_name}</p>
+                      <p className="text-xs text-[#666361] font-medium">{pos.production_name}</p>
                     </div>
 
                     {pos.character_description && (
-                      <p className="text-xs text-[#466272] line-clamp-2 leading-relaxed font-light pt-1">
+                      <p className="text-xs text-[#666361] line-clamp-2 leading-relaxed font-light pt-1">
                         {pos.character_description}
                       </p>
                     )}
                   </div>
 
-                  <div className="pt-3 border-t border-[#e6e2dd] flex items-center justify-between text-xs gap-2">
+                  <div className="pt-3 border-t border-[#DDD8CE] flex items-center justify-between text-xs gap-2">
                     <button
                       type="button"
                       onClick={(e) => handleOpenEditRole(pos, e)}
-                      className="px-3 py-1 rounded-lg bg-[#fdf9f4] hover:bg-[#e6e2dd] text-[#635f41] font-bold text-[11px] border border-[#cac6b9]/60 transition-all flex items-center gap-1 shadow-2xs"
+                      className="px-3 py-1 rounded-lg bg-[#E7DDD3] hover:bg-[#DDD8CE] text-[#353535] font-bold text-[11px] border border-[#D5C9BE]/60 transition-all flex items-center gap-1 shadow-2xs"
                     >
-                      <Sparkles className="w-3 h-3 text-[#8CC0EB]" /> Save / Edit Role Details
+                      <Sparkles className="w-3 h-3 text-[#E85F57]" /> Save / Edit Role Details
                     </button>
-                    <span className="text-[#635f41] font-bold hover:underline">
+                    <span className="text-[#353535] font-bold hover:underline">
                       Requests ({reqCount}) →
                     </span>
                   </div>
@@ -890,23 +890,23 @@ export default function AuditionsManagement() {
         /* VIEW 2: AUDITION REQUESTS FOR SELECTED ROLE */
         <div className="space-y-6 animate-in fade-in-50 duration-200">
           {/* Minimal Role Overview Banner */}
-          <div className="bg-white border border-[#e6e2dd] rounded-2xl p-5 space-y-2 shadow-xs">
+          <div className="bg-white border border-[#DDD8CE] rounded-2xl p-5 space-y-2 shadow-xs">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#635f41]">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#353535]">
                 {activeViewRole.role_category} • {activeViewRole.production_name}
               </span>
-              <span className="text-xs font-bold px-3 py-1 bg-[#635f41] text-white rounded-xl">
+              <span className="text-xs font-bold px-3 py-1 bg-[#353535] text-white rounded-xl">
                 {activeViewRole.status}
               </span>
             </div>
-            <p className="text-xs text-[#1c1b19] leading-relaxed">
+            <p className="text-xs text-[#232323] leading-relaxed">
               {activeViewRole.character_description}
             </p>
           </div>
 
           {/* Status Filter Bar */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#e6e2dd] pb-4">
-            <h3 className="font-serif text-lg font-bold text-[#1c1b19]">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#DDD8CE] pb-4">
+            <h3 className="font-serif text-lg font-bold text-[#232323]">
               Submitted Requests ({activeRoleApplications.length})
             </h3>
 
@@ -917,8 +917,8 @@ export default function AuditionsManagement() {
                   onClick={() => setStatusFilter(st)}
                   className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
                     statusFilter === st
-                      ? "bg-[#635f41] text-white shadow-xs"
-                      : "bg-white text-[#466272] border border-[#cac6b9]/40 hover:bg-[#fdf9f4]"
+                      ? "bg-[#353535] text-white shadow-xs"
+                      : "bg-white text-[#666361] border border-[#D5C9BE]/40 hover:bg-[#E7DDD3]"
                   }`}
                 >
                   {st}
@@ -929,8 +929,8 @@ export default function AuditionsManagement() {
 
           {/* Submitted Member Requests */}
           {activeRoleApplications.length === 0 ? (
-            <div className="p-12 text-center text-[#466272] space-y-2 bg-white rounded-2xl border border-dashed border-[#cac6b9]">
-              <p className="text-sm font-bold text-[#1c1b19]">No audition requests submitted yet for this role.</p>
+            <div className="p-12 text-center text-[#666361] space-y-2 bg-white rounded-2xl border border-dashed border-[#D5C9BE]">
+              <p className="text-sm font-bold text-[#232323]">No audition requests submitted yet for this role.</p>
               <p className="text-xs">Submissions from ensemble members will appear here.</p>
             </div>
           ) : (
@@ -938,12 +938,12 @@ export default function AuditionsManagement() {
               {activeRoleApplications.map((appItem) => (
                 <div
                   key={appItem.id}
-                  className="p-5 bg-white border border-[#e6e2dd] rounded-2xl shadow-xs space-y-4 hover:border-[#cac6b9] transition-all"
+                  className="p-5 bg-white border border-[#DDD8CE] rounded-2xl shadow-xs space-y-4 hover:border-[#D5C9BE] transition-all"
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-gray-100">
                     <div>
                       <div className="flex items-center gap-2">
-                        <h4 className="font-serif text-base font-bold text-[#1c1b19]">
+                        <h4 className="font-serif text-base font-bold text-[#232323]">
                           {appItem.applicant_name}
                         </h4>
                         <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
@@ -958,24 +958,24 @@ export default function AuditionsManagement() {
                           {appItem.status}
                         </span>
                       </div>
-                      <span className="text-xs text-[#466272] font-medium">{appItem.experience_level}</span>
+                      <span className="text-xs text-[#666361] font-medium">{appItem.experience_level}</span>
                     </div>
 
-                    <div className="text-xs text-[#466272] space-y-0.5 text-left sm:text-right">
+                    <div className="text-xs text-[#666361] space-y-0.5 text-left sm:text-right">
                       <div className="flex items-center gap-1.5 sm:justify-end">
-                        <Mail className="w-3.5 h-3.5 text-[#635f41]" />
+                        <Mail className="w-3.5 h-3.5 text-[#353535]" />
                         <span>{appItem.applicant_email}</span>
                       </div>
                       <div className="flex items-center gap-1.5 sm:justify-end">
-                        <Phone className="w-3.5 h-3.5 text-[#635f41]" />
+                        <Phone className="w-3.5 h-3.5 text-[#353535]" />
                         <span>{appItem.applicant_phone}</span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="space-y-3 text-xs text-[#466272]">
+                  <div className="space-y-3 text-xs text-[#666361]">
                     {appItem.notes && (
-                      <div className="bg-[#fdf9f4] p-3 rounded-xl border border-[#cac6b9]/40 leading-relaxed italic">
+                      <div className="bg-[#E7DDD3] p-3 rounded-xl border border-[#D5C9BE]/40 leading-relaxed italic">
                         "{appItem.notes}"
                       </div>
                     )}
@@ -987,10 +987,10 @@ export default function AuditionsManagement() {
 
                       if (isScanned) {
                         return (
-                          <div className="bg-[#fdf9f4] p-3.5 rounded-2xl border border-[#cac6b9]/60 space-y-3 animate-in fade-in-50 duration-200">
+                          <div className="bg-[#E7DDD3] p-3.5 rounded-2xl border border-[#D5C9BE]/60 space-y-3 animate-in fade-in-50 duration-200">
                             <div className="flex items-center justify-between">
-                              <span className="text-[10px] font-bold uppercase tracking-wider text-[#635f41] flex items-center gap-1">
-                                <Sparkles className="w-3.5 h-3.5 text-[#8CC0EB]" /> {isPerformer ? "AI Audition Video Verified" : "AI Technical Portfolio Verified"}
+                              <span className="text-[10px] font-bold uppercase tracking-wider text-[#353535] flex items-center gap-1">
+                                <Sparkles className="w-3.5 h-3.5 text-[#E85F57]" /> {isPerformer ? "AI Audition Video Verified" : "AI Technical Portfolio Verified"}
                               </span>
                               <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-full">
                                 Up to Mark • Benchmark Passed
@@ -999,35 +999,35 @@ export default function AuditionsManagement() {
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                               {/* Tool 1: Role / Skill Match */}
-                              <div className="bg-white p-3 rounded-xl border border-[#cac6b9]/40 space-y-1">
+                              <div className="bg-white p-3 rounded-xl border border-[#D5C9BE]/40 space-y-1">
                                 <div className="flex items-center justify-between">
-                                  <span className="font-bold text-[#1c1b19] text-[11px]">{isPerformer ? "Portfolio Role Fit" : "Technical Skill Match"}</span>
+                                  <span className="font-bold text-[#232323] text-[11px]">{isPerformer ? "Portfolio Role Fit" : "Technical Skill Match"}</span>
                                   <span className="font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
                                     {getPortfolioMatchScore(appItem, activeViewRole)}% Match
                                   </span>
                                 </div>
-                                <p className="text-[11px] text-[#466272] leading-tight font-light">
+                                <p className="text-[11px] text-[#666361] leading-tight font-light">
                                   {isPerformer ? "Matches character archetype & monologue delivery." : "Technical staging skills & experience verified."}
                                 </p>
                               </div>
 
                               {/* Tool 2: Video Quality (Performers) OR Portfolio PDF Evaluator (Tech Crew) */}
-                              <div className="bg-white p-3 rounded-xl border border-[#cac6b9]/40 space-y-2">
+                              <div className="bg-white p-3 rounded-xl border border-[#D5C9BE]/40 space-y-2">
                                 <div className="flex items-center justify-between">
-                                  <span className="font-bold text-[#1c1b19] text-[11px]">{isPerformer ? "Video/Audio Quality" : "PDF Portfolio Depth"}</span>
+                                  <span className="font-bold text-[#232323] text-[11px]">{isPerformer ? "Video/Audio Quality" : "PDF Portfolio Depth"}</span>
                                   <span className="font-mono font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
                                     {aiResultsMap[appItem.id]?.ai_report?.overall_score ?? (isPerformer ? getVideoQualityScore(appItem) : getPortfolioMatchScore(appItem, activeViewRole))}% {isPerformer ? "Quality" : "Depth"}
                                   </span>
                                 </div>
                                 
                                 <div className="flex items-center justify-between pt-1 border-t border-gray-100">
-                                  <p className="text-[10px] text-[#466272] font-light">
+                                  <p className="text-[10px] text-[#666361] font-light">
                                     AI report ready
                                   </p>
                                   <button
                                     type="button"
                                     onClick={() => setSelectedAiDetailApp(appItem)}
-                                    className="px-2.5 py-1 rounded-lg bg-[#8CC0EB] hover:bg-[#8CC0EB]/80 text-[#1c1b19] font-bold text-[10px] transition-all flex items-center gap-1 shadow-2xs"
+                                    className="px-2.5 py-1 rounded-lg bg-[#E85F57] hover:bg-[#E85F57]/80 text-[#232323] font-bold text-[10px] transition-all flex items-center gap-1 shadow-2xs"
                                   >
                                     <Eye className="w-3 h-3" /> View AI Details
                                   </button>
@@ -1039,12 +1039,12 @@ export default function AuditionsManagement() {
                       }
 
                       return (
-                        <div className="bg-[#fdf9f4] p-3 rounded-2xl border border-[#cac6b9]/60 flex items-center justify-between gap-3">
+                        <div className="bg-[#E7DDD3] p-3 rounded-2xl border border-[#D5C9BE]/60 flex items-center justify-between gap-3">
                           <div className="text-xs">
-                            <span className="font-bold text-[#1c1b19] block flex items-center gap-1">
-                              <Sparkles className="w-3.5 h-3.5 text-[#8CC0EB]" /> {isPerformer ? "AI Monologue Video & Quality Scanner" : "AI Technical Portfolio & Skill Scanner"}
+                            <span className="font-bold text-[#232323] block flex items-center gap-1">
+                              <Sparkles className="w-3.5 h-3.5 text-[#E85F57]" /> {isPerformer ? "AI Monologue Video & Quality Scanner" : "AI Technical Portfolio & Skill Scanner"}
                             </span>
-                            <span className="text-[11px] text-[#466272]">
+                            <span className="text-[11px] text-[#666361]">
                               {isPerformer ? "Run AI evaluation on video slate resolution, acoustics & archetype fit." : "Run AI scan on candidate technical resume, portfolio PDF & stage experience."}
                             </span>
                           </div>
@@ -1053,7 +1053,7 @@ export default function AuditionsManagement() {
                             type="button"
                             onClick={() => handleRunScan(appItem)}
                             disabled={scanningAppId === appItem.id}
-                            className="px-4 py-2 rounded-xl bg-[#466272] hover:bg-[#314652] text-white font-bold text-xs transition-all shadow-xs flex-shrink-0 disabled:opacity-50 flex items-center gap-1.5"
+                            className="px-4 py-2 rounded-xl bg-[#666361] hover:bg-[#314652] text-white font-bold text-xs transition-all shadow-xs flex-shrink-0 disabled:opacity-50 flex items-center gap-1.5"
                           >
                             {scanningAppId === appItem.id ? (
                               <>
@@ -1061,7 +1061,7 @@ export default function AuditionsManagement() {
                               </>
                             ) : (
                               <>
-                                <Sparkles className="w-3.5 h-3.5 text-[#8CC0EB]" /> {isPerformer ? "Scan Video Quality" : "Scan Portfolio PDF"}
+                                <Sparkles className="w-3.5 h-3.5 text-[#E85F57]" /> {isPerformer ? "Scan Video Quality" : "Scan Portfolio PDF"}
                               </>
                             )}
                           </button>
@@ -1075,9 +1075,9 @@ export default function AuditionsManagement() {
                           href={appItem.portfolio_link}
                           target="_blank"
                           rel="noreferrer"
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-[#cac6b9] text-[#635f41] hover:text-[#1c1b19] font-bold transition-all shadow-2xs"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-[#D5C9BE] text-[#353535] hover:text-[#232323] font-bold transition-all shadow-2xs"
                         >
-                          <Video className="w-3.5 h-3.5 text-[#635f41]" />
+                          <Video className="w-3.5 h-3.5 text-[#353535]" />
                           Audition Reel / Monologue Slate <ExternalLink className="w-3 h-3" />
                         </a>
                       )}
@@ -1088,7 +1088,7 @@ export default function AuditionsManagement() {
                     </div>
                   </div>
 
-                  <div className="pt-3 border-t border-[#e6e2dd] flex flex-wrap items-center justify-end gap-2 text-xs">
+                  <div className="pt-3 border-t border-[#DDD8CE] flex flex-wrap items-center justify-end gap-2 text-xs">
                     <button
                       onClick={() => handleUpdateApplicationStatus(appItem.id, "Rejected")}
                       disabled={appItem.status === "Rejected"}
@@ -1106,7 +1106,7 @@ export default function AuditionsManagement() {
                     <button
                       onClick={() => handleUpdateApplicationStatus(appItem.id, "Selected")}
                       disabled={appItem.status === "Selected"}
-                      className="px-4 py-1.5 rounded-xl bg-[#635f41] text-white hover:bg-[#4d4a32] font-bold transition-all disabled:opacity-40 shadow-xs"
+                      className="px-4 py-1.5 rounded-xl bg-[#353535] text-white hover:bg-[#4d4a32] font-bold transition-all disabled:opacity-40 shadow-xs"
                     >
                       Cast Performers
                     </button>
@@ -1120,19 +1120,19 @@ export default function AuditionsManagement() {
 
       {/* FULL WINDOW: CREATE AUDITION CALLING PANEL (Sidebar visible on left) */}
       {createModalOpen && (
-        <div className="fixed top-0 bottom-0 right-0 left-0 md:left-64 z-50 bg-[#fdf9f4] overflow-y-auto p-6 md:p-10 border-l border-[#cac6b9]/40 shadow-2xl animate-in fade-in-50 slide-in-from-right-4 duration-200 text-[#1c1b19]">
+        <div className="fixed top-0 bottom-0 right-0 left-0 md:left-64 z-50 bg-[#E7DDD3] overflow-y-auto p-6 md:p-10 border-l border-[#D5C9BE]/40 shadow-2xl animate-in fade-in-50 slide-in-from-right-4 duration-200 text-[#232323]">
           <div className="max-w-5xl mx-auto space-y-8">
             {/* Top Navigation Bar */}
-            <div className="flex items-center justify-between border-b border-[#cac6b9]/40 pb-4">
+            <div className="flex items-center justify-between border-b border-[#D5C9BE]/40 pb-4">
               <button
                 type="button"
                 onClick={() => setCreateModalOpen(false)}
-                className="flex items-center gap-2 text-xs font-bold text-[#635f41] hover:text-[#1c1b19] bg-white border border-[#cac6b9]/60 px-4 py-2 rounded-xl transition-all shadow-2xs cursor-pointer"
+                className="flex items-center gap-2 text-xs font-bold text-[#353535] hover:text-[#232323] bg-white border border-[#D5C9BE]/60 px-4 py-2 rounded-xl transition-all shadow-2xs cursor-pointer"
               >
                 ← Back to Maintainer Auditions
               </button>
 
-              <Badge className="bg-[#635f41] text-white font-mono text-xs font-bold px-3 py-1">
+              <Badge className="bg-[#353535] text-white font-mono text-xs font-bold px-3 py-1">
                 Audition Creator Portal
               </Badge>
             </div>
@@ -1142,46 +1142,46 @@ export default function AuditionsManagement() {
               <span className="text-xs uppercase tracking-widest text-[#9B1C31] font-bold block mb-1">
                 Production Calling Setup
               </span>
-              <h1 className="font-serif text-[#635f41] text-3xl md:text-4xl font-bold">
+              <h1 className="font-serif text-[#353535] text-3xl md:text-4xl font-bold">
                 Publish New Audition Calling
               </h1>
-              <p className="text-xs md:text-sm text-[#466272] mt-1 leading-relaxed">
+              <p className="text-xs md:text-sm text-[#666361] mt-1 leading-relaxed">
                 Create an open character role or technical crew position with full specifications, emotional beats, and casting benchmarks.
               </p>
             </div>
 
-            <form onSubmit={handleCreatePositionSubmit} className="space-y-6 bg-white p-6 md:p-8 rounded-2xl border border-[#cac6b9]/40 shadow-xs text-xs text-left">
+            <form onSubmit={handleCreatePositionSubmit} className="space-y-6 bg-white p-6 md:p-8 rounded-2xl border border-[#D5C9BE]/40 shadow-xs text-xs text-left">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                  <label className="font-bold text-[#635f41] block mb-1">Target Production Name *</label>
+                  <label className="font-bold text-[#353535] block mb-1">Target Production Name *</label>
                   <Input
                     required
                     value={newPositionForm.production_name}
                     onChange={(e) => setNewPositionForm({ ...newPositionForm, production_name: e.target.value })}
                     placeholder="e.g. Tughlaq - Ensemble Production"
-                    className="bg-[#fdf9f4] border-[#cac6b9]/60 h-10 text-xs rounded-xl"
+                    className="bg-[#E7DDD3] border-[#D5C9BE]/60 h-10 text-xs rounded-xl"
                   />
                 </div>
 
                 <div>
-                  <label className="font-bold text-[#635f41] block mb-1">Role Title / Position Name *</label>
+                  <label className="font-bold text-[#353535] block mb-1">Role Title / Position Name *</label>
                   <Input
                     required
                     value={newPositionForm.role_name}
                     onChange={(e) => setNewPositionForm({ ...newPositionForm, role_name: e.target.value })}
                     placeholder="e.g. Sultan Muhammad bin Tughlaq (Lead)"
-                    className="bg-[#fdf9f4] border-[#cac6b9]/60 h-10 text-xs rounded-xl"
+                    className="bg-[#E7DDD3] border-[#D5C9BE]/60 h-10 text-xs rounded-xl"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                 <div>
-                  <label className="font-bold text-[#635f41] block mb-1">Role Classification</label>
+                  <label className="font-bold text-[#353535] block mb-1">Role Classification</label>
                   <select
                     value={newPositionForm.role_category}
                     onChange={(e) => setNewPositionForm({ ...newPositionForm, role_category: e.target.value })}
-                    className="w-full bg-[#fdf9f4] border border-[#cac6b9]/60 h-10 px-3 text-xs font-bold rounded-xl text-[#1c1b19] focus:outline-none"
+                    className="w-full bg-[#E7DDD3] border border-[#D5C9BE]/60 h-10 px-3 text-xs font-bold rounded-xl text-[#232323] focus:outline-none"
                   >
                     <option value="Character Role">Character Role (Performer)</option>
                     <option value="Performer">Performer / Lead Acting</option>
@@ -1193,22 +1193,22 @@ export default function AuditionsManagement() {
                 </div>
 
                 <div>
-                  <label className="font-bold text-[#635f41] block mb-1">Open Slots Available</label>
+                  <label className="font-bold text-[#353535] block mb-1">Open Slots Available</label>
                   <Input
                     type="number"
                     min={1}
                     value={newPositionForm.slots_available}
                     onChange={(e) => setNewPositionForm({ ...newPositionForm, slots_available: parseInt(e.target.value) || 1 })}
-                    className="bg-[#fdf9f4] border-[#cac6b9]/60 h-10 text-xs rounded-xl"
+                    className="bg-[#E7DDD3] border-[#D5C9BE]/60 h-10 text-xs rounded-xl"
                   />
                 </div>
 
                 <div>
-                  <label className="font-bold text-[#635f41] block mb-1">Audition Calling Status</label>
+                  <label className="font-bold text-[#353535] block mb-1">Audition Calling Status</label>
                   <select
                     value={newPositionForm.status}
                     onChange={(e) => setNewPositionForm({ ...newPositionForm, status: e.target.value })}
-                    className="w-full bg-[#fdf9f4] border border-[#cac6b9]/60 h-10 px-3 text-xs font-bold rounded-xl text-[#1c1b19] focus:outline-none"
+                    className="w-full bg-[#E7DDD3] border border-[#D5C9BE]/60 h-10 px-3 text-xs font-bold rounded-xl text-[#232323] focus:outline-none"
                   >
                     <option value="Open Calling">Open Calling</option>
                     <option value="In Review">In Review</option>
@@ -1218,39 +1218,39 @@ export default function AuditionsManagement() {
               </div>
 
               <div>
-                <label className="font-bold text-[#635f41] block mb-1">Character & Role Specifications (Full Description)</label>
+                <label className="font-bold text-[#353535] block mb-1">Character & Role Specifications (Full Description)</label>
                 <textarea
                   rows={4}
                   value={newPositionForm.character_description}
                   onChange={(e) => setNewPositionForm({ ...newPositionForm, character_description: e.target.value })}
                   placeholder="Describe character archetype, age bracket, vocal projection, emotional beats, and stage posture expected..."
-                  className="w-full bg-[#fdf9f4] border border-[#cac6b9]/60 p-3.5 rounded-xl text-xs text-[#1c1b19] focus:outline-none"
+                  className="w-full bg-[#E7DDD3] border border-[#D5C9BE]/60 p-3.5 rounded-xl text-xs text-[#232323] focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="font-bold text-[#635f41] block mb-1">Detailed Audition & Portfolio Requirements</label>
+                <label className="font-bold text-[#353535] block mb-1">Detailed Audition & Portfolio Requirements</label>
                 <textarea
                   rows={3}
                   value={newPositionForm.requirements}
                   onChange={(e) => setNewPositionForm({ ...newPositionForm, requirements: e.target.value })}
                   placeholder="List required submissions: e.g. 2-minute Hindustani drama monologue video, headshot PDF, or SFX portfolio..."
-                  className="w-full bg-[#fdf9f4] border border-[#cac6b9]/60 p-3.5 rounded-xl text-xs text-[#1c1b19] focus:outline-none"
+                  className="w-full bg-[#E7DDD3] border border-[#D5C9BE]/60 p-3.5 rounded-xl text-xs text-[#232323] focus:outline-none"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-4 border-t border-[#cac6b9]/40 pt-5">
+              <div className="flex items-center justify-end gap-4 border-t border-[#D5C9BE]/40 pt-5">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => setCreateModalOpen(false)}
-                  className="border-2 border-[#cac6b9] text-[#635f41] hover:bg-gray-100 rounded-xl text-xs font-bold px-8 h-11"
+                  className="border-2 border-[#D5C9BE] text-[#353535] hover:bg-gray-100 rounded-xl text-xs font-bold px-8 h-11"
                 >
                   Cancel
                 </Button>
                 <Button
                   type="submit"
-                  className="bg-[#635f41] hover:bg-[#4d4a32] text-white font-bold text-xs rounded-xl px-10 h-11 shadow-md"
+                  className="bg-[#353535] hover:bg-[#4d4a32] text-white font-bold text-xs rounded-xl px-10 h-11 shadow-md"
                 >
                   Publish Audition Calling
                 </Button>
@@ -1262,19 +1262,19 @@ export default function AuditionsManagement() {
 
       {/* FULL WINDOW: EDIT & SAVE AUDITION ROLE DETAILS PANEL (Sidebar visible on left) */}
       {editingRoleForm && editRoleModalOpen && (
-        <div className="fixed top-0 bottom-0 right-0 left-0 md:left-64 z-50 bg-[#fdf9f4] overflow-y-auto p-6 md:p-10 border-l border-[#cac6b9]/40 shadow-2xl animate-in fade-in-50 slide-in-from-right-4 duration-200 text-[#1c1b19]">
+        <div className="fixed top-0 bottom-0 right-0 left-0 md:left-64 z-50 bg-[#E7DDD3] overflow-y-auto p-6 md:p-10 border-l border-[#D5C9BE]/40 shadow-2xl animate-in fade-in-50 slide-in-from-right-4 duration-200 text-[#232323]">
           <div className="max-w-5xl mx-auto space-y-8">
             {/* Top Navigation Bar */}
-            <div className="flex items-center justify-between border-b border-[#cac6b9]/40 pb-4">
+            <div className="flex items-center justify-between border-b border-[#D5C9BE]/40 pb-4">
               <button
                 type="button"
                 onClick={() => setEditRoleModalOpen(false)}
-                className="flex items-center gap-2 text-xs font-bold text-[#635f41] hover:text-[#1c1b19] bg-white border border-[#cac6b9]/60 px-4 py-2 rounded-xl transition-all shadow-2xs cursor-pointer"
+                className="flex items-center gap-2 text-xs font-bold text-[#353535] hover:text-[#232323] bg-white border border-[#D5C9BE]/60 px-4 py-2 rounded-xl transition-all shadow-2xs cursor-pointer"
               >
                 ← Back to Maintainer Auditions
               </button>
 
-              <Badge className="bg-[#635f41] text-white font-mono text-xs font-bold px-3 py-1">
+              <Badge className="bg-[#353535] text-white font-mono text-xs font-bold px-3 py-1">
                 Maintainer Role Editor
               </Badge>
             </div>
@@ -1284,44 +1284,44 @@ export default function AuditionsManagement() {
               <span className="text-xs uppercase tracking-widest text-[#9B1C31] font-bold block mb-1">
                 Role Management Portal
               </span>
-              <h1 className="font-serif text-[#635f41] text-3xl md:text-4xl font-bold">
+              <h1 className="font-serif text-[#353535] text-3xl md:text-4xl font-bold">
                 Edit Audition Role: {editingRoleForm.role_name}
               </h1>
-              <p className="text-xs md:text-sm text-[#466272] mt-1 leading-relaxed">
+              <p className="text-xs md:text-sm text-[#666361] mt-1 leading-relaxed">
                 Update character specifications, role descriptions, and required benchmarks saved in the database.
               </p>
             </div>
 
-            <form onSubmit={handleSaveRoleDetailsSubmit} className="space-y-6 bg-white p-6 md:p-8 rounded-2xl border border-[#cac6b9]/40 shadow-xs text-xs text-left">
+            <form onSubmit={handleSaveRoleDetailsSubmit} className="space-y-6 bg-white p-6 md:p-8 rounded-2xl border border-[#D5C9BE]/40 shadow-xs text-xs text-left">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                  <label className="font-bold text-[#635f41] block mb-1">Production Name *</label>
+                  <label className="font-bold text-[#353535] block mb-1">Production Name *</label>
                   <Input
                     required
                     value={editingRoleForm.production_name}
                     onChange={(e) => setEditingRoleForm({ ...editingRoleForm, production_name: e.target.value })}
-                    className="bg-[#fdf9f4] border-[#cac6b9]/60 h-10 text-xs rounded-xl"
+                    className="bg-[#E7DDD3] border-[#D5C9BE]/60 h-10 text-xs rounded-xl"
                   />
                 </div>
 
                 <div>
-                  <label className="font-bold text-[#635f41] block mb-1">Role Title / Position Name *</label>
+                  <label className="font-bold text-[#353535] block mb-1">Role Title / Position Name *</label>
                   <Input
                     required
                     value={editingRoleForm.role_name}
                     onChange={(e) => setEditingRoleForm({ ...editingRoleForm, role_name: e.target.value })}
-                    className="bg-[#fdf9f4] border-[#cac6b9]/60 h-10 text-xs rounded-xl"
+                    className="bg-[#E7DDD3] border-[#D5C9BE]/60 h-10 text-xs rounded-xl"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                 <div>
-                  <label className="font-bold text-[#635f41] block mb-1">Role Classification</label>
+                  <label className="font-bold text-[#353535] block mb-1">Role Classification</label>
                   <select
                     value={editingRoleForm.role_category}
                     onChange={(e) => setEditingRoleForm({ ...editingRoleForm, role_category: e.target.value })}
-                    className="w-full bg-[#fdf9f4] border border-[#cac6b9]/60 h-10 px-3 text-xs font-bold rounded-xl text-[#1c1b19] focus:outline-none"
+                    className="w-full bg-[#E7DDD3] border border-[#D5C9BE]/60 h-10 px-3 text-xs font-bold rounded-xl text-[#232323] focus:outline-none"
                   >
                     <option value="Character Role">Character Role (Performer)</option>
                     <option value="Performer">Performer / Lead Acting</option>
@@ -1333,22 +1333,22 @@ export default function AuditionsManagement() {
                 </div>
 
                 <div>
-                  <label className="font-bold text-[#635f41] block mb-1">Open Slots Available</label>
+                  <label className="font-bold text-[#353535] block mb-1">Open Slots Available</label>
                   <Input
                     type="number"
                     min={1}
                     value={editingRoleForm.slots_available}
                     onChange={(e) => setEditingRoleForm({ ...editingRoleForm, slots_available: parseInt(e.target.value) || 1 })}
-                    className="bg-[#fdf9f4] border-[#cac6b9]/60 h-10 text-xs rounded-xl"
+                    className="bg-[#E7DDD3] border-[#D5C9BE]/60 h-10 text-xs rounded-xl"
                   />
                 </div>
 
                 <div>
-                  <label className="font-bold text-[#635f41] block mb-1">Audition Status</label>
+                  <label className="font-bold text-[#353535] block mb-1">Audition Status</label>
                   <select
                     value={editingRoleForm.status}
                     onChange={(e) => setEditingRoleForm({ ...editingRoleForm, status: e.target.value })}
-                    className="w-full bg-[#fdf9f4] border border-[#cac6b9]/60 h-10 px-3 text-xs font-bold rounded-xl text-[#1c1b19] focus:outline-none"
+                    className="w-full bg-[#E7DDD3] border border-[#D5C9BE]/60 h-10 px-3 text-xs font-bold rounded-xl text-[#232323] focus:outline-none"
                   >
                     <option value="Open Calling">Open Calling</option>
                     <option value="In Review">In Review</option>
@@ -1358,39 +1358,39 @@ export default function AuditionsManagement() {
               </div>
 
               <div>
-                <label className="font-bold text-[#635f41] block mb-1">Character & Role Specifications (Full Description)</label>
+                <label className="font-bold text-[#353535] block mb-1">Character & Role Specifications (Full Description)</label>
                 <textarea
                   rows={4}
                   value={editingRoleForm.character_description || ""}
                   onChange={(e) => setEditingRoleForm({ ...editingRoleForm, character_description: e.target.value })}
                   placeholder="Describe character archetype, age bracket, vocal projection, emotional beats, and stage posture expected..."
-                  className="w-full bg-[#fdf9f4] border border-[#cac6b9]/60 p-3.5 rounded-xl text-xs text-[#1c1b19] focus:outline-none"
+                  className="w-full bg-[#E7DDD3] border border-[#D5C9BE]/60 p-3.5 rounded-xl text-xs text-[#232323] focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="font-bold text-[#635f41] block mb-1">Detailed Audition & Portfolio Requirements</label>
+                <label className="font-bold text-[#353535] block mb-1">Detailed Audition & Portfolio Requirements</label>
                 <textarea
                   rows={3}
                   value={editingRoleForm.requirements || ""}
                   onChange={(e) => setEditingRoleForm({ ...editingRoleForm, requirements: e.target.value })}
                   placeholder="List required submissions: e.g. 2-minute Hindustani drama monologue video, headshot PDF, or SFX portfolio..."
-                  className="w-full bg-[#fdf9f4] border border-[#cac6b9]/60 p-3.5 rounded-xl text-xs text-[#1c1b19] focus:outline-none"
+                  className="w-full bg-[#E7DDD3] border border-[#D5C9BE]/60 p-3.5 rounded-xl text-xs text-[#232323] focus:outline-none"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-4 border-t border-[#cac6b9]/40 pt-5">
+              <div className="flex items-center justify-end gap-4 border-t border-[#D5C9BE]/40 pt-5">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => setEditRoleModalOpen(false)}
-                  className="border-2 border-[#cac6b9] text-[#635f41] hover:bg-gray-100 rounded-xl text-xs font-bold px-8 h-11"
+                  className="border-2 border-[#D5C9BE] text-[#353535] hover:bg-gray-100 rounded-xl text-xs font-bold px-8 h-11"
                 >
                   Cancel
                 </Button>
                 <Button
                   type="submit"
-                  className="bg-[#635f41] hover:bg-[#4d4a32] text-white font-bold text-xs rounded-xl px-10 h-11 shadow-md"
+                  className="bg-[#353535] hover:bg-[#4d4a32] text-white font-bold text-xs rounded-xl px-10 h-11 shadow-md"
                 >
                   Save Role Details
                 </Button>
@@ -1403,20 +1403,20 @@ export default function AuditionsManagement() {
       {/* AI VIDEO QUALITY FULL DETAIL MODAL */}
       {selectedAiDetailApp && (
         <Dialog open={!!selectedAiDetailApp} onOpenChange={() => setSelectedAiDetailApp(null)}>
-          <DialogContent className="bg-[#fdf9f4] border border-[#cac6b9] text-[#466272] max-w-xl p-6 rounded-2xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="bg-[#E7DDD3] border border-[#D5C9BE] text-[#666361] max-w-xl p-6 rounded-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader className="space-y-1">
               <div className="flex items-center gap-2">
-                <Badge className="bg-[#8CC0EB]/20 text-[#1c1b19] border-[#8CC0EB]/40 font-mono font-bold text-xs">
+                <Badge className="bg-[#E85F57]/20 text-[#232323] border-[#E85F57]/40 font-mono font-bold text-xs">
                   AI Screening Report
                 </Badge>
                 <Badge className="bg-emerald-100 text-emerald-800 font-bold text-[10px]">
                   Verified Rating
                 </Badge>
               </div>
-              <DialogTitle className="font-serif text-[#635f41] text-xl font-bold pt-1">
+              <DialogTitle className="font-serif text-[#353535] text-xl font-bold pt-1">
                 AI Quality Analysis: {selectedAiDetailApp.applicant_name}
               </DialogTitle>
-              <DialogDescription className="text-xs text-[#466272]">
+              <DialogDescription className="text-xs text-[#666361]">
                 Full technical measurement breakdown & AI evaluation for <strong>{selectedAiDetailApp.role_name}</strong>
               </DialogDescription>
             </DialogHeader>
@@ -1460,16 +1460,16 @@ export default function AuditionsManagement() {
                   {/* Rating Banner */}
                   <div className="bg-gradient-to-r from-blue-50 to-emerald-50 p-4 rounded-xl border border-blue-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                     <div>
-                      <span className="text-[10px] font-bold text-[#466272] uppercase tracking-wider block">
+                      <span className="text-[10px] font-bold text-[#666361] uppercase tracking-wider block">
                         {isPerformer ? "Video & Acoustic Quality Rating" : "Technical Skill & Portfolio Rating"}
                       </span>
-                      <div className="text-3xl font-extrabold text-[#1c1b19] font-mono flex items-center gap-2">
+                      <div className="text-3xl font-extrabold text-[#232323] font-mono flex items-center gap-2">
                         {score}% <span className="text-sm font-normal text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">Passed</span>
                       </div>
                     </div>
                     <div className="sm:text-right">
-                      <span className="text-[10px] text-[#466272] uppercase font-bold block">AI Recommendation</span>
-                      <span className="inline-block mt-0.5 px-3 py-1 bg-[#635f41] text-white font-bold rounded-lg text-xs">
+                      <span className="text-[10px] text-[#666361] uppercase font-bold block">AI Recommendation</span>
+                      <span className="inline-block mt-0.5 px-3 py-1 bg-[#353535] text-white font-bold rounded-lg text-xs">
                         {reportObj.recommendation || (isPerformer ? "Shortlist for Callback" : "Appoint to Crew Staff")}
                       </span>
                     </div>
@@ -1477,13 +1477,13 @@ export default function AuditionsManagement() {
 
                   {/* Percentage Progress Bar */}
                   <div className="space-y-1">
-                    <div className="flex justify-between text-[11px] font-bold text-[#635f41]">
+                    <div className="flex justify-between text-[11px] font-bold text-[#353535]">
                       <span>{isPerformer ? "Video Quality Score Bar" : "Portfolio Skill Match Score Bar"}</span>
                       <span>{score} / 100</span>
                     </div>
                     <div className="w-full h-2.5 bg-gray-200 rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-gradient-to-r from-[#8CC0EB] to-emerald-500 transition-all duration-500"
+                        className="h-full bg-gradient-to-r from-[#E85F57] to-emerald-500 transition-all duration-500"
                         style={{ width: `${score}%` }}
                       />
                     </div>
@@ -1492,49 +1492,49 @@ export default function AuditionsManagement() {
                   {/* Key Metrics Breakdown Grid */}
                   {isPerformer ? (
                     <div className="grid grid-cols-2 gap-3">
-                      <div className="bg-white p-3 rounded-xl border border-[#cac6b9]/40 space-y-1">
+                      <div className="bg-white p-3 rounded-xl border border-[#D5C9BE]/40 space-y-1">
                         <span className="text-[10px] text-gray-500 font-bold uppercase block">Lighting</span>
-                        <span className="font-semibold text-[#1c1b19] block">{reportObj.lighting || "Good Stage Lighting"}</span>
+                        <span className="font-semibold text-[#232323] block">{reportObj.lighting || "Good Stage Lighting"}</span>
                       </div>
 
-                      <div className="bg-[#white] p-3 rounded-xl border border-[#cac6b9]/40 space-y-1">
+                      <div className="bg-[#white] p-3 rounded-xl border border-[#D5C9BE]/40 space-y-1">
                         <span className="text-[10px] text-gray-500 font-bold uppercase block">Camera Framing</span>
-                        <span className="font-semibold text-[#1c1b19] block">{reportObj.camera_quality || "1080p HD Clear Framing"}</span>
+                        <span className="font-semibold text-[#232323] block">{reportObj.camera_quality || "1080p HD Clear Framing"}</span>
                       </div>
 
-                      <div className="bg-white p-3 rounded-xl border border-[#cac6b9]/40 space-y-1">
+                      <div className="bg-white p-3 rounded-xl border border-[#D5C9BE]/40 space-y-1">
                         <span className="text-[10px] text-gray-500 font-bold uppercase block">Face Visibility</span>
-                        <span className="font-semibold text-[#1c1b19] block">{reportObj.face_visibility || "High Visibility"}</span>
+                        <span className="font-semibold text-[#232323] block">{reportObj.face_visibility || "High Visibility"}</span>
                       </div>
 
-                      <div className="bg-white p-3 rounded-xl border border-[#cac6b9]/40 space-y-1">
+                      <div className="bg-white p-3 rounded-xl border border-[#D5C9BE]/40 space-y-1">
                         <span className="text-[10px] text-gray-500 font-bold uppercase block">Audio SNR & Quality</span>
-                        <span className="font-semibold text-[#1c1b19] block">{reportObj.audio_quality || "Acoustics Sound Clear"}</span>
+                        <span className="font-semibold text-[#232323] block">{reportObj.audio_quality || "Acoustics Sound Clear"}</span>
                       </div>
                     </div>
                   ) : (
                     <div className="grid grid-cols-2 gap-3">
-                      <div className="bg-white p-3 rounded-xl border border-[#cac6b9]/40 space-y-1">
+                      <div className="bg-white p-3 rounded-xl border border-[#D5C9BE]/40 space-y-1">
                         <span className="text-[10px] text-gray-500 font-bold uppercase block">Technical Skill Fit</span>
-                        <span className="font-semibold text-[#1c1b19] block">{reportObj.technical_skill_fit || "Mastery Level Staging"}</span>
+                        <span className="font-semibold text-[#232323] block">{reportObj.technical_skill_fit || "Mastery Level Staging"}</span>
                       </div>
 
-                      <div className="bg-white p-3 rounded-xl border border-[#cac6b9]/40 space-y-1">
+                      <div className="bg-white p-3 rounded-xl border border-[#D5C9BE]/40 space-y-1">
                         <span className="text-[10px] text-gray-500 font-bold uppercase block">Portfolio PDF Depth</span>
-                        <span className="font-semibold text-[#1c1b19] block">{reportObj.portfolio_depth || "PDF Samples Verified"}</span>
+                        <span className="font-semibold text-[#232323] block">{reportObj.portfolio_depth || "PDF Samples Verified"}</span>
                       </div>
 
-                      <div className="bg-white p-3 rounded-xl border border-[#cac6b9]/40 space-y-1 col-span-2">
+                      <div className="bg-white p-3 rounded-xl border border-[#D5C9BE]/40 space-y-1 col-span-2">
                         <span className="text-[10px] text-gray-500 font-bold uppercase block">Resume Keyword Match</span>
-                        <span className="font-semibold text-[#1c1b19] block">{reportObj.resume_keywords || "Period Prosthetics, Drape fitting, Soundboard"}</span>
+                        <span className="font-semibold text-[#232323] block">{reportObj.resume_keywords || "Period Prosthetics, Drape fitting, Soundboard"}</span>
                       </div>
                     </div>
                   )}
 
                   {/* AI Requirement Matching Badges */}
                   {(aiData.matched_skills?.length > 0 || aiData.missing_skills?.length > 0) && (
-                    <div className="bg-white p-3 rounded-xl border border-[#cac6b9]/40 space-y-2">
-                      <strong className="text-[#635f41] font-bold block text-xs">Role Requirement AI Matching</strong>
+                    <div className="bg-white p-3 rounded-xl border border-[#D5C9BE]/40 space-y-2">
+                      <strong className="text-[#353535] font-bold block text-xs">Role Requirement AI Matching</strong>
                       {aiData.matched_skills?.length > 0 && (
                         <div className="flex flex-wrap gap-1.5 items-center">
                           <span className="text-[10px] text-gray-500 font-bold uppercase mr-1">Matched Skills:</span>
@@ -1560,14 +1560,14 @@ export default function AuditionsManagement() {
 
                   {/* Raw Specs for Performers */}
                   {isPerformer && (
-                    <div className="bg-white p-3 rounded-xl border border-[#cac6b9]/40 flex items-center justify-between text-[11px]">
+                    <div className="bg-white p-3 rounded-xl border border-[#D5C9BE]/40 flex items-center justify-between text-[11px]">
                       <div>
                         <span className="text-gray-500 font-medium">Blur Score: </span>
-                        <strong className="text-[#1c1b19] font-mono">{aiData.blur ?? 178.5}</strong>
+                        <strong className="text-[#232323] font-mono">{aiData.blur ?? 178.5}</strong>
                       </div>
                       <div>
                         <span className="text-gray-500 font-medium">Brightness: </span>
-                        <strong className="text-[#1c1b19] font-mono">{aiData.brightness ?? 162.3}</strong>
+                        <strong className="text-[#232323] font-mono">{aiData.brightness ?? 162.3}</strong>
                       </div>
                       <div>
                         <span className="text-gray-500 font-medium">Face Detected: </span>
@@ -1579,8 +1579,8 @@ export default function AuditionsManagement() {
                   {/* AI Detailed Feedback Notes */}
                   {feedbackText && (
                     <div className="space-y-1">
-                      <strong className="text-[#635f41] font-bold block text-xs">AI Evaluation Feedback</strong>
-                      <p className="bg-white p-3 rounded-xl border border-[#cac6b9]/40 text-[#466272] leading-relaxed whitespace-pre-wrap">
+                      <strong className="text-[#353535] font-bold block text-xs">AI Evaluation Feedback</strong>
+                      <p className="bg-white p-3 rounded-xl border border-[#D5C9BE]/40 text-[#666361] leading-relaxed whitespace-pre-wrap">
                         {feedbackText}
                       </p>
                     </div>
@@ -1589,8 +1589,8 @@ export default function AuditionsManagement() {
                   {/* Audio Speech Transcript for Performers */}
                   {isPerformer && aiData.transcript && (
                     <div className="space-y-1">
-                      <strong className="text-[#635f41] font-bold block text-xs">Extracted Audio Transcript (Whisper AI)</strong>
-                      <p className="bg-white p-3 rounded-xl border border-[#cac6b9]/40 text-[#466272] leading-relaxed italic">
+                      <strong className="text-[#353535] font-bold block text-xs">Extracted Audio Transcript (Whisper AI)</strong>
+                      <p className="bg-white p-3 rounded-xl border border-[#D5C9BE]/40 text-[#666361] leading-relaxed italic">
                         {aiData.transcript}
                       </p>
                     </div>
@@ -1603,7 +1603,7 @@ export default function AuditionsManagement() {
               <Button
                 type="button"
                 onClick={() => setSelectedAiDetailApp(null)}
-                className="bg-[#635f41] hover:bg-[#4d4a32] text-white font-bold text-xs rounded-xl px-6"
+                className="bg-[#353535] hover:bg-[#4d4a32] text-white font-bold text-xs rounded-xl px-6"
               >
                 Close AI Report
               </Button>
@@ -1614,7 +1614,7 @@ export default function AuditionsManagement() {
 
       {/* Global Toast */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 bg-[#31302d] text-white border border-[#cac6b9]/30 rounded-xl px-4 py-3 shadow-xl z-50 flex items-center gap-3 text-xs font-semibold">
+        <div className="fixed bottom-6 right-6 bg-[#31302d] text-white border border-[#D5C9BE]/30 rounded-xl px-4 py-3 shadow-xl z-50 flex items-center gap-3 text-xs font-semibold">
           <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
           <span>{toastMessage}</span>
         </div>

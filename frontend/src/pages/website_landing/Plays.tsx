@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
-import { BookOpen, Star, Calendar, MapPin, Clock, Ticket } from "lucide-react";
+import { BookOpen, Star, Calendar, MapPin, Clock, Ticket, ArrowRight } from "lucide-react";
 
 interface Production {
   id: string;
   title: string;
   status: string;
-  statusColor: string;
+  statusColor?: string;
   description: string;
   director: string;
   cast: string;
@@ -22,7 +22,6 @@ const fallbackProductions: Production[] = [
     id: "kky",
     title: "Karn Ki Yachika",
     status: "SELLING FAST",
-    statusColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
     description: "A monumental classical Malayalam/Hindi tragedy exploring Karn's moral dilemma, honor, and destiny on the battleground of Kurukshetra.",
     director: "S. Sri Vaishnavi",
     cast: "Abay Nandhiga, Utkarsh (Yuuhi), Samarth Shrivastava",
@@ -37,7 +36,6 @@ const fallbackProductions: Production[] = [
     id: "tamashbin-kathputliya",
     title: "Tamashbin Kathputliya",
     status: "LIMITED TICKETS",
-    statusColor: "bg-amber-50 text-amber-700 border-amber-200",
     description: "A high-energy street play (Nukkad Natak) combining puppetry motifs, live dholak rhythms, and political satire.",
     director: "Utkarsh (Yuuhi)",
     cast: "Samarth Shrivastava, Krishna Subramanian, Swati Singh",
@@ -52,7 +50,6 @@ const fallbackProductions: Production[] = [
     id: "dddj",
     title: "DDDJ - Stage Production",
     status: "TICKETS ON SALE",
-    statusColor: "bg-purple-50 text-purple-700 border-purple-200",
     description: "An intense proscenium drama exploring relationship dynamics, ambition, and modern societal pressures.",
     director: "S. Sri Vaishnavi",
     cast: "Abay Nandhiga, Krishna Subramanian, Sneha Das",
@@ -67,7 +64,6 @@ const fallbackProductions: Production[] = [
     id: "samatvam",
     title: "Samatvam",
     status: "TICKETS ON SALE",
-    statusColor: "bg-blue-50 text-blue-700 border-blue-200",
     description: "An intense ensemble drama exploring inner conflict, balance, and human empathy in modern high-pressure academic society.",
     director: "Tanu Kurade",
     cast: "Abay Nandhiga, Sneha Das, Anshi Jain",
@@ -82,7 +78,6 @@ const fallbackProductions: Production[] = [
     id: "speak-up-tara",
     title: "Speak Up Tara",
     status: "SELLING FAST",
-    statusColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
     description: "A powerful social awareness play highlighting gender equality, courage, and standing up against societal silence.",
     director: "S. Sri Vaishnavi",
     cast: "Anshi Jain, Sneha Das, Swati Singh",
@@ -115,117 +110,135 @@ export default function Plays() {
   }, []);
 
   return (
-    <div className="bg-[#fdf9f4] text-[#1c1b19] min-h-screen font-sans selection:bg-[#c6e4f7] pt-8 pb-16">
-      <main className="max-w-7xl mx-auto px-6 md:px-12">
+    <div className="bg-[#E7DDD3] text-[#232323] min-h-screen font-sans selection:bg-[#F8E8E4] pt-8 pb-20">
+      <main className="max-w-7xl mx-auto px-6 md:px-12 space-y-12">
         {/* Header Section */}
-        <section className="mb-8 border-b border-[#cac6b9]/25 pb-6">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <section className="border-b border-[#D5C9BE]/40 pb-8">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
-              <span className="text-[10px] font-bold text-[#635f41] uppercase tracking-[0.25em] bg-[#c6e4f7]/30 px-3 py-1 rounded-full inline-block mb-2">
-                Our Stage Plays
-              </span>
-              <h1 className="font-serif text-3xl md:text-5xl text-[#635f41] font-bold tracking-tight">
-                The 2026 Production Season
+              <div className="inline-flex items-center gap-2 text-xs font-mono font-semibold uppercase tracking-widest text-[#E85F57] mb-2">
+                <span>SEASON ARCHIVE // 2026</span>
+              </div>
+              <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl text-[#232323] font-normal tracking-tight">
+                Curated Stage Productions
               </h1>
-              <p className="text-xs md:text-sm text-[#49473d] max-w-2xl leading-relaxed font-light mt-2">
-                Discover the stories defining our seasonal calendar. Aayam showcases classical and contemporary stagecraft crafted with spatial depth, raw light, and dramatic resonance.
+              <p className="text-sm md:text-base text-[#666361] max-w-2xl leading-relaxed font-normal mt-3">
+                Discover the stories defining our seasonal calendar. Aayam showcases classical and contemporary stagecraft crafted with spatial depth, raw lighting, and visceral dramaturgy.
               </p>
+            </div>
+            <div className="text-xs font-mono text-[#666361] bg-[#EFE8E1] px-4 py-2 rounded-full border border-[#D5C9BE]/50 shrink-0 self-start md:self-auto">
+              TOTAL PRODUCTIONS: <strong className="text-[#232323]">{productions.length}</strong>
             </div>
           </div>
         </section>
 
-        {/* 3-Column Play Cards Grid */}
+        {/* 3-Column Dark Slate Play Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {productions.map((play) => (
+          {productions.map((play, idx) => (
             <div 
               key={play.id} 
-              className="flex flex-col bg-white border border-[#cac6b9]/25 rounded-2xl overflow-hidden shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 group"
+              className="flex flex-col bg-[#232323] text-white border border-[#353535] rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl hover:border-[#E85F57]/50 hover:-translate-y-1 transition-all duration-300 group justify-between"
             >
-              {/* Playbill Poster Image */}
-              <div className="relative aspect-[16/10] overflow-hidden bg-[#f7f3ee]">
-                <img 
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
-                  alt={play.title} 
-                  src={play.image}
-                />
-                <div className="absolute top-4 right-4">
-                  <span className={`inline-flex items-center gap-1 px-3 py-1 text-[10px] font-bold rounded border uppercase tracking-wider bg-white/95 backdrop-blur-sm ${play.statusColor} shadow-sm`}>
-                    {play.status}
-                  </span>
-                </div>
-              </div>
+              <div>
+                {/* Playbill Poster Image */}
+                <div className="relative aspect-[16/10] overflow-hidden bg-[#353535]">
+                  <img 
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 filter brightness-90 contrast-105" 
+                    alt={play.title} 
+                    src={play.image}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#232323] via-transparent to-black/20" />
+                  
+                  {/* Status Capsule Badge */}
+                  <div className="absolute top-4 right-4">
+                    <span className="inline-flex items-center gap-1 px-3 py-1 text-[9px] font-mono font-bold rounded-full uppercase tracking-wider bg-[#232323]/90 text-[#E85F57] border border-[#E85F57]/30 shadow-md backdrop-blur-md">
+                      {play.status}
+                    </span>
+                  </div>
 
-              {/* Details & Contents */}
-              <div className="p-8 flex flex-col flex-grow justify-between">
-                <div>
-                  <span className="text-[10px] font-bold text-[#466272] tracking-widest uppercase mb-1 block">
-                    {play.season}
-                  </span>
-                  <h2 className="font-serif text-2xl font-bold text-[#635f41] group-hover:text-[#635f41]/90 transition-colors mb-4">
-                    {play.title}
-                  </h2>
-                  <p className="text-sm text-[#49473d] mb-6 leading-relaxed font-light line-clamp-3">
+                  {/* Numeral Index */}
+                  <div className="absolute bottom-3 left-6 text-xs font-mono font-bold text-white/50">
+                    0{idx + 1}
+                  </div>
+                </div>
+
+                {/* Details & Contents */}
+                <div className="p-7 space-y-5">
+                  <div>
+                    <span className="text-[10px] font-mono font-semibold text-[#E85F57] tracking-widest uppercase mb-1 block">
+                      {play.season}
+                    </span>
+                    <h2 className="font-serif text-2xl font-normal text-[#F7F5F0] group-hover:text-[#E85F57] transition-colors leading-snug">
+                      {play.title}
+                    </h2>
+                  </div>
+
+                  <p className="text-xs text-white/70 leading-relaxed font-light line-clamp-3">
                     {play.description}
                   </p>
 
-                  {/* High-Fidelity Metadata Grid */}
-                  <div className="grid grid-cols-2 gap-x-4 gap-y-3 mb-6 pt-4 border-t border-[#cac6b9]/20">
-                    <div className="flex items-center gap-2.5 text-xs text-[#49473d]">
-                      <MapPin className="w-4 h-4 text-[#635f41] flex-shrink-0" />
+                  {/* Metadata Grid */}
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-3 pt-4 border-t border-white/10 text-xs font-mono text-white/70">
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-3.5 h-3.5 text-[#E85F57] flex-shrink-0" />
                       <span className="truncate">{play.venue}</span>
                     </div>
-                    <div className="flex items-center gap-2.5 text-xs text-[#49473d]">
-                      <Calendar className="w-4 h-4 text-[#635f41] flex-shrink-0" />
+                    <div className="flex items-center gap-2">
+                      <Calendar className="w-3.5 h-3.5 text-[#E85F57] flex-shrink-0" />
                       <span className="truncate">{play.dates}</span>
                     </div>
-                    <div className="flex items-center gap-2.5 text-xs text-[#49473d]">
-                      <Clock className="w-4 h-4 text-[#635f41] flex-shrink-0" />
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-3.5 h-3.5 text-[#E85F57] flex-shrink-0" />
                       <span className="truncate">{play.runtime}</span>
                     </div>
-                    <div className="flex items-center gap-2.5 text-xs text-[#49473d]">
-                      <Ticket className="w-4 h-4 text-[#635f41] flex-shrink-0" />
-                      <span className="font-semibold">{play.price}</span>
+                    <div className="flex items-center gap-2">
+                      <Ticket className="w-3.5 h-3.5 text-[#E85F57] flex-shrink-0" />
+                      <span className="font-bold text-[#E85F57] truncate">{play.price}</span>
                     </div>
                   </div>
 
                   {/* Production Team details */}
-                  <div className="space-y-2 mb-8 bg-[#f7f3ee]/40 p-4 rounded-xl border border-[#cac6b9]/15">
-                    <div className="flex items-center gap-3 text-[#466272] text-xs">
-                      <BookOpen className="w-3.5 h-3.5 text-[#635f41]" />
+                  <div className="space-y-2 bg-[#353535]/40 p-4 rounded-2xl border border-white/5 text-xs text-white/80">
+                    <div className="flex items-center gap-2.5">
+                      <BookOpen className="w-3.5 h-3.5 text-[#E85F57]" />
                       <span><strong>Director:</strong> {play.director}</span>
                     </div>
-                    <div className="flex items-center gap-3 text-[#466272] text-xs">
-                      <Star className="w-3.5 h-3.5 text-[#635f41]" />
-                      <span><strong>Cast:</strong> {play.cast}</span>
+                    <div className="flex items-center gap-2.5">
+                      <Star className="w-3.5 h-3.5 text-[#E85F57]" />
+                      <span className="truncate"><strong>Cast:</strong> {play.cast}</span>
                     </div>
                   </div>
                 </div>
+              </div>
 
-                {/* Interactive Action Buttons */}
-                <div className="flex flex-col gap-3 mt-auto">
-                  <button className="w-full bg-[#635f41] text-white py-3 rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-[#635f41]/90 shadow-sm transition-all active:scale-95 flex items-center justify-center gap-2">
-                    <Ticket className="w-4 h-4" /> Buy Tickets
-                  </button>
-                  <button className="w-full border border-[#cac6b9] text-[#635f41] py-3 text-xs font-bold rounded-xl hover:bg-[#635f41]/5 transition-colors uppercase tracking-widest">
-                    Sponsor this Play
-                  </button>
-                </div>
+              {/* Interactive Action Buttons */}
+              <div className="p-7 pt-0 flex flex-col gap-3">
+                <button className="w-full bg-[#E85F57] text-white hover:bg-[#D94538] py-3.5 rounded-full text-xs font-bold uppercase tracking-widest shadow-md transition-all active:scale-95 flex items-center justify-center gap-2 group">
+                  <Ticket className="w-4 h-4" />
+                  <span>Reserve Pass</span>
+                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                </button>
               </div>
             </div>
           ))}
         </div>
 
-        {/* Custom Staging & Hiring Section */}
-        <section className="mt-28 bg-[#c6e4f7]/30 rounded-3xl p-12 text-center border border-[#8CC0EB]/20">
-          <h2 className="font-serif text-3xl md:text-5xl text-[#635f41] mb-6 font-bold tracking-tight">Custom Productions & Staging</h2>
-          <p className="text-base text-[#49473d] max-w-2xl mx-auto mb-10 leading-relaxed font-light">
-            Sponsor a play of your choice or hire our professional ensemble to produce custom theatrical campaigns. We craft tailored productions regarding brand advertisements, corporate messaging, and public awareness campaigns.
+        {/* Custom Staging & Hiring Banner */}
+        <section className="mt-16 bg-[#232323] text-white rounded-3xl p-10 md:p-14 text-center border border-[#353535] space-y-6 shadow-xl">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#E85F57]/15 text-[#E85F57] text-[10px] font-mono font-bold uppercase tracking-widest border border-[#E85F57]/30">
+            <span>COLLECTIVE STAGE CRAFT</span>
+          </div>
+          <h2 className="font-serif text-3xl md:text-5xl text-[#F7F5F0] font-normal tracking-tight">
+            Custom Productions & Ensemble Commission
+          </h2>
+          <p className="text-sm md:text-base text-white/70 max-w-2xl mx-auto leading-relaxed font-light">
+            Sponsor a play of your choice or commission our ensemble to produce bespoke theatrical campaigns, corporate performances, and societal awareness narratives.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-[#635f41] text-white px-8 py-4 rounded-full text-xs font-bold uppercase tracking-wider shadow-md active:scale-95 transition-all">
-              Hire Our Ensemble
+          <div className="flex flex-col sm:flex-row gap-4 justify-center pt-2">
+            <button className="bg-[#E85F57] text-white hover:bg-[#D94538] px-9 py-4 rounded-full text-xs font-bold uppercase tracking-widest shadow-md active:scale-95 transition-all">
+              Commission Ensemble
             </button>
-            <button className="border border-[#635f41] text-[#635f41] hover:bg-[#635f41]/5 px-8 py-4 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-300">
+            <button className="border border-white/20 text-[#F7F5F0] hover:bg-white/10 px-9 py-4 rounded-full text-xs font-bold uppercase tracking-widest transition-all">
               Inquire for Staging & Ads
             </button>
           </div>

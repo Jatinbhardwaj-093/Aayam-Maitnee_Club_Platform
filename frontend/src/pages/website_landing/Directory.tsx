@@ -229,17 +229,17 @@ export default function Directory() {
   });
 
   return (
-    <div className="bg-[#fdf9f4] text-[#1c1b19] min-h-screen font-sans selection:bg-[#c6e4f7] pt-8 pb-16">
+    <div className="bg-[#E7DDD3] text-[#232323] min-h-screen font-sans selection:bg-[#F8E8E4] pt-8 pb-16">
       <main className="max-w-7xl mx-auto px-6 md:px-12">
         {/* Hero Section */}
         <section className="mb-16">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div className="max-w-2xl">
-              <span className="text-xs font-semibold text-[#635f41] uppercase tracking-[0.25em] mb-4 block">
+              <span className="text-xs font-semibold text-[#353535] uppercase tracking-[0.25em] mb-4 block">
                 Creative Ensemble
               </span>
-              <h1 className="font-serif text-5xl md:text-7xl text-[#1c1b19] font-bold mb-4 tracking-tight">Ensemble Directory</h1>
-              <p className="text-lg text-[#49473d] leading-relaxed font-light">
+              <h1 className="font-serif text-5xl md:text-7xl text-[#232323] font-bold mb-4 tracking-tight">Ensemble Directory</h1>
+              <p className="text-lg text-[#666361] leading-relaxed font-light">
                 Discover the extraordinary talent bringing Aayam's stage to life. Explore the artists, directors, and designers behind our theatrical productions.
               </p>
             </div>
@@ -247,28 +247,28 @@ export default function Directory() {
         </section>
 
         {/* Search & Filter Bar */}
-        <section className="mb-12 sticky top-20 z-40 bg-[#fdf9f4] py-4 border-b border-[#cac6b9]/30">
-          <div className="bg-[#f7f3ee] border border-[#cac6b9]/30 p-4 md:p-6 shadow-sm flex flex-col md:flex-row gap-4 items-center rounded-2xl">
+        <section className="mb-12 sticky top-20 z-40 bg-[#E7DDD3]/90 backdrop-blur-md py-4 border-b border-[#D5C9BE]/40">
+          <div className="bg-[#232323] text-white border border-[#353535] p-4 md:p-6 shadow-xl flex flex-col md:flex-row gap-5 items-center rounded-3xl">
             <div className="relative w-full md:flex-1">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-[#E85F57] w-4 h-4" />
               <input 
-                className="w-full pl-12 pr-4 py-3 bg-white border-0 border-b border-[#cac6b9]/40 focus:ring-0 focus:border-[#635f41] text-sm text-[#1c1b19] placeholder-gray-400" 
-                placeholder="Search by name or keyword..." 
+                className="w-full pl-12 pr-4 py-3 bg-[#353535]/80 border border-white/10 rounded-full focus:outline-none focus:border-[#E85F57] text-xs font-mono text-[#F7F5F0] placeholder-white/40 transition-all" 
+                placeholder="Search ensemble by name, role, or interest..." 
                 type="text"
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
               />
             </div>
-            <div className="flex flex-wrap gap-2 items-center w-full md:w-auto">
-              <label className="text-xs font-bold text-[#49473d] mr-2 uppercase tracking-wider">Roles:</label>
+            <div className="flex flex-wrap gap-2 items-center w-full md:w-auto shrink-0">
+              <span className="text-[10px] font-mono font-bold text-white/50 mr-1 uppercase tracking-widest">ROLES:</span>
               {(["All", "Actor", "Director", "Design", "Production"] as const).map(role => (
                 <button 
                   key={role}
                   onClick={() => setFilter(role)}
-                  className={`px-4 py-1.5 text-xs font-bold rounded-full transition-all uppercase tracking-wider ${
+                  className={`px-4 py-2 text-[10px] font-mono font-bold rounded-full transition-all uppercase tracking-wider ${
                     filter === role 
-                      ? "bg-[#635f41] text-white shadow-sm" 
-                      : "bg-[#c6e4f7] text-[#2e4a5a] hover:bg-[#c6e4f7]/80"
+                      ? "bg-[#E85F57] text-white shadow-md" 
+                      : "bg-[#353535] text-white/70 hover:text-white hover:bg-white/10 border border-white/5"
                   }`}
                 >
                   {role}
@@ -281,28 +281,33 @@ export default function Directory() {
         {/* Member Grid */}
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredMembers.map((member, index) => (
-            <div key={index} className="group bg-white border border-[#cac6b9]/25 overflow-hidden rounded-2xl shadow-sm hover:border-[#635f41]/25 transition-all duration-300 flex flex-col justify-between">
+            <div key={index} className="group bg-[#232323] text-white border border-[#353535] overflow-hidden rounded-3xl shadow-xl hover:border-[#E85F57]/50 hover:shadow-2xl transition-all duration-300 flex flex-col justify-between">
               <div>
-                <div className="relative aspect-[4/5] overflow-hidden bg-[#f7f3ee]">
+                <div className="relative aspect-[4/5] overflow-hidden bg-[#353535]">
                   <img 
-                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 hover:scale-105" 
+                    className="w-full h-full object-cover object-top grayscale group-hover:grayscale-0 transition-all duration-700 hover:scale-105 filter brightness-90 contrast-105" 
                     alt={member.name} 
                     src={member.image}
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = "/aayam_assets/tamashbin_user_1.jpg";
+                    }}
                   />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#232323] via-transparent to-transparent" />
+                  
                   {member.isFeatured && (
                     <div className="absolute top-4 right-4">
-                      <span className="bg-[#fff9d2] border border-[#635f41]/20 text-[#635f41] text-[10px] uppercase tracking-widest px-3 py-1 font-bold rounded flex items-center gap-1 shadow-md">
-                        <Star className="w-3 h-3 fill-[#635f41]" /> Featured
+                      <span className="bg-[#232323]/90 border border-[#E85F57]/40 text-[#E85F57] text-[10px] font-mono uppercase tracking-widest px-3 py-1 font-bold rounded-full flex items-center gap-1 shadow-md backdrop-blur-md">
+                        <Star className="w-3 h-3 fill-[#E85F57]" /> Featured
                       </span>
                     </div>
                   )}
                 </div>
-                <div className="p-6">
-                  <div className="flex flex-col gap-1 mb-4">
-                    <h3 className="font-serif text-xl font-bold text-[#1c1b19] group-hover:text-[#635f41] transition-colors">{member.name}</h3>
-                    <span className="text-xs font-bold text-[#466272] tracking-widest uppercase">{member.role}</span>
+                <div className="p-6 space-y-3">
+                  <div className="flex flex-col gap-1">
+                    <h3 className="font-serif text-xl font-normal text-[#F7F5F0] group-hover:text-[#E85F57] transition-colors leading-snug">{member.name}</h3>
+                    <span className="text-[10px] font-mono font-semibold text-[#E85F57] tracking-widest uppercase">{member.role}</span>
                   </div>
-                  <p className="text-sm text-[#49473d] leading-relaxed line-clamp-3 font-light">
+                  <p className="text-xs text-white/70 leading-relaxed line-clamp-3 font-light">
                     {member.description}
                   </p>
                 </div>
@@ -310,7 +315,7 @@ export default function Directory() {
               <div className="p-6 pt-0">
                 <Link 
                   to={`/profile/${member.id}`} 
-                  className="w-full py-3 bg-[#635f41] text-white hover:bg-[#635f41]/90 font-bold text-xs uppercase tracking-wider block text-center rounded-xl shadow-md transition-all active:scale-95"
+                  className="w-full py-3.5 bg-[#E85F57] text-white hover:bg-[#D94538] font-bold text-xs uppercase tracking-widest block text-center rounded-full shadow-md transition-all active:scale-95"
                 >
                   View Portfolio
                 </Link>

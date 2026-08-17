@@ -198,7 +198,7 @@ export default function AppLayout() {
   const sidebarWidthClass = isCollapsed ? "w-[72px]" : "w-64 xl:w-72";
 
   return (
-    <div className="min-h-screen flex bg-[#fdf9f4] text-[#466272] font-sans">
+    <div className="min-h-screen flex bg-[#E7DDD3] text-[#666361] font-sans">
       {/* Desktop Sidebar */}
       {!isLandingPage && activeUser && (
         <aside className={`hidden md:block ${sidebarWidthClass} flex-shrink-0 transition-all duration-300`}>
@@ -219,60 +219,62 @@ export default function AppLayout() {
       <div className="flex-1 flex flex-col min-w-0">
         {/* Fixed Top Navigation Bar */}
         {isLandingPage ? (
-          <header className="sticky top-0 z-40 bg-[#fdf9f4]/90 backdrop-blur-xl border-b border-[#cac6b9]/40 h-20 transition-all duration-300">
+          <header className="sticky top-0 z-40 bg-[#E7DDD3]/90 backdrop-blur-xl border-b border-[#D5C9BE]/40 h-20 transition-all duration-300">
             <div className="flex justify-between items-center px-6 md:px-12 w-full max-w-7xl mx-auto h-full">
               {/* Logo / Brand */}
-              <div className="flex items-center gap-12">
+              <div className="flex items-center gap-10">
                 <Link
                   to="/"
-                  className="font-serif text-2xl font-bold tracking-tight text-[#635f41] hover:opacity-90 active:scale-95 transition-all"
+                  className="group flex items-center gap-2.5"
                 >
-                  AAYAM
+                  <span className="font-serif text-2xl font-semibold tracking-wider text-[#232323] group-hover:text-[#E85F57] transition-colors">
+                    AAYAM
+                  </span>
                 </Link>
 
                 {/* Desktop Nav Links */}
                 <nav className="hidden md:flex items-center gap-8">
                   <Link
                     to="/about"
-                    className={`text-sm font-semibold tracking-wide transition-all ${location.pathname === "/about" || location.pathname === "/manifesto"
-                      ? "text-[#635f41] border-b-2 border-[#635f41] pb-1"
-                      : "text-[#466272] hover:text-[#635f41]"
+                    className={`text-xs font-bold uppercase tracking-widest transition-all ${location.pathname === "/about" || location.pathname === "/manifesto"
+                      ? "text-[#E85F57] border-b-2 border-[#E85F57] pb-1"
+                      : "text-[#666361] hover:text-[#232323]"
                       }`}
                   >
-                    About / Manifesto
+                    Manifesto
                   </Link>
                   <Link
                     to="/plays"
-                    className={`text-sm font-semibold tracking-wide transition-all ${location.pathname === "/plays"
-                      ? "text-[#635f41] border-b-2 border-[#635f41] pb-1"
-                      : "text-[#466272] hover:text-[#635f41]"
+                    className={`text-xs font-bold uppercase tracking-widest transition-all ${location.pathname === "/plays"
+                      ? "text-[#E85F57] border-b-2 border-[#E85F57] pb-1"
+                      : "text-[#666361] hover:text-[#232323]"
                       }`}
                   >
                     Our Plays
                   </Link>
                   <Link
                     to="/events"
-                    className={`text-sm font-semibold tracking-wide transition-all ${location.pathname === "/events"
-                      ? "text-[#635f41] border-b-2 border-[#635f41] pb-1"
-                      : "text-[#466272] hover:text-[#635f41]"
+                    className={`text-xs font-bold uppercase tracking-widest transition-all ${location.pathname === "/events"
+                      ? "text-[#E85F57] border-b-2 border-[#E85F57] pb-1"
+                      : "text-[#666361] hover:text-[#232323]"
                       }`}
                   >
                     Events
                   </Link>
                   <Link
                     to="/directory"
-                    className={`text-sm font-semibold tracking-wide transition-all ${location.pathname === "/directory"
-                      ? "text-[#635f41] border-b-2 border-[#635f41] pb-1"
-                      : "text-[#466272] hover:text-[#635f41]"
+                    className={`text-xs font-bold uppercase tracking-widest transition-all ${location.pathname === "/directory"
+                      ? "text-[#E85F57] border-b-2 border-[#E85F57] pb-1"
+                      : "text-[#666361] hover:text-[#232323]"
                       }`}
                   >
                     Member Directory
                   </Link>
                   <Link
                     to="/gallery"
-                    className={`text-sm font-semibold tracking-wide transition-all ${location.pathname === "/gallery" || location.pathname === "/public-gallery"
-                      ? "text-[#635f41] border-b-2 border-[#635f41] pb-1"
-                      : "text-[#466272] hover:text-[#635f41]"
+                    className={`text-xs font-bold uppercase tracking-widest transition-all ${location.pathname === "/gallery" || location.pathname === "/public-gallery"
+                      ? "text-[#E85F57] border-b-2 border-[#E85F57] pb-1"
+                      : "text-[#666361] hover:text-[#232323]"
                       }`}
                   >
                     Gallery
@@ -283,39 +285,41 @@ export default function AppLayout() {
               {/* Right Side Actions */}
               <div className="flex items-center gap-4">
                 {activeUser ? (
-                  <Link
-                    to={isMaintainer ? "/maintainer" : "/member"}
-                    className="bg-[#635f41] text-white hover:bg-[#635f41]/90 rounded-[8px] h-9 px-4 flex items-center text-xs font-semibold tracking-wider transition-all uppercase"
-                  >
-                    Dashboard
-                  </Link>
+                  <div className="flex items-center gap-3">
+                    <Link
+                      to={isMaintainer ? "/maintainer" : "/member"}
+                      className="bg-[#232323] text-white hover:bg-[#E85F57] px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all shadow-xs"
+                    >
+                      Dashboard
+                    </Link>
+                  </div>
                 ) : (
-                  <>
+                  <div className="flex items-center gap-3">
                     <Link
                       to="/join"
-                      className="bg-[#635f41] text-white hover:bg-[#635f41]/90 rounded-[8px] h-9 px-4 flex items-center text-xs font-bold uppercase tracking-wider transition-all"
+                      className="border border-[#232323]/20 text-[#232323] hover:bg-[#232323] hover:text-white px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all"
                     >
                       Join Club
                     </Link>
                     <Button
                       onClick={() => setPortalOpen(true)}
-                      className="gap-2 bg-[#8CC0EB] text-[#1c1b19] hover:bg-[#8CC0EB]/95 font-semibold rounded-[8px] h-9 px-4 transition-all active:scale-95 flex items-center"
+                      className="bg-[#E85F57] text-white hover:bg-[#D94538] font-bold rounded-full h-9 px-5 transition-all active:scale-95 flex items-center gap-2 shadow-xs"
                     >
-                      <User className="w-4 h-4 text-[#1c1b19]" />
-                      <span className="text-xs font-semibold">Portal Access</span>
+                      <User className="w-3.5 h-3.5" />
+                      <span className="text-xs font-bold uppercase tracking-wider">Portal Access</span>
                     </Button>
-                  </>
+                  </div>
                 )}
               </div>
             </div>
           </header>
         ) : (
-          <header className="sticky top-0 z-40 bg-[#fdf9f4]/80 backdrop-blur-md border-b border-[#e6e2dd] h-16 flex items-center justify-between px-6">
+          <header className="sticky top-0 z-40 bg-[#E7DDD3]/80 backdrop-blur-md border-b border-[#DDD8CE] h-16 flex items-center justify-between px-6">
             <div className="flex items-center gap-4">
               {/* Mobile Sidebar Trigger */}
               {!isLandingPage && activeUser && (
                 <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-                  <SheetTrigger render={<Button variant="ghost" size="icon" className="md:hidden text-[#466272] hover:bg-[#f7f3ee]" />}>
+                  <SheetTrigger render={<Button variant="ghost" size="icon" className="md:hidden text-[#666361] hover:bg-[#EFE8E1]" />}>
                     <Menu className="w-5 h-5" />
                   </SheetTrigger>
                   <SheetContent side="left" className="p-0 w-72 border-r-0">
@@ -333,10 +337,10 @@ export default function AppLayout() {
               )}
 
               <div>
-                <span className="text-[10px] uppercase tracking-widest text-[#466272]/75 font-semibold hidden sm:inline">
+                <span className="text-[10px] uppercase tracking-widest text-[#666361]/75 font-semibold hidden sm:inline">
                   {activeItem.description}
                 </span>
-                <h1 className="text-lg font-bold font-serif text-[#635f41] leading-tight">
+                <h1 className="text-lg font-bold font-serif text-[#353535] leading-tight">
                   {activeItem.label}
                 </h1>
               </div>
@@ -348,7 +352,7 @@ export default function AppLayout() {
                 <>
                   <Link
                     to="/"
-                    className="border border-[#cac6b9]/40 text-[#635f41] hover:bg-[#e6e2dd]/40 rounded-[8px] h-9 px-4 flex items-center text-xs font-semibold tracking-wider transition-all uppercase"
+                    className="border border-[#D5C9BE]/40 text-[#353535] hover:bg-[#DDD8CE]/40 rounded-[8px] h-9 px-4 flex items-center text-xs font-semibold tracking-wider transition-all uppercase"
                   >
                     Landing Page
                   </Link>
@@ -359,49 +363,49 @@ export default function AppLayout() {
                       handleMarkAllRead();
                     }
                   }}>
-                    <DialogTrigger render={<Button variant="ghost" size="icon" className="relative text-[#466272] hover:bg-[#f7f3ee] rounded-full" />}>
+                    <DialogTrigger render={<Button variant="ghost" size="icon" className="relative text-[#666361] hover:bg-[#EFE8E1] rounded-full" />}>
                       <Bell className="w-5 h-5" />
                       {hasUnread && (
-                        <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full border border-[#fdf9f4]"></span>
+                        <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full border border-[#E7DDD3]"></span>
                       )}
                     </DialogTrigger>
-                    <DialogContent className="bg-[#fdf9f4] border border-[#e6e2dd] text-[#466272] max-w-md">
+                    <DialogContent className="bg-[#E7DDD3] border border-[#DDD8CE] text-[#666361] max-w-md">
                       <DialogHeader>
-                        <DialogTitle className="font-serif text-[#635f41] flex items-center justify-between gap-2">
+                        <DialogTitle className="font-serif text-[#353535] flex items-center justify-between gap-2">
                           <span className="flex items-center gap-2">
-                            <Bell className="w-5 h-5 text-[#8CC0EB]" /> Notifications Inbox
+                            <Bell className="w-5 h-5 text-[#E85F57]" /> Notifications Inbox
                           </span>
                           {hasUnread && (
                             <Badge className="bg-red-100 text-red-700 text-[10px] font-bold">New Updates</Badge>
                           )}
                         </DialogTitle>
-                        <DialogDescription className="text-xs text-[#466272]/85">
+                        <DialogDescription className="text-xs text-[#666361]/85">
                           Live dispatches and production updates for <strong>{activeUser.name}</strong>.
                         </DialogDescription>
                       </DialogHeader>
 
                       <div className="py-4 space-y-3 max-h-[60vh] overflow-y-auto pr-1">
                         {dbNotifications.length === 0 ? (
-                          <div className="p-6 text-center text-xs text-[#466272]/70 italic">
+                          <div className="p-6 text-center text-xs text-[#666361]/70 italic">
                             No notifications in your inbox.
                           </div>
                         ) : (
                           dbNotifications.map((notif) => (
                             <div
                               key={notif.id}
-                              className={`p-3.5 border rounded-[10px] space-y-1 transition-all ${notif.is_read ? "bg-white/70 border-[#e6e2dd]" : "bg-white border-[#8CC0EB] shadow-xs"
+                              className={`p-3.5 border rounded-[10px] space-y-1 transition-all ${notif.is_read ? "bg-white/70 border-[#DDD8CE]" : "bg-white border-[#E85F57] shadow-xs"
                                 }`}
                             >
                               <div className="flex justify-between items-center gap-2">
-                                <span className="text-xs font-bold text-[#635f41] flex items-center gap-1.5">
-                                  {!notif.is_read && <span className="w-2 h-2 rounded-full bg-[#8CC0EB] inline-block"></span>}
+                                <span className="text-xs font-bold text-[#353535] flex items-center gap-1.5">
+                                  {!notif.is_read && <span className="w-2 h-2 rounded-full bg-[#E85F57] inline-block"></span>}
                                   {notif.title || "Production Notice"}
                                 </span>
-                                <span className="text-[10px] text-[#466272]/60 font-mono flex-shrink-0">
+                                <span className="text-[10px] text-[#666361]/60 font-mono flex-shrink-0">
                                   {notif.created_at || "Recent"}
                                 </span>
                               </div>
-                              <p className="text-xs text-[#466272]/90 leading-relaxed font-light">
+                              <p className="text-xs text-[#666361]/90 leading-relaxed font-light">
                                 {notif.message}
                               </p>
                             </div>
@@ -409,13 +413,13 @@ export default function AppLayout() {
                         )}
                       </div>
 
-                      <DialogFooter className="sm:justify-between items-center gap-4 border-t border-[#e6e2dd] pt-3">
-                        <span className="text-[11px] text-[#466272]/60 italic">Live SQLite DB Feed</span>
+                      <DialogFooter className="sm:justify-between items-center gap-4 border-t border-[#DDD8CE] pt-3">
+                        <span className="text-[11px] text-[#666361]/60 italic">Live SQLite DB Feed</span>
                         <div className="flex gap-2">
-                          <Button onClick={handleMarkAllRead} variant="outline" className="text-xs font-bold border-[#e6e2dd] text-[#635f41]">
+                          <Button onClick={handleMarkAllRead} variant="outline" className="text-xs font-bold border-[#DDD8CE] text-[#353535]">
                             Mark All Read
                           </Button>
-                          <Button onClick={() => setNotificationsOpen(false)} className="bg-[#8CC0EB] text-[#001e2c] font-bold hover:bg-[#8CC0EB]/90 rounded-[8px]">
+                          <Button onClick={() => setNotificationsOpen(false)} className="bg-[#E85F57] text-[#001e2c] font-bold hover:bg-[#E85F57]/90 rounded-[8px]">
                             Dismiss
                           </Button>
                         </div>
@@ -429,9 +433,9 @@ export default function AppLayout() {
               {!activeUser && (
                 <Button
                   onClick={() => setPortalOpen(true)}
-                  className="gap-2 bg-[#8CC0EB] text-[#1c1b19] hover:bg-[#8CC0EB]/95 font-semibold rounded-[8px] h-9 px-4 transition-all active:scale-95 flex items-center"
+                  className="gap-2 bg-[#E85F57] text-[#232323] hover:bg-[#E85F57]/95 font-semibold rounded-[8px] h-9 px-4 transition-all active:scale-95 flex items-center"
                 >
-                  <User className="w-4 h-4 text-[#1c1b19]" />
+                  <User className="w-4 h-4 text-[#232323]" />
                   <span className="text-xs font-semibold">Portal Access</span>
                 </Button>
               )}
@@ -444,13 +448,13 @@ export default function AppLayout() {
 
         {/* Login Dialog */}
         <Dialog open={portalOpen} onOpenChange={setPortalOpen}>
-          <DialogContent className="bg-[#fdf9f4]/95 backdrop-blur-md border border-[#cac6b9]/80 text-[#466272] max-w-md rounded-3xl shadow-2xl p-7 transition-all duration-300">
-            <DialogHeader className="border-b border-[#e6e2dd]/80 pb-4 text-center space-y-1.5">
-              <div className="mx-auto w-12 h-12 rounded-2xl bg-[#635f41]/10 flex items-center justify-center mb-1 text-[#635f41] shadow-inner">
+          <DialogContent className="bg-[#E7DDD3]/95 backdrop-blur-md border border-[#D5C9BE]/80 text-[#666361] max-w-md rounded-3xl shadow-2xl p-7 transition-all duration-300">
+            <DialogHeader className="border-b border-[#DDD8CE]/80 pb-4 text-center space-y-1.5">
+              <div className="mx-auto w-12 h-12 rounded-2xl bg-[#353535]/10 flex items-center justify-center mb-1 text-[#353535] shadow-inner">
                 <User className="w-6 h-6" />
               </div>
-              <DialogTitle className="font-serif text-2xl font-bold text-[#635f41] tracking-tight">Ensemble Portal</DialogTitle>
-              <DialogDescription className="text-xs text-[#466272]/80 font-medium max-w-xs mx-auto">
+              <DialogTitle className="font-serif text-2xl font-bold text-[#353535] tracking-tight">Ensemble Portal</DialogTitle>
+              <DialogDescription className="text-xs text-[#666361]/80 font-medium max-w-xs mx-auto">
                 Sign in with your username or email address to access your Aayam workspace.
               </DialogDescription>
             </DialogHeader>
@@ -467,14 +471,14 @@ export default function AppLayout() {
               )}
 
               <div className="space-y-1.5">
-                <label className="text-[11px] uppercase tracking-wider text-[#635f41] font-bold block">
+                <label className="text-[11px] uppercase tracking-wider text-[#353535] font-bold block">
                   Username or Email Address
                 </label>
                 <Input
                   type="text"
                   name="identifier"
                   placeholder="Username or user@domain.com"
-                  className="border-[#e6e2dd] h-11 bg-white/90 focus-visible:ring-2 focus-visible:ring-[#635f41]/40 focus-visible:border-[#635f41] transition-all text-sm rounded-xl px-3.5 shadow-sm"
+                  className="border-[#DDD8CE] h-11 bg-white/90 focus-visible:ring-2 focus-visible:ring-[#353535]/40 focus-visible:border-[#353535] transition-all text-sm rounded-xl px-3.5 shadow-sm"
                   required
                   autoFocus
                 />
@@ -482,13 +486,13 @@ export default function AppLayout() {
 
               <div className="space-y-1.5">
                 <div className="flex justify-between items-center">
-                  <label className="text-[11px] uppercase tracking-wider text-[#635f41] font-bold">
+                  <label className="text-[11px] uppercase tracking-wider text-[#353535] font-bold">
                     Password
                   </label>
                   <a
                     href="#"
                     onClick={(e) => { e.preventDefault(); alert("Prototype info: any password is accepted."); }}
-                    className="text-[11px] text-[#635f41] hover:underline font-semibold transition-colors"
+                    className="text-[11px] text-[#353535] hover:underline font-semibold transition-colors"
                   >
                     Forgot?
                   </a>
@@ -498,13 +502,13 @@ export default function AppLayout() {
                     type={showPassword ? "text" : "password"}
                     name="password"
                     placeholder="Enter your password"
-                    className="border-[#e6e2dd] h-11 bg-white/90 focus-visible:ring-2 focus-visible:ring-[#635f41]/40 focus-visible:border-[#635f41] transition-all text-sm rounded-xl pl-3.5 pr-10 shadow-sm"
+                    className="border-[#DDD8CE] h-11 bg-white/90 focus-visible:ring-2 focus-visible:ring-[#353535]/40 focus-visible:border-[#353535] transition-all text-sm rounded-xl pl-3.5 pr-10 shadow-sm"
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#466272]/60 hover:text-[#635f41] transition-colors focus:outline-none p-1"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#666361]/60 hover:text-[#353535] transition-colors focus:outline-none p-1"
                     title={showPassword ? "Hide password" : "Show password"}
                   >
                     {showPassword ? (
@@ -516,8 +520,8 @@ export default function AppLayout() {
                 </div>
               </div>
 
-              <div className="bg-[#f4efe8]/70 border border-[#e6e2dd] rounded-xl p-2.5">
-                <span className="text-[10px] text-[#466272]/85 leading-relaxed block text-center">
+              <div className="bg-[#f4efe8]/70 border border-[#DDD8CE] rounded-xl p-2.5">
+                <span className="text-[10px] text-[#666361]/85 leading-relaxed block text-center">
                   <strong>Tip:</strong> Log in with <strong>username</strong> or <strong>email</strong> (e.g. <em>maintainer@matinee.club</em> for Admin).
                 </span>
               </div>
@@ -527,13 +531,13 @@ export default function AppLayout() {
                   type="button"
                   variant="outline"
                   onClick={() => setPortalOpen(false)}
-                  className="border-[#cac6b9] text-[#466272] hover:bg-[#f7f3ee] rounded-xl text-xs font-semibold h-11 flex-1 shadow-sm transition-all"
+                  className="border-[#D5C9BE] text-[#666361] hover:bg-[#EFE8E1] rounded-xl text-xs font-semibold h-11 flex-1 shadow-sm transition-all"
                 >
                   Cancel
                 </Button>
                 <Button
                   type="submit"
-                  className="bg-[#635f41] text-white hover:bg-[#4d4a32] active:scale-[0.99] rounded-xl text-xs font-bold h-11 flex-1 shadow-md hover:shadow-lg transition-all"
+                  className="bg-[#353535] text-white hover:bg-[#4d4a32] active:scale-[0.99] rounded-xl text-xs font-bold h-11 flex-1 shadow-md hover:shadow-lg transition-all"
                 >
                   Sign In
                 </Button>
@@ -550,18 +554,18 @@ export default function AppLayout() {
             </main>
 
             {/* Footer */}
-            <footer className="bg-white py-16 px-6 md:px-12 border-t border-[#cac6b9]/30 mt-auto w-full">
+            <footer className="bg-[#E7DDD3] py-16 px-6 md:px-12 border-t border-[#D5C9BE]/50 mt-auto w-full">
               <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
-                <div className="text-center md:text-left">
-                  <h3 className="font-serif text-3xl font-bold text-[#635f41] mb-2 tracking-tight">AAYAM</h3>
-                  <p className="text-sm text-[#466272]/70">Celebrating theatrical excellence and refined stagecraft.</p>
+                <div className="text-center md:text-left space-y-1">
+                  <h3 className="font-serif text-3xl font-normal text-[#232323] tracking-tight">AAYAM</h3>
+                  <p className="text-xs text-[#666361]">Celebrating theatrical excellence and archival stagecraft.</p>
                 </div>
-                <nav className="flex flex-wrap justify-center gap-8 text-xs font-bold uppercase tracking-wider">
-                  <Link className="text-[#466272]/85 hover:text-[#635f41] transition-colors" to="/">Home</Link>
-                  <Link className="text-[#466272]/85 hover:text-[#635f41] transition-colors" to="/plays">Our Plays</Link>
-                  <Link className="text-[#466272]/85 hover:text-[#635f41] transition-colors" to="/events">Upcoming Events</Link>
-                  <Link className="text-[#466272]/85 hover:text-[#635f41] transition-colors" to="/directory">Member Directory</Link>
-                  <Link className="text-[#466272]/85 hover:text-[#635f41] transition-colors" to="/public-gallery">Gallery</Link>
+                <nav className="flex flex-wrap justify-center gap-8 text-xs font-bold uppercase tracking-widest">
+                  <Link className="text-[#666361] hover:text-[#E85F57] transition-colors" to="/">Home</Link>
+                  <Link className="text-[#666361] hover:text-[#E85F57] transition-colors" to="/plays">Our Plays</Link>
+                  <Link className="text-[#666361] hover:text-[#E85F57] transition-colors" to="/events">Upcoming Events</Link>
+                  <Link className="text-[#666361] hover:text-[#E85F57] transition-colors" to="/directory">Member Directory</Link>
+                  <Link className="text-[#666361] hover:text-[#E85F57] transition-colors" to="/public-gallery">Gallery</Link>
                 </nav>
               </div>
             </footer>
@@ -569,19 +573,19 @@ export default function AppLayout() {
         ) : (
           <main className="flex-1 px-4 md:px-8 py-4 md:py-6 max-w-[1280px] mx-auto w-full">
             {showAccessDenied ? (
-              <div className="flex flex-col items-center justify-center text-center py-12 px-4 bg-white border border-[#e6e2dd] rounded-[8px] space-y-6 shadow-xs max-w-md mx-auto mt-8">
+              <div className="flex flex-col items-center justify-center text-center py-12 px-4 bg-white border border-[#DDD8CE] rounded-[8px] space-y-6 shadow-xs max-w-md mx-auto mt-8">
                 <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center text-red-500 border border-red-100">
                   <ShieldAlert className="w-8 h-8" />
                 </div>
                 <div className="space-y-2">
-                  <h3 className="text-xl font-bold font-serif text-[#635f41]">Restricted Stage Access</h3>
-                  <p className="text-sm text-[#466272] leading-relaxed">
-                    Your current role (<strong className="text-[#635f41]">{activeUser.role}</strong>) does not have authorization to access this operational area.
+                  <h3 className="text-xl font-bold font-serif text-[#353535]">Restricted Stage Access</h3>
+                  <p className="text-sm text-[#666361] leading-relaxed">
+                    Your current role (<strong className="text-[#353535]">{activeUser.role}</strong>) does not have authorization to access this operational area.
                   </p>
                 </div>
                 <Link
                   to="/member"
-                  className="bg-[#8CC0EB] hover:bg-[#8CC0EB]/90 text-[#1c1b19] font-semibold text-xs rounded-[8px] py-2.5 px-6 shadow-sm transition-all active:scale-95 flex items-center gap-2"
+                  className="bg-[#E85F57] hover:bg-[#E85F57]/90 text-[#232323] font-semibold text-xs rounded-[8px] py-2.5 px-6 shadow-sm transition-all active:scale-95 flex items-center gap-2"
                 >
                   Return to Dashboard
                 </Link>

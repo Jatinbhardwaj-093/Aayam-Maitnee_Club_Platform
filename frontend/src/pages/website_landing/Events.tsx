@@ -43,7 +43,7 @@ interface Event {
 const getCategoryStyles = (category: string) => {
   const cat = (category || "").toLowerCase();
   if (cat.includes("play")) {
-    return { bg: "bg-[#BFDDF0] text-[#2e4a5a]", color: "text-[#2e4a5a]" };
+    return { bg: "bg-[#BFDDF0] text-[#E85F57]", color: "text-[#E85F57]" };
   } else if (cat.includes("workshop") || cat.includes("masterclass")) {
     return { bg: "bg-[#FFEBCC] text-[#765d00]", color: "text-[#765d00]" };
   } else if (cat.includes("sponsor") || cat.includes("ad")) {
@@ -113,8 +113,8 @@ const fallbackEvents: Event[] = [
     title: "Darpan 2026 Annual Drama Festival",
     description: "Aayam's signature annual festival featuring Abhinaya Mono-acting, Envisage Directorial, and ScreenKraft Script Writing competitions.",
     category: "Plays",
-    categoryBg: "bg-[#BFDDF0] text-[#2e4a5a]",
-    categoryColor: "text-[#2e4a5a]",
+    categoryBg: "bg-[#BFDDF0] text-[#E85F57]",
+    categoryColor: "text-[#E85F57]",
     date: "Oct 05, 2026",
     day: 5,
     month: "OCT",
@@ -290,30 +290,30 @@ export default function Events() {
   const featuredEvent = events.find((e) => e.status === "upcoming") || events[0];
 
   return (
-    <div className="bg-[#fdf9f4] text-[#1c1b19] min-h-screen font-sans selection:bg-[#c6e4f7] pt-8 pb-16">
+    <div className="bg-[#E7DDD3] text-[#232323] min-h-screen font-sans selection:bg-[#F8E8E4] pt-8 pb-16">
       <main className="max-w-7xl mx-auto px-6 md:px-12 space-y-10">
         {isRequestModalOpen ? (
           /* DEDICATED PROPOSE EVENT PAGE VIEW (Only Propose Event Form is Visible) */
-          <section className="bg-white border border-[#e6e2dd] p-6 sm:p-10 md:p-12 rounded-3xl shadow-sm space-y-8 animate-in fade-in-50 duration-200">
+          <section className="bg-white border border-[#DDD8CE] p-6 sm:p-10 md:p-12 rounded-3xl shadow-sm space-y-8 animate-in fade-in-50 duration-200">
             
             {/* Top Navigation Bar with Back to Events Button */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-[#e6e2dd]">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-[#DDD8CE]">
               <button
                 type="button"
                 onClick={() => setIsRequestModalOpen(false)}
-                className="px-5 py-2.5 rounded-xl border border-[#cac6b9] text-[#635f41] hover:text-[#1c1b19] hover:bg-[#fdf9f4] text-xs font-bold transition-all flex items-center gap-2"
+                className="px-5 py-2.5 rounded-xl border border-[#D5C9BE] text-[#353535] hover:text-[#232323] hover:bg-[#E7DDD3] text-xs font-bold transition-all flex items-center gap-2"
               >
                 Back to Events
               </button>
 
-              <div className="flex gap-2 bg-[#fdf9f4] p-1 rounded-xl border border-[#cac6b9]/60">
+              <div className="flex gap-2 bg-[#E7DDD3] p-1 rounded-xl border border-[#D5C9BE]/60">
                 <button
                   type="button"
                   onClick={() => setIsAiProposalMode(false)}
                   className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${
                     !isAiProposalMode
-                      ? "bg-[#635f41] text-white shadow-xs"
-                      : "text-[#466272] hover:text-[#1c1b19]"
+                      ? "bg-[#353535] text-white shadow-xs"
+                      : "text-[#666361] hover:text-[#232323]"
                   }`}
                 >
                   Manual Form
@@ -323,8 +323,8 @@ export default function Events() {
                   onClick={() => setIsAiProposalMode(true)}
                   className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${
                     isAiProposalMode
-                      ? "bg-[#466272] text-white shadow-xs"
-                      : "text-[#466272] hover:text-[#1c1b19]"
+                      ? "bg-[#666361] text-white shadow-xs"
+                      : "text-[#666361] hover:text-[#232323]"
                   }`}
                 >
                   AI Smart Generator
@@ -333,10 +333,10 @@ export default function Events() {
             </div>
 
             <div className="space-y-1">
-              <h1 className="font-serif text-3xl md:text-4xl font-bold text-[#1c1b19]">
+              <h1 className="font-serif text-3xl md:text-4xl font-bold text-[#232323]">
                 {isAiProposalMode ? "Propose Event by AI" : "Propose Event to Aayam"}
               </h1>
-              <p className="text-xs sm:text-sm text-[#466272]">
+              <p className="text-xs sm:text-sm text-[#666361]">
                 {isAiProposalMode
                   ? "Paste your raw unformatted event brief or email thread below. AI will extract and auto-fill form fields."
                   : "Submit your member production pitch or corporate sponsorship deal for maintainer review."}
@@ -345,17 +345,17 @@ export default function Events() {
 
             {/* AI RAW PARAGRAPH EXTRACTOR BOX */}
             {isAiProposalMode && (
-              <div className="p-6 bg-[#fdf9f4] border border-[#cac6b9]/60 rounded-3xl space-y-4 shadow-xs">
+              <div className="p-6 bg-[#E7DDD3] border border-[#D5C9BE]/60 rounded-3xl space-y-4 shadow-xs">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                   <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#635f41]">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#353535]">
                       AI Smart Brief Extractor
                     </span>
-                    <h3 className="font-serif text-lg font-bold text-[#1c1b19]">
+                    <h3 className="font-serif text-lg font-bold text-[#232323]">
                       Paste Full Event Description / Paragraph
                     </h3>
                   </div>
-                  <span className="text-xs text-[#466272]">
+                  <span className="text-xs text-[#666361]">
                     AI auto-extracts title, brand name, contact, budget & venue
                   </span>
                 </div>
@@ -368,7 +368,7 @@ export default function Events() {
                     setAiExtractedSuccess(false);
                   }}
                   placeholder="e.g. FabIndia is presenting a grand ethnic costume showcase at the Royal Stage Auditorium on 24th August with an offered budget of ₹1,50,000. Contact Rohan Sharma at rohan@fabindia.com or +91 98110 44321 to discuss stage sidecar branding..."
-                  className="w-full bg-white border border-[#cac6b9]/80 rounded-2xl p-4 text-xs text-[#1c1b19] focus:outline-none focus:border-[#635f41] leading-relaxed shadow-inner"
+                  className="w-full bg-white border border-[#D5C9BE]/80 rounded-2xl p-4 text-xs text-[#232323] focus:outline-none focus:border-[#353535] leading-relaxed shadow-inner"
                 />
 
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-1">
@@ -376,7 +376,7 @@ export default function Events() {
                     type="button"
                     disabled={isExtractingAi}
                     onClick={() => parseAiEventBrief(rawAiParagraph)}
-                    className="px-6 py-2.5 rounded-xl bg-[#466272] hover:bg-[#314652] text-white text-xs font-bold transition-all shadow-sm disabled:opacity-50 flex items-center justify-center gap-2"
+                    className="px-6 py-2.5 rounded-xl bg-[#666361] hover:bg-[#314652] text-white text-xs font-bold transition-all shadow-sm disabled:opacity-50 flex items-center justify-center gap-2"
                   >
                     {isExtractingAi ? (
                       <>
@@ -410,7 +410,7 @@ export default function Events() {
                 {/* Column 1: Proposal Category, Title, Target Venue */}
                 <div className="space-y-5">
                   <div className="space-y-1.5 min-h-[66px]">
-                    <label className="text-xs font-bold uppercase tracking-wider text-[#635f41] block">
+                    <label className="text-xs font-bold uppercase tracking-wider text-[#353535] block">
                       Proposal Category
                     </label>
                     <select
@@ -423,7 +423,7 @@ export default function Events() {
                           sponsorshipTerms: val.includes("Sponsor") ? (proposalForm.sponsorshipTerms || "₹50,000") : ""
                         });
                       }}
-                      className="w-full bg-[#fdf9f4] border border-[#cac6b9]/80 rounded-xl px-4 py-2.5 text-xs text-[#1c1b19] font-medium focus:outline-none focus:border-[#635f41]"
+                      className="w-full bg-[#E7DDD3] border border-[#D5C9BE]/80 rounded-xl px-4 py-2.5 text-xs text-[#232323] font-medium focus:outline-none focus:border-[#353535]"
                     >
                       {activeUser ? (
                         <>
@@ -437,7 +437,7 @@ export default function Events() {
                   </div>
 
                   <div className="space-y-1.5 min-h-[66px]">
-                    <label className="text-xs font-bold uppercase tracking-wider text-[#635f41] block">
+                    <label className="text-xs font-bold uppercase tracking-wider text-[#353535] block">
                       Proposed Event Title
                     </label>
                     <Input
@@ -445,12 +445,12 @@ export default function Events() {
                       placeholder="e.g. Vintage Costume Showcase & Mixer"
                       value={proposalForm.title}
                       onChange={(e) => setProposalForm({ ...proposalForm, title: e.target.value })}
-                      className="bg-[#fdf9f4] border-[#cac6b9]/80 text-xs h-10 rounded-xl px-4"
+                      className="bg-[#E7DDD3] border-[#D5C9BE]/80 text-xs h-10 rounded-xl px-4"
                     />
                   </div>
 
                   <div className="space-y-1.5 min-h-[66px]">
-                    <label className="text-xs font-bold uppercase tracking-wider text-[#635f41] block">
+                    <label className="text-xs font-bold uppercase tracking-wider text-[#353535] block">
                       Target Venue / Stage
                     </label>
                     <Input
@@ -458,7 +458,7 @@ export default function Events() {
                       placeholder="e.g. Main Stage Auditorium / Rehearsal Studio B"
                       value={proposalForm.venue}
                       onChange={(e) => setProposalForm({ ...proposalForm, venue: e.target.value })}
-                      className="bg-[#fdf9f4] border-[#cac6b9]/80 text-xs h-10 rounded-xl px-4"
+                      className="bg-[#E7DDD3] border-[#D5C9BE]/80 text-xs h-10 rounded-xl px-4"
                     />
                   </div>
                 </div>
@@ -466,7 +466,7 @@ export default function Events() {
                 {/* Column 2: Name/Brand, Contact Info, Fixed Budget Slot */}
                 <div className="space-y-5">
                   <div className="space-y-1.5 min-h-[66px]">
-                    <label className="text-xs font-bold uppercase tracking-wider text-[#635f41] block">
+                    <label className="text-xs font-bold uppercase tracking-wider text-[#353535] block">
                       {proposalForm.proposalType.includes("Sponsor") ? "Sponsor / Brand Name" : "Your Full Name"}
                     </label>
                     <Input
@@ -474,13 +474,13 @@ export default function Events() {
                       placeholder={proposalForm.proposalType.includes("Sponsor") ? "e.g. Red Bull India" : "e.g. Aarav Sharma"}
                       value={proposalForm.submitterName}
                       onChange={(e) => setProposalForm({ ...proposalForm, submitterName: e.target.value })}
-                      className="bg-[#fdf9f4] border-[#cac6b9]/80 text-xs h-10 rounded-xl px-4"
+                      className="bg-[#E7DDD3] border-[#D5C9BE]/80 text-xs h-10 rounded-xl px-4"
                     />
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 min-h-[66px]">
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold uppercase tracking-wider text-[#635f41] block">
+                      <label className="text-xs font-bold uppercase tracking-wider text-[#353535] block">
                         Contact Email
                       </label>
                       <Input
@@ -489,19 +489,19 @@ export default function Events() {
                         placeholder="e.g. partner@domain.com"
                         value={proposalForm.submitterEmail}
                         onChange={(e) => setProposalForm({ ...proposalForm, submitterEmail: e.target.value })}
-                        className="bg-[#fdf9f4] border-[#cac6b9]/80 text-xs h-10 rounded-xl px-4"
+                        className="bg-[#E7DDD3] border-[#D5C9BE]/80 text-xs h-10 rounded-xl px-4"
                       />
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold uppercase tracking-wider text-[#635f41] block">
+                      <label className="text-xs font-bold uppercase tracking-wider text-[#353535] block">
                         Contact Phone
                       </label>
                       <Input
                         placeholder="e.g. +91 98110 44321"
                         value={proposalForm.submitterPhone}
                         onChange={(e) => setProposalForm({ ...proposalForm, submitterPhone: e.target.value })}
-                        className="bg-[#fdf9f4] border-[#cac6b9]/80 text-xs h-10 rounded-xl px-4"
+                        className="bg-[#E7DDD3] border-[#D5C9BE]/80 text-xs h-10 rounded-xl px-4"
                       />
                     </div>
                   </div>
@@ -510,14 +510,14 @@ export default function Events() {
                   <div className="space-y-1.5 min-h-[66px] flex flex-col justify-end">
                     {proposalForm.proposalType.includes("Sponsor") ? (
                       <>
-                        <label className="text-xs font-bold uppercase tracking-wider text-[#635f41] block">
+                        <label className="text-xs font-bold uppercase tracking-wider text-[#353535] block">
                           Offered Sponsorship Budget
                         </label>
                         <Input
                           placeholder="e.g. ₹50,000"
                           value={proposalForm.sponsorshipTerms}
                           onChange={(e) => setProposalForm({ ...proposalForm, sponsorshipTerms: e.target.value })}
-                          className="bg-[#fdf9f4] border-[#cac6b9]/80 text-xs h-10 rounded-xl px-4"
+                          className="bg-[#E7DDD3] border-[#D5C9BE]/80 text-xs h-10 rounded-xl px-4"
                         />
                       </>
                     ) : (
@@ -525,7 +525,7 @@ export default function Events() {
                         <label className="text-xs font-bold uppercase tracking-wider text-gray-400 block">
                           Budget Requirement
                         </label>
-                        <div className="bg-[#fdf9f4]/60 border border-dashed border-[#cac6b9]/60 text-[#466272]/70 text-xs h-10 rounded-xl px-4 flex items-center italic">
+                        <div className="bg-[#E7DDD3]/60 border border-dashed border-[#D5C9BE]/60 text-[#666361]/70 text-xs h-10 rounded-xl px-4 flex items-center italic">
                           Member pitches are fully funded by ensemble desk (No budget required)
                         </div>
                       </>
@@ -536,7 +536,7 @@ export default function Events() {
 
               {/* Description */}
               <div className="space-y-1.5">
-                <label className="text-xs font-bold uppercase tracking-wider text-[#635f41] block">
+                <label className="text-xs font-bold uppercase tracking-wider text-[#353535] block">
                   Proposal Description & Deliverables
                 </label>
                 <textarea
@@ -545,22 +545,22 @@ export default function Events() {
                   placeholder="Describe the production format, audience scope, rehearsal timeline, and deliverables..."
                   value={proposalForm.description}
                   onChange={(e) => setProposalForm({ ...proposalForm, description: e.target.value })}
-                  className="w-full bg-[#fdf9f4] border border-[#cac6b9]/80 rounded-xl p-3.5 text-xs text-[#1c1b19] focus:outline-none focus:border-[#635f41]"
+                  className="w-full bg-[#E7DDD3] border border-[#D5C9BE]/80 rounded-xl p-3.5 text-xs text-[#232323] focus:outline-none focus:border-[#353535]"
                 />
               </div>
 
               {/* Actions */}
-              <div className="pt-3 border-t border-[#e6e2dd] flex gap-4 justify-end">
+              <div className="pt-3 border-t border-[#DDD8CE] flex gap-4 justify-end">
                 <button
                   type="button"
                   onClick={() => setIsRequestModalOpen(false)}
-                  className="px-6 py-2.5 rounded-xl border border-[#cac6b9] text-[#466272] hover:bg-[#f7f3ee] text-xs font-bold transition-all"
+                  className="px-6 py-2.5 rounded-xl border border-[#D5C9BE] text-[#666361] hover:bg-[#EFE8E1] text-xs font-bold transition-all"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-8 py-2.5 rounded-xl bg-[#635f41] text-white hover:bg-[#4d4a32] text-xs font-bold shadow-md transition-all"
+                  className="px-8 py-2.5 rounded-xl bg-[#353535] text-white hover:bg-[#4d4a32] text-xs font-bold shadow-md transition-all"
                 >
                   Submit Proposal
                 </button>
@@ -572,15 +572,15 @@ export default function Events() {
           <>
             {/* Hero & Title Section */}
             <section>
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#cac6b9]/25 pb-6">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#D5C9BE]/25 pb-6">
                 <div>
-                  <span className="text-[10px] font-bold text-[#635f41] uppercase tracking-[0.25em] mb-1 block">
+                  <span className="text-[10px] font-bold text-[#353535] uppercase tracking-[0.25em] mb-1 block">
                     Official Roster & Calendar
                   </span>
-                  <h1 className="font-serif text-3xl md:text-5xl text-[#1c1b19] font-bold tracking-tight">
+                  <h1 className="font-serif text-3xl md:text-5xl text-[#232323] font-bold tracking-tight">
                     Events & Performances
                   </h1>
-                  <p className="max-w-xl text-xs md:text-sm text-[#49473d] leading-relaxed font-light mt-1.5">
+                  <p className="max-w-xl text-xs md:text-sm text-[#666361] leading-relaxed font-light mt-1.5">
                     Explore active stage plays, masterclasses, and community meetups at Aayam.
                   </p>
                 </div>
@@ -591,7 +591,7 @@ export default function Events() {
                       setIsAiProposalMode(true);
                       setIsRequestModalOpen(true);
                     }}
-                    className="px-5 py-2.5 rounded-xl bg-[#466272] text-white hover:bg-[#314652] text-xs font-bold uppercase tracking-wider shadow-xs transition-all active:scale-95"
+                    className="px-5 py-2.5 rounded-xl bg-[#666361] text-white hover:bg-[#314652] text-xs font-bold uppercase tracking-wider shadow-xs transition-all active:scale-95"
                   >
                     Propose Event by AI
                   </button>
@@ -601,7 +601,7 @@ export default function Events() {
                       setIsAiProposalMode(false);
                       setIsRequestModalOpen(true);
                     }}
-                    className="px-5 py-2.5 rounded-xl bg-[#635f41] text-white hover:bg-[#635f41]/90 text-xs font-bold uppercase tracking-wider shadow-xs transition-all active:scale-95 flex items-center gap-2"
+                    className="px-5 py-2.5 rounded-xl bg-[#353535] text-white hover:bg-[#353535]/90 text-xs font-bold uppercase tracking-wider shadow-xs transition-all active:scale-95 flex items-center gap-2"
                   >
                     <Plus className="w-4 h-4" /> Propose Event
                   </button>
@@ -612,63 +612,63 @@ export default function Events() {
             {/* Bento Grid: Dynamic Calendar + Featured Highlight */}
             <section className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
               {/* Dynamic Calendar Widget */}
-              <div className="lg:col-span-2 bg-white rounded-2xl border border-[#cac6b9]/30 p-8 shadow-xs">
-                <div className="flex items-center justify-between mb-8">
-                  <h3 className="font-serif text-2xl font-bold text-[#635f41]">Upcoming Production Calendar</h3>
-                  <span className="text-xs font-bold text-[#466272] uppercase tracking-wider">
+              <div className="lg:col-span-2 bg-[#232323] text-white rounded-3xl border border-[#353535] p-8 shadow-xl">
+                <div className="flex items-center justify-between mb-8 pb-4 border-b border-white/10">
+                  <h3 className="font-serif text-2xl font-normal text-[#F7F5F0]">Upcoming Production Calendar</h3>
+                  <span className="text-xs font-mono text-[#E85F57] uppercase tracking-wider bg-[#E85F57]/15 px-3 py-1 rounded-full border border-[#E85F57]/30">
                     {events.length} Scheduled
                   </span>
                 </div>
 
                 {/* Calendar Grid */}
-                <div className="grid grid-cols-7 border-l border-t border-[#cac6b9]/20 text-center text-xs font-bold text-[#49473d] uppercase tracking-wider">
+                <div className="grid grid-cols-7 border-l border-t border-white/10 text-center text-xs font-mono font-semibold text-white/60 uppercase tracking-wider">
                   {["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"].map((day) => (
-                    <div key={day} className="p-3 border-r border-b border-[#cac6b9]/20">
+                    <div key={day} className="p-3 border-r border-b border-white/10 text-[#E85F57]">
                       {day}
                     </div>
                   ))}
 
-                  <div className="h-20 md:h-28 p-2 border-r border-b border-[#cac6b9]/20 bg-[#f7f3ee]/30"></div>
-                  <div className="h-20 md:h-28 p-2 border-r border-b border-[#cac6b9]/20 bg-[#f7f3ee]/30"></div>
+                  <div className="h-20 md:h-24 p-2 border-r border-b border-white/10 bg-[#353535]/30"></div>
+                  <div className="h-20 md:h-24 p-2 border-r border-b border-white/10 bg-[#353535]/30"></div>
 
                   {/* Dynamic event date chips */}
-                  <div className="h-20 md:h-28 p-2 border-r border-b border-[#cac6b9]/20 text-left font-semibold text-gray-500">
+                  <div className="h-20 md:h-24 p-2 border-r border-b border-white/10 text-left font-mono text-white/50">
                     1
                   </div>
-                  <div className="h-20 md:h-28 p-2 border-r border-b border-[#cac6b9]/20 text-left font-semibold text-gray-500">
+                  <div className="h-20 md:h-24 p-2 border-r border-b border-white/10 text-left font-mono text-white/50">
                     2
                   </div>
-                  <div className="h-20 md:h-28 p-2 border-r border-b border-[#cac6b9]/20 text-left font-semibold relative text-[#1c1b19]">
+                  <div className="h-20 md:h-24 p-2 border-r border-b border-white/10 text-left font-mono relative text-white">
                     3
-                    <div className="absolute bottom-2 left-2 right-2 bg-[#BFDDF0] p-1 rounded text-[9px] font-bold text-[#2e4a5a] truncate">
+                    <div className="absolute bottom-2 left-2 right-2 bg-[#E85F57]/20 border border-[#E85F57]/40 p-1 rounded-lg text-[9px] font-mono font-bold text-[#E85F57] truncate">
                       Rehearsal
                     </div>
                   </div>
-                  <div className="h-20 md:h-28 p-2 border-r border-b border-[#cac6b9]/20 text-left font-semibold text-gray-500">
+                  <div className="h-20 md:h-24 p-2 border-r border-b border-white/10 text-left font-mono text-white/50">
                     4
                   </div>
-                  <div className="h-20 md:h-28 p-2 border-r border-b border-[#cac6b9]/20 text-left font-semibold text-gray-500">
+                  <div className="h-20 md:h-24 p-2 border-r border-b border-white/10 text-left font-mono text-white/50">
                     5
                   </div>
-                  <div className="h-20 md:h-28 p-2 border-r border-b border-[#cac6b9]/20 text-left font-semibold text-gray-500">
+                  <div className="h-20 md:h-24 p-2 border-r border-b border-white/10 text-left font-mono text-white/50">
                     6
                   </div>
 
-                  <div className="h-20 md:h-28 p-2 border-r border-b border-[#cac6b9]/20 text-left font-semibold bg-[#fff9d2]/40 ring-1 ring-inset ring-[#635f41]/30 text-[#1c1b19]">
+                  <div className="h-20 md:h-24 p-2 border-r border-b border-white/10 text-left font-mono bg-[#353535]/60 ring-1 ring-inset ring-[#E85F57]/40 text-white">
                     12
-                    <div className="mt-1 bg-[#635f41] text-white p-1 rounded text-[9px] font-bold truncate">
-                      Tughlaq Premiere
+                    <div className="mt-1 bg-[#E85F57] text-white p-1 rounded-lg text-[9px] font-mono font-bold truncate">
+                      Premiere
                     </div>
                   </div>
-                  <div className="h-20 md:h-28 p-2 border-r border-b border-[#cac6b9]/20 text-left font-semibold text-gray-500">
+                  <div className="h-20 md:h-24 p-2 border-r border-b border-white/10 text-left font-mono text-white/50">
                     13
                   </div>
-                  <div className="h-20 md:h-28 p-2 border-r border-b border-[#cac6b9]/20 text-left font-semibold text-gray-500">
+                  <div className="h-20 md:h-24 p-2 border-r border-b border-white/10 text-left font-mono text-white/50">
                     14
                   </div>
-                  <div className="h-20 md:h-28 p-2 border-r border-b border-[#cac6b9]/20 text-left font-semibold bg-[#FFEBCC] text-[#765d00]">
+                  <div className="h-20 md:h-24 p-2 border-r border-b border-white/10 text-left font-mono bg-[#353535]/40 text-white">
                     19
-                    <div className="mt-1 bg-[#765d00] text-white p-1 rounded text-[9px] font-bold truncate">
+                    <div className="mt-1 bg-[#353535] border border-white/20 text-[#E85F57] p-1 rounded-lg text-[9px] font-mono font-bold truncate">
                       Workshop
                     </div>
                   </div>
@@ -677,43 +677,43 @@ export default function Events() {
 
               {/* Dynamic Featured Highlight Card */}
               {featuredEvent && (
-                <div className="bg-[#635f41] text-white rounded-2xl p-8 flex flex-col justify-between relative overflow-hidden shadow-xs border border-[#cac6b9]/25">
+                <div className="bg-[#232323] text-white rounded-3xl p-8 flex flex-col justify-between relative overflow-hidden shadow-xl border border-[#353535] space-y-6">
                   <div>
-                    <span className="bg-white/20 px-3 py-1 rounded-full text-xs font-bold tracking-wider uppercase">
-                      Featured Highlight
-                    </span>
-                    <h2 className="font-serif text-3xl mt-6 leading-tight font-bold">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#E85F57]/15 text-[#E85F57] text-[10px] font-mono font-bold uppercase tracking-widest border border-[#E85F57]/30">
+                      <span>FEATURED HIGHLIGHT</span>
+                    </div>
+                    <h2 className="font-serif text-3xl text-[#F7F5F0] mt-4 leading-tight font-normal">
                       {featuredEvent.title}
                     </h2>
-                    <p className="mt-4 text-xs text-white/90 leading-relaxed font-light line-clamp-3">
+                    <p className="mt-3 text-xs text-white/70 leading-relaxed font-light line-clamp-3">
                       {featuredEvent.description}
                     </p>
                   </div>
 
-                  <div className="space-y-4 pt-6">
-                    <div className="flex items-center gap-3 text-xs text-white/90">
-                      <Clock className="w-5 h-5 text-white/80" />
+                  <div className="space-y-4 pt-4 border-t border-white/10">
+                    <div className="flex items-center gap-3 text-xs text-white/80 font-mono">
+                      <Clock className="w-4 h-4 text-[#E85F57] flex-shrink-0" />
                       <div>
-                        <span className="font-bold block uppercase tracking-wider text-[10px] text-white/70">
+                        <span className="font-bold block uppercase tracking-wider text-[9px] text-[#E85F57]">
                           Date & Time
                         </span>
                         <span>{featuredEvent.date} ({featuredEvent.timeRange})</span>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-3 text-xs text-white/90">
-                      <MapPin className="w-5 h-5 text-white/80" />
+                    <div className="flex items-center gap-3 text-xs text-white/80 font-mono">
+                      <MapPin className="w-4 h-4 text-[#E85F57] flex-shrink-0" />
                       <div>
-                        <span className="font-bold block uppercase tracking-wider text-[10px] text-white/70">
+                        <span className="font-bold block uppercase tracking-wider text-[9px] text-[#E85F57]">
                           Venue
                         </span>
-                        <span>{featuredEvent.venue}</span>
+                        <span className="truncate">{featuredEvent.venue}</span>
                       </div>
                     </div>
 
                     <button
                       onClick={() => alert(`RSVP registered for ${featuredEvent.title}`)}
-                      className="w-full bg-[#8CC0EB] text-[#001e2c] py-3 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-[#8CC0EB]/95 active:scale-95 transition-all shadow-xs"
+                      className="w-full bg-[#E85F57] text-white py-3.5 rounded-full font-bold text-xs uppercase tracking-widest hover:bg-[#D94538] active:scale-95 transition-all shadow-md mt-2"
                     >
                       Reserve Seat
                     </button>
@@ -724,21 +724,21 @@ export default function Events() {
 
             {/* All Events List */}
             <section className="space-y-8">
-              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 border-b border-[#cac6b9]/30 pb-6">
-                <h2 className="font-serif text-3xl font-bold text-[#1c1b19] tracking-tight">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 border-b border-[#D5C9BE]/30 pb-6">
+                <h2 className="font-serif text-3xl font-bold text-[#232323] tracking-tight">
                   Event Schedule & Archive
                 </h2>
 
                 <div className="flex flex-wrap gap-4 items-center">
-                  <div className="flex gap-1.5 bg-[#f7f3ee] p-1 rounded-full border border-[#cac6b9]/20">
+                  <div className="flex gap-1.5 bg-[#EFE8E1] p-1 rounded-full border border-[#D5C9BE]/20">
                     {(["All", "Plays", "Workshops", "Meetups"] as const).map((cat) => (
                       <button
                         key={cat}
                         onClick={() => setFilter(cat)}
                         className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all uppercase tracking-wider ${
                           filter === cat
-                            ? "bg-[#635f41] text-white shadow-xs"
-                            : "hover:bg-black/5 text-[#49473d]"
+                            ? "bg-[#353535] text-white shadow-xs"
+                            : "hover:bg-black/5 text-[#666361]"
                         }`}
                       >
                         {cat}
@@ -746,15 +746,15 @@ export default function Events() {
                     ))}
                   </div>
 
-                  <div className="flex gap-1.5 bg-[#f7f3ee] p-1 rounded-full border border-[#cac6b9]/20">
+                  <div className="flex gap-1.5 bg-[#EFE8E1] p-1 rounded-full border border-[#D5C9BE]/20">
                     {(["All", "Soon to Happen", "Concluded"] as const).map((statusOpt) => (
                       <button
                         key={statusOpt}
                         onClick={() => setStatusFilter(statusOpt)}
                         className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all uppercase tracking-wider ${
                           statusFilter === statusOpt
-                            ? "bg-[#466272] text-white shadow-xs"
-                            : "hover:bg-black/5 text-[#49473d]"
+                            ? "bg-[#666361] text-white shadow-xs"
+                            : "hover:bg-black/5 text-[#666361]"
                         }`}
                       >
                         {statusOpt}
@@ -768,76 +768,79 @@ export default function Events() {
                 {filteredEvents.map((evt, index) => (
                   <div
                     key={index}
-                    className="flex flex-col bg-white rounded-2xl overflow-hidden border border-[#cac6b9]/25 shadow-xs group hover:border-[#635f41]/20 transition-all duration-300"
+                    className="flex flex-col bg-[#232323] text-white rounded-3xl overflow-hidden border border-[#353535] shadow-xl group hover:border-[#E85F57]/50 hover:shadow-2xl transition-all duration-300 justify-between"
                   >
-                    <div className="relative h-56 overflow-hidden flex-shrink-0 bg-gray-100">
-                      <img
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                        alt={evt.title}
-                        src={evt.image}
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=800&auto=format&fit=crop";
-                        }}
-                      />
-                      <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-lg text-center shadow-xs border border-[#cac6b9]/20">
-                        <p className="text-[10px] font-bold text-[#466272] uppercase leading-none">{evt.month}</p>
-                        <p className="text-lg font-bold text-[#635f41] leading-none mt-0.5">{evt.day}</p>
+                    <div>
+                      <div className="relative h-56 overflow-hidden flex-shrink-0 bg-[#353535]">
+                        <img
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 filter brightness-90 contrast-105"
+                          alt={evt.title}
+                          src={evt.image}
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=800&auto=format&fit=crop";
+                          }}
+                        />
+                        <div className="absolute top-4 left-4 bg-[#232323]/90 backdrop-blur-md px-3.5 py-2 rounded-2xl text-center shadow-md border border-[#353535]">
+                          <p className="text-[10px] font-mono font-bold text-[#E85F57] uppercase leading-none">{evt.month}</p>
+                          <p className="text-xl font-serif font-normal text-white leading-none mt-1">{evt.day}</p>
+                        </div>
+
+                        <div className="absolute top-4 right-4">
+                          <span
+                            className={`text-[9px] font-mono font-bold px-3 py-1 rounded-full shadow-md uppercase tracking-wider backdrop-blur-md ${
+                              evt.status === "concluded"
+                                ? "bg-[#353535]/80 text-white/60 border border-white/10"
+                                : "bg-[#232323]/90 text-[#E85F57] border border-[#E85F57]/40"
+                            }`}
+                          >
+                            {evt.status === "concluded" ? "Concluded" : "Live Season"}
+                          </span>
+                        </div>
+
+                        <div className="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-[#232323] via-transparent to-transparent">
+                          <span className="text-[9px] font-mono font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider bg-[#E85F57] text-white">
+                            {evt.category}
+                          </span>
+                        </div>
                       </div>
 
-                      <div className="absolute top-4 right-4">
-                        <span
-                          className={`text-[9px] font-bold px-2.5 py-1 rounded-md shadow-xs uppercase tracking-wider ${
-                            evt.status === "concluded"
-                              ? "bg-gray-100 text-gray-600 border border-gray-200"
-                              : "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                          }`}
-                        >
-                          {evt.status === "concluded" ? "Concluded" : "Soon to Happen"}
-                        </span>
-                      </div>
-
-                      <div className="absolute bottom-0 left-0 w-full p-3 bg-gradient-to-t from-black/60 to-transparent">
-                        <span className={`text-[9px] font-bold px-2.5 py-1 rounded uppercase tracking-wider ${evt.categoryBg}`}>
-                          {evt.category}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="p-6 flex flex-col flex-grow justify-between space-y-4">
-                      <div>
-                        <h3 className="font-serif text-xl font-bold text-[#1c1b19] mb-2 group-hover:text-[#635f41] transition-colors">
+                      <div className="p-7 space-y-4">
+                        <h3 className="font-serif text-2xl font-normal text-[#F7F5F0] group-hover:text-[#E85F57] transition-colors leading-snug">
                           {evt.title}
                         </h3>
-                        <p className="text-xs text-[#49473d] leading-relaxed font-light line-clamp-3">
+                        <p className="text-xs text-white/70 leading-relaxed font-light line-clamp-3">
                           {evt.description}
                         </p>
 
-                        <div className="grid grid-cols-2 gap-x-2 gap-y-3 mt-4 pt-4 border-t border-[#cac6b9]/15 text-xs text-[#49473d]">
+                        <div className="grid grid-cols-2 gap-x-2 gap-y-3 pt-4 border-t border-white/10 text-xs font-mono text-white/70">
                           <div className="flex items-center gap-2 truncate">
-                            <MapPin className="w-3.5 h-3.5 text-[#635f41] flex-shrink-0" />
+                            <MapPin className="w-3.5 h-3.5 text-[#E85F57] flex-shrink-0" />
                             <span className="truncate">{evt.venue}</span>
                           </div>
                           <div className="flex items-center gap-2 truncate">
-                            <Clock className="w-3.5 h-3.5 text-[#635f41] flex-shrink-0" />
+                            <Clock className="w-3.5 h-3.5 text-[#E85F57] flex-shrink-0" />
                             <span className="truncate">{evt.timeRange}</span>
                           </div>
                         </div>
                       </div>
+                    </div>
 
-                      <div className="pt-3 border-t border-[#cac6b9]/15">
-                        {evt.status === "upcoming" ? (
-                          <button
-                            onClick={() => alert(`Seat booked for ${evt.title}!`)}
-                            className="w-full bg-[#635f41] text-white py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-[#635f41]/95 transition-all shadow-xs flex items-center justify-center gap-2"
-                          >
-                            <CalendarIcon className="w-4 h-4" /> Book Seat
-                          </button>
-                        ) : (
-                          <button className="w-full bg-gray-100 border border-gray-200 text-gray-400 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider cursor-default flex items-center justify-center gap-2">
-                            <CheckCircle2 className="w-4 h-4" /> Concluded
-                          </button>
-                        )}
-                      </div>
+                    <div className="p-7 pt-0">
+                      {evt.status === "upcoming" ? (
+                        <button
+                          onClick={() => alert(`Seat booked for ${evt.title}!`)}
+                          className="w-full bg-[#E85F57] text-white hover:bg-[#D94538] py-3.5 rounded-full text-xs font-bold uppercase tracking-widest shadow-md transition-all active:scale-95"
+                        >
+                          RSVP for Event
+                        </button>
+                      ) : (
+                        <button
+                          disabled
+                          className="w-full bg-[#353535] text-white/40 py-3.5 rounded-full text-xs font-bold uppercase tracking-widest cursor-not-allowed border border-white/5"
+                        >
+                          Archive Recorded
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -849,7 +852,7 @@ export default function Events() {
 
       {/* Proposal Toast */}
       {proposalSubmittedToast && (
-        <div className="fixed bottom-6 right-6 bg-[#31302d] text-white border border-[#cac6b9]/30 rounded-xl px-5 py-3.5 shadow-xl z-50 flex items-center gap-3 text-xs font-semibold max-w-md">
+        <div className="fixed bottom-6 right-6 bg-[#31302d] text-white border border-[#D5C9BE]/30 rounded-xl px-5 py-3.5 shadow-xl z-50 flex items-center gap-3 text-xs font-semibold max-w-md">
           <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0" />
           <span>{proposalSubmittedToast}</span>
         </div>

@@ -7,28 +7,28 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Custom theme primitives
-        canvas: '#fdf9f4',
-        headers: '#635f41',
-        subtext: '#466272',
-        'card-surface': '#f7f3ee',
-        highlight: '#8CC0EB',
+        // Custom theme primitives - Archival Editorial Palette
+        canvas: '#EFECE6',
+        headers: '#2B2D30',
+        subtext: '#5A5D61',
+        'card-surface': '#F7F5F0',
+        highlight: '#EE5649',
 
         // The Matinee Gallery / Stitch design system colors
-        'on-surface': '#1c1b19',
-        'on-surface-variant': '#49473d',
-        outline: '#7a776c',
-        'outline-variant': '#cac6b9',
+        'on-surface': '#1A1C1E',
+        'on-surface-variant': '#4A4C50',
+        outline: '#7A7C80',
+        'outline-variant': '#D9D5CC',
         error: '#ba1a1a',
         'error-container': '#ffdad6',
         'on-error-container': '#93000a',
-        'surface-container-lowest': '#ffffff',
-        'surface-container-low': '#f7f3ee',
-        'surface-container': '#f1ede9',
-        'surface-container-high': '#ece7e3',
-        'surface-container-highest': '#e6e2dd',
-        'primary-container': '#fff9d2',
-        'on-primary-container': '#767253',
+        'surface-container-lowest': '#FFFFFF',
+        'surface-container-low': '#F7F5F0',
+        'surface-container': '#EFECE6',
+        'surface-container-high': '#E5E1D8',
+        'surface-container-highest': '#DDD8CE',
+        'primary-container': '#FDE8E5',
+        'on-primary-container': '#C93B2E',
 
         // Standard shadcn variables
         border: "var(--border)",
@@ -66,8 +66,8 @@ export default {
         },
       },
       fontFamily: {
-        serif: ["Playfair Display", "serif"],
-        sans: ["Source Sans 3", "sans-serif"],
+        serif: ["Instrument Serif", "Playfair Display", "serif"],
+        sans: ["Plus Jakarta Sans", "Source Sans 3", "sans-serif"],
       }
     },
   },

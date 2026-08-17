@@ -165,9 +165,9 @@ export default function MemberDashboard() {
   const calendarDays = Array.from({length: daysInMonth}, (_, i) => new Date(displayYear, displayMonth, i + 1));
 
   return (
-    <div className="space-y-[32px] font-sans text-[#466272]">
+    <div className="space-y-[32px] font-sans text-[#666361]">
       {/* Header and Welcome Banner */}
-      <div className="relative border border-[#e6e2dd] rounded-[16px] overflow-hidden p-[24px] md:p-[36px] flex flex-col md:flex-row justify-between items-start md:items-center gap-[24px] shadow-sm">
+      <div className="relative border border-[#DDD8CE] rounded-[16px] overflow-hidden p-[24px] md:p-[36px] flex flex-col md:flex-row justify-between items-start md:items-center gap-[24px] shadow-sm">
         {/* Background Production Banner Image */}
         <div className="absolute inset-0 z-0">
           <img
@@ -175,22 +175,22 @@ export default function MemberDashboard() {
             alt="Production Banner"
             className="w-full h-full object-cover object-center"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#1c1b19]/95 via-[#1c1b19]/85 to-[#1c1b19]/50 backdrop-blur-[2px]"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-[#232323]/95 via-[#232323]/85 to-[#232323]/50 backdrop-blur-[2px]"></div>
         </div>
 
         <div className="relative z-10 space-y-[12px] flex-1 text-white">
           <div className="space-y-[8px]">
-            <Badge className="bg-[#8CC0EB] text-[#001e2c] font-bold border-0 rounded-[4px] uppercase tracking-wider text-[10px]">Active Production Member</Badge>
+            <Badge className="bg-[#E85F57] text-[#001e2c] font-bold border-0 rounded-[4px] uppercase tracking-wider text-[10px]">Active Production Member</Badge>
             <h2 className="text-[32px] font-bold font-serif text-white tracking-tight">Welcome Back, {activeUser?.name?.split(' ')[0] || "Member"}</h2>
             <p className="text-[14px] text-white/90 font-light">
-              You have <span className="font-semibold text-[#8CC0EB]">{pendingCount} pending rehearsal invites</span> for Tamashbin Kathputliya & Macbeth this week.
+              You have <span className="font-semibold text-[#E85F57]">{pendingCount} pending rehearsal invites</span> for Tamashbin Kathputliya & Macbeth this week.
             </p>
           </div>
           
           {/* Elegant countdown container */}
           <div className="inline-flex items-center gap-[12px] bg-black/40 border border-white/20 backdrop-blur-md rounded-[8px] px-[16px] py-[8px] text-xs shadow-sm">
-            <div className="flex items-center gap-1.5 text-[#8CC0EB] font-bold uppercase tracking-wider text-[10px]">
-              <Clock className="w-3.5 h-3.5 text-[#8CC0EB]" />
+            <div className="flex items-center gap-1.5 text-[#E85F57] font-bold uppercase tracking-wider text-[10px]">
+              <Clock className="w-3.5 h-3.5 text-[#E85F57]" />
               <span>Next Performance:</span>
             </div>
             <div className="flex items-center gap-1 font-mono text-white font-bold text-sm">
@@ -208,13 +208,13 @@ export default function MemberDashboard() {
         <div className="relative z-10 flex flex-wrap gap-[12px] flex-shrink-0">
           <Button 
             onClick={() => navigate("/ai-rehearsal")}
-            className="bg-[#635f41] hover:bg-[#4d4a32] text-white font-bold rounded-[8px] py-[10px] px-[20px] gap-2 shadow-sm transition-all active:scale-95 flex items-center"
+            className="bg-[#353535] hover:bg-[#4d4a32] text-white font-bold rounded-[8px] py-[10px] px-[20px] gap-2 shadow-sm transition-all active:scale-95 flex items-center"
           >
             <Mic className="w-4 h-4" /> Rehearsal Studio
           </Button>
           <Button 
             onClick={() => setCalendarOpen(true)}
-            className="bg-[#8CC0EB] hover:bg-[#8CC0EB]/90 text-[#001e2c] font-bold rounded-[8px] py-[10px] px-[20px] gap-2 shadow-sm transition-all active:scale-95"
+            className="bg-[#E85F57] hover:bg-[#E85F57]/90 text-[#001e2c] font-bold rounded-[8px] py-[10px] px-[20px] gap-2 shadow-sm transition-all active:scale-95"
           >
             <CalendarIcon className="w-4 h-4" /> View Calendar
           </Button>
@@ -225,78 +225,78 @@ export default function MemberDashboard() {
       {/* Script & Role Resources */}
       <section className="grid grid-cols-1 md:grid-cols-3 gap-[24px]">
         {/* Dedicated AI Rehearsal Card */}
-        <div className="bg-[#f7f3ee] border border-[#e6e2dd] rounded-[8px] p-[24px] flex flex-col justify-between space-y-[16px]">
+        <div className="bg-[#EFE8E1] border border-[#DDD8CE] rounded-[8px] p-[24px] flex flex-col justify-between space-y-[16px]">
           <div className="space-y-[8px]">
-            <span className="w-[32px] h-[32px] rounded-full bg-[#635f41]/10 flex items-center justify-center text-[#635f41]">
-              <Mic className="w-4 h-4 text-[#635f41]" />
+            <span className="w-[32px] h-[32px] rounded-full bg-[#353535]/10 flex items-center justify-center text-[#353535]">
+              <Mic className="w-4 h-4 text-[#353535]" />
             </span>
-            <h4 className="font-bold text-base text-[#635f41] font-serif">Script Voice Rehearsals</h4>
-            <p className="text-xs text-[#466272]/80 leading-relaxed">
+            <h4 className="font-bold text-base text-[#353535] font-serif">Script Voice Rehearsals</h4>
+            <p className="text-xs text-[#666361]/80 leading-relaxed">
               Practice lines live with interactive audio readers, run memory recall tests, and track your scores.
             </p>
           </div>
           <Button
             onClick={() => navigate("/ai-rehearsal")}
-            className="w-full bg-[#635f41] hover:bg-[#4d4a32] text-white font-semibold rounded-[8px] py-[10px] shadow-2xs"
+            className="w-full bg-[#353535] hover:bg-[#4d4a32] text-white font-semibold rounded-[8px] py-[10px] shadow-2xs"
           >
             Open Rehearsal Studio →
           </Button>
         </div>
 
-        <div className="bg-[#f7f3ee] border border-[#e6e2dd] rounded-[8px] p-[24px] flex flex-col justify-between space-y-[16px]">
+        <div className="bg-[#EFE8E1] border border-[#DDD8CE] rounded-[8px] p-[24px] flex flex-col justify-between space-y-[16px]">
           <div className="space-y-[8px]">
-            <span className="w-[32px] h-[32px] rounded-full bg-[#635f41]/10 flex items-center justify-center text-[#635f41]">
-              <BookOpen className="w-4 h-4 text-[#635f41]" />
+            <span className="w-[32px] h-[32px] rounded-full bg-[#353535]/10 flex items-center justify-center text-[#353535]">
+              <BookOpen className="w-4 h-4 text-[#353535]" />
             </span>
-            <h4 className="font-bold text-base text-[#635f41] font-serif">Macbeth Script</h4>
-            <p className="text-xs text-[#466272]/80 leading-relaxed">
+            <h4 className="font-bold text-base text-[#353535] font-serif">Macbeth Script</h4>
+            <p className="text-xs text-[#666361]/80 leading-relaxed">
               Read and review the modified script passages for the banquet scene and the apparition prophecies.
             </p>
           </div>
           <Dialog open={scriptOpen} onOpenChange={setScriptOpen}>
-            <DialogTrigger render={<Button variant="outline" className="w-full border-2 border-[#8CC0EB] text-[#8CC0EB] bg-white/50 hover:bg-white font-semibold rounded-[8px] py-[10px]" />}>
+            <DialogTrigger render={<Button variant="outline" className="w-full border-2 border-[#E85F57] text-[#E85F57] bg-white/50 hover:bg-white font-semibold rounded-[8px] py-[10px]" />}>
               Open Script Material
             </DialogTrigger>
-            <DialogContent className="bg-[#fdf9f4] border border-[#e6e2dd] text-[#466272] max-w-lg">
+            <DialogContent className="bg-[#E7DDD3] border border-[#DDD8CE] text-[#666361] max-w-lg">
               <DialogHeader>
-                <DialogTitle className="font-serif text-[#635f41] text-xl font-bold flex items-center gap-2">
-                  <BookOpen className="w-5 h-5 text-[#8CC0EB]" /> Macbeth - Act III, Scene 4
+                <DialogTitle className="font-serif text-[#353535] text-xl font-bold flex items-center gap-2">
+                  <BookOpen className="w-5 h-5 text-[#E85F57]" /> Macbeth - Act III, Scene 4
                 </DialogTitle>
-                <DialogDescription className="text-xs text-[#466272]/85">
+                <DialogDescription className="text-xs text-[#666361]/85">
                   Banquet Scene. Rehearsal Draft (Aayam Matinee Edition)
                 </DialogDescription>
               </DialogHeader>
-              <div className="py-4 space-y-4 font-serif text-[14px] leading-relaxed text-black/85 bg-white border border-[#e6e2dd] rounded-[8px] p-6 max-h-[50vh] overflow-y-auto">
-                <p className="font-bold text-center border-b border-[#e6e2dd] pb-2 mb-4 text-[#635f41]">SCENE IV. The same. Hall in the palace.</p>
+              <div className="py-4 space-y-4 font-serif text-[14px] leading-relaxed text-black/85 bg-white border border-[#DDD8CE] rounded-[8px] p-6 max-h-[50vh] overflow-y-auto">
+                <p className="font-bold text-center border-b border-[#DDD8CE] pb-2 mb-4 text-[#353535]">SCENE IV. The same. Hall in the palace.</p>
                 <p className="italic text-gray-500 mb-2">A banquet prepared. Enter MACBETH, LADY MACBETH, ROSS, LENNOX, Lords, and Attendants.</p>
                 
-                <p className="font-semibold text-[#635f41] mt-3">MACBETH</p>
+                <p className="font-semibold text-[#353535] mt-3">MACBETH</p>
                 <p className="pl-4">You know your own degrees; sit down: at first</p>
                 <p className="pl-4">And last the hearty welcome.</p>
                 
-                <p className="font-semibold text-[#635f41] mt-3">LORDS</p>
+                <p className="font-semibold text-[#353535] mt-3">LORDS</p>
                 <p className="pl-4">Thanks to your majesty.</p>
                 
-                <p className="font-semibold text-[#635f41] mt-3">MACBETH</p>
+                <p className="font-semibold text-[#353535] mt-3">MACBETH</p>
                 <p className="pl-4">Ourself will mingle with society,</p>
                 <p className="pl-4">And play the humble host.</p>
                 <p className="pl-4">Our hostess keeps her state, but in best time</p>
                 <p className="pl-4">We will require her welcome.</p>
                 
-                <p className="font-semibold text-[#635f41] mt-3">LADY MACBETH</p>
+                <p className="font-semibold text-[#353535] mt-3">LADY MACBETH</p>
                 <p className="pl-4">Pronounce it for me, sir, to all our friends;</p>
                 <p className="pl-4">For my heart speaks they are welcome.</p>
                 
                 <p className="italic text-gray-500 my-2">First Murderer appears at the door.</p>
                 
-                <p className="font-semibold text-[#635f41] mt-3">MACBETH</p>
+                <p className="font-semibold text-[#353535] mt-3">MACBETH</p>
                 <p className="pl-4">See, they encounter thee with their hearts' thanks.</p>
                 <p className="pl-4">Both sides are even: here I'll sit i' the midst:</p>
                 <p className="pl-4">Be large in mirth; anon we'll drink a measure</p>
               </div>
               <DialogFooter className="flex sm:justify-between items-center gap-4">
-                <span className="text-[10px] text-[#466272]/60">Format: Standard Matinee Playbook</span>
-                <Button onClick={() => setScriptOpen(false)} className="bg-[#8CC0EB] text-[#1c1b19] hover:bg-[#8CC0EB]/90 rounded-[8px]">
+                <span className="text-[10px] text-[#666361]/60">Format: Standard Matinee Playbook</span>
+                <Button onClick={() => setScriptOpen(false)} className="bg-[#E85F57] text-[#232323] hover:bg-[#E85F57]/90 rounded-[8px]">
                   Close Reader
                 </Button>
               </DialogFooter>
@@ -304,42 +304,42 @@ export default function MemberDashboard() {
           </Dialog>
         </div>
 
-        <div className="bg-[#f7f3ee] border border-[#e6e2dd] rounded-[8px] p-[24px] flex flex-col justify-between space-y-[16px]">
+        <div className="bg-[#EFE8E1] border border-[#DDD8CE] rounded-[8px] p-[24px] flex flex-col justify-between space-y-[16px]">
           <div className="space-y-[8px]">
-            <span className="w-[32px] h-[32px] rounded-full bg-[#635f41]/10 flex items-center justify-center text-[#635f41]">
-              <CalendarIcon className="w-4 h-4 text-[#635f41]" />
+            <span className="w-[32px] h-[32px] rounded-full bg-[#353535]/10 flex items-center justify-center text-[#353535]">
+              <CalendarIcon className="w-4 h-4 text-[#353535]" />
             </span>
-            <h4 className="font-bold text-base text-[#635f41] font-serif">Attendance Records</h4>
-            <p className="text-xs text-[#466272]/80 leading-relaxed">
+            <h4 className="font-bold text-base text-[#353535] font-serif">Attendance Records</h4>
+            <p className="text-xs text-[#666361]/80 leading-relaxed">
               You have completed 95% of scheduled rehearsal attendances in the current Macbeth cycle. Keep it up!
             </p>
           </div>
           <Dialog open={attendanceOpen} onOpenChange={setAttendanceOpen}>
-            <DialogTrigger render={<Button variant="outline" className="w-full border-2 border-[#8CC0EB] text-[#8CC0EB] bg-white/50 hover:bg-white font-semibold rounded-[8px] py-[10px]" />}>
+            <DialogTrigger render={<Button variant="outline" className="w-full border-2 border-[#E85F57] text-[#E85F57] bg-white/50 hover:bg-white font-semibold rounded-[8px] py-[10px]" />}>
               Open Log Report
             </DialogTrigger>
-            <DialogContent className="bg-[#fdf9f4] border border-[#e6e2dd] text-[#466272] max-w-lg">
+            <DialogContent className="bg-[#E7DDD3] border border-[#DDD8CE] text-[#666361] max-w-lg">
               <DialogHeader>
-                <DialogTitle className="font-serif text-[#635f41] text-xl font-bold flex items-center gap-2">
+                <DialogTitle className="font-serif text-[#353535] text-xl font-bold flex items-center gap-2">
                   <CheckCircle className="w-5 h-5 text-emerald-600" /> Attendance History
                 </DialogTitle>
-                <DialogDescription className="text-xs text-[#466272]/85">
+                <DialogDescription className="text-xs text-[#666361]/85">
                   Macbeth cycle attendance log for Jayesh Dave.
                 </DialogDescription>
               </DialogHeader>
               <div className="py-4">
-                <div className="border border-[#e6e2dd] rounded-[8px] bg-white overflow-hidden shadow-xs">
+                <div className="border border-[#DDD8CE] rounded-[8px] bg-white overflow-hidden shadow-xs">
                   <Table>
-                    <TableHeader className="bg-[#f7f3ee]/50">
-                      <TableRow className="border-b border-[#e6e2dd] hover:bg-transparent">
-                        <TableHead className="text-xs font-bold text-[#635f41]">Date</TableHead>
-                        <TableHead className="text-xs font-bold text-[#635f41]">Production Session</TableHead>
-                        <TableHead className="text-xs font-bold text-[#635f41] text-right">Status</TableHead>
+                    <TableHeader className="bg-[#EFE8E1]/50">
+                      <TableRow className="border-b border-[#DDD8CE] hover:bg-transparent">
+                        <TableHead className="text-xs font-bold text-[#353535]">Date</TableHead>
+                        <TableHead className="text-xs font-bold text-[#353535]">Production Session</TableHead>
+                        <TableHead className="text-xs font-bold text-[#353535] text-right">Status</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {attendanceLog.map((log, index) => (
-                        <TableRow key={index} className="border-b border-[#e6e2dd]/60 text-xs hover:bg-[#fdf9f4]/45">
+                        <TableRow key={index} className="border-b border-[#DDD8CE]/60 text-xs hover:bg-[#E7DDD3]/45">
                           <TableCell className="font-medium">{log.date}</TableCell>
                           <TableCell>{log.event}</TableCell>
                           <TableCell className="text-right">
@@ -354,7 +354,7 @@ export default function MemberDashboard() {
                 </div>
               </div>
               <DialogFooter>
-                <Button onClick={() => setAttendanceOpen(false)} className="bg-[#8CC0EB] text-[#1c1b19] hover:bg-[#8CC0EB]/90 rounded-[8px]">
+                <Button onClick={() => setAttendanceOpen(false)} className="bg-[#E85F57] text-[#232323] hover:bg-[#E85F57]/90 rounded-[8px]">
                   Dismiss
                 </Button>
               </DialogFooter>
@@ -364,23 +364,23 @@ export default function MemberDashboard() {
       </section>
 
       {/* Upcoming Rehearsals and Invites Schedule */}
-      <section className="bg-white border border-[#cac6b9]/30 rounded-2xl overflow-hidden shadow-sm">
-        <div className="px-6 py-5 border-b border-[#cac6b9]/20 bg-[#f7f3ee]/30 flex justify-between items-center">
+      <section className="bg-white border border-[#D5C9BE]/30 rounded-2xl overflow-hidden shadow-sm">
+        <div className="px-6 py-5 border-b border-[#D5C9BE]/20 bg-[#EFE8E1]/30 flex justify-between items-center">
           <div>
-            <h3 className="font-bold text-[18px] text-[#635f41] font-serif">My Upcoming Rehearsals &amp; Schedule</h3>
-            <p className="text-xs text-[#466272]/70">Accept pending invitations or view your rehearsal roadmap</p>
+            <h3 className="font-bold text-[18px] text-[#353535] font-serif">My Upcoming Rehearsals &amp; Schedule</h3>
+            <p className="text-xs text-[#666361]/70">Accept pending invitations or view your rehearsal roadmap</p>
           </div>
         </div>
 
         <div className="overflow-x-auto">
           <Table>
             <TableHeader className="bg-gray-50/50">
-              <TableRow className="border-b border-[#e6e2dd] hover:bg-transparent">
-                <TableHead className="text-[#635f41] font-semibold w-[250px] md:w-[30%]">Event Detail</TableHead>
-                <TableHead className="text-[#635f41] font-semibold">Date &amp; Time</TableHead>
-                <TableHead className="text-[#635f41] font-semibold">Location</TableHead>
-                <TableHead className="text-[#635f41] font-semibold">Attendance State</TableHead>
-                <TableHead className="text-[#635f41] font-semibold text-right">Actions</TableHead>
+              <TableRow className="border-b border-[#DDD8CE] hover:bg-transparent">
+                <TableHead className="text-[#353535] font-semibold w-[250px] md:w-[30%]">Event Detail</TableHead>
+                <TableHead className="text-[#353535] font-semibold">Date &amp; Time</TableHead>
+                <TableHead className="text-[#353535] font-semibold">Location</TableHead>
+                <TableHead className="text-[#353535] font-semibold">Attendance State</TableHead>
+                <TableHead className="text-[#353535] font-semibold text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -392,29 +392,29 @@ export default function MemberDashboard() {
                     return 0;
                   })
                   .map((event) => (
-                    <TableRow key={event.id} className="border-b border-[#e6e2dd]/60 hover:bg-[#fdf9f4]/45 transition-colors">
-                      <TableCell className="font-medium text-[#635f41] py-4 w-[250px] md:w-[30%] align-top">
+                    <TableRow key={event.id} className="border-b border-[#DDD8CE]/60 hover:bg-[#E7DDD3]/45 transition-colors">
+                      <TableCell className="font-medium text-[#353535] py-4 w-[250px] md:w-[30%] align-top">
                         <div className="flex flex-col">
                           <span className="font-semibold text-sm whitespace-normal break-words">{event.title}</span>
-                          <span className="text-xs text-[#466272]/60 mt-0.5">{event.roleRequired}</span>
+                          <span className="text-xs text-[#666361]/60 mt-0.5">{event.roleRequired}</span>
                           {event.directorNotes && (
-                            <div className="text-xs text-[#466272]/75 mt-2 bg-[#f7f3ee]/40 border-l-2 border-[#8CC0EB] pl-2 italic whitespace-normal break-words">
+                            <div className="text-xs text-[#666361]/75 mt-2 bg-[#EFE8E1]/40 border-l-2 border-[#E85F57] pl-2 italic whitespace-normal break-words">
                               <strong>Director Notes:</strong> "{event.directorNotes}"
                             </div>
                           )}
                         </div>
                       </TableCell>
                       <TableCell className="py-4 align-top">
-                        <div className="flex flex-col text-xs text-[#466272]">
+                        <div className="flex flex-col text-xs text-[#666361]">
                           <span className="font-semibold">{event.date}</span>
-                          <span className="text-[#466272]/70 flex items-center gap-1 mt-1">
-                            <Clock className="w-3.5 h-3.5 text-[#8CC0EB]" /> {event.time}
+                          <span className="text-[#666361]/70 flex items-center gap-1 mt-1">
+                            <Clock className="w-3.5 h-3.5 text-[#E85F57]" /> {event.time}
                           </span>
                         </div>
                       </TableCell>
                       <TableCell className="py-4 align-top">
-                        <div className="flex items-center gap-1.5 text-xs text-[#466272]">
-                          <MapPin className="w-3.5 h-3.5 text-[#8CC0EB]" />
+                        <div className="flex items-center gap-1.5 text-xs text-[#666361]">
+                          <MapPin className="w-3.5 h-3.5 text-[#E85F57]" />
                           <span className="truncate">{event.location}</span>
                         </div>
                       </TableCell>
@@ -447,14 +447,14 @@ export default function MemberDashboard() {
                             </Button>
                           </div>
                         ) : (
-                          <span className="text-xs text-[#466272]/50 italic">Decision Made</span>
+                          <span className="text-xs text-[#666361]/50 italic">Decision Made</span>
                         )}
                       </TableCell>
                     </TableRow>
                   ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center py-8 text-sm text-[#466272]/50 italic bg-[#fcfbfa]">
+                  <TableCell colSpan={5} className="text-center py-8 text-sm text-[#666361]/50 italic bg-[#fcfbfa]">
                     No rehearsals or events scheduled at the moment.
                   </TableCell>
                 </TableRow>
@@ -466,21 +466,21 @@ export default function MemberDashboard() {
 
       {/* Production Calendar Dialog */}
       <Dialog open={calendarOpen} onOpenChange={setCalendarOpen}>
-        <DialogContent className="bg-[#fdf9f4] border border-[#e6e2dd] text-[#466272] max-w-3xl">
+        <DialogContent className="bg-[#E7DDD3] border border-[#DDD8CE] text-[#666361] max-w-3xl">
           <DialogHeader>
-            <DialogTitle className="font-serif text-[#635f41] text-xl font-bold flex items-center gap-2">
-              <CalendarIcon className="w-5 h-5 text-[#8CC0EB]" /> Production Calendar
+            <DialogTitle className="font-serif text-[#353535] text-xl font-bold flex items-center gap-2">
+              <CalendarIcon className="w-5 h-5 text-[#E85F57]" /> Production Calendar
             </DialogTitle>
-            <DialogDescription className="text-xs text-[#466272]/85">
+            <DialogDescription className="text-xs text-[#666361]/85">
               Scheduled events for {monthNames[displayMonth]} {displayYear}.
             </DialogDescription>
           </DialogHeader>
           <div className="py-4 space-y-4">
             {/* Dynamic Calendar Grid */}
-            <div className="border border-[#e6e2dd] rounded-[8px] bg-white shadow-xs">
-              <div className="grid grid-cols-7 gap-[1px] border-l border-[#e6e2dd] bg-[#e6e2dd]">
+            <div className="border border-[#DDD8CE] rounded-[8px] bg-white shadow-xs">
+              <div className="grid grid-cols-7 gap-[1px] border-l border-[#DDD8CE] bg-[#DDD8CE]">
                 {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => (
-                  <div key={d} className="text-center text-xs font-semibold text-[#635f41] py-2 bg-[#f7f3ee]/50">{d}</div>
+                  <div key={d} className="text-center text-xs font-semibold text-[#353535] py-2 bg-[#EFE8E1]/50">{d}</div>
                 ))}
                 {calendarEmptyDays.map((_, i) => <div key={`empty-${i}`} className="p-2 bg-[#fcfbfa]" />)}
                 {calendarDays.map(day => {
@@ -492,10 +492,10 @@ export default function MemberDashboard() {
                   
                   return (
                     <div key={day.toISOString()} className="min-h-[80px] p-1 bg-white relative flex flex-col">
-                      <div className="text-right text-[#635f41] text-xs font-medium mb-1 pr-1">{day.getDate()}</div>
+                      <div className="text-right text-[#353535] text-xs font-medium mb-1 pr-1">{day.getDate()}</div>
                       <div className="space-y-1 flex-1 overflow-y-auto max-h-[100px]">
                         {dayEvents.map(e => (
-                          <div key={e.id} className="bg-[#8CC0EB]/20 hover:bg-[#8CC0EB]/40 text-[#466272] text-[10px] px-1 py-0.5 rounded truncate border border-[#8CC0EB]/30 transition-colors" title={`${e.time} - ${e.title}`}>
+                          <div key={e.id} className="bg-[#E85F57]/20 hover:bg-[#E85F57]/40 text-[#666361] text-[10px] px-1 py-0.5 rounded truncate border border-[#E85F57]/30 transition-colors" title={`${e.time} - ${e.title}`}>
                             {e.time.split(' ')[0]} {e.title}
                           </div>
                         ))}
@@ -507,7 +507,7 @@ export default function MemberDashboard() {
             </div>
           </div>
           <DialogFooter>
-            <Button onClick={() => setCalendarOpen(false)} className="bg-[#8CC0EB] text-[#1c1b19] hover:bg-[#8CC0EB]/90 rounded-[8px] w-full">
+            <Button onClick={() => setCalendarOpen(false)} className="bg-[#E85F57] text-[#232323] hover:bg-[#E85F57]/90 rounded-[8px] w-full">
               Close Calendar
             </Button>
           </DialogFooter>

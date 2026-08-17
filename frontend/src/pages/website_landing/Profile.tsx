@@ -398,29 +398,29 @@ export default function Profile() {
 
   if (loading || !profile) {
     return (
-      <div className="bg-[#fdf9f4] text-[#1c1b19] min-h-screen font-sans py-32 text-center">
+      <div className="bg-[#E7DDD3] text-[#232323] min-h-screen font-sans py-32 text-center">
         <div className="max-w-md mx-auto space-y-4">
-          <div className="w-12 h-12 rounded-full bg-[#635f41]/10 text-[#635f41] flex items-center justify-center mx-auto animate-spin">
+          <div className="w-12 h-12 rounded-full bg-[#353535]/10 text-[#353535] flex items-center justify-center mx-auto animate-spin">
             🎭
           </div>
-          <p className="text-sm font-bold text-[#635f41]">Loading Ensemble Profile...</p>
+          <p className="text-sm font-bold text-[#353535]">Loading Ensemble Profile...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-[#fdf9f4] text-[#1c1b19] min-h-screen font-sans selection:bg-[#c6e4f7] pt-2 pb-12">
+    <div className="bg-[#E7DDD3] text-[#232323] min-h-screen font-sans selection:bg-[#F8E8E4] pt-2 pb-12">
       <main className="max-w-7xl mx-auto px-6 md:px-12">
         {/* Page Header */}
-        <header className="mb-16 border-b border-[#cac6b9]/30 pb-6 flex flex-col md:flex-row md:items-end justify-between">
+        <header className="mb-16 border-b border-[#D5C9BE]/30 pb-6 flex flex-col md:flex-row md:items-end justify-between">
           <div>
-            <span className="text-xs font-semibold text-[#635f41] uppercase tracking-[0.25em] mb-2 block">
+            <span className="text-xs font-semibold text-[#353535] uppercase tracking-[0.25em] mb-2 block">
               Ensemble Member Profile
             </span>
-            <h1 className="font-serif text-5xl font-bold text-[#1c1b19] tracking-tight">{profile.name}</h1>
+            <h1 className="font-serif text-5xl font-bold text-[#232323] tracking-tight">{profile.name}</h1>
           </div>
-          <p className="text-sm text-[#635f41] mt-2 md:mt-0 font-bold uppercase tracking-wider">
+          <p className="text-sm text-[#353535] mt-2 md:mt-0 font-bold uppercase tracking-wider">
             {profile.role} at Aayam
           </p>
         </header>
@@ -430,30 +430,30 @@ export default function Profile() {
           
           {/* Left Sidebar - Profile Summary */}
           <aside className="lg:col-span-3 space-y-8 lg:sticky lg:top-28">
-            <div className="bg-[#f7f3ee] p-6 rounded-2xl border border-[#cac6b9]/40 shadow-sm flex flex-col items-center text-center">
-              <div className="w-32 h-32 rounded-full overflow-hidden mb-6 border-2 border-white/50 shadow-md">
+            <div className="bg-[#232323] text-white p-7 rounded-3xl border border-[#353535] shadow-xl flex flex-col items-center text-center">
+              <div className="w-32 h-32 rounded-full overflow-hidden mb-6 border-2 border-[#353535] shadow-md">
                 <img 
-                  className="w-full h-full object-cover" 
+                  className="w-full h-full object-cover filter brightness-95 contrast-105" 
                   alt={`${profile.name} headshot`} 
                   src={profile.image}
                 />
               </div>
-              <h3 className="font-serif text-2xl font-bold text-[#635f41] mb-1">{profile.name}</h3>
-              <p className="text-xs font-bold text-[#466272] uppercase tracking-wider mb-4">{profile.role}</p>
+              <h3 className="font-serif text-2xl font-normal text-[#F7F5F0] mb-1">{profile.name}</h3>
+              <p className="text-[10px] font-mono font-semibold text-[#E85F57] uppercase tracking-widest mb-5">{profile.role}</p>
               
-              <div className="w-full border-t border-[#cac6b9]/25 pt-4 space-y-3 text-left">
+              <div className="w-full border-t border-white/10 pt-5 space-y-3 text-left">
                 {profile.email && (
-                  <div className="flex items-center gap-3 text-xs text-[#49473d] truncate">
-                    <Mail className="w-4 h-4 text-[#635f41] flex-shrink-0" />
+                  <div className="flex items-center gap-3 text-xs text-white/70 truncate">
+                    <Mail className="w-4 h-4 text-[#E85F57] flex-shrink-0" />
                     <span className="truncate"><strong>Email:</strong> {profile.email}</span>
                   </div>
                 )}
-                <div className="flex items-center gap-3 text-xs text-[#49473d]">
-                  <Calendar className="w-4 h-4 text-[#635f41] flex-shrink-0" />
+                <div className="flex items-center gap-3 text-xs text-white/70">
+                  <Calendar className="w-4 h-4 text-[#E85F57] flex-shrink-0" />
                   <span><strong>Active Since:</strong> {profile.activeSince}</span>
                 </div>
-                <div className="flex items-center gap-3 text-xs text-[#49473d]">
-                  <Shield className="w-4 h-4 text-[#635f41] flex-shrink-0" />
+                <div className="flex items-center gap-3 text-xs text-white/70">
+                  <Shield className="w-4 h-4 text-[#E85F57] flex-shrink-0" />
                   <span><strong>Ensemble Tier:</strong> {profile.tier}</span>
                 </div>
               </div>
@@ -461,7 +461,7 @@ export default function Profile() {
               <div className="flex gap-3 mt-6 w-full">
                 <a
                   href={`mailto:${profile.email || "ensemble@matinee.club"}`}
-                  className="flex-1 py-2.5 bg-[#635f41] text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 hover:bg-[#635f41]/90 shadow-xs transition-all active:scale-95"
+                  className="flex-1 py-3 bg-[#E85F57] text-white rounded-full text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-[#D94538] shadow-md transition-all active:scale-95"
                 >
                   <Mail className="w-3.5 h-3.5" /> Email
                 </a>
@@ -469,8 +469,8 @@ export default function Profile() {
             </div>
             
             {/* Navigation Link */}
-            <div className="hidden lg:flex flex-col bg-white rounded-2xl border border-[#cac6b9]/30 p-4 space-y-1">
-              <Link to="/directory" className="px-4 py-2.5 rounded-lg text-[#635f41] hover:bg-[#635f41]/5 text-xs font-bold flex items-center gap-2 transition-all">
+            <div className="hidden lg:flex flex-col bg-[#232323] text-white rounded-3xl border border-[#353535] p-4 space-y-1">
+              <Link to="/directory" className="px-4 py-2.5 rounded-2xl text-white/80 hover:text-[#E85F57] hover:bg-white/5 text-xs font-mono font-semibold uppercase tracking-wider flex items-center gap-2 transition-all">
                 ← Back to Directory
               </Link>
             </div>
@@ -478,34 +478,34 @@ export default function Profile() {
 
           {/* Center Column - Production Portfolio Feed */}
           <div className="lg:col-span-6 space-y-8" id="portfolio">
-            <h2 className="text-xs font-bold text-[#635f41] uppercase tracking-[0.25em] mb-4 block">
-              Curated Production Feed
-            </h2>
+            <div className="inline-flex items-center gap-2 text-xs font-mono font-semibold uppercase tracking-widest text-[#E85F57]">
+              <span>CURATED PRODUCTION FEED</span>
+            </div>
             
             {profile.portfolio.map((item, index) => (
-              <article key={index} className="bg-white rounded-2xl overflow-hidden border border-[#cac6b9]/25 shadow-xs hover:shadow-md transition-all duration-300">
-                <div className="p-6">
-                  <div className="flex items-center justify-between mb-4">
+              <article key={index} className="bg-[#232323] text-white rounded-3xl overflow-hidden border border-[#353535] shadow-xl hover:border-[#E85F57]/50 hover:shadow-2xl transition-all duration-300">
+                <div className="p-7 space-y-4">
+                  <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-[#c6e4f7] flex items-center justify-center text-[#2e4a5a]">
+                      <div className="w-10 h-10 rounded-2xl bg-[#353535] flex items-center justify-center text-[#E85F57]">
                         <Award className="w-5 h-5" />
                       </div>
                       <div>
-                        <h4 className="text-sm font-bold text-[#1c1b19]">{item.role}</h4>
-                        <p className="text-[11px] text-[#49473d]">{item.year} Production</p>
+                        <h4 className="text-base font-normal font-serif text-[#F7F5F0]">{item.role}</h4>
+                        <p className="text-[10px] font-mono text-white/60">{item.year} Production</p>
                       </div>
                     </div>
-                    <span className="text-[10px] font-bold text-[#635f41] uppercase bg-[#635f41]/10 border border-[#635f41]/20 px-3 py-1 rounded">
+                    <span className="text-[9px] font-mono font-bold text-[#E85F57] uppercase bg-[#E85F57]/15 border border-[#E85F57]/30 px-3 py-1 rounded-full">
                       {item.title}
                     </span>
                   </div>
-                  <p className="text-sm text-[#49473d] mb-4 leading-relaxed font-light">
+                  <p className="text-xs text-white/70 leading-relaxed font-light">
                     {item.description}
                   </p>
                 </div>
-                <div className="aspect-[16/10] relative overflow-hidden bg-[#f7f3ee]">
+                <div className="aspect-[16/10] relative overflow-hidden bg-[#353535]">
                   <img 
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" 
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-700 filter brightness-90 contrast-105" 
                     alt={item.title} 
                     src={item.image || profile.image}
                     onError={(e) => {
@@ -520,28 +520,28 @@ export default function Profile() {
           {/* Right Sidebar - Artistic Statement & Skills */}
           <aside className="lg:col-span-3 space-y-8">
             {/* Artistic Statement Card */}
-            <section className="bg-white p-6 rounded-2xl border border-[#cac6b9]/30 shadow-xs" id="statement">
-              <h3 className="text-xs font-bold text-[#635f41] uppercase tracking-wider mb-4 pb-2 border-b border-[#cac6b9]/10 flex items-center justify-between">
+            <section className="bg-[#232323] text-white p-7 rounded-3xl border border-[#353535] shadow-xl" id="statement">
+              <h3 className="text-xs font-mono font-bold text-[#E85F57] uppercase tracking-widest mb-4 pb-3 border-b border-white/10 flex items-center justify-between">
                 <span>{profile.statementTitle}</span>
                 <BookOpen className="w-4 h-4" />
               </h3>
-              <p className="text-xs text-[#49473d] leading-relaxed mb-4 font-light">
+              <p className="text-xs text-white/70 leading-relaxed mb-4 font-light">
                 {profile.statementBody}
               </p>
-              <p className="text-xs text-[#49473d] leading-relaxed font-light">
+              <p className="text-xs text-white/70 leading-relaxed font-light">
                 {profile.statementSecondary}
               </p>
             </section>
 
             {/* Specializations & Skills */}
-            <section className="bg-white p-6 rounded-2xl border border-[#cac6b9]/30 shadow-xs">
-              <h3 className="text-xs font-bold text-[#635f41] uppercase tracking-wider mb-4 pb-2 border-b border-[#cac6b9]/10 flex items-center justify-between">
+            <section className="bg-[#232323] text-white p-7 rounded-3xl border border-[#353535] shadow-xl">
+              <h3 className="text-xs font-mono font-bold text-[#E85F57] uppercase tracking-widest mb-4 pb-3 border-b border-white/10 flex items-center justify-between">
                 <span>Specializations</span>
                 <Tag className="w-4 h-4" />
               </h3>
               <div className="flex flex-wrap gap-2">
                 {profile.specializations.map(skill => (
-                  <span key={skill} className="bg-[#e2fdff] text-[#324b4d] px-3 py-1.5 rounded-full text-[9px] font-bold tracking-widest border border-[#324b4d]/10">
+                  <span key={skill} className="bg-[#353535] text-[#F7F5F0] px-3 py-1.5 rounded-full text-[9px] font-mono font-semibold tracking-wider border border-white/10">
                     {skill}
                   </span>
                 ))}
@@ -549,9 +549,9 @@ export default function Profile() {
             </section>
 
             {/* Favorite Quote Card */}
-            <section className="p-5 border-l-4 border-[#635f41] bg-[#635f41]/5 rounded-r-2xl">
-              <Quote className="w-6 h-6 text-[#635f41] opacity-40 mb-2" />
-              <p className="text-xs italic text-[#49473d] leading-relaxed font-light">
+            <section className="p-6 border-l-2 border-[#E85F57] bg-[#232323] text-white rounded-r-3xl border-t border-b border-r border-[#353535] shadow-xl">
+              <Quote className="w-6 h-6 text-[#E85F57] opacity-80 mb-2" />
+              <p className="text-xs italic text-white/80 leading-relaxed font-light">
                 "{profile.quote}"
               </p>
             </section>

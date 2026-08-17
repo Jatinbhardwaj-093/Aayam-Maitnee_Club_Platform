@@ -151,18 +151,18 @@ export default function MediaModeration() {
     };
 
     return (
-        <div className="p-6 md:p-8 max-w-7xl mx-auto space-y-8 bg-[#fdf9f4] min-h-screen text-[#1c1b19]">
+        <div className="p-6 md:p-8 max-w-7xl mx-auto space-y-8 bg-[#E7DDD3] min-h-screen text-[#232323]">
             {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#cac6b9]/40 pb-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#D5C9BE]/40 pb-6">
                 <div>
-                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#635f41]/10 text-[#635f41] text-xs font-bold uppercase tracking-wider mb-2">
+                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#353535]/10 text-[#353535] text-xs font-bold uppercase tracking-wider mb-2">
                         <Cloud className="w-3.5 h-3.5" />
                         <span>Maintainer Media Management</span>
                     </div>
-                    <h1 className="text-3xl md:text-4xl font-serif font-bold text-[#1c1b19]">
+                    <h1 className="text-3xl md:text-4xl font-serif font-bold text-[#232323]">
                         Media Moderation & Gallery Database
                     </h1>
-                    <p className="text-sm text-[#49473d] mt-1 font-light">
+                    <p className="text-sm text-[#666361] mt-1 font-light">
                         Select play folders to manage photos, open full window previews, or delete media from the database.
                     </p>
                 </div>
@@ -171,7 +171,7 @@ export default function MediaModeration() {
                     <Button
                         onClick={fetchGalleryItems}
                         variant="outline"
-                        className="border-[#cac6b9] text-[#49473d] hover:bg-[#635f41]/10 flex items-center gap-2 rounded-xl text-xs font-bold"
+                        className="border-[#D5C9BE] text-[#666361] hover:bg-[#353535]/10 flex items-center gap-2 rounded-xl text-xs font-bold"
                     >
                         <RefreshCw className="w-4 h-4" />
                         <span>Refresh</span>
@@ -179,7 +179,7 @@ export default function MediaModeration() {
 
                     <Button
                         onClick={() => setIsAddModalOpen(true)}
-                        className="bg-[#635f41] hover:bg-[#524e35] text-white flex items-center gap-2 shadow-xs rounded-xl text-xs font-bold"
+                        className="bg-[#353535] hover:bg-[#524e35] text-white flex items-center gap-2 shadow-xs rounded-xl text-xs font-bold"
                     >
                         <Plus className="w-4 h-4" />
                         <span>Add Media to Database</span>
@@ -188,10 +188,10 @@ export default function MediaModeration() {
             </div>
 
             {/* Play Category Filter Bar matching Website Screenshot */}
-            <div className="bg-white p-4 rounded-2xl border border-[#cac6b9]/30 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="bg-white p-4 rounded-2xl border border-[#D5C9BE]/30 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0">
-                    <span className="text-xs font-bold text-[#635f41] uppercase tracking-wider mr-2 flex items-center gap-1.5 flex-shrink-0">
-                        <Folder className="w-4 h-4 text-[#635f41]" />
+                    <span className="text-xs font-bold text-[#353535] uppercase tracking-wider mr-2 flex items-center gap-1.5 flex-shrink-0">
+                        <Folder className="w-4 h-4 text-[#353535]" />
                         <span>Play Folders:</span>
                     </span>
                     {PLAY_CATEGORIES.map((cat) => {
@@ -208,8 +208,8 @@ export default function MediaModeration() {
                                 onClick={() => setSelectedCategory(cat)}
                                 className={`px-4 py-2 rounded-xl text-xs font-bold tracking-wider transition-all uppercase flex-shrink-0 ${
                                     selectedCategory === cat
-                                        ? "bg-[#635f41] text-white shadow-xs"
-                                        : "bg-[#fdf9f4] text-[#49473d] hover:bg-[#635f41]/10 border border-[#cac6b9]/30"
+                                        ? "bg-[#353535] text-white shadow-xs"
+                                        : "bg-[#E7DDD3] text-[#666361] hover:bg-[#353535]/10 border border-[#D5C9BE]/30"
                                 }`}
                             >
                                 {cat} <span className="opacity-70 ml-1">({count})</span>
@@ -223,14 +223,14 @@ export default function MediaModeration() {
             {loading ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
-                        <div key={n} className="h-60 bg-white/60 animate-pulse rounded-2xl border border-[#cac6b9]/20"></div>
+                        <div key={n} className="h-60 bg-white/60 animate-pulse rounded-2xl border border-[#D5C9BE]/20"></div>
                     ))}
                 </div>
             ) : filteredItems.length === 0 ? (
-                <div className="text-center py-20 bg-white rounded-3xl border border-[#cac6b9]/30 p-8">
-                    <ImageIcon className="w-12 h-12 text-[#635f41]/40 mx-auto mb-3" />
-                    <h3 className="font-serif text-xl font-bold text-[#1c1b19]">No media photos in this folder</h3>
-                    <p className="text-xs text-[#49473d] mt-1">Select another play folder or click "Add Media to Database" above.</p>
+                <div className="text-center py-20 bg-white rounded-3xl border border-[#D5C9BE]/30 p-8">
+                    <ImageIcon className="w-12 h-12 text-[#353535]/40 mx-auto mb-3" />
+                    <h3 className="font-serif text-xl font-bold text-[#232323]">No media photos in this folder</h3>
+                    <p className="text-xs text-[#666361] mt-1">Select another play folder or click "Add Media to Database" above.</p>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -238,7 +238,7 @@ export default function MediaModeration() {
                         <div
                             key={item.id}
                             onClick={() => setActiveLightboxItem(item)}
-                            className="group relative bg-white rounded-2xl overflow-hidden border border-[#cac6b9]/30 shadow-xs hover:shadow-md transition-all duration-300 cursor-pointer flex flex-col justify-between"
+                            className="group relative bg-white rounded-2xl overflow-hidden border border-[#D5C9BE]/30 shadow-xs hover:shadow-md transition-all duration-300 cursor-pointer flex flex-col justify-between"
                         >
                             <div className="relative h-56 overflow-hidden bg-gray-100">
                                 <img
@@ -252,14 +252,14 @@ export default function MediaModeration() {
 
                                 {/* Hover Dark Overlay */}
                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
-                                    <div className="bg-white/90 text-[#1c1b19] px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-md">
+                                    <div className="bg-white/90 text-[#232323] px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-md">
                                         <Maximize2 className="w-3.5 h-3.5" /> Full View
                                     </div>
                                 </div>
 
                                 {/* Category Tag */}
                                 <div className="absolute top-3 left-3">
-                                    <span className="bg-white/95 backdrop-blur-md text-[#635f41] text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-xs border border-[#cac6b9]/20">
+                                    <span className="bg-white/95 backdrop-blur-md text-[#353535] text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-xs border border-[#D5C9BE]/20">
                                         {item.category}
                                     </span>
                                 </div>
@@ -275,19 +275,19 @@ export default function MediaModeration() {
                             </div>
 
                             {/* Card Details */}
-                            <div className="p-4 bg-white border-t border-[#cac6b9]/15 flex flex-col justify-between space-y-2">
+                            <div className="p-4 bg-white border-t border-[#D5C9BE]/15 flex flex-col justify-between space-y-2">
                                 <div>
-                                    <h3 className="font-serif font-bold text-sm text-[#1c1b19] group-hover:text-[#635f41] transition-colors truncate">
+                                    <h3 className="font-serif font-bold text-sm text-[#232323] group-hover:text-[#353535] transition-colors truncate">
                                         {item.title}
                                     </h3>
                                     {item.caption && (
-                                        <p className="text-[11px] text-[#49473d] line-clamp-1 font-light mt-0.5">
+                                        <p className="text-[11px] text-[#666361] line-clamp-1 font-light mt-0.5">
                                             {item.caption}
                                         </p>
                                     )}
                                 </div>
 
-                                <div className="flex items-center justify-between text-[10px] text-gray-500 pt-2 border-t border-[#cac6b9]/15">
+                                <div className="flex items-center justify-between text-[10px] text-gray-500 pt-2 border-t border-[#D5C9BE]/15">
                                     <span className="truncate">By {item.uploaderName}</span>
                                     <span>{item.uploadedAt}</span>
                                 </div>
@@ -307,7 +307,7 @@ export default function MediaModeration() {
                         <X className="w-6 h-6" />
                     </button>
 
-                    <div className="max-w-4xl w-full bg-[#1c1b19] rounded-3xl overflow-hidden border border-white/10 shadow-2xl flex flex-col md:flex-row max-h-[90vh]">
+                    <div className="max-w-4xl w-full bg-[#232323] rounded-3xl overflow-hidden border border-white/10 shadow-2xl flex flex-col md:flex-row max-h-[90vh]">
                         <div className="md:w-3/5 bg-black flex items-center justify-center p-2 relative overflow-hidden">
                             <img
                                 src={activeLightboxItem.imageUrl}
@@ -321,7 +321,7 @@ export default function MediaModeration() {
 
                         <div className="md:w-2/5 p-8 flex flex-col justify-between text-white bg-[#262422]">
                             <div className="space-y-4">
-                                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-xs font-bold uppercase tracking-wider text-[#8CC0EB]">
+                                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-xs font-bold uppercase tracking-wider text-[#E85F57]">
                                     <Tag className="w-3.5 h-3.5" />
                                     <span>{activeLightboxItem.category}</span>
                                 </div>
@@ -362,35 +362,35 @@ export default function MediaModeration() {
 
             {/* Add Media Modal */}
             <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
-                <DialogContent className="sm:max-w-lg bg-[#fdf9f4] border-[#cac6b9]">
+                <DialogContent className="sm:max-w-lg bg-[#E7DDD3] border-[#D5C9BE]">
                     <DialogHeader>
-                        <DialogTitle className="font-serif text-2xl text-[#1c1b19] flex items-center gap-2">
-                            <Plus className="w-5 h-5 text-[#635f41]" />
+                        <DialogTitle className="font-serif text-2xl text-[#232323] flex items-center gap-2">
+                            <Plus className="w-5 h-5 text-[#353535]" />
                             <span>Add New Media to Database</span>
                         </DialogTitle>
-                        <DialogDescription className="text-xs text-[#49473d]">
+                        <DialogDescription className="text-xs text-[#666361]">
                             Upload photo into specific play folder in Aayam database.
                         </DialogDescription>
                     </DialogHeader>
 
                     <form onSubmit={handleAddMediaSubmit} className="space-y-4 py-2">
                         <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-[#635f41] uppercase tracking-wider">Photo Title</label>
+                            <label className="text-xs font-bold text-[#353535] uppercase tracking-wider">Photo Title</label>
                             <Input
                                 required
                                 placeholder="e.g. Tamashbin Kathputliya Stage Performance"
                                 value={newMedia.title}
                                 onChange={(e) => setNewMedia({ ...newMedia, title: e.target.value })}
-                                className="bg-white border-[#cac6b9]"
+                                className="bg-white border-[#D5C9BE]"
                             />
                         </div>
 
                         <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-[#635f41] uppercase tracking-wider">Play Folder Category</label>
+                            <label className="text-xs font-bold text-[#353535] uppercase tracking-wider">Play Folder Category</label>
                             <select
                                 value={newMedia.category}
                                 onChange={(e) => setNewMedia({ ...newMedia, category: e.target.value })}
-                                className="w-full h-10 px-3 rounded-md bg-white border border-[#cac6b9] text-sm focus:outline-none focus:ring-2 focus:ring-[#635f41]"
+                                className="w-full h-10 px-3 rounded-md bg-white border border-[#D5C9BE] text-sm focus:outline-none focus:ring-2 focus:ring-[#353535]"
                             >
                                 {["Tamashbin Kathputliya", "DDDJ", "KKY", "Samatvam", "Speak Up Tara"].map((cat) => (
                                     <option key={cat} value={cat}>
@@ -401,50 +401,50 @@ export default function MediaModeration() {
                         </div>
 
                         <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-[#635f41] uppercase tracking-wider">Image URL or Path</label>
+                            <label className="text-xs font-bold text-[#353535] uppercase tracking-wider">Image URL or Path</label>
                             <Input
                                 required
                                 placeholder="/aayam_assets/tamashbin_kathputliya_1.jpg or https://..."
                                 value={newMedia.imageUrl}
                                 onChange={(e) => setNewMedia({ ...newMedia, imageUrl: e.target.value })}
-                                className="bg-white border-[#cac6b9]"
+                                className="bg-white border-[#D5C9BE]"
                             />
                         </div>
 
                         <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-[#635f41] uppercase tracking-wider">Caption / Description</label>
+                            <label className="text-xs font-bold text-[#353535] uppercase tracking-wider">Caption / Description</label>
                             <textarea
                                 rows={3}
                                 placeholder="Description of scene or performance photo..."
                                 value={newMedia.caption}
                                 onChange={(e) => setNewMedia({ ...newMedia, caption: e.target.value })}
-                                className="w-full p-3 rounded-md bg-white border border-[#cac6b9] text-sm focus:outline-none focus:ring-2 focus:ring-[#635f41]"
+                                className="w-full p-3 rounded-md bg-white border border-[#D5C9BE] text-sm focus:outline-none focus:ring-2 focus:ring-[#353535]"
                             />
                         </div>
 
                         <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-[#635f41] uppercase tracking-wider">Uploader Name</label>
+                            <label className="text-xs font-bold text-[#353535] uppercase tracking-wider">Uploader Name</label>
                             <Input
                                 placeholder="Maintainer Name"
                                 value={newMedia.uploaderName}
                                 onChange={(e) => setNewMedia({ ...newMedia, uploaderName: e.target.value })}
-                                className="bg-white border-[#cac6b9]"
+                                className="bg-white border-[#D5C9BE]"
                             />
                         </div>
 
-                        <DialogFooter className="pt-4 border-t border-[#cac6b9]/30">
+                        <DialogFooter className="pt-4 border-t border-[#D5C9BE]/30">
                             <Button
                                 type="button"
                                 variant="outline"
                                 onClick={() => setIsAddModalOpen(false)}
-                                className="border-[#cac6b9]"
+                                className="border-[#D5C9BE]"
                             >
                                 Cancel
                             </Button>
                             <Button
                                 type="submit"
                                 disabled={submitting}
-                                className="bg-[#635f41] hover:bg-[#524e35] text-white"
+                                className="bg-[#353535] hover:bg-[#524e35] text-white"
                             >
                                 {submitting ? "Saving to DB..." : "Add to Database"}
                             </Button>

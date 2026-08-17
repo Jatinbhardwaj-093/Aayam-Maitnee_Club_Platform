@@ -34,6 +34,7 @@ import Gallery from "./pages/website_landing/Gallery";
 import Profile from "./pages/website_landing/Profile";
 import About from "./pages/website_landing/About";
 import JoinClub from "./pages/JoinClub";
+import ThemePreview from "./pages/ThemePreview";
 
 export default function App() {
   return (

@@ -153,7 +153,7 @@ export default function AllMembersDirectory() {
         .join("")
         .toUpperCase()
         .slice(0, 2),
-      labels: [{ id: 101, name: "New Member", color: "#8CC0EB" }]
+      labels: [{ id: 101, name: "New Member", color: "#E85F57" }]
     };
 
     setMembers([created, ...members]);
@@ -178,33 +178,33 @@ export default function AllMembersDirectory() {
   const getRoleStyle = (role: string) => {
     const lower = role.toLowerCase();
     if (lower.includes("maintainer") || lower.includes("director")) {
-      return "bg-[#635f41]/10 text-[#635f41] border-[#635f41]/30";
+      return "bg-[#353535]/10 text-[#353535] border-[#353535]/30";
     }
     if (lower.includes("patron") || lower.includes("sponsor")) {
       return "bg-amber-50 text-amber-800 border-amber-200";
     }
     if (lower.includes("actor") || lower.includes("performer")) {
-      return "bg-[#8CC0EB]/20 text-[#1e4463] border-[#8CC0EB]/40";
+      return "bg-[#E85F57]/20 text-[#1e4463] border-[#E85F57]/40";
     }
     return "bg-slate-100 text-slate-700 border-slate-200";
   };
 
   return (
-    <div className="flex-1 bg-[#fdf9f4] text-[#1c1b19] font-sans pb-16">
+    <div className="flex-1 bg-[#E7DDD3] text-[#232323] font-sans pb-16">
       <div className="max-w-7xl mx-auto space-y-8">
         
         {/* Page Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-[#e6e2dd]">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-[#DDD8CE]">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="px-2.5 py-0.5 rounded-full bg-[#635f41]/10 text-[#635f41] text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
-                <Shield className="w-3 h-3 text-[#635f41]" /> Maintainer Governance
+              <span className="px-2.5 py-0.5 rounded-full bg-[#353535]/10 text-[#353535] text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
+                <Shield className="w-3 h-3 text-[#353535]" /> Maintainer Governance
               </span>
             </div>
-            <h1 className="font-serif text-3xl md:text-4xl font-bold text-[#635f41] tracking-tight">
+            <h1 className="font-serif text-3xl md:text-4xl font-bold text-[#353535] tracking-tight">
               Members & Crew Directory
             </h1>
-            <p className="text-xs md:text-sm text-[#466272] mt-1 max-w-2xl">
+            <p className="text-xs md:text-sm text-[#666361] mt-1 max-w-2xl">
               Central roster management for ensemble performers, directors, technical crew, and patrons.
             </p>
           </div>
@@ -212,14 +212,14 @@ export default function AllMembersDirectory() {
           <div className="flex items-center gap-3">
             <button
               onClick={handleExportCSV}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#cac6b9] bg-white text-[#466272] hover:bg-[#f7f3ee] text-xs font-semibold shadow-xs transition-all active:scale-95"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#D5C9BE] bg-white text-[#666361] hover:bg-[#EFE8E1] text-xs font-semibold shadow-xs transition-all active:scale-95"
             >
-              <Download className="w-4 h-4 text-[#635f41]" />
+              <Download className="w-4 h-4 text-[#353535]" />
               Export Roster
             </button>
             <button
               onClick={() => setIsAddModalOpen(true)}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#635f41] text-white hover:bg-[#635f41]/90 text-xs font-bold shadow-sm transition-all active:scale-95"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#353535] text-white hover:bg-[#353535]/90 text-xs font-bold shadow-sm transition-all active:scale-95"
             >
               <UserPlus className="w-4 h-4" />
               Add Member
@@ -229,17 +229,17 @@ export default function AllMembersDirectory() {
 
         {/* Executive Overview Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <div className="bg-white border border-[#e6e2dd] rounded-2xl p-6 shadow-sm hover:shadow-md transition-all relative overflow-hidden group">
+          <div className="bg-white border border-[#DDD8CE] rounded-2xl p-6 shadow-sm hover:shadow-md transition-all relative overflow-hidden group">
             <div className="flex items-center justify-between">
               <div className="space-y-1">
-                <span className="text-xs font-bold uppercase tracking-wider text-[#466272]">Total Members</span>
-                <div className="text-3xl font-serif font-bold text-[#635f41]">{stats.total}</div>
+                <span className="text-xs font-bold uppercase tracking-wider text-[#666361]">Total Members</span>
+                <div className="text-3xl font-serif font-bold text-[#353535]">{stats.total}</div>
               </div>
-              <div className="w-12 h-12 rounded-2xl bg-[#635f41]/10 flex items-center justify-center text-[#635f41]">
+              <div className="w-12 h-12 rounded-2xl bg-[#353535]/10 flex items-center justify-center text-[#353535]">
                 <Users className="w-6 h-6" />
               </div>
             </div>
-            <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-[11px] text-[#466272]/80">
+            <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-[11px] text-[#666361]/80">
               <span className="flex items-center gap-1 font-medium text-emerald-600">
                 <Sparkles className="w-3 h-3" /> Fully Synced
               </span>
@@ -247,35 +247,35 @@ export default function AllMembersDirectory() {
             </div>
           </div>
 
-          <div className="bg-white border border-[#e6e2dd] rounded-2xl p-6 shadow-sm hover:shadow-md transition-all relative overflow-hidden group">
+          <div className="bg-white border border-[#DDD8CE] rounded-2xl p-6 shadow-sm hover:shadow-md transition-all relative overflow-hidden group">
             <div className="flex items-center justify-between">
               <div className="space-y-1">
-                <span className="text-xs font-bold uppercase tracking-wider text-[#466272]">Active Performers</span>
-                <div className="text-3xl font-serif font-bold text-[#635f41]">{stats.active}</div>
+                <span className="text-xs font-bold uppercase tracking-wider text-[#666361]">Active Performers</span>
+                <div className="text-3xl font-serif font-bold text-[#353535]">{stats.active}</div>
               </div>
-              <div className="w-12 h-12 rounded-2xl bg-[#8CC0EB]/20 flex items-center justify-center text-[#1e4463]">
+              <div className="w-12 h-12 rounded-2xl bg-[#E85F57]/20 flex items-center justify-center text-[#1e4463]">
                 <UserCheck className="w-6 h-6" />
               </div>
             </div>
-            <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-[11px] text-[#466272]/80">
-              <span className="flex items-center gap-1 text-[#466272]">
+            <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-[11px] text-[#666361]/80">
+              <span className="flex items-center gap-1 text-[#666361]">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" /> 100% Verified
               </span>
               <span>Stage Ready</span>
             </div>
           </div>
 
-          <div className="bg-white border border-[#e6e2dd] rounded-2xl p-6 shadow-sm hover:shadow-md transition-all relative overflow-hidden group">
+          <div className="bg-white border border-[#DDD8CE] rounded-2xl p-6 shadow-sm hover:shadow-md transition-all relative overflow-hidden group">
             <div className="flex items-center justify-between">
               <div className="space-y-1">
-                <span className="text-xs font-bold uppercase tracking-wider text-[#466272]">New Joins</span>
-                <div className="text-3xl font-serif font-bold text-[#635f41]">{stats.newJoins}</div>
+                <span className="text-xs font-bold uppercase tracking-wider text-[#666361]">New Joins</span>
+                <div className="text-3xl font-serif font-bold text-[#353535]">{stats.newJoins}</div>
               </div>
               <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600">
                 <Award className="w-6 h-6" />
               </div>
             </div>
-            <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-[11px] text-[#466272]/80">
+            <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-[11px] text-[#666361]/80">
               <span className="text-emerald-700 font-semibold">+3 this month</span>
               <span>Onboarding active</span>
             </div>
@@ -283,7 +283,7 @@ export default function AllMembersDirectory() {
         </div>
 
         {/* Filter & Controls Toolbar */}
-        <div className="bg-white border border-[#e6e2dd] rounded-2xl p-4 shadow-sm space-y-4 md:space-y-0 md:flex md:items-center md:justify-between gap-4">
+        <div className="bg-white border border-[#DDD8CE] rounded-2xl p-4 shadow-sm space-y-4 md:space-y-0 md:flex md:items-center md:justify-between gap-4">
           <div className="flex-1 flex flex-col md:flex-row gap-3 items-center">
             {/* Search Input */}
             <div className="relative w-full md:w-80">
@@ -296,7 +296,7 @@ export default function AllMembersDirectory() {
                   setSearchQuery(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="w-full pl-10 pr-9 py-2 bg-[#fdf9f4] border border-[#cac6b9]/60 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#8CC0EB] transition-all"
+                className="w-full pl-10 pr-9 py-2 bg-[#E7DDD3] border border-[#D5C9BE]/60 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#E85F57] transition-all"
               />
               {searchQuery && (
                 <button
@@ -316,7 +316,7 @@ export default function AllMembersDirectory() {
                   setRoleFilter(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="w-full md:w-auto bg-[#fdf9f4] border border-[#cac6b9]/60 rounded-xl px-3 py-2 text-xs text-[#466272] font-medium focus:outline-none"
+                className="w-full md:w-auto bg-[#E7DDD3] border border-[#D5C9BE]/60 rounded-xl px-3 py-2 text-xs text-[#666361] font-medium focus:outline-none"
               >
                 <option value="All">All Roles ({availableRoles.length - 1})</option>
                 {availableRoles
@@ -337,7 +337,7 @@ export default function AllMembersDirectory() {
                   setStatusFilter(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="w-full md:w-auto bg-[#fdf9f4] border border-[#cac6b9]/60 rounded-xl px-3 py-2 text-xs text-[#466272] font-medium focus:outline-none"
+                className="w-full md:w-auto bg-[#E7DDD3] border border-[#D5C9BE]/60 rounded-xl px-3 py-2 text-xs text-[#666361] font-medium focus:outline-none"
               >
                 <option value="All">All Statuses</option>
                 <option value="Active">Active</option>
@@ -349,17 +349,17 @@ export default function AllMembersDirectory() {
 
           {/* Right Toolbar Actions (Layout switcher & counter) */}
           <div className="flex items-center justify-between md:justify-end gap-3 pt-2 md:pt-0 border-t md:border-t-0 border-gray-100">
-            <span className="text-xs text-[#466272]/70 font-medium">
+            <span className="text-xs text-[#666361]/70 font-medium">
               Showing <strong>{filteredMembers.length}</strong> members
             </span>
 
-            <div className="flex items-center bg-[#fdf9f4] p-1 border border-[#cac6b9]/60 rounded-xl gap-1">
+            <div className="flex items-center bg-[#E7DDD3] p-1 border border-[#D5C9BE]/60 rounded-xl gap-1">
               <button
                 onClick={() => setViewMode("grid")}
                 className={`p-1.5 rounded-lg transition-all ${
                   viewMode === "grid"
-                    ? "bg-white text-[#635f41] shadow-xs font-bold"
-                    : "text-[#466272]/60 hover:text-[#466272]"
+                    ? "bg-white text-[#353535] shadow-xs font-bold"
+                    : "text-[#666361]/60 hover:text-[#666361]"
                 }`}
                 title="Grid View"
               >
@@ -369,8 +369,8 @@ export default function AllMembersDirectory() {
                 onClick={() => setViewMode("table")}
                 className={`p-1.5 rounded-lg transition-all ${
                   viewMode === "table"
-                    ? "bg-white text-[#635f41] shadow-xs font-bold"
-                    : "text-[#466272]/60 hover:text-[#466272]"
+                    ? "bg-white text-[#353535] shadow-xs font-bold"
+                    : "text-[#666361]/60 hover:text-[#666361]"
                 }`}
                 title="Table View"
               >
@@ -388,12 +388,12 @@ export default function AllMembersDirectory() {
         )}
 
         {paginatedMembers.length === 0 ? (
-          <div className="py-16 text-center bg-white border border-dashed border-[#cac6b9] rounded-2xl space-y-3">
-            <div className="w-12 h-12 rounded-full bg-[#fdf9f4] flex items-center justify-center mx-auto text-[#466272]/60">
+          <div className="py-16 text-center bg-white border border-dashed border-[#D5C9BE] rounded-2xl space-y-3">
+            <div className="w-12 h-12 rounded-full bg-[#E7DDD3] flex items-center justify-center mx-auto text-[#666361]/60">
               <Users className="w-6 h-6" />
             </div>
-            <h3 className="text-base font-bold text-[#635f41]">No matching members found</h3>
-            <p className="text-xs text-[#466272]/70 max-w-sm mx-auto">
+            <h3 className="text-base font-bold text-[#353535]">No matching members found</h3>
+            <p className="text-xs text-[#666361]/70 max-w-sm mx-auto">
               Try adjusting your search keywords or resetting status/role filters.
             </p>
             <button
@@ -402,7 +402,7 @@ export default function AllMembersDirectory() {
                 setRoleFilter("All");
                 setStatusFilter("All");
               }}
-              className="text-xs font-bold text-[#8CC0EB] hover:underline pt-2 inline-block"
+              className="text-xs font-bold text-[#E85F57] hover:underline pt-2 inline-block"
             >
               Reset All Filters
             </button>
@@ -413,7 +413,7 @@ export default function AllMembersDirectory() {
             {paginatedMembers.map((member) => (
               <div
                 key={member.id}
-                className="bg-white border border-[#e6e2dd] rounded-2xl p-5 shadow-xs hover:shadow-md hover:border-[#8CC0EB] transition-all duration-300 flex flex-col justify-between group relative"
+                className="bg-white border border-[#DDD8CE] rounded-2xl p-5 shadow-xs hover:shadow-md hover:border-[#E85F57] transition-all duration-300 flex flex-col justify-between group relative"
               >
                 <div>
                   {/* Card Top: Avatar & Status */}
@@ -426,7 +426,7 @@ export default function AllMembersDirectory() {
                           className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-xs"
                         />
                       ) : (
-                        <div className="w-12 h-12 rounded-full bg-[#635f41]/10 text-[#635f41] border border-[#e6e2dd] flex items-center justify-center font-bold text-sm">
+                        <div className="w-12 h-12 rounded-full bg-[#353535]/10 text-[#353535] border border-[#DDD8CE] flex items-center justify-center font-bold text-sm">
                           {member.initials}
                         </div>
                       )}
@@ -442,7 +442,7 @@ export default function AllMembersDirectory() {
 
                     <button
                       onClick={() => navigate(`/profile-audit?email=${encodeURIComponent(member.email)}`)}
-                      className="p-1.5 text-[#466272]/50 hover:text-[#635f41] hover:bg-[#fdf9f4] rounded-lg transition-all"
+                      className="p-1.5 text-[#666361]/50 hover:text-[#353535] hover:bg-[#E7DDD3] rounded-lg transition-all"
                       title="View Member Audit Log"
                     >
                       <ArrowUpRight className="w-4 h-4" />
@@ -451,11 +451,11 @@ export default function AllMembersDirectory() {
 
                   {/* Name & Contact */}
                   <div className="space-y-1">
-                    <h3 className="font-bold text-base text-[#1c1b19] tracking-tight group-hover:text-[#635f41] transition-colors">
+                    <h3 className="font-bold text-base text-[#232323] tracking-tight group-hover:text-[#353535] transition-colors">
                       {member.name}
                     </h3>
-                    <p className="text-xs text-[#466272]/70 truncate flex items-center gap-1">
-                      <Mail className="w-3 h-3 text-[#466272]/50 flex-shrink-0" />
+                    <p className="text-xs text-[#666361]/70 truncate flex items-center gap-1">
+                      <Mail className="w-3 h-3 text-[#666361]/50 flex-shrink-0" />
                       {member.email}
                     </p>
                   </div>
@@ -493,14 +493,14 @@ export default function AllMembersDirectory() {
                 </div>
 
                 {/* Footer Details */}
-                <div className="mt-6 pt-3 border-t border-gray-100 flex items-center justify-between text-[11px] text-[#466272]/70">
+                <div className="mt-6 pt-3 border-t border-gray-100 flex items-center justify-between text-[11px] text-[#666361]/70">
                   <span className="flex items-center gap-1">
-                    <Clapperboard className="w-3.5 h-3.5 text-[#635f41]/60" />
+                    <Clapperboard className="w-3.5 h-3.5 text-[#353535]/60" />
                     {member.productionsCount} Plays
                   </span>
                   <button
                     onClick={() => navigate(`/profile-audit?email=${encodeURIComponent(member.email)}`)}
-                    className="text-xs font-bold text-[#8CC0EB] hover:text-[#1e4463] transition-colors"
+                    className="text-xs font-bold text-[#E85F57] hover:text-[#1e4463] transition-colors"
                   >
                     Manage Roster →
                   </button>
@@ -510,11 +510,11 @@ export default function AllMembersDirectory() {
           </div>
         ) : (
           /* Table View */
-          <div className="bg-white border border-[#e6e2dd] rounded-2xl shadow-xs overflow-hidden">
+          <div className="bg-white border border-[#DDD8CE] rounded-2xl shadow-xs overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
-                  <tr className="bg-[#fdf9f4] border-b border-[#e6e2dd] text-[#466272] uppercase tracking-wider font-bold text-[10px]">
+                  <tr className="bg-[#E7DDD3] border-b border-[#DDD8CE] text-[#666361] uppercase tracking-wider font-bold text-[10px]">
                     <th className="py-3.5 px-6">Member</th>
                     <th className="py-3.5 px-4">Role</th>
                     <th className="py-3.5 px-4">Status</th>
@@ -525,7 +525,7 @@ export default function AllMembersDirectory() {
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {paginatedMembers.map((member) => (
-                    <tr key={member.id} className="hover:bg-[#fdf9f4]/60 transition-colors">
+                    <tr key={member.id} className="hover:bg-[#E7DDD3]/60 transition-colors">
                       <td className="py-3.5 px-6">
                         <div className="flex items-center gap-3">
                           {member.avatarUrl ? (
@@ -535,13 +535,13 @@ export default function AllMembersDirectory() {
                               className="w-9 h-9 rounded-full object-cover border border-gray-200"
                             />
                           ) : (
-                            <div className="w-9 h-9 rounded-full bg-[#635f41]/10 text-[#635f41] border border-[#e6e2dd] flex items-center justify-center font-bold text-xs">
+                            <div className="w-9 h-9 rounded-full bg-[#353535]/10 text-[#353535] border border-[#DDD8CE] flex items-center justify-center font-bold text-xs">
                               {member.initials}
                             </div>
                           )}
                           <div>
-                            <div className="font-bold text-[#1c1b19]">{member.name}</div>
-                            <div className="text-[11px] text-[#466272]/70">{member.email}</div>
+                            <div className="font-bold text-[#232323]">{member.name}</div>
+                            <div className="text-[11px] text-[#666361]/70">{member.email}</div>
                           </div>
                         </div>
                       </td>
@@ -575,16 +575,16 @@ export default function AllMembersDirectory() {
                         </span>
                       </td>
 
-                      <td className="py-3.5 px-4 font-semibold text-[#466272]">
+                      <td className="py-3.5 px-4 font-semibold text-[#666361]">
                         {member.productionsCount} productions
                       </td>
 
-                      <td className="py-3.5 px-4 text-[#466272]/70">{member.joinDate}</td>
+                      <td className="py-3.5 px-4 text-[#666361]/70">{member.joinDate}</td>
 
                       <td className="py-3.5 px-6 text-right">
                         <button
                           onClick={() => navigate(`/profile-audit?email=${encodeURIComponent(member.email)}`)}
-                          className="px-3 py-1.5 rounded-lg bg-[#8CC0EB]/20 text-[#1e4463] hover:bg-[#8CC0EB]/40 font-bold text-[11px] transition-all"
+                          className="px-3 py-1.5 rounded-lg bg-[#E85F57]/20 text-[#1e4463] hover:bg-[#E85F57]/40 font-bold text-[11px] transition-all"
                         >
                           View Audit
                         </button>
@@ -599,8 +599,8 @@ export default function AllMembersDirectory() {
 
         {/* Pagination Footer */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between pt-4 border-t border-[#e6e2dd]">
-            <span className="text-xs text-[#466272]">
+          <div className="flex items-center justify-between pt-4 border-t border-[#DDD8CE]">
+            <span className="text-xs text-[#666361]">
               Page <strong>{currentPage}</strong> of <strong>{totalPages}</strong>
             </span>
             <div className="flex items-center gap-2">
@@ -609,7 +609,7 @@ export default function AllMembersDirectory() {
                 size="sm"
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-                className="border-[#cac6b9] text-[#466272] hover:bg-[#f7f3ee] text-xs h-8"
+                className="border-[#D5C9BE] text-[#666361] hover:bg-[#EFE8E1] text-xs h-8"
               >
                 <ChevronLeft className="w-4 h-4 mr-1" /> Previous
               </Button>
@@ -618,7 +618,7 @@ export default function AllMembersDirectory() {
                 size="sm"
                 disabled={currentPage === totalPages}
                 onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
-                className="border-[#cac6b9] text-[#466272] hover:bg-[#f7f3ee] text-xs h-8"
+                className="border-[#D5C9BE] text-[#666361] hover:bg-[#EFE8E1] text-xs h-8"
               >
                 Next <ChevronRight className="w-4 h-4 ml-1" />
               </Button>
@@ -629,19 +629,19 @@ export default function AllMembersDirectory() {
 
       {/* Add Member Dialog */}
       <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
-        <DialogContent className="bg-[#fdf9f4] border border-[#cac6b9] text-[#466272] max-w-md rounded-2xl shadow-xl p-6">
-          <DialogHeader className="border-b border-[#e6e2dd] pb-3">
-            <DialogTitle className="font-serif text-xl text-[#635f41] font-bold">
+        <DialogContent className="bg-[#E7DDD3] border border-[#D5C9BE] text-[#666361] max-w-md rounded-2xl shadow-xl p-6">
+          <DialogHeader className="border-b border-[#DDD8CE] pb-3">
+            <DialogTitle className="font-serif text-xl text-[#353535] font-bold">
               Add New Ensemble Member
             </DialogTitle>
-            <DialogDescription className="text-xs text-[#466272]/85">
+            <DialogDescription className="text-xs text-[#666361]/85">
               Register a performer, crew member, or coordinator into the Matinee roster.
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleAddMemberSubmit} className="py-4 space-y-4">
             <div className="space-y-1">
-              <label className="text-[10px] uppercase tracking-wider text-[#635f41] font-bold">
+              <label className="text-[10px] uppercase tracking-wider text-[#353535] font-bold">
                 Full Name
               </label>
               <Input
@@ -650,12 +650,12 @@ export default function AllMembersDirectory() {
                 placeholder="e.g. Aarav Sharma"
                 value={newMember.name}
                 onChange={(e) => setNewMember({ ...newMember, name: e.target.value })}
-                className="border-[#e6e2dd] bg-white h-9 text-xs rounded-lg"
+                className="border-[#DDD8CE] bg-white h-9 text-xs rounded-lg"
               />
             </div>
 
             <div className="space-y-1">
-              <label className="text-[10px] uppercase tracking-wider text-[#635f41] font-bold">
+              <label className="text-[10px] uppercase tracking-wider text-[#353535] font-bold">
                 Email Address
               </label>
               <Input
@@ -664,18 +664,18 @@ export default function AllMembersDirectory() {
                 placeholder="e.g. aarav@matinee.club"
                 value={newMember.email}
                 onChange={(e) => setNewMember({ ...newMember, email: e.target.value })}
-                className="border-[#e6e2dd] bg-white h-9 text-xs rounded-lg"
+                className="border-[#DDD8CE] bg-white h-9 text-xs rounded-lg"
               />
             </div>
 
             <div className="space-y-1">
-              <label className="text-[10px] uppercase tracking-wider text-[#635f41] font-bold">
+              <label className="text-[10px] uppercase tracking-wider text-[#353535] font-bold">
                 Production Role
               </label>
               <select
                 value={newMember.role}
                 onChange={(e) => setNewMember({ ...newMember, role: e.target.value })}
-                className="w-full bg-white border border-[#e6e2dd] rounded-lg px-3 py-2 text-xs text-[#466272] font-medium focus:outline-none"
+                className="w-full bg-white border border-[#DDD8CE] rounded-lg px-3 py-2 text-xs text-[#666361] font-medium focus:outline-none"
               >
                 <option value="Lead Actor & Member">Lead Actor & Member</option>
                 <option value="Director Coordinator">Director Coordinator</option>
@@ -688,13 +688,13 @@ export default function AllMembersDirectory() {
             </div>
 
             <div className="space-y-1">
-              <label className="text-[10px] uppercase tracking-wider text-[#635f41] font-bold">
+              <label className="text-[10px] uppercase tracking-wider text-[#353535] font-bold">
                 Initial Status
               </label>
               <select
                 value={newMember.status}
                 onChange={(e) => setNewMember({ ...newMember, status: e.target.value })}
-                className="w-full bg-white border border-[#e6e2dd] rounded-lg px-3 py-2 text-xs text-[#466272] font-medium focus:outline-none"
+                className="w-full bg-white border border-[#DDD8CE] rounded-lg px-3 py-2 text-xs text-[#666361] font-medium focus:outline-none"
               >
                 <option value="Active">Active</option>
                 <option value="Approved">Approved</option>
@@ -702,18 +702,18 @@ export default function AllMembersDirectory() {
               </select>
             </div>
 
-            <DialogFooter className="pt-4 border-t border-[#e6e2dd] flex gap-2">
+            <DialogFooter className="pt-4 border-t border-[#DDD8CE] flex gap-2">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setIsAddModalOpen(false)}
-                className="border-[#cac6b9] text-[#466272] hover:bg-[#f7f3ee] rounded-lg text-xs font-bold flex-1"
+                className="border-[#D5C9BE] text-[#666361] hover:bg-[#EFE8E1] rounded-lg text-xs font-bold flex-1"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
-                className="bg-[#635f41] text-white hover:bg-[#635f41]/90 rounded-lg text-xs font-bold flex-1"
+                className="bg-[#353535] text-white hover:bg-[#353535]/90 rounded-lg text-xs font-bold flex-1"
               >
                 Save Member
               </Button>

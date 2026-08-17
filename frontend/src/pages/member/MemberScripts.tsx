@@ -291,20 +291,20 @@ export default function MemberScripts() {
   };
 
   return (
-    <div className="space-y-[32px] font-sans text-[#466272]">
+    <div className="space-y-[32px] font-sans text-[#666361]">
       {/* Header Banner */}
-      <div className="bg-[#fdf9f4] border border-[#e6e2dd] rounded-[24px] p-[28px] md:p-[36px] flex flex-col md:flex-row justify-between items-start md:items-center gap-[24px] shadow-xs">
+      <div className="bg-[#E7DDD3] border border-[#DDD8CE] rounded-[24px] p-[28px] md:p-[36px] flex flex-col md:flex-row justify-between items-start md:items-center gap-[24px] shadow-xs">
         <div className="space-y-[10px] flex-1">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-[#635f41]/10 text-[#635f41] flex items-center justify-center font-bold shadow-inner">
-              <FileText className="w-6 h-6 text-[#635f41]" />
+            <div className="w-12 h-12 rounded-2xl bg-[#353535]/10 text-[#353535] flex items-center justify-center font-bold shadow-inner">
+              <FileText className="w-6 h-6 text-[#353535]" />
             </div>
             <div>
-              <h2 className="text-[28px] font-bold font-serif text-[#635f41] tracking-tight">Script Vault & Production Texts</h2>
-              <p className="text-xs text-[#466272]/80 font-medium">Official Playbooks • Member Drafts • Approval Workflow</p>
+              <h2 className="text-[28px] font-bold font-serif text-[#353535] tracking-tight">Script Vault & Production Texts</h2>
+              <p className="text-xs text-[#666361]/80 font-medium">Official Playbooks • Member Drafts • Approval Workflow</p>
             </div>
           </div>
-          <p className="text-[13px] text-[#466272] leading-relaxed max-w-3xl font-light pt-1">
+          <p className="text-[13px] text-[#666361] leading-relaxed max-w-3xl font-light pt-1">
             Access verified Aayam production playbooks, write your own original scripts, and request publication to the ensemble vault.
           </p>
         </div>
@@ -312,7 +312,7 @@ export default function MemberScripts() {
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-shrink-0 w-full md:w-auto">
           <Button
             onClick={() => navigate("/script-builder")}
-            className="bg-[#635f41] hover:bg-[#4d4a32] text-white font-bold rounded-xl px-5 py-3 text-xs flex items-center justify-center gap-2 shadow-md transition-all active:scale-95"
+            className="bg-[#353535] hover:bg-[#4d4a32] text-white font-bold rounded-xl px-5 py-3 text-xs flex items-center justify-center gap-2 shadow-md transition-all active:scale-95"
           >
             <Plus className="w-4 h-4" /> Create New Script
           </Button>
@@ -320,13 +320,13 @@ export default function MemberScripts() {
       </div>
 
       {/* Tabs Bar */}
-      <div className="flex flex-wrap items-center justify-between border-b border-[#e6e2dd] pb-4 gap-4">
-        <div className="flex items-center gap-2 bg-[#f4efe8] p-1.5 rounded-2xl border border-[#cac6b9]/40">
+      <div className="flex flex-wrap items-center justify-between border-b border-[#DDD8CE] pb-4 gap-4">
+        <div className="flex items-center gap-2 bg-[#f4efe8] p-1.5 rounded-2xl border border-[#D5C9BE]/40">
           <button
             onClick={() => setActiveTab("public")}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${activeTab === "public"
-              ? "bg-[#635f41] text-white shadow-sm"
-              : "text-[#466272] hover:text-[#1c1b19] hover:bg-[#e6e2dd]/50"
+              ? "bg-[#353535] text-white shadow-sm"
+              : "text-[#666361] hover:text-[#232323] hover:bg-[#DDD8CE]/50"
               }`}
           >
             <BookOpen className="w-4 h-4" /> Public Vault ({publicScripts.length})
@@ -335,8 +335,8 @@ export default function MemberScripts() {
           <button
             onClick={() => setActiveTab("drafts")}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${activeTab === "drafts"
-              ? "bg-[#635f41] text-white shadow-sm"
-              : "text-[#466272] hover:text-[#1c1b19] hover:bg-[#e6e2dd]/50"
+              ? "bg-[#353535] text-white shadow-sm"
+              : "text-[#666361] hover:text-[#232323] hover:bg-[#DDD8CE]/50"
               }`}
           >
             <FilePlus className="w-4 h-4" /> My Scripts ({myDrafts.length})
@@ -346,8 +346,8 @@ export default function MemberScripts() {
             <button
               onClick={() => setActiveTab("pending")}
               className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 relative ${activeTab === "pending"
-                ? "bg-[#635f41] text-white shadow-sm"
-                : "text-[#466272] hover:text-[#1c1b19] hover:bg-[#e6e2dd]/50"
+                ? "bg-[#353535] text-white shadow-sm"
+                : "text-[#666361] hover:text-[#232323] hover:bg-[#DDD8CE]/50"
                 }`}
             >
               <Clock className="w-4 h-4" /> Pending Requests ({pendingScripts.length})
@@ -358,21 +358,21 @@ export default function MemberScripts() {
           )}
         </div>
 
-        <span className="text-xs text-[#466272]/70 font-medium">
+        <span className="text-xs text-[#666361]/70 font-medium">
           {isMaintainer ? "Maintainer Mode: Full Script Management" : "Member Mode: View & Submit Scripts"}
         </span>
       </div>
 
       {/* Script Grid Content */}
       {loading ? (
-        <div className="text-center py-20 text-[#466272]/70 font-semibold italic">Accessing script database...</div>
+        <div className="text-center py-20 text-[#666361]/70 font-semibold italic">Accessing script database...</div>
       ) : (
         <>
           {/* TAB 1: PUBLIC SCRIPTS */}
           {activeTab === "public" && (
             <div>
               {publicScripts.length === 0 ? (
-                <div className="text-center py-16 bg-white border border-[#e6e2dd] rounded-2xl text-xs text-[#466272]">
+                <div className="text-center py-16 bg-white border border-[#DDD8CE] rounded-2xl text-xs text-[#666361]">
                   No public scripts available yet.
                 </div>
               ) : (
@@ -380,22 +380,22 @@ export default function MemberScripts() {
                   {publicScripts.map((item) => (
                     <div
                       key={item.id}
-                      className="bg-white border border-[#e6e2dd] rounded-2xl p-6 md:p-8 hover:border-[#635f41] hover:shadow-lg transition-all duration-300 flex flex-col justify-between space-y-6"
+                      className="bg-white border border-[#DDD8CE] rounded-2xl p-6 md:p-8 hover:border-[#353535] hover:shadow-lg transition-all duration-300 flex flex-col justify-between space-y-6"
                     >
                       <div className="space-y-4">
-                        <div className="flex items-start justify-between gap-4 border-b border-[#e6e2dd]/60 pb-4">
+                        <div className="flex items-start justify-between gap-4 border-b border-[#DDD8CE]/60 pb-4">
                           <div>
-                            <span className="text-[10px] font-bold text-[#635f41] uppercase tracking-[0.2em] block mb-1">
+                            <span className="text-[10px] font-bold text-[#353535] uppercase tracking-[0.2em] block mb-1">
                               {item.genre} • {item.created_at}
                             </span>
-                            <h3 className="text-2xl font-bold font-serif text-[#1c1b19] tracking-tight">{item.title}</h3>
-                            <p className="text-xs text-[#466272] font-semibold mt-1">
-                              Playwright: <span className="text-[#1c1b19]">{item.playwright}</span>
+                            <h3 className="text-2xl font-bold font-serif text-[#232323] tracking-tight">{item.title}</h3>
+                            <p className="text-xs text-[#666361] font-semibold mt-1">
+                              Playwright: <span className="text-[#232323]">{item.playwright}</span>
                             </p>
                           </div>
 
                           <div className="flex flex-col items-end gap-1.5">
-                            <Badge className="bg-[#8CC0EB]/20 text-[#001e2c] border border-[#8CC0EB]/40 font-bold text-[10px] uppercase tracking-wider px-3 py-1 flex-shrink-0">
+                            <Badge className="bg-[#E85F57]/20 text-[#001e2c] border border-[#E85F57]/40 font-bold text-[10px] uppercase tracking-wider px-3 py-1 flex-shrink-0">
                               {item.language}
                             </Badge>
                             {isMaintainer && (
@@ -407,36 +407,36 @@ export default function MemberScripts() {
                         </div>
 
                         {/* Specs Grid */}
-                        <div className="grid grid-cols-3 gap-3 bg-[#fdf9f4] p-4 rounded-xl border border-[#e6e2dd]/80 text-xs">
+                        <div className="grid grid-cols-3 gap-3 bg-[#E7DDD3] p-4 rounded-xl border border-[#DDD8CE]/80 text-xs">
                           <div className="space-y-1">
-                            <span className="text-[10px] uppercase font-bold text-[#466272]/70 flex items-center gap-1">
-                              <BookOpen className="w-3.5 h-3.5 text-[#635f41]" /> Pages
+                            <span className="text-[10px] uppercase font-bold text-[#666361]/70 flex items-center gap-1">
+                              <BookOpen className="w-3.5 h-3.5 text-[#353535]" /> Pages
                             </span>
-                            <span className="font-bold text-[#1c1b19] block">{item.pages}</span>
+                            <span className="font-bold text-[#232323] block">{item.pages}</span>
                           </div>
 
                           <div className="space-y-1">
-                            <span className="text-[10px] uppercase font-bold text-[#466272]/70 flex items-center gap-1">
-                              <Layers className="w-3.5 h-3.5 text-[#635f41]" /> Structure
+                            <span className="text-[10px] uppercase font-bold text-[#666361]/70 flex items-center gap-1">
+                              <Layers className="w-3.5 h-3.5 text-[#353535]" /> Structure
                             </span>
-                            <span className="font-bold text-[#1c1b19] truncate block">{item.acts}</span>
+                            <span className="font-bold text-[#232323] truncate block">{item.acts}</span>
                           </div>
 
                           <div className="space-y-1">
-                            <span className="text-[10px] uppercase font-bold text-[#466272]/70 flex items-center gap-1">
-                              <Users className="w-3.5 h-3.5 text-[#635f41]" /> Cast
+                            <span className="text-[10px] uppercase font-bold text-[#666361]/70 flex items-center gap-1">
+                              <Users className="w-3.5 h-3.5 text-[#353535]" /> Cast
                             </span>
-                            <span className="font-bold text-[#1c1b19] truncate block">{item.rolesCount}</span>
+                            <span className="font-bold text-[#232323] truncate block">{item.rolesCount}</span>
                           </div>
                         </div>
 
                         {/* Excerpt */}
                         {item.excerpt && (
                           <div className="space-y-1.5">
-                            <h4 className="text-[11px] font-bold uppercase tracking-wider text-[#635f41] flex items-center gap-1">
-                              <Tag className="w-3.5 h-3.5 text-[#635f41]" /> Excerpt
+                            <h4 className="text-[11px] font-bold uppercase tracking-wider text-[#353535] flex items-center gap-1">
+                              <Tag className="w-3.5 h-3.5 text-[#353535]" /> Excerpt
                             </h4>
-                            <div className="p-3 bg-[#f7f3ee]/60 border border-[#e6e2dd] rounded-xl font-serif text-xs italic text-[#1c1b19] leading-relaxed">
+                            <div className="p-3 bg-[#EFE8E1]/60 border border-[#DDD8CE] rounded-xl font-serif text-xs italic text-[#232323] leading-relaxed">
                               "{item.excerpt}"
                             </div>
                           </div>
@@ -444,18 +444,18 @@ export default function MemberScripts() {
                       </div>
 
                       {/* Controls Footer */}
-                      <div className="pt-4 border-t border-[#e6e2dd] flex flex-wrap items-center justify-between gap-3">
+                      <div className="pt-4 border-t border-[#DDD8CE] flex flex-wrap items-center justify-between gap-3">
                         <div className="flex items-center gap-2">
                           <Button
                             onClick={() => openViewModal(item)}
                             variant="outline"
-                            className="text-xs font-semibold h-9 rounded-xl border-[#cac6b9] text-[#466272] hover:bg-[#f7f3ee]"
+                            className="text-xs font-semibold h-9 rounded-xl border-[#D5C9BE] text-[#666361] hover:bg-[#EFE8E1]"
                           >
                             <Eye className="w-3.5 h-3.5 mr-1" /> View Script
                           </Button>
                           <Button
                             onClick={() => handleDownload(item.title)}
-                            className="bg-[#635f41] hover:bg-[#4d4a32] text-white font-bold h-9 rounded-xl text-xs flex items-center gap-1.5 px-4 shadow-sm"
+                            className="bg-[#353535] hover:bg-[#4d4a32] text-white font-bold h-9 rounded-xl text-xs flex items-center gap-1.5 px-4 shadow-sm"
                           >
                             <Download className="w-3.5 h-3.5" /> Download PDF
                           </Button>
@@ -467,7 +467,7 @@ export default function MemberScripts() {
                               onClick={() => openEditModal(item)}
                               variant="outline"
                               size="sm"
-                              className="h-8 text-xs border-[#cac6b9] hover:bg-gray-50 text-[#466272]"
+                              className="h-8 text-xs border-[#D5C9BE] hover:bg-gray-50 text-[#666361]"
                               title="Edit Script"
                             >
                               <Edit3 className="w-3.5 h-3.5" />
@@ -495,11 +495,11 @@ export default function MemberScripts() {
           {activeTab === "drafts" && (
             <div>
               {myDrafts.length === 0 ? (
-                <div className="text-center py-16 bg-white border border-[#e6e2dd] rounded-2xl p-8 space-y-4">
-                  <FilePlus className="w-10 h-10 text-[#635f41]/40 mx-auto" />
+                <div className="text-center py-16 bg-white border border-[#DDD8CE] rounded-2xl p-8 space-y-4">
+                  <FilePlus className="w-10 h-10 text-[#353535]/40 mx-auto" />
                   <div className="space-y-1">
-                    <h3 className="font-serif text-lg font-bold text-[#635f41]">No personal scripts created yet</h3>
-                    <p className="text-xs text-[#466272]/70 max-w-sm mx-auto">
+                    <h3 className="font-serif text-lg font-bold text-[#353535]">No personal scripts created yet</h3>
+                    <p className="text-xs text-[#666361]/70 max-w-sm mx-auto">
                       Click "+ Create New Script" to write original play scripts and submit them for ensemble review.
                     </p>
                   </div>
@@ -508,7 +508,7 @@ export default function MemberScripts() {
                       resetForm();
                       setCreateOpen(true);
                     }}
-                    className="bg-[#635f41] hover:bg-[#4d4a32] text-white font-bold text-xs rounded-xl px-5 py-2.5"
+                    className="bg-[#353535] hover:bg-[#4d4a32] text-white font-bold text-xs rounded-xl px-5 py-2.5"
                   >
                     <Plus className="w-4 h-4 mr-1" /> Create Your First Script
                   </Button>
@@ -518,10 +518,10 @@ export default function MemberScripts() {
                   {myDrafts.map((item) => (
                     <div
                       key={item.id}
-                      className="bg-white border border-[#e6e2dd] rounded-2xl p-6 md:p-8 hover:shadow-md transition-all duration-300 flex flex-col justify-between space-y-6"
+                      className="bg-white border border-[#DDD8CE] rounded-2xl p-6 md:p-8 hover:shadow-md transition-all duration-300 flex flex-col justify-between space-y-6"
                     >
                       <div className="space-y-4">
-                        <div className="flex items-start justify-between gap-4 border-b border-[#e6e2dd]/60 pb-4">
+                        <div className="flex items-start justify-between gap-4 border-b border-[#DDD8CE]/60 pb-4">
                           <div>
                             <div className="flex items-center gap-2 mb-1">
                               {item.status === "Pending" ? (
@@ -534,9 +534,9 @@ export default function MemberScripts() {
                                 </span>
                               )}
                             </div>
-                            <h3 className="text-2xl font-bold font-serif text-[#1c1b19] tracking-tight">{item.title}</h3>
-                            <p className="text-xs text-[#466272] font-semibold mt-1 flex items-center gap-2 flex-wrap">
-                              <span>Playwright: <span className="text-[#1c1b19]">{item.playwright}</span></span>
+                            <h3 className="text-2xl font-bold font-serif text-[#232323] tracking-tight">{item.title}</h3>
+                            <p className="text-xs text-[#666361] font-semibold mt-1 flex items-center gap-2 flex-wrap">
+                              <span>Playwright: <span className="text-[#232323]">{item.playwright}</span></span>
                               {item.created_at && (
                                 <span className="text-[10px] text-gray-500 font-normal bg-gray-100 px-2 py-0.5 rounded-full border border-gray-200">
                                   {item.created_at}
@@ -544,48 +544,48 @@ export default function MemberScripts() {
                               )}
                             </p>
                           </div>
-                          <Badge className="bg-gray-100 text-[#466272] border border-gray-200 font-bold text-[10px]">
+                          <Badge className="bg-gray-100 text-[#666361] border border-gray-200 font-bold text-[10px]">
                             {item.language}
                           </Badge>
                         </div>
 
                         {/* Specs */}
-                        <div className="grid grid-cols-3 gap-3 bg-[#fdf9f4] p-3.5 rounded-xl border border-[#e6e2dd]/80 text-xs">
+                        <div className="grid grid-cols-3 gap-3 bg-[#E7DDD3] p-3.5 rounded-xl border border-[#DDD8CE]/80 text-xs">
                           <div>
-                            <span className="text-[10px] uppercase font-bold text-[#466272]/70 block">Pages</span>
-                            <span className="font-bold text-[#1c1b19]">{item.pages}</span>
+                            <span className="text-[10px] uppercase font-bold text-[#666361]/70 block">Pages</span>
+                            <span className="font-bold text-[#232323]">{item.pages}</span>
                           </div>
                           <div>
-                            <span className="text-[10px] uppercase font-bold text-[#466272]/70 block">Acts</span>
-                            <span className="font-bold text-[#1c1b19] truncate block">{item.acts}</span>
+                            <span className="text-[10px] uppercase font-bold text-[#666361]/70 block">Acts</span>
+                            <span className="font-bold text-[#232323] truncate block">{item.acts}</span>
                           </div>
                           <div>
-                            <span className="text-[10px] uppercase font-bold text-[#466272]/70 block">Cast</span>
-                            <span className="font-bold text-[#1c1b19] truncate block">{item.rolesCount}</span>
+                            <span className="text-[10px] uppercase font-bold text-[#666361]/70 block">Cast</span>
+                            <span className="font-bold text-[#232323] truncate block">{item.rolesCount}</span>
                           </div>
                         </div>
 
                         {item.excerpt && (
-                          <div className="p-3 bg-gray-50 border border-gray-200 rounded-xl font-serif text-xs italic text-[#1c1b19]">
+                          <div className="p-3 bg-gray-50 border border-gray-200 rounded-xl font-serif text-xs italic text-[#232323]">
                             "{item.excerpt}"
                           </div>
                         )}
                       </div>
 
                       {/* Footer Actions */}
-                      <div className="pt-4 border-t border-[#e6e2dd] flex flex-wrap items-center justify-between gap-3">
+                      <div className="pt-4 border-t border-[#DDD8CE] flex flex-wrap items-center justify-between gap-3">
                         <div className="flex items-center gap-2">
                           <Button
                             onClick={() => openViewModal(item)}
                             variant="outline"
-                            className="text-xs font-semibold h-9 rounded-xl border-[#cac6b9]"
+                            className="text-xs font-semibold h-9 rounded-xl border-[#D5C9BE]"
                           >
                             <Eye className="w-3.5 h-3.5 mr-1" /> View Script
                           </Button>
                           <Button
                             onClick={() => openEditModal(item)}
                             variant="outline"
-                            className="text-xs font-semibold h-9 rounded-xl border-[#cac6b9]"
+                            className="text-xs font-semibold h-9 rounded-xl border-[#D5C9BE]"
                           >
                             <Edit3 className="w-3.5 h-3.5 mr-1" /> Edit
                           </Button>
@@ -595,7 +595,7 @@ export default function MemberScripts() {
                           {item.status === "Draft" && (
                             <Button
                               onClick={() => handleRequestPublish(item.id)}
-                              className="bg-[#8CC0EB] hover:bg-[#68a0cd] text-[#001e2c] font-bold h-9 rounded-xl text-xs flex items-center gap-1 px-3.5"
+                              className="bg-[#E85F57] hover:bg-[#68a0cd] text-[#001e2c] font-bold h-9 rounded-xl text-xs flex items-center gap-1 px-3.5"
                             >
                               <Send className="w-3.5 h-3.5" /> Request Publish
                             </Button>
@@ -621,7 +621,7 @@ export default function MemberScripts() {
           {activeTab === "pending" && isMaintainer && (
             <div>
               {pendingScripts.length === 0 ? (
-                <div className="text-center py-16 bg-white border border-[#e6e2dd] rounded-2xl text-xs text-[#466272]">
+                <div className="text-center py-16 bg-white border border-[#DDD8CE] rounded-2xl text-xs text-[#666361]">
                   No pending script publish requests at this time.
                 </div>
               ) : (
@@ -637,9 +637,9 @@ export default function MemberScripts() {
                             <span className="text-[10px] font-bold text-amber-800 uppercase tracking-widest block mb-1">
                               Submission by: {item.author_name} ({item.author_email})
                             </span>
-                            <h3 className="text-2xl font-bold font-serif text-[#1c1b19] tracking-tight">{item.title}</h3>
-                            <p className="text-xs text-[#466272] font-semibold mt-1">
-                              Playwright: <span className="text-[#1c1b19]">{item.playwright}</span>
+                            <h3 className="text-2xl font-bold font-serif text-[#232323] tracking-tight">{item.title}</h3>
+                            <p className="text-xs text-[#666361] font-semibold mt-1">
+                              Playwright: <span className="text-[#232323]">{item.playwright}</span>
                             </p>
                           </div>
                           <Badge className="bg-amber-100 text-amber-900 border border-amber-300 font-bold text-[10px]">
@@ -647,7 +647,7 @@ export default function MemberScripts() {
                           </Badge>
                         </div>
 
-                        <div className="p-3 bg-white border border-amber-200 rounded-xl font-serif text-xs italic text-[#1c1b19]">
+                        <div className="p-3 bg-white border border-amber-200 rounded-xl font-serif text-xs italic text-[#232323]">
                           "{item.excerpt || "No excerpt provided."}"
                         </div>
                       </div>
@@ -657,7 +657,7 @@ export default function MemberScripts() {
                         <Button
                           onClick={() => openViewModal(item)}
                           variant="outline"
-                          className="text-xs font-semibold h-9 rounded-xl border-[#cac6b9] bg-white"
+                          className="text-xs font-semibold h-9 rounded-xl border-[#D5C9BE] bg-white"
                         >
                           <Eye className="w-3.5 h-3.5 mr-1" /> Review Full Script
                         </Button>
@@ -689,10 +689,10 @@ export default function MemberScripts() {
 
       {/* MODAL 1: CREATE SCRIPT */}
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-        <DialogContent className="bg-[#fdf9f4] border border-[#cac6b9] text-[#466272] max-w-xl rounded-3xl p-7 max-h-[90vh] overflow-y-auto">
-          <DialogHeader className="border-b border-[#e6e2dd] pb-4">
-            <DialogTitle className="font-serif text-2xl font-bold text-[#635f41]">Create New Production Script</DialogTitle>
-            <DialogDescription className="text-xs text-[#466272]/80">
+        <DialogContent className="bg-[#E7DDD3] border border-[#D5C9BE] text-[#666361] max-w-xl rounded-3xl p-7 max-h-[90vh] overflow-y-auto">
+          <DialogHeader className="border-b border-[#DDD8CE] pb-4">
+            <DialogTitle className="font-serif text-2xl font-bold text-[#353535]">Create New Production Script</DialogTitle>
+            <DialogDescription className="text-xs text-[#666361]/80">
               Draft an original script or play playbook. You can save it to your personal drafts or submit it for ensemble publishing.
             </DialogDescription>
           </DialogHeader>
@@ -700,89 +700,89 @@ export default function MemberScripts() {
           <form onSubmit={handleCreateSubmit} className="space-y-4 pt-4 text-left">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1">
-                <label className="text-[11px] font-bold uppercase tracking-wider text-[#635f41]">Script Title *</label>
+                <label className="text-[11px] font-bold uppercase tracking-wider text-[#353535]">Script Title *</label>
                 <Input
                   required
                   placeholder="e.g. Mahabhoj Courtroom Cut"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="bg-white border-[#e6e2dd] h-10 text-sm rounded-xl"
+                  className="bg-white border-[#DDD8CE] h-10 text-sm rounded-xl"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-[11px] font-bold uppercase tracking-wider text-[#635f41]">Playwright / Adapter *</label>
+                <label className="text-[11px] font-bold uppercase tracking-wider text-[#353535]">Playwright / Adapter *</label>
                 <Input
                   required
                   placeholder="e.g. Mannu Bhandari / Aayam Team"
                   value={formData.playwright}
                   onChange={(e) => setFormData({ ...formData, playwright: e.target.value })}
-                  className="bg-white border-[#e6e2dd] h-10 text-sm rounded-xl"
+                  className="bg-white border-[#DDD8CE] h-10 text-sm rounded-xl"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <div className="space-y-1">
-                <label className="text-[10px] font-bold uppercase tracking-wider text-[#635f41]">Genre</label>
+                <label className="text-[10px] font-bold uppercase tracking-wider text-[#353535]">Genre</label>
                 <Input
                   placeholder="Drama"
                   value={formData.genre}
                   onChange={(e) => setFormData({ ...formData, genre: e.target.value })}
-                  className="bg-white border-[#e6e2dd] h-9 text-xs rounded-lg"
+                  className="bg-white border-[#DDD8CE] h-9 text-xs rounded-lg"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-[10px] font-bold uppercase tracking-wider text-[#635f41]">Language</label>
+                <label className="text-[10px] font-bold uppercase tracking-wider text-[#353535]">Language</label>
                 <Input
                   placeholder="Hindi / English"
                   value={formData.language}
                   onChange={(e) => setFormData({ ...formData, language: e.target.value })}
-                  className="bg-white border-[#e6e2dd] h-9 text-xs rounded-lg"
+                  className="bg-white border-[#DDD8CE] h-9 text-xs rounded-lg"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-[10px] font-bold uppercase tracking-wider text-[#635f41]">Acts Structure</label>
+                <label className="text-[10px] font-bold uppercase tracking-wider text-[#353535]">Acts Structure</label>
                 <Input
                   placeholder="2 Acts"
                   value={formData.acts}
                   onChange={(e) => setFormData({ ...formData, acts: e.target.value })}
-                  className="bg-white border-[#e6e2dd] h-9 text-xs rounded-lg"
+                  className="bg-white border-[#DDD8CE] h-9 text-xs rounded-lg"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-[10px] font-bold uppercase tracking-wider text-[#635f41]">Pages</label>
+                <label className="text-[10px] font-bold uppercase tracking-wider text-[#353535]">Pages</label>
                 <Input
                   type="number"
                   value={formData.pages}
                   onChange={(e) => setFormData({ ...formData, pages: parseInt(e.target.value) || 0 })}
-                  className="bg-white border-[#e6e2dd] h-9 text-xs rounded-lg"
+                  className="bg-white border-[#DDD8CE] h-9 text-xs rounded-lg"
                 />
               </div>
             </div>
 
             <div className="space-y-1">
-              <label className="text-[11px] font-bold uppercase tracking-wider text-[#635f41]">Script Scene Excerpt</label>
+              <label className="text-[11px] font-bold uppercase tracking-wider text-[#353535]">Script Scene Excerpt</label>
               <textarea
                 rows={2}
                 placeholder="Opening monologue or key scene dialogue excerpt..."
                 value={formData.excerpt}
                 onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
-                className="w-full bg-white border border-[#e6e2dd] p-3 text-xs font-serif rounded-xl focus:outline-none focus:ring-2 focus:ring-[#635f41]/40"
+                className="w-full bg-white border border-[#DDD8CE] p-3 text-xs font-serif rounded-xl focus:outline-none focus:ring-2 focus:ring-[#353535]/40"
               />
             </div>
 
             <div className="space-y-1">
-              <label className="text-[11px] font-bold uppercase tracking-wider text-[#635f41]">Full Script Content / Text</label>
+              <label className="text-[11px] font-bold uppercase tracking-wider text-[#353535]">Full Script Content / Text</label>
               <textarea
                 rows={5}
                 placeholder="Paste or type full script text, scene breakdown, and director notes here..."
                 value={formData.content}
                 onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                className="w-full bg-white border border-[#e6e2dd] p-3 text-xs font-serif rounded-xl focus:outline-none focus:ring-2 focus:ring-[#635f41]/40"
+                className="w-full bg-white border border-[#DDD8CE] p-3 text-xs font-serif rounded-xl focus:outline-none focus:ring-2 focus:ring-[#353535]/40"
               />
             </div>
 
@@ -793,19 +793,19 @@ export default function MemberScripts() {
                   id="isPublicCheck"
                   checked={formData.isPublic}
                   onChange={(e) => setFormData({ ...formData, isPublic: e.target.checked })}
-                  className="w-4 h-4 text-[#635f41] rounded border-gray-300"
+                  className="w-4 h-4 text-[#353535] rounded border-gray-300"
                 />
-                <label htmlFor="isPublicCheck" className="text-xs font-bold text-[#635f41]">
+                <label htmlFor="isPublicCheck" className="text-xs font-bold text-[#353535]">
                   Publish directly to Public Script Vault (Maintainer Override)
                 </label>
               </div>
             )}
 
-            <DialogFooter className="pt-4 border-t border-[#e6e2dd] flex gap-2">
-              <Button type="button" variant="outline" onClick={() => setCreateOpen(false)} className="border-[#cac6b9]">
+            <DialogFooter className="pt-4 border-t border-[#DDD8CE] flex gap-2">
+              <Button type="button" variant="outline" onClick={() => setCreateOpen(false)} className="border-[#D5C9BE]">
                 Cancel
               </Button>
-              <Button type="submit" className="bg-[#635f41] text-white hover:bg-[#4d4a32] font-bold">
+              <Button type="submit" className="bg-[#353535] text-white hover:bg-[#4d4a32] font-bold">
                 Save Script
               </Button>
             </DialogFooter>
@@ -815,58 +815,58 @@ export default function MemberScripts() {
 
       {/* MODAL 2: EDIT SCRIPT */}
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
-        <DialogContent className="bg-[#fdf9f4] border border-[#cac6b9] text-[#466272] max-w-xl rounded-3xl p-7 max-h-[90vh] overflow-y-auto">
-          <DialogHeader className="border-b border-[#e6e2dd] pb-4">
-            <DialogTitle className="font-serif text-2xl font-bold text-[#635f41]">Edit Production Script</DialogTitle>
+        <DialogContent className="bg-[#E7DDD3] border border-[#D5C9BE] text-[#666361] max-w-xl rounded-3xl p-7 max-h-[90vh] overflow-y-auto">
+          <DialogHeader className="border-b border-[#DDD8CE] pb-4">
+            <DialogTitle className="font-serif text-2xl font-bold text-[#353535]">Edit Production Script</DialogTitle>
           </DialogHeader>
 
           <form onSubmit={handleEditSubmit} className="space-y-4 pt-4 text-left">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1">
-                <label className="text-[11px] font-bold uppercase tracking-wider text-[#635f41]">Script Title *</label>
+                <label className="text-[11px] font-bold uppercase tracking-wider text-[#353535]">Script Title *</label>
                 <Input
                   required
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="bg-white border-[#e6e2dd] h-10 text-sm rounded-xl"
+                  className="bg-white border-[#DDD8CE] h-10 text-sm rounded-xl"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-[11px] font-bold uppercase tracking-wider text-[#635f41]">Playwright / Adapter</label>
+                <label className="text-[11px] font-bold uppercase tracking-wider text-[#353535]">Playwright / Adapter</label>
                 <Input
                   value={formData.playwright}
                   onChange={(e) => setFormData({ ...formData, playwright: e.target.value })}
-                  className="bg-white border-[#e6e2dd] h-10 text-sm rounded-xl"
+                  className="bg-white border-[#DDD8CE] h-10 text-sm rounded-xl"
                 />
               </div>
             </div>
 
             <div className="space-y-1">
-              <label className="text-[11px] font-bold uppercase tracking-wider text-[#635f41]">Script Scene Excerpt</label>
+              <label className="text-[11px] font-bold uppercase tracking-wider text-[#353535]">Script Scene Excerpt</label>
               <textarea
                 rows={2}
                 value={formData.excerpt}
                 onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
-                className="w-full bg-white border border-[#e6e2dd] p-3 text-xs font-serif rounded-xl focus:outline-none focus:ring-2 focus:ring-[#635f41]/40"
+                className="w-full bg-white border border-[#DDD8CE] p-3 text-xs font-serif rounded-xl focus:outline-none focus:ring-2 focus:ring-[#353535]/40"
               />
             </div>
 
             <div className="space-y-1">
-              <label className="text-[11px] font-bold uppercase tracking-wider text-[#635f41]">Full Script Text</label>
+              <label className="text-[11px] font-bold uppercase tracking-wider text-[#353535]">Full Script Text</label>
               <textarea
                 rows={6}
                 value={formData.content}
                 onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                className="w-full bg-white border border-[#e6e2dd] p-3 text-xs font-serif rounded-xl focus:outline-none focus:ring-2 focus:ring-[#635f41]/40"
+                className="w-full bg-white border border-[#DDD8CE] p-3 text-xs font-serif rounded-xl focus:outline-none focus:ring-2 focus:ring-[#353535]/40"
               />
             </div>
 
-            <DialogFooter className="pt-4 border-t border-[#e6e2dd] flex gap-2">
-              <Button type="button" variant="outline" onClick={() => setEditOpen(false)} className="border-[#cac6b9]">
+            <DialogFooter className="pt-4 border-t border-[#DDD8CE] flex gap-2">
+              <Button type="button" variant="outline" onClick={() => setEditOpen(false)} className="border-[#D5C9BE]">
                 Cancel
               </Button>
-              <Button type="submit" className="bg-[#635f41] text-white hover:bg-[#4d4a32] font-bold">
+              <Button type="submit" className="bg-[#353535] text-white hover:bg-[#4d4a32] font-bold">
                 Save Changes
               </Button>
             </DialogFooter>
@@ -876,31 +876,31 @@ export default function MemberScripts() {
 
       {/* MODAL 3: VIEW SCRIPT */}
       <Dialog open={viewOpen} onOpenChange={setViewOpen}>
-        <DialogContent className="bg-[#fdf9f4] border border-[#cac6b9] text-[#466272] max-w-2xl rounded-3xl p-7 max-h-[90vh] overflow-y-auto">
+        <DialogContent className="bg-[#E7DDD3] border border-[#D5C9BE] text-[#666361] max-w-2xl rounded-3xl p-7 max-h-[90vh] overflow-y-auto">
           {selectedScript && (
             <div className="space-y-5 text-left">
-              <DialogHeader className="border-b border-[#e6e2dd] pb-4">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-[#635f41]">
+              <DialogHeader className="border-b border-[#DDD8CE] pb-4">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-[#353535]">
                   {selectedScript.genre} • {selectedScript.language}
                 </span>
-                <DialogTitle className="font-serif text-3xl font-bold text-[#1c1b19]">{selectedScript.title}</DialogTitle>
-                <DialogDescription className="text-xs text-[#466272]">
+                <DialogTitle className="font-serif text-3xl font-bold text-[#232323]">{selectedScript.title}</DialogTitle>
+                <DialogDescription className="text-xs text-[#666361]">
                   Playwright: <strong>{selectedScript.playwright}</strong> | Added by: {selectedScript.author_name}
                 </DialogDescription>
               </DialogHeader>
 
               {selectedScript.excerpt && (
                 <div className="space-y-1.5">
-                  <h4 className="text-[11px] font-bold uppercase tracking-wider text-[#635f41]">Scene Excerpt</h4>
-                  <blockquote className="p-4 bg-[#f7f3ee] border-l-4 border-[#635f41] rounded-r-xl font-serif text-sm italic text-[#1c1b19] leading-relaxed">
+                  <h4 className="text-[11px] font-bold uppercase tracking-wider text-[#353535]">Scene Excerpt</h4>
+                  <blockquote className="p-4 bg-[#EFE8E1] border-l-4 border-[#353535] rounded-r-xl font-serif text-sm italic text-[#232323] leading-relaxed">
                     "{selectedScript.excerpt}"
                   </blockquote>
                 </div>
               )}
 
               <div className="space-y-2">
-                <h4 className="text-[11px] font-bold uppercase tracking-wider text-[#635f41]">Full Script Playbook</h4>
-                <div className="p-5 bg-white border border-[#e6e2dd] rounded-2xl font-serif text-xs leading-relaxed max-h-72 overflow-y-auto space-y-3">
+                <h4 className="text-[11px] font-bold uppercase tracking-wider text-[#353535]">Full Script Playbook</h4>
+                <div className="p-5 bg-white border border-[#DDD8CE] rounded-2xl font-serif text-xs leading-relaxed max-h-72 overflow-y-auto space-y-3">
                   {(() => {
                     try {
                       if (selectedScript.content && selectedScript.content.startsWith("{")) {
@@ -908,10 +908,10 @@ export default function MemberScripts() {
                         if (parsed.lines && parsed.lines.length > 0) {
                           return parsed.lines.map((l: any, idx: number) => (
                             <div key={idx} className="space-y-0.5 text-left">
-                              <span className="text-[11px] font-sans font-bold uppercase tracking-wider" style={{ color: l.color || '#635f41' }}>
+                              <span className="text-[11px] font-sans font-bold uppercase tracking-wider" style={{ color: l.color || '#353535' }}>
                                 {l.characterName}
                               </span>
-                              <p className="text-xs text-[#1c1b19] font-serif leading-relaxed pl-3">
+                              <p className="text-xs text-[#232323] font-serif leading-relaxed pl-3">
                                 "{l.text}"
                               </p>
                             </div>
@@ -924,13 +924,13 @@ export default function MemberScripts() {
                 </div>
               </div>
 
-              <DialogFooter className="pt-4 border-t border-[#e6e2dd] flex justify-between items-center">
-                <Button variant="outline" onClick={() => setViewOpen(false)} className="border-[#cac6b9]">
+              <DialogFooter className="pt-4 border-t border-[#DDD8CE] flex justify-between items-center">
+                <Button variant="outline" onClick={() => setViewOpen(false)} className="border-[#D5C9BE]">
                   Close
                 </Button>
                 <Button
                   onClick={() => handleDownload(selectedScript.title)}
-                  className="bg-[#635f41] text-white hover:bg-[#4d4a32] font-bold flex items-center gap-1.5"
+                  className="bg-[#353535] text-white hover:bg-[#4d4a32] font-bold flex items-center gap-1.5"
                 >
                   <Download className="w-4 h-4" /> Download PDF Playbook
                 </Button>

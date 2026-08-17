@@ -42,47 +42,47 @@ export default function ViewProfile() {
 
   if (loading) {
     return (
-      <div className="flex-1 flex items-center justify-center p-8 bg-[#fdf9f4] min-h-[70vh]">
+      <div className="flex-1 flex items-center justify-center p-8 bg-[#E7DDD3] min-h-[70vh]">
         <div className="text-center">
-          <div className="w-12 h-12 border-4 border-[#8CC0EB] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-sm text-[#466272]/80">Loading database profile details...</p>
+          <div className="w-12 h-12 border-4 border-[#E85F57] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-sm text-[#666361]/80">Loading database profile details...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex-1 bg-[#fdf9f4] text-[#1c1b19] font-sans py-2 md:py-4 selection:bg-[#c6e4f7]">
+    <div className="flex-1 bg-[#E7DDD3] text-[#232323] font-sans py-2 md:py-4 selection:bg-[#F8E8E4]">
       <div className="max-w-5xl mx-auto px-6">
         
         {/* Back header */}
         <div className="mb-6 flex justify-between items-center">
           <button
             onClick={() => navigate(activeUser?.role.toLowerCase().includes("maintainer") ? "/maintainer" : "/member")}
-            className="flex items-center gap-2 text-xs font-semibold text-[#635f41] hover:text-[#635f41]/80 transition-all"
+            className="flex items-center gap-2 text-xs font-semibold text-[#353535] hover:text-[#353535]/80 transition-all"
           >
             <ArrowLeft className="w-4 h-4" /> Back to Dashboard
           </button>
 
           <Link
             to="/profile/edit"
-            className="bg-[#635f41] text-white hover:bg-[#635f41]/90 rounded-xl px-4 py-2.5 text-xs font-bold flex items-center gap-2 shadow-sm transition-all"
+            className="bg-[#353535] text-white hover:bg-[#353535]/90 rounded-xl px-4 py-2.5 text-xs font-bold flex items-center gap-2 shadow-sm transition-all"
           >
             <Edit3 className="w-3.5 h-3.5" /> Edit Profile
           </Link>
         </div>
 
         {/* Profile Card Header */}
-        <div className="bg-white border border-[#cac6b9]/30 rounded-3xl shadow-sm overflow-hidden mb-8">
-          <div className="bg-[#635f41]/10 border-b border-[#e6e2dd]/60 p-8 flex flex-col md:flex-row items-center gap-6">
-            <div className="w-20 h-20 rounded-full bg-[#635f41]/20 border-2 border-white flex items-center justify-center text-[#635f41] font-bold text-2xl shadow-sm">
+        <div className="bg-white border border-[#D5C9BE]/30 rounded-3xl shadow-sm overflow-hidden mb-8">
+          <div className="bg-[#353535]/10 border-b border-[#DDD8CE]/60 p-8 flex flex-col md:flex-row items-center gap-6">
+            <div className="w-20 h-20 rounded-full bg-[#353535]/20 border-2 border-white flex items-center justify-center text-[#353535] font-bold text-2xl shadow-sm">
               {activeUser?.initials}
             </div>
             
             <div className="text-center md:text-left flex-1 space-y-1.5">
               <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
-                <h1 className="font-serif text-3xl font-bold text-[#635f41] tracking-tight">{profile.name}</h1>
-                <span className="inline-block px-3 py-1 rounded-full bg-[#8CC0EB]/20 text-[#2e4a5a] text-[10px] font-bold uppercase tracking-wider">
+                <h1 className="font-serif text-3xl font-bold text-[#353535] tracking-tight">{profile.name}</h1>
+                <span className="inline-block px-3 py-1 rounded-full bg-[#E85F57]/20 text-[#E85F57] text-[10px] font-bold uppercase tracking-wider">
                   {profile.roles && profile.roles.length > 0 ? profile.roles[0] : "Member"}
                 </span>
                 
@@ -102,13 +102,13 @@ export default function ViewProfile() {
                   </span>
                 ))}
               </div>
-              <p className="text-sm text-[#466272]">{profile.email}</p>
+              <p className="text-sm text-[#666361]">{profile.email}</p>
             </div>
 
-            <div className="flex gap-4 items-center bg-white/60 backdrop-blur-xs border border-[#e6e2dd]/80 px-4 py-3 rounded-2xl">
+            <div className="flex gap-4 items-center bg-white/60 backdrop-blur-xs border border-[#DDD8CE]/80 px-4 py-3 rounded-2xl">
               <div className="text-right">
-                <p className="text-[10px] uppercase font-bold text-[#635f41]/75 tracking-wider">Member ID</p>
-                <p className="text-xs font-bold text-[#466272]">{profile.member_id || "AAY-PEND"}</p>
+                <p className="text-[10px] uppercase font-bold text-[#353535]/75 tracking-wider">Member ID</p>
+                <p className="text-xs font-bold text-[#666361]">{profile.member_id || "AAY-PEND"}</p>
               </div>
             </div>
           </div>
@@ -120,10 +120,10 @@ export default function ViewProfile() {
               
               {/* Contact Info */}
               <div className="space-y-4">
-                <h2 className="text-xs font-bold uppercase tracking-widest text-[#635f41] flex items-center gap-2 border-b border-[#e6e2dd]/60 pb-2">
-                  <Phone className="w-4 h-4 text-[#8CC0EB]" /> Contact Information
+                <h2 className="text-xs font-bold uppercase tracking-widest text-[#353535] flex items-center gap-2 border-b border-[#DDD8CE]/60 pb-2">
+                  <Phone className="w-4 h-4 text-[#E85F57]" /> Contact Information
                 </h2>
-                <div className="space-y-3 text-sm text-[#466272]/95">
+                <div className="space-y-3 text-sm text-[#666361]/95">
                   <p><strong>Phone:</strong> {profile.phone || "Not specified"}</p>
                   <p><strong>Pronouns:</strong> {profile.pronouns || "Not specified"}</p>
                   <p><strong>Age:</strong> {profile.age || "Not specified"}</p>
@@ -132,10 +132,10 @@ export default function ViewProfile() {
 
               {/* Address */}
               <div className="space-y-4">
-                <h2 className="text-xs font-bold uppercase tracking-widest text-[#635f41] flex items-center gap-2 border-b border-[#e6e2dd]/60 pb-2">
-                  <MapPin className="w-4 h-4 text-[#8CC0EB]" /> Address & Location
+                <h2 className="text-xs font-bold uppercase tracking-widest text-[#353535] flex items-center gap-2 border-b border-[#DDD8CE]/60 pb-2">
+                  <MapPin className="w-4 h-4 text-[#E85F57]" /> Address & Location
                 </h2>
-                <div className="space-y-2 text-sm text-[#466272]/95">
+                <div className="space-y-2 text-sm text-[#666361]/95">
                   <p><strong>Street:</strong> {profile.address || "Not specified"}</p>
                   <p><strong>City:</strong> {profile.city || "Not specified"}</p>
                   <p><strong>State:</strong> {profile.state || "Not specified"}</p>
@@ -148,7 +148,7 @@ export default function ViewProfile() {
                 <h2 className="text-xs font-bold uppercase tracking-widest text-red-800 flex items-center gap-2 border-b border-red-100 pb-2">
                   <ShieldAlert className="w-4 h-4 text-red-600" /> Emergency Details
                 </h2>
-                <div className="space-y-2.5 text-sm text-[#466272]/95">
+                <div className="space-y-2.5 text-sm text-[#666361]/95">
                   <p><strong>Contact Name:</strong> {profile.emergency_name || "Not specified"}</p>
                   <p><strong>Contact Phone:</strong> {profile.emergency_phone || "Not specified"}</p>
                 </div>
@@ -161,11 +161,11 @@ export default function ViewProfile() {
               
               {/* Bio block */}
               <div className="space-y-3 text-left">
-                <h2 className="text-xs font-bold uppercase tracking-widest text-[#635f41] flex items-center gap-2 border-b border-[#e6e2dd]/60 pb-2">
-                  <FileText className="w-4 h-4 text-[#8CC0EB]" /> Artistic Biography
+                <h2 className="text-xs font-bold uppercase tracking-widest text-[#353535] flex items-center gap-2 border-b border-[#DDD8CE]/60 pb-2">
+                  <FileText className="w-4 h-4 text-[#E85F57]" /> Artistic Biography
                 </h2>
                 {profile.bio ? (
-                  <blockquote className="border-l-4 border-[#8CC0EB] pl-4 italic text-sm leading-relaxed text-[#466272]/90 my-4 bg-gray-50 py-3 pr-3 rounded-r-xl">
+                  <blockquote className="border-l-4 border-[#E85F57] pl-4 italic text-sm leading-relaxed text-[#666361]/90 my-4 bg-gray-50 py-3 pr-3 rounded-r-xl">
                     "{profile.bio}"
                   </blockquote>
                 ) : (
@@ -178,10 +178,10 @@ export default function ViewProfile() {
                 
                 {/* Interest & Avail */}
                 <div className="space-y-3">
-                  <h3 className="text-xs font-bold uppercase tracking-widest text-[#635f41] flex items-center gap-2 border-b border-[#e6e2dd]/40 pb-1.5">
-                    <Award className="w-4 h-4 text-[#8CC0EB]" /> Theatrical Profile
+                  <h3 className="text-xs font-bold uppercase tracking-widest text-[#353535] flex items-center gap-2 border-b border-[#DDD8CE]/40 pb-1.5">
+                    <Award className="w-4 h-4 text-[#E85F57]" /> Theatrical Profile
                   </h3>
-                  <div className="space-y-2 text-sm text-[#466272]/95">
+                  <div className="space-y-2 text-sm text-[#666361]/95">
                     <p><strong>Primary Interest:</strong> {profile.interest || "Acting"}</p>
                     <p><strong>Availability:</strong> {profile.availability || "Weekends"}</p>
                   </div>
@@ -189,12 +189,12 @@ export default function ViewProfile() {
 
                 {/* Portfolio */}
                 <div className="space-y-3">
-                  <h3 className="text-xs font-bold uppercase tracking-widest text-[#635f41] flex items-center gap-2 border-b border-[#e6e2dd]/40 pb-1.5">
-                    <Globe className="w-4 h-4 text-[#8CC0EB]" /> Portfolio Details
+                  <h3 className="text-xs font-bold uppercase tracking-widest text-[#353535] flex items-center gap-2 border-b border-[#DDD8CE]/40 pb-1.5">
+                    <Globe className="w-4 h-4 text-[#E85F57]" /> Portfolio Details
                   </h3>
-                  <div className="space-y-2 text-sm text-[#466272]/95">
+                  <div className="space-y-2 text-sm text-[#666361]/95">
                     <p><strong>Link:</strong> {profile.portfolio ? (
-                      <a href={profile.portfolio} target="_blank" rel="noreferrer" className="text-[#8CC0EB] hover:underline font-medium break-all">{profile.portfolio}</a>
+                      <a href={profile.portfolio} target="_blank" rel="noreferrer" className="text-[#E85F57] hover:underline font-medium break-all">{profile.portfolio}</a>
                     ) : (
                       <span className="text-gray-400 italic">None listed</span>
                     )}</p>
@@ -204,18 +204,18 @@ export default function ViewProfile() {
               </div>
 
               {/* System Account Stats */}
-              <div className="bg-[#f7f3ee]/60 border border-[#cac6b9]/40 p-5 rounded-2xl space-y-3">
-                <h3 className="text-xs font-bold uppercase tracking-widest text-[#635f41] flex items-center gap-2">
-                  <Shield className="w-4 h-4 text-[#8CC0EB]" /> System Privileges
+              <div className="bg-[#EFE8E1]/60 border border-[#D5C9BE]/40 p-5 rounded-2xl space-y-3">
+                <h3 className="text-xs font-bold uppercase tracking-widest text-[#353535] flex items-center gap-2">
+                  <Shield className="w-4 h-4 text-[#E85F57]" /> System Privileges
                 </h3>
                 <div className="grid grid-cols-2 gap-4 text-xs">
                   <div>
                     <span className="text-gray-500">Account status:</span>
-                    <p className="font-bold text-[#635f41]">{profile.status || "Active"}</p>
+                    <p className="font-bold text-[#353535]">{profile.status || "Active"}</p>
                   </div>
                   <div>
                     <span className="text-gray-500">Experience level:</span>
-                    <p className="font-bold text-[#635f41]">{profile.level || "Intermediate"}</p>
+                    <p className="font-bold text-[#353535]">{profile.level || "Intermediate"}</p>
                   </div>
                 </div>
               </div>

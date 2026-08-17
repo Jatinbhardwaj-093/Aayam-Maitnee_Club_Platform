@@ -80,21 +80,21 @@ export default function MemberPlays() {
   }, []);
 
   return (
-    <div className="space-y-[32px] font-sans text-[#466272]">
+    <div className="space-y-[32px] font-sans text-[#666361]">
       {/* Header Banner - Clean Text Style without Image Overlay */}
-      <div className="bg-[#f7f3ee] border border-[#e6e2dd] rounded-[16px] p-[28px] md:p-[36px] flex flex-col md:flex-row justify-between items-start md:items-center gap-[24px] shadow-xs">
+      <div className="bg-[#EFE8E1] border border-[#DDD8CE] rounded-[16px] p-[28px] md:p-[36px] flex flex-col md:flex-row justify-between items-start md:items-center gap-[24px] shadow-xs">
         <div className="space-y-[12px] flex-1">
-          <Badge className="bg-[#635f41] text-white border-0 rounded-[4px] uppercase tracking-wider text-[10px] font-bold">
+          <Badge className="bg-[#353535] text-white border-0 rounded-[4px] uppercase tracking-wider text-[10px] font-bold">
             Repertoire & Production Vault
           </Badge>
-          <h2 className="text-[32px] font-bold font-serif text-[#635f41] tracking-tight">Production Plays</h2>
-          <p className="text-[14px] text-[#466272] max-w-3xl leading-relaxed font-light">
+          <h2 className="text-[32px] font-bold font-serif text-[#353535] tracking-tight">Production Plays</h2>
+          <p className="text-[14px] text-[#666361] max-w-3xl leading-relaxed font-light">
             Comprehensive production guides, staging details, cast rosters, and rehearsal specifications for Aayam theatrical works. Clean, bannerless cards detailed for directors, performers, and technical crew.
           </p>
         </div>
         <div className="flex-shrink-0">
           <Link to="/member-scripts">
-            <Button className="bg-[#8CC0EB] hover:bg-[#8CC0EB]/90 text-[#001e2c] font-bold rounded-[8px] py-[12px] px-[22px] gap-2 shadow-sm transition-all active:scale-95">
+            <Button className="bg-[#E85F57] hover:bg-[#E85F57]/90 text-[#001e2c] font-bold rounded-[8px] py-[12px] px-[22px] gap-2 shadow-sm transition-all active:scale-95">
               <FileText className="w-4.5 h-4.5 text-[#001e2c]" /> Open Script Library
             </Button>
           </Link>
@@ -103,7 +103,7 @@ export default function MemberPlays() {
 
       {/* Plays Grid - Clean Bannerless Informative Cards */}
       {loading ? (
-        <div className="text-center py-16 text-[#466272]/70 font-semibold italic">Loading production details...</div>
+        <div className="text-center py-16 text-[#666361]/70 font-semibold italic">Loading production details...</div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-[24px]">
           {plays.map((play) => {
@@ -118,72 +118,72 @@ export default function MemberPlays() {
             return (
               <div 
                 key={play.id} 
-                className="bg-white border border-[#e6e2dd] rounded-2xl p-6 md:p-8 hover:border-[#635f41] hover:shadow-lg transition-all duration-300 flex flex-col justify-between space-y-6"
+                className="bg-white border border-[#DDD8CE] rounded-2xl p-6 md:p-8 hover:border-[#353535] hover:shadow-lg transition-all duration-300 flex flex-col justify-between space-y-6"
               >
                 {/* Header Info */}
                 <div className="space-y-4">
-                  <div className="flex items-start justify-between gap-4 border-b border-[#e6e2dd]/60 pb-4">
+                  <div className="flex items-start justify-between gap-4 border-b border-[#DDD8CE]/60 pb-4">
                     <div>
-                      <span className="text-[10px] font-bold text-[#635f41] uppercase tracking-[0.2em] block mb-1">
+                      <span className="text-[10px] font-bold text-[#353535] uppercase tracking-[0.2em] block mb-1">
                         {play.season || "2024-2025 Lineage"}
                       </span>
-                      <h3 className="text-2xl font-bold font-serif text-[#1c1b19] tracking-tight">{play.title}</h3>
-                      <p className="text-xs text-[#635f41] font-semibold italic mt-1">{extra.tagline}</p>
+                      <h3 className="text-2xl font-bold font-serif text-[#232323] tracking-tight">{play.title}</h3>
+                      <p className="text-xs text-[#353535] font-semibold italic mt-1">{extra.tagline}</p>
                     </div>
-                    <Badge className="bg-[#635f41]/10 text-[#635f41] border border-[#635f41]/20 font-bold text-[10px] uppercase tracking-wider px-3 py-1 flex-shrink-0">
+                    <Badge className="bg-[#353535]/10 text-[#353535] border border-[#353535]/20 font-bold text-[10px] uppercase tracking-wider px-3 py-1 flex-shrink-0">
                       {play.status || "Active Repertoire"}
                     </Badge>
                   </div>
 
                   {/* Key Specifications Grid */}
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 bg-[#fdf9f4] p-4 rounded-xl border border-[#e6e2dd]/80 text-xs">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 bg-[#E7DDD3] p-4 rounded-xl border border-[#DDD8CE]/80 text-xs">
                     <div className="space-y-1">
-                      <span className="text-[10px] uppercase font-bold text-[#466272]/70 block flex items-center gap-1">
-                        <Award className="w-3.5 h-3.5 text-[#635f41]" /> Director
+                      <span className="text-[10px] uppercase font-bold text-[#666361]/70 block flex items-center gap-1">
+                        <Award className="w-3.5 h-3.5 text-[#353535]" /> Director
                       </span>
-                      <span className="font-bold text-[#1c1b19] truncate block">{play.director || "Ensemble Lead"}</span>
+                      <span className="font-bold text-[#232323] truncate block">{play.director || "Ensemble Lead"}</span>
                     </div>
 
                     <div className="space-y-1">
-                      <span className="text-[10px] uppercase font-bold text-[#466272]/70 block flex items-center gap-1">
-                        <MapPin className="w-3.5 h-3.5 text-[#635f41]" /> Venue
+                      <span className="text-[10px] uppercase font-bold text-[#666361]/70 block flex items-center gap-1">
+                        <MapPin className="w-3.5 h-3.5 text-[#353535]" /> Venue
                       </span>
-                      <span className="font-bold text-[#1c1b19] truncate block">{play.venue || "OAT IIT Madras"}</span>
+                      <span className="font-bold text-[#232323] truncate block">{play.venue || "OAT IIT Madras"}</span>
                     </div>
 
                     <div className="space-y-1">
-                      <span className="text-[10px] uppercase font-bold text-[#466272]/70 block flex items-center gap-1">
-                        <Clock className="w-3.5 h-3.5 text-[#635f41]" /> Runtime
+                      <span className="text-[10px] uppercase font-bold text-[#666361]/70 block flex items-center gap-1">
+                        <Clock className="w-3.5 h-3.5 text-[#353535]" /> Runtime
                       </span>
-                      <span className="font-bold text-[#1c1b19] truncate block">{play.runtime || "90 Mins"}</span>
+                      <span className="font-bold text-[#232323] truncate block">{play.runtime || "90 Mins"}</span>
                     </div>
 
                     <div className="space-y-1">
-                      <span className="text-[10px] uppercase font-bold text-[#466272]/70 block flex items-center gap-1">
-                        <Layers className="w-3.5 h-3.5 text-[#635f41]" /> Structure
+                      <span className="text-[10px] uppercase font-bold text-[#666361]/70 block flex items-center gap-1">
+                        <Layers className="w-3.5 h-3.5 text-[#353535]" /> Structure
                       </span>
-                      <span className="font-bold text-[#1c1b19] truncate block">{extra.acts}</span>
+                      <span className="font-bold text-[#232323] truncate block">{extra.acts}</span>
                     </div>
 
                     <div className="space-y-1">
-                      <span className="text-[10px] uppercase font-bold text-[#466272]/70 block flex items-center gap-1">
-                        <Users className="w-3.5 h-3.5 text-[#635f41]" /> Cast Size
+                      <span className="text-[10px] uppercase font-bold text-[#666361]/70 block flex items-center gap-1">
+                        <Users className="w-3.5 h-3.5 text-[#353535]" /> Cast Size
                       </span>
-                      <span className="font-bold text-[#1c1b19] truncate block">{extra.castCount}</span>
+                      <span className="font-bold text-[#232323] truncate block">{extra.castCount}</span>
                     </div>
 
                     <div className="space-y-1">
-                      <span className="text-[10px] uppercase font-bold text-[#466272]/70 block flex items-center gap-1">
-                        <Calendar className="w-3.5 h-3.5 text-[#635f41]" /> Rehearsals
+                      <span className="text-[10px] uppercase font-bold text-[#666361]/70 block flex items-center gap-1">
+                        <Calendar className="w-3.5 h-3.5 text-[#353535]" /> Rehearsals
                       </span>
-                      <span className="font-bold text-[#1c1b19] truncate block">{extra.rehearsalSchedule}</span>
+                      <span className="font-bold text-[#232323] truncate block">{extra.rehearsalSchedule}</span>
                     </div>
                   </div>
 
                   {/* Synopsis Description */}
                   <div className="space-y-2">
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-[#635f41]">Production Synopsis & Themes</h4>
-                    <p className="text-xs text-[#466272] leading-relaxed font-light">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-[#353535]">Production Synopsis & Themes</h4>
+                    <p className="text-xs text-[#666361] leading-relaxed font-light">
                       {play.description}
                     </p>
                   </div>
@@ -191,8 +191,8 @@ export default function MemberPlays() {
                   {/* Featured Cast Roster */}
                   {play.cast && (
                     <div className="space-y-1.5 pt-2">
-                      <span className="text-[10px] font-bold text-[#635f41] uppercase tracking-wider block">Featured Performers:</span>
-                      <p className="text-xs font-medium text-[#1c1b19] bg-gray-50 p-2.5 rounded-lg border border-gray-200/60">
+                      <span className="text-[10px] font-bold text-[#353535] uppercase tracking-wider block">Featured Performers:</span>
+                      <p className="text-xs font-medium text-[#232323] bg-gray-50 p-2.5 rounded-lg border border-gray-200/60">
                         {play.cast}
                       </p>
                     </div>
@@ -200,14 +200,14 @@ export default function MemberPlays() {
                 </div>
 
                 {/* Footer Action Buttons */}
-                <div className="pt-4 border-t border-[#e6e2dd] flex flex-col sm:flex-row items-center justify-between gap-3">
-                  <div className="flex items-center gap-2 text-[11px] text-[#466272] font-semibold">
-                    <Tag className="w-3.5 h-3.5 text-[#8CC0EB]" /> {extra.theme}
+                <div className="pt-4 border-t border-[#DDD8CE] flex flex-col sm:flex-row items-center justify-between gap-3">
+                  <div className="flex items-center gap-2 text-[11px] text-[#666361] font-semibold">
+                    <Tag className="w-3.5 h-3.5 text-[#E85F57]" /> {extra.theme}
                   </div>
                   <div className="flex items-center gap-2 w-full sm:w-auto">
                     <Link 
                       to="/member-scripts" 
-                      className="flex-1 sm:flex-initial bg-[#8CC0EB] text-[#001e2c] hover:bg-[#8CC0EB]/90 px-4 py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all"
+                      className="flex-1 sm:flex-initial bg-[#E85F57] text-[#001e2c] hover:bg-[#E85F57]/90 px-4 py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all"
                     >
                       <FileText className="w-3.5 h-3.5" /> Download Script
                     </Link>
