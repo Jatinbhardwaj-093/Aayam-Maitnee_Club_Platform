@@ -84,20 +84,20 @@ export default function About() {
       <section className="py-20 px-6 md:px-12 max-w-7xl mx-auto border-b border-[#D5C9BE]/40">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           <div className="text-center space-y-3">
-            <h4 className="text-5xl md:text-6xl font-serif text-[#E85F57]">24+</h4>
+            <h4 className="text-5xl md:text-6xl font-serif text-[#E85F57]">6</h4>
             <p className="text-xs font-mono uppercase tracking-widest text-[#666361] font-bold">Productions</p>
           </div>
           <div className="text-center space-y-3">
-            <h4 className="text-5xl md:text-6xl font-serif text-[#E85F57]">150+</h4>
+            <h4 className="text-5xl md:text-6xl font-serif text-[#E85F57]">13</h4>
             <p className="text-xs font-mono uppercase tracking-widest text-[#666361] font-bold">Ensemble Members</p>
           </div>
           <div className="text-center space-y-3">
-            <h4 className="text-5xl md:text-6xl font-serif text-[#E85F57]">12</h4>
-            <p className="text-xs font-mono uppercase tracking-widest text-[#666361] font-bold">National Awards</p>
+            <h4 className="text-5xl md:text-6xl font-serif text-[#E85F57]">5</h4>
+            <p className="text-xs font-mono uppercase tracking-widest text-[#666361] font-bold">Key Events</p>
           </div>
           <div className="text-center space-y-3">
-            <h4 className="text-5xl md:text-6xl font-serif text-[#E85F57]">5k+</h4>
-            <p className="text-xs font-mono uppercase tracking-widest text-[#666361] font-bold">Audience Reached</p>
+            <h4 className="text-5xl md:text-6xl font-serif text-[#E85F57]">67</h4>
+            <p className="text-xs font-mono uppercase tracking-widest text-[#666361] font-bold">Gallery Archives</p>
           </div>
         </div>
       </section>
