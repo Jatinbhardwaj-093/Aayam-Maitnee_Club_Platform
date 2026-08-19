@@ -1,10 +1,17 @@
 // @ts-nocheck
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useOutletContext } from "react-router-dom";
 import { Sparkles, Users, BookOpen, HeartHandshake, ArrowRight, Compass, Theater, Mail, ExternalLink, Quote, Flame, Eye, Landmark, MoveRight, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function About() {
+  const contextData = useOutletContext<any>() || {};
+  const activeUser = contextData.activeUser || JSON.parse(sessionStorage.getItem("aayam_active_user") || "null");
+
+  const auditionPath = activeUser 
+    ? (activeUser.role?.includes("Maintainer") || activeUser.role?.includes("Secretary") || activeUser.role?.includes("Chief") ? "/auditions-admin" : "/auditions")
+    : "/join";
+
   return (
     <div className="min-h-screen bg-[#E7DDD3] text-[#2C2A28] font-sans pb-24 selection:bg-[#F8E8E4]">
       
@@ -163,7 +170,7 @@ export default function About() {
 
           {/* Samarth */}
           <div className="bg-[#2C2A28] text-white border border-[#353535] rounded-3xl overflow-hidden p-6 space-y-4 shadow-xl hover:border-[#E85F57]/50 transition-all">
-            <img src="/aayam_assets/profiles/my_pic.jpg" alt="Samarth Shrivastava" className="w-full h-56 object-cover object-top rounded-2xl filter brightness-90 contrast-105" />
+            <img src="/aayam_assets/profiles/samarth_shrivastava.jpg" alt="Samarth Shrivastava" className="w-full h-56 object-cover object-top rounded-2xl filter brightness-90 contrast-105" />
             <div>
               <h4 className="font-normal font-serif text-xl text-[#F7F5F0]">Samarth Shrivastava</h4>
               <span className="text-[10px] font-mono font-semibold text-[#E85F57] uppercase tracking-wider block">Chief Coordinator</span>
@@ -242,9 +249,9 @@ export default function About() {
             </div>
 
             <div className="flex flex-wrap gap-4 justify-center">
-              <Link to="/join">
+              <Link to={auditionPath}>
                 <Button className="bg-[#E85F57] hover:bg-white hover:text-[#E85F57] text-white font-bold px-10 py-6 rounded-full text-sm uppercase tracking-widest transition-all shadow-xl active:scale-95">
-                  Apply for Auditions
+                  {activeUser ? "Auditions & Casting Portal" : "Apply for Auditions"}
                 </Button>
               </Link>
             </div>

@@ -34,7 +34,7 @@ import Gallery from "./pages/website_landing/Gallery";
 import Profile from "./pages/website_landing/Profile";
 import About from "./pages/website_landing/About";
 import JoinClub from "./pages/JoinClub";
-import ThemePreview from "./pages/ThemePreview";
+import Login from "./pages/Login";
 
 export default function App() {
   return (
@@ -54,6 +54,7 @@ export default function App() {
           <Route path="profile/edit" element={<EditProfile />} />
           <Route path="profile/:memberId" element={<Profile />} />
           <Route path="join" element={<JoinClub />} />
+          <Route path="login" element={<Login />} />
 
           {/* Portal / Dashboard paths */}
           <Route path="member" element={<MemberDashboard />} />

@@ -50,6 +50,7 @@ class User(db.Model):
     state = db.Column(db.String(100), nullable=True)
     country = db.Column(db.String(100), nullable=True)
     interest = db.Column(db.String(100), nullable=True)
+    avatar_url = db.Column(db.Text, nullable=True)
 
     roles = db.relationship("Role", secondary=user_roles, back_populates="users")
     membership = db.relationship("Membership", back_populates="user", uselist=False, cascade="all, delete-orphan")
@@ -69,7 +70,7 @@ class User(db.Model):
             "Yuuhi": "/aayam_assets/profiles/abay_nandhiga.jpg",
             "Utkarsh / Yuuhi": "/aayam_assets/profiles/abay_nandhiga.jpg",
             "Utkarsh (Yuuhi)": "/aayam_assets/profiles/abay_nandhiga.jpg",
-            "Samarth Shrivastava": "/aayam_assets/profiles/my_pic.jpg",
+            "Samarth Shrivastava": "/aayam_assets/profiles/samarth_shrivastava.jpg",
             "Krishna Subramanian": "/aayam_assets/profiles/krishna_subramanian.jpg",
             "Harsh Aryan": "/aayam_assets/profiles/harsh_aryan.jpg",
             "Swati Singh": "/aayam_assets/profiles/swati_singh.jpg",
@@ -90,7 +91,187 @@ class User(db.Model):
             "Esha Hinde": "/aayam_assets/profiles/esha_hinde.jpg",
             "Aditi": "/aayam_assets/profiles/aditi_drama.jpg"
         }
-        avatar_url = avatar_map.get(self.name, "/aayam_assets/profiles/abay_nandhiga.jpg")
+        avatar_url = self.avatar_url or avatar_map.get(self.name, "/aayam_assets/profiles/abay_nandhiga.jpg")
+
+        roles_list = [r.name for r in self.roles]
+        primary_role = roles_list[0] if roles_list else "Ensemble Member"
+
+        # Determine tier and statement dynamically
+        is_exec = any(k in primary_role.lower() or k in (self.name or "").lower() for k in ["secretary", "coordinator", "maintainer", "lead", "abay", "yuuhi", "samarth", "swati"])
+        tier = "Core Directorial Council" if is_exec else ("Principal Dramatic Artist" if "director" in primary_role.lower() or "actor" in primary_role.lower() else "Production & Technical Lead")
+        
+        # Determine specializations
+        specializations = [s.strip().upper() for s in (self.interest or "Stagecraft, Voice Modulation, Blocking, Ensemble Sync").split(",") if s.strip()]
+        if not specializations:
+            specializations = ["STAGE PERFORMANCE", "SCRIPT ANALYSIS", "CHARACTER WORK", "THEATRE PRODUCTION"]
+
+        # Dynamic portfolio items based on member's role and productions
+        portfolio_items = []
+        name_l = (self.name or "").lower()
+        if "abay" in name_l:
+            portfolio_items = [
+                {
+                    "title": "Tamashbin Kathputliya",
+                    "role": "Executive Producer & Ensemble Lead",
+                    "year": 2026,
+                    "image": "/aayam_assets/tamashbin_user_1.jpg",
+                    "description": "Led society tour staging and courtyard audience interaction across IIT campus festival circuit."
+                },
+                {
+                    "title": "DDDJ Stage Production",
+                    "role": "Production Director",
+                    "year": 2026,
+                    "image": "/aayam_assets/dddj_user_1.jpg",
+                    "description": "Directed high-contrast stage lighting shifts and dramatic proscenium blocking for CLT auditorium showcase."
+                },
+                {
+                    "title": "Karn Ki Yachika",
+                    "role": "Cast Lead (Karn)",
+                    "year": 2026,
+                    "image": "/aayam_assets/kky_user_5.jpg",
+                    "description": "Featured classical dramatic performance at Kashiyatra National Drama Festival."
+                }
+            ]
+        elif "yuuhi" in name_l or "utkarsh" in name_l:
+            portfolio_items = [
+                {
+                    "title": "Tamashbin Kathputliya",
+                    "role": "Director & Lead Narrator",
+                    "year": 2026,
+                    "image": "/aayam_assets/tamashbin_user_2.jpg",
+                    "description": "Conceptualized satire dialogues, dholak percussion cues, and live street-play direction."
+                },
+                {
+                    "title": "Karn Ki Yachika",
+                    "role": "Principal Dramatic Performer",
+                    "year": 2026,
+                    "image": "/aayam_assets/kky_user_3.jpg",
+                    "description": "Delivered high-intensity tragic monologues in classical Hindi verse adaptation."
+                }
+            ]
+        elif "samarth" in name_l:
+            portfolio_items = [
+                {
+                    "title": "Samatvam Physical Theatre",
+                    "role": "Chief Production Coordinator",
+                    "year": 2026,
+                    "image": "/aayam_assets/samatvam_user_3.jpg",
+                    "description": "Coordinated multi-tier stage logistics, acoustic balancing, and rehearsal hall setups."
+                },
+                {
+                    "title": "Tamashbin Street Showcase",
+                    "role": "Percussion & Staging Coordinator",
+                    "year": 2026,
+                    "image": "/aayam_assets/tamashbin_user_3.jpg",
+                    "description": "Managed courtyard venue staging and live crowd acoustic projection."
+                }
+            ]
+        elif "krishna" in name_l:
+            portfolio_items = [
+                {
+                    "title": "DDDJ Proscenium Drama",
+                    "role": "Lighting & Technical Lead",
+                    "year": 2026,
+                    "image": "/aayam_assets/dddj_user_4.jpg",
+                    "description": "Designed DMX programmable spotlight cues and ambient acoustic transitions."
+                },
+                {
+                    "title": "Samatvam Theatre",
+                    "role": "Ensemble Sound Designer",
+                    "year": 2026,
+                    "image": "/aayam_assets/samatvam_user_4.jpg",
+                    "description": "Engineered live microphone acoustics and spatial stage cues for full ensemble."
+                }
+            ]
+        elif "swati" in name_l:
+            portfolio_items = [
+                {
+                    "title": "Speak Up Tara",
+                    "role": "Script Editor & Digital Lead",
+                    "year": 2026,
+                    "image": "/aayam_assets/speak_up_tara_user_1.webp",
+                    "description": "Curated the published script version and managed online ticketing infrastructure."
+                },
+                {
+                    "title": "Aayam Digital Archives",
+                    "role": "Web Operations & Archival Lead",
+                    "year": 2026,
+                    "image": "/aayam_assets/speak_up_tara_user_4.jpg",
+                    "description": "Engineered digital member roster, audition portal, and gallery database."
+                }
+            ]
+        elif "sneha" in name_l:
+            portfolio_items = [
+                {
+                    "title": "Tamashbin Kathputliya",
+                    "role": "Scenic Backdrop & Prop Head",
+                    "year": 2026,
+                    "image": "/aayam_assets/tamashbin_user_5.jpg",
+                    "description": "Painted traditional Rajasthani and contemporary street motifs for outdoor production."
+                },
+                {
+                    "title": "DDDJ Visual Identity",
+                    "role": "Costume & Aesthetic Designer",
+                    "year": 2026,
+                    "image": "/aayam_assets/dddj_user_5.jpg",
+                    "description": "Curated proscenium stage visual palette, lighting gels, and character styling."
+                }
+            ]
+        elif "tanu" in name_l:
+            portfolio_items = [
+                {
+                    "title": "Samatvam",
+                    "role": "Director & Dramaturge",
+                    "year": 2026,
+                    "image": "/aayam_assets/samatvam_user_1.jpg",
+                    "description": "Directed 90-minute ensemble piece exploring modern inner conflict and collective movement."
+                }
+            ]
+        elif "vaishnavi" in name_l:
+            portfolio_items = [
+                {
+                    "title": "Karn Ki Yachika",
+                    "role": "Production Director",
+                    "year": 2026,
+                    "image": "/aayam_assets/kky_user_2.jpg",
+                    "description": "Spearheaded classical blocking, verse modulation, and tragic crescendo staging."
+                },
+                {
+                    "title": "Speak Up Tara",
+                    "role": "Director",
+                    "year": 2026,
+                    "image": "/aayam_assets/speak_up_tara_user_2.jpg",
+                    "description": "Directed festival showcase on gender equality and societal voice."
+                }
+            ]
+        else:
+            portfolio_items = [
+                {
+                    "title": "Aayam 2026 Repertoire Showcase",
+                    "role": primary_role,
+                    "year": 2026,
+                    "image": "/aayam_assets/tamashbin_user_1.jpg",
+                    "description": f"Active contribution to {self.interest or 'theatrical performance and stagecraft'} during seasonal productions."
+                },
+                {
+                    "title": "Campus Theatre Workshop",
+                    "role": "Ensemble Contributor",
+                    "year": 2026,
+                    "image": "/aayam_assets/samatvam_user_2.jpg",
+                    "description": "Participated in method acting drills, vocal modulation, and stage blocking labs."
+                }
+            ]
+
+        portfolio_data = {
+            'activeSince': 2023,
+            'tier': tier,
+            'statementTitle': "Artistic Vision & Stagecraft",
+            'statementBody': self.bio or f"{self.name} is a dedicated theatrical artist and leader at Aayam - IIT Madras BS Drama Society.",
+            'statementSecondary': f"Based in {self.city or 'IIT Madras BS'}. Contributing to {self.interest or 'Stagecraft and Theatrical Expression'}.",
+            'specializations': specializations,
+            'quote': "The stage is not a mirror to reflect reality, but a prism to refract human truth.",
+            'portfolio': portfolio_items
+        }
 
         return {
             'id': self.id,
@@ -112,12 +293,13 @@ class User(db.Model):
             'availability': self.availability,
             'bio': self.bio,
             'portfolio': self.portfolio,
+            'portfolioData': portfolio_data,
             'interest': self.interest,
             'emergency_name': self.emergency_name,
             'emergency_phone': self.emergency_phone,
-            'roles': [r.name for r in self.roles],
+            'roles': roles_list,
             'labels': [{'id': l.id, 'name': l.name, 'color': l.color} for l in self.labels],
-            'productionsCount': len(self.participations) if self.participations else 0
+            'productionsCount': len(self.participations) if self.participations else len(portfolio_items)
         }
 
 class Role(db.Model):

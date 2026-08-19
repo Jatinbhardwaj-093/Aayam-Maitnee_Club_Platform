@@ -114,7 +114,8 @@ def join_club():
         interest=data['interest'],
         status='Active',
         emergency_name=data['emergencyName'],
-        emergency_phone=data['emergencyPhone']
+        emergency_phone=data['emergencyPhone'],
+        avatar_url=data.get('avatar_url') or data.get('image') or data.get('avatarUrl')
     )
 
     if role_obj:
@@ -913,48 +914,48 @@ def get_audition_positions():
     if not positions:
         defaults = [
             {
-                "production_name": "Tughlaq - Ensemble Production",
-                "role_name": "Sultan Muhammad bin Tughlaq (Lead)",
+                "production_name": "Karn Ki Yachika",
+                "role_name": "Lead Performer (Karn)",
                 "role_category": "Performer",
-                "character_description": "Complex, vision-driven 14th-century ruler torn between idealism and ruthlessness. Requires powerful vocal presence, command over classical Hindustani diction, dramatic intensity, and emotional range.",
-                "requirements": "Audition monologue video clip & theatrical resume",
-                "slots_available": 2,
-                "status": "Open Calling"
-            },
-            {
-                "production_name": "Tughlaq - Ensemble Production",
-                "role_name": "Step-Mother / Queen Consort (Antagonist)",
-                "role_category": "Performer",
-                "character_description": "Sharp-witted, politically calculating royal matriarch who challenges Tughlaq's court decrees. Requires sharp eye contact, royal posture, and crisp monologue delivery.",
-                "requirements": "Classical drama monologue video & portfolio",
-                "slots_available": 1,
-                "status": "Open Calling"
-            },
-            {
-                "production_name": "Macbeth - Mainstage Production",
-                "role_name": "Lead Stage Makeup & Special Effects Stylist",
-                "role_category": "Creative Designer",
-                "character_description": "Head makeup artist responsible for period prosthetics, battle scars, dark theatrical contours, and quick backstage transformations for Macbeth, Lady Macbeth, and the Three Witches.",
-                "requirements": "Technical SFX makeup portfolio PDF & sketch samples",
+                "character_description": "Monumental tragic protagonist navigating moral dilemma, honor, and destiny. High-intensity classical Hindi monologue & verse delivery required.",
+                "requirements": "Audition monologue video clip (2 mins) & theatrical bio",
                 "slots_available": 2,
                 "status": "Open Calling"
             },
             {
                 "production_name": "Tamashbin Kathputliya",
-                "role_name": "Soundboard & Acoustic Design Operator",
-                "role_category": "Technical Crew",
-                "character_description": "Technical audio operator responsible for live sound mixing, ambient folk instrument amplification, cue playback, and wireless microphone balancing during live mainstage runs.",
-                "requirements": "Audio staging portfolio PDF & work resume",
-                "slots_available": 1,
+                "role_name": "Dholak & Courtyard Chorus Lead",
+                "role_category": "Performer",
+                "character_description": "High-energy street drama performer skilled in vocal projection, folk rhythm synchronization, and crowd interaction.",
+                "requirements": "Live percussion video or street drama reel",
+                "slots_available": 3,
                 "status": "Open Calling"
             },
             {
-                "production_name": "Andha Yug",
-                "role_name": "Costume Assistant & Wardrobe Master",
-                "role_category": "Creative Designer",
-                "character_description": "Backstage wardrobe assistant managing heritage drape costumes, armor fitting, quick-change coordination, and textile maintenance for a 25-person ensemble cast.",
-                "requirements": "Costume design portfolio PDF & resume",
-                "slots_available": 3,
+                "production_name": "DDDJ - Stage Production",
+                "role_name": "Proscenium Lighting & DMX Rig Operator",
+                "role_category": "Technical Crew",
+                "character_description": "Technical crew member managing DMX lighting console, spot gels, color transitions, and live proscenium stage cues.",
+                "requirements": "Technical crew portfolio or stage experience summary",
+                "slots_available": 2,
+                "status": "Open Calling"
+            },
+            {
+                "production_name": "Samatvam",
+                "role_name": "Physical Movement & Body Ensemble",
+                "role_category": "Performer",
+                "character_description": "Experimental physical theatre actor exploring body synchronization, Navarasa facial control, and synchronized spatial movement.",
+                "requirements": "Movement audition tape & physical theatre bio",
+                "slots_available": 2,
+                "status": "Open Calling"
+            },
+            {
+                "production_name": "Speak Up Tara",
+                "role_name": "Assistant Stage Director & Dramaturge",
+                "role_category": "Director",
+                "character_description": "Collaborate with principal director on scene blocking, actor notes, script adaptation, and rehearsal pacing.",
+                "requirements": "Directorial concept note or previous play review",
+                "slots_available": 1,
                 "status": "Open Calling"
             }
         ]

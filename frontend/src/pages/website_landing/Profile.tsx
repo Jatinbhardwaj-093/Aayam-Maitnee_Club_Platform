@@ -1,7 +1,22 @@
 // @ts-nocheck
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import { Mail, Share2, Calendar, Award, BookOpen, Quote, Shield, Tag } from "lucide-react";
+import {
+  Mail,
+  Calendar,
+  Award,
+  BookOpen,
+  Quote,
+  Shield,
+  Tag,
+  MapPin,
+  ArrowLeft,
+  ArrowUpRight,
+  Flame,
+  Star,
+  Sparkles,
+  Layers
+} from "lucide-react";
 
 interface PortfolioItem {
   title: string;
@@ -13,9 +28,13 @@ interface PortfolioItem {
 
 interface MemberProfile {
   id: string;
+  member_id: string;
   name: string;
   role: string;
   email?: string;
+  city?: string;
+  state?: string;
+  pronouns?: string;
   activeSince: number;
   tier: string;
   image: string;
@@ -42,7 +61,7 @@ export default function Profile() {
       })
       .then((membersData) => {
         if (Array.isArray(membersData)) {
-          // Find matching member by ID, member_id, or email
+          // Find matching member by ID, member_id, or email, or normalized name
           const found = membersData.find(
             (m: any) =>
               (m.member_id && m.member_id.toLowerCase() === memberId?.toLowerCase()) ||
@@ -52,339 +71,73 @@ export default function Profile() {
           );
 
           if (found) {
-            const roleName = found.roles && found.roles.length > 0 ? found.roles[0] : "Ensemble Member";
-            const nameLower = (found.name || "").toLowerCase();
-
-            // Personalized profiles per member
-            let personalizedData = {
-              activeSince: 2023,
-              tier: roleName.includes("Maintainer") || roleName.includes("Secretary") || roleName.includes("Chief") ? "Core Executive Committee" : "Principal Performer",
-              statementTitle: "Artistic Vision & Stagecraft",
-              statementBody: found.bio || `${found.name} is a dedicated leader and performer at Aayam - IIT Madras BS Drama Society.`,
-              statementSecondary: `Active in ${found.city || "IIT Madras BS"} chapter. Specializing in ${found.interest || "Stagecraft and Theatrical Expression"}.`,
-              specializations: (found.interest || "Method Acting, Script Analysis, Stagecraft, Direction").split(",").map((s: string) => s.trim().toUpperCase()),
-              quote: "The stage is not a mirror to reflect reality, but a prism to refract human truth.",
-              portfolio: [
-                {
-                  title: "Tamashbin Kathputliya",
-                  role: roleName,
-                  year: 2024,
-                  image: "/aayam_assets/tamashbin_user_1.jpg",
-                  description: "Lead involvement in satirical street play performance and stage direction at open courtyard."
-                },
-                {
-                  title: "DDDJ Stage Showcase",
-                  role: "Ensemble Lead",
-                  year: 2024,
-                  image: "/aayam_assets/dddj_user_1.jpg",
-                  description: "Featured in full-length stage drama with dynamic spotlight choreography."
-                }
-              ]
-            };
-
-            if (nameLower.includes("abay")) {
-              personalizedData = {
-                activeSince: 2023,
-                tier: "Secretary & Executive Leader",
-                statementTitle: "Society Governance & Stage Direction",
-                statementBody: "Abay leads the overall strategic vision, inter-collegiate partnerships, and theatrical productions of Aayam - IIT Madras BS Drama Society.",
-                statementSecondary: "Pioneered society expansion, festival participation, and collaborative playwriting workshops across campuses.",
-                specializations: ["SOCIETY GOVERNANCE", "STAGE DIRECTION", "PRODUCTION MANAGEMENT", "NUKKAD NATAK"],
-                quote: "Theatre is not just performance; it is a movement that connects hearts across campuses.",
-                portfolio: [
-                  {
-                    title: "Tamashbin Kathputliya",
-                    role: "Executive Producer & Coordinator",
-                    year: 2024,
-                    image: "/aayam_assets/tamashbin_user_1.jpg",
-                    description: "Spearheaded the satirical street play production, securing top honors in inter-collegiate drama competitions."
-                  },
-                  {
-                    title: "DDDJ Stage Production",
-                    role: "Production Director",
-                    year: 2024,
-                    image: "/aayam_assets/dddj_user_2.jpg",
-                    description: "Directed stage cue timing, lighting shifts, and ensemble cast positioning for the annual theatrical showcase."
-                  }
-                ]
-              };
-            } else if (nameLower.includes("yuuhi") || nameLower.includes("utkarsh")) {
-              personalizedData = {
-                activeSince: 2023,
-                tier: "Deputy Secretary & Director",
-                statementTitle: "Street Play Creation & Actor Development",
-                statementBody: "Yuuhi specializes in high-energy street theatre, character work, and scriptwriting for competitive Nukkad Natak plays.",
-                statementSecondary: "Conducts acting masterclasses and physical theatre drills for incoming ensemble members.",
-                specializations: ["STREET THEATRE", "ACTING WORKSHOPS", "PLAYWRITING", "PHYSICAL DRAMA"],
-                quote: "When the drum beats in the open courtyard, truth needs no amplification.",
-                portfolio: [
-                  {
-                    title: "Tamashbin Kathputliya",
-                    role: "Director & Lead Actor",
-                    year: 2024,
-                    image: "/aayam_assets/tamashbin_user_2.jpg",
-                    description: "Designed the central satirical monologue and performed as the lead street-play narrator."
-                  },
-                  {
-                    title: "Karn Ki Yachika",
-                    role: "Dramatic Lead",
-                    year: 2024,
-                    image: "/aayam_assets/kky_user_1.jpg",
-                    description: "Delivered intense tragic monologues in classical Hindi theatrical drama."
-                  }
-                ]
-              };
-            } else if (nameLower.includes("samarth")) {
-              personalizedData = {
-                activeSince: 2023,
-                tier: "Chief Coordinator",
-                statementTitle: "Technical Stagecraft & Production Operations",
-                statementBody: "Samarth oversees stage logistics, venue arrangements, equipment procurement, and backstage crew coordination.",
-                statementSecondary: "Ensures technical perfection across all acoustic soundscapes, prop transfers, and lighting boards.",
-                specializations: ["PRODUCTION LOGISTICS", "PROPS MANAGEMENT", "SOUND DESIGN", "VENUE CURATION"],
-                quote: "Behind every seamless curtain call lies hours of invisible precision.",
-                portfolio: [
-                  {
-                    title: "Samatvam Physical Theatre",
-                    role: "Chief Production Coordinator",
-                    year: 2024,
-                    image: "/aayam_assets/samatvam_user_1.jpg",
-                    description: "Coordinated complex group movement timing, props placement, and stage lighting transitions."
-                  },
-                  {
-                    title: "Speak Up Tara",
-                    role: "Stage Operations Director",
-                    year: 2024,
-                    image: "/aayam_assets/speak_up_tara_user_1.webp",
-                    description: "Managed acoustic sound mixing and auditorium stage set construction."
-                  }
-                ]
-              };
-            } else if (nameLower.includes("krishna")) {
-              personalizedData = {
-                activeSince: 2023,
-                tier: "Dept. Chief Coordinator",
-                statementTitle: "Lighting Engineering & Live Acoustics",
-                statementBody: "Krishna specializes in lighting board programming, acoustic soundscapes, and live cue execution during major stage plays.",
-                statementSecondary: "Oversees technical crew training and sound-check protocols for external auditoriums.",
-                specializations: ["LIGHTING DESIGN", "ACOUSTIC ENGINEERING", "LIVE SOUND MIXING", "TECHNICAL CUES"],
-                quote: "Light creates shadow, and shadow creates drama.",
-                portfolio: [
-                  {
-                    title: "DDDJ Stage Production",
-                    role: "Technical Lighting Director",
-                    year: 2024,
-                    image: "/aayam_assets/dddj_user_3.jpg",
-                    description: "Programmed high-contrast spotlight shifts and dramatic color saturations."
-                  },
-                  {
-                    title: "Speak Up Tara",
-                    role: "Soundboard Lead",
-                    year: 2024,
-                    image: "/aayam_assets/speak_up_tara_user_3.webp",
-                    description: "Designed live audio cues and background scoring for social drama performance."
-                  }
-                ]
-              };
-            } else if (nameLower.includes("swati")) {
-              personalizedData = {
-                activeSince: 2023,
-                tier: "Content & Copywriting Head",
-                statementTitle: "Dramatic Writing & Promotional Narrative",
-                statementBody: "Swati heads content creation, promotional scriptwriting, press releases, and dramatic literature for Aayam.",
-                statementSecondary: "Crafts compelling play synopses, social media narratives, and archival documentation.",
-                specializations: ["PLAYWRITING", "DRAMATIC COPYWRITING", "PUBLIC RELATIONS", "CONTENT STRATEGY"],
-                quote: "A single spoken word on stage can ripple through an entire auditorium.",
-                portfolio: [
-                  {
-                    title: "Speak Up Tara",
-                    role: "Script Editor & Publicist",
-                    year: 2024,
-                    image: "/aayam_assets/speak_up_tara_user_2.webp",
-                    description: "Authored promotional narratives and refined dialogue for high emotional impact."
-                  },
-                  {
-                    title: "Tamashbin Kathputliya",
-                    role: "Street Play Scriptwriter",
-                    year: 2024,
-                    image: "/aayam_assets/tamashbin_user_4.jpg",
-                    description: "Co-wrote satirical rhymes and rhythmic chants for street play chorus."
-                  }
-                ]
-              };
-            } else if (nameLower.includes("harsh")) {
-              personalizedData = {
-                activeSince: 2023,
-                tier: "Web Operations & Tech Lead",
-                statementTitle: "Digital Platform Architecture & Archival",
-                statementBody: "Harsh leads digital platform development, online audition portals, media databases, and web maintenance for Aayam.",
-                statementSecondary: "Maintains smooth digital operations for ensemble members, maintainers, and public patrons.",
-                specializations: ["WEB OPERATIONS", "MEDIA ARCHIVAL", "UI/UX DESIGN", "PLATFORM ARCHITECTURE"],
-                quote: "Bridging the timeless art of the stage with modern digital innovation.",
-                portfolio: [
-                  {
-                    title: "Aayam Digital Platform",
-                    role: "Lead Web Architect",
-                    year: 2024,
-                    image: "/aayam_assets/speak_up_tara_user_5.webp",
-                    description: "Built and deployed the digital member directory, gallery database, and maintainer control panel."
-                  },
-                  {
-                    title: "Karn Ki Yachika Digital Archival",
-                    role: "Media Manager",
-                    year: 2024,
-                    image: "/aayam_assets/kky_user_5.jpg",
-                    description: "Curated high-resolution photo archives and video press kits."
-                  }
-                ]
-              };
-            } else if (nameLower.includes("tanu")) {
-              personalizedData = {
-                activeSince: 2023,
-                tier: "Social Media & Brand Head",
-                statementTitle: "Visual Branding & Multimedia Storytelling",
-                statementBody: "Tanu manages visual identity, reel production, performance teasers, and social media campaigns for Aayam.",
-                statementSecondary: "Drives visual engagement across digital channels before every major theatrical premiere.",
-                specializations: ["SOCIAL MEDIA", "VISUAL DESIGN", "VIDEO PRODUCTION", "BRAND AESTHETICS"],
-                quote: "Capturing the fleeting magic of live theater in everlasting visuals.",
-                portfolio: [
-                  {
-                    title: "Karn Ki Yachika Teaser Campaign",
-                    role: "Social Media Director",
-                    year: 2024,
-                    image: "/aayam_assets/kky_user_3.jpg",
-                    description: "Produced behind-the-scenes teasers and promotional photo showcases."
-                  },
-                  {
-                    title: "DDDJ Promo Reels",
-                    role: "Creative Media Editor",
-                    year: 2024,
-                    image: "/aayam_assets/dddj_user_5.jpg",
-                    description: "Edited dynamic trailer reels capturing highlight moments of the play."
-                  }
-                ]
-              };
-            } else if (nameLower.includes("esha")) {
-              personalizedData = {
-                activeSince: 2023,
-                tier: "Costume & Styling Coordinator",
-                statementTitle: "Scenic Art & Costume Design",
-                statementBody: "Esha leads period costume styling, character wardrobe selection, prop curation, and backstage quick-change coordination for Aayam.",
-                statementSecondary: "Crafts hand-embroidered theatrical garments and prop sets for historical and contemporary stage plays.",
-                specializations: ["COSTUME DESIGN", "PROP CURATION", "STAGE STYLING", "PERIOD WARDROBE"],
-                quote: "Every costume tells a story before a single word is spoken.",
-                portfolio: [
-                  {
-                    title: "Karn Ki Yachika Costumes",
-                    role: "Lead Costume Designer",
-                    year: 2024,
-                    image: "/aayam_assets/kky_user_2.jpg",
-                    description: "Designed authentic classical costumes and traditional stage drapes."
-                  },
-                  {
-                    title: "Speak Up Tara Styling",
-                    role: "Backstage Stylist",
-                    year: 2024,
-                    image: "/aayam_assets/speak_up_tara_user_4.webp",
-                    description: "Managed contemporary wardrobe coordination and quick-change backstage queues."
-                  }
-                ]
-              };
-            } else if (nameLower.includes("kanishk")) {
-              personalizedData = {
-                activeSince: 2023,
-                tier: "Stage & Technical Director",
-                statementTitle: "Acoustic Engineering & Technical Direction",
-                statementBody: "Kanishk manages auditorium acoustics, lighting rigs, set construction, and live technical cue sync during major stage performances.",
-                statementSecondary: "Coordinates inter-collegiate venue setups and soundboard soundscapes.",
-                specializations: ["STAGE DIRECTION", "ACOUSTIC RIGS", "TECHNICAL CUES", "SET CONSTRUCTION"],
-                quote: "Precision in technical cues elevates pure performance into magic.",
-                portfolio: [
-                  {
-                    title: "DDDJ Technical Direction",
-                    role: "Stage Technical Director",
-                    year: 2024,
-                    image: "/aayam_assets/dddj_user_3.jpg",
-                    description: "Engineered stage light saturation and multi-channel sound mixing."
-                  },
-                  {
-                    title: "Tamashbin Courtyard Setup",
-                    role: "Technical Operations",
-                    year: 2024,
-                    image: "/aayam_assets/tamashbin_user_3.jpg",
-                    description: "Designed outdoor courtyard acoustic sound amplification."
-                  }
-                ]
-              };
-            } else if (nameLower.includes("aditi")) {
-              personalizedData = {
-                activeSince: 2023,
-                tier: "Principal Dramatic Performer",
-                statementTitle: "Character Portrayal & Dramatic Expression",
-                statementBody: "Aditi is a lead dramatic actress featured in contemporary stage plays, emotional monologues, and street play chorus roles.",
-                statementSecondary: "Specializes in voice modulation, emotional realism, and high-energy ensemble performance.",
-                specializations: ["METHOD ACTING", "CHARACTER PORTRAYAL", "DRAMATIC MONOLOGUES", "STREET THEATRE"],
-                quote: "Acting is living truthfully under imaginary circumstances.",
-                portfolio: [
-                  {
-                    title: "Speak Up Tara",
-                    role: "Lead Dramatic Actress",
-                    year: 2024,
-                    image: "/aayam_assets/speak_up_tara_user_1.webp",
-                    description: "Portrayed the central character in the social drama production."
-                  },
-                  {
-                    title: "Tamashbin Kathputliya Chorus",
-                    role: "Ensemble Performer",
-                    year: 2024,
-                    image: "/aayam_assets/tamashbin_user_5.jpg",
-                    description: "Performed in high-energy street play chorus and crowd engagement scenes."
-                  }
-                ]
-              };
-            }
+            const roleName = found.roles && found.roles.length > 0 ? found.roles[0] : (found.role || "Ensemble Member");
+            const pData = found.portfolioData || {};
 
             setProfile({
-              id: found.member_id || found.id.toString(),
+              id: found.id?.toString() || "1",
+              member_id: found.member_id || "MC-1001",
               name: found.name,
               role: roleName,
               email: found.email,
-              activeSince: personalizedData.activeSince,
-              tier: personalizedData.tier,
-              image: found.avatarUrl || "/aayam_assets/profiles/abay_nandhiga.jpg",
-              statementTitle: personalizedData.statementTitle,
-              statementBody: personalizedData.statementBody,
-              statementSecondary: personalizedData.statementSecondary,
-              specializations: personalizedData.specializations,
-              quote: personalizedData.quote,
-              portfolio: personalizedData.portfolio
+              city: found.city || "IIT Madras BS",
+              state: found.state || "Tamil Nadu",
+              pronouns: found.pronouns || "they/them",
+              activeSince: pData.activeSince || 2023,
+              tier: pData.tier || "Core Theatrical Ensemble",
+              image: found.avatarUrl || found.image || "/aayam_assets/profiles/utkarsh_yuuhi.jpg",
+              statementTitle: pData.statementTitle || "Artistic Vision & Stagecraft",
+              statementBody: pData.statementBody || found.bio || `${found.name} is a dedicated performer and coordinator at Aayam.`,
+              statementSecondary: pData.statementSecondary || `Active in ${found.city || "IIT Madras BS"} chapter. Specializing in ${found.interest || "Theatrical Expression"}.`,
+              specializations: pData.specializations || (found.interest || "Acting, Stagecraft, Direction").split(",").map((s: string) => s.trim().toUpperCase()),
+              quote: pData.quote || "The stage is not a mirror to reflect reality, but a prism to refract human truth.",
+              portfolio: pData.portfolio && pData.portfolio.length > 0 ? pData.portfolio : [
+                {
+                  title: "Aayam Seasonal Repertoire",
+                  role: roleName,
+                  year: 2026,
+                  image: "/aayam_assets/tamashbin_user_1.jpg",
+                  description: "Core participation in annual stage showcases, street play festivals, and collegiate dramatics."
+                }
+              ]
             });
             setLoading(false);
             return;
           }
         }
 
-        // Default Fallback profile if member ID is not matched
+        // Fallback if not found in list
         setProfile({
           id: "MC-1001",
-          name: "Sneha Vyas",
-          role: "Director Coordinator",
-          email: "sneha@handle.com",
-          activeSince: 2018,
-          tier: "Core Ensemble Leader",
-          image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=600&auto=format&fit=crop",
-          statementTitle: "Finding the Human Core",
-          statementBody: "Sneha is a classical performer and director who believes stage acting is a high-contrast study of raw human vulnerability.",
-          statementSecondary: "Over her years at Aayam, she has taken on the most challenging dramatic roles and directed multiple award-winning plays.",
-          specializations: ["METHOD ACTING", "CLASSICAL DRAMA", "DIRECTION", "STAGE MANAGEMENT"],
-          quote: "Acting is not about being someone else; it's about finding the likeness of another human in yourself.",
+          member_id: "MC-1001",
+          name: "Abay Nandhiga",
+          role: "Secretary Aayam",
+          email: "23f2000668@ds.study.iitm.ac.in",
+          city: "Chennai",
+          state: "Tamil Nadu",
+          pronouns: "he/him",
+          activeSince: 2023,
+          tier: "Core Directorial Council",
+          image: "/aayam_assets/profiles/utkarsh_yuuhi.jpg",
+          statementTitle: "Society Governance & Stage Direction",
+          statementBody: "Directing society operations, stagecraft productions, and national festival tours across India.",
+          statementSecondary: "Pioneered society expansion and collaborative playwriting workshops across IIT Madras BS.",
+          specializations: ["SOCIETY GOVERNANCE", "STAGE DIRECTION", "PRODUCTION MANAGEMENT", "NUKKAD NATAK"],
+          quote: "Theatre is not just performance; it is a movement that connects hearts across campuses.",
           portfolio: [
             {
-              title: "Tughlaq Premiere",
-              role: "Director",
-              year: 2024,
-              image: "https://images.unsplash.com/photo-1507676184212-d0330a151f15?q=80&w=600&auto=format&fit=crop",
-              description: "Directed opening night of Girish Karnad's Tughlaq under dramatic lighting."
+              title: "Tamashbin Kathputliya",
+              role: "Executive Producer",
+              year: 2026,
+              image: "/aayam_assets/tamashbin_user_1.jpg",
+              description: "Spearheaded satirical street play production across IIT campus festival circuit."
+            },
+            {
+              title: "DDDJ Stage Production",
+              role: "Production Director",
+              year: 2026,
+              image: "/aayam_assets/dddj_user_1.jpg",
+              description: "Directed high-contrast proscenium blocking and lighting cues for CLT auditorium."
             }
           ]
         });
@@ -398,166 +151,234 @@ export default function Profile() {
 
   if (loading || !profile) {
     return (
-      <div className="bg-[#E7DDD3] text-[#2C2A28] min-h-screen font-sans py-32 text-center">
-        <div className="max-w-md mx-auto space-y-4">
-          <div className="w-12 h-12 rounded-full bg-[#353535]/10 text-[#353535] flex items-center justify-center mx-auto animate-spin">
-            🎭
+      <div className="bg-[#E7DDD3] text-[#2C2A28] min-h-screen font-sans flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="w-12 h-12 rounded-full bg-[#E85F57]/20 text-[#E85F57] flex items-center justify-center mx-auto animate-pulse">
+            <Flame className="w-6 h-6" />
           </div>
-          <p className="text-sm font-bold text-[#353535]">Loading Ensemble Profile...</p>
+          <p className="text-xs font-mono font-bold uppercase tracking-wider text-[#666361]">
+            Loading Ensemble Portfolio...
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-[#E7DDD3] text-[#2C2A28] min-h-screen font-sans selection:bg-[#F8E8E4] pt-2 pb-12">
-      <main className="max-w-7xl mx-auto px-6 md:px-12">
-        {/* Page Header */}
-        <header className="mb-16 border-b border-[#D5C9BE]/30 pb-6 flex flex-col md:flex-row md:items-end justify-between">
-          <div>
-            <span className="text-xs font-semibold text-[#353535] uppercase tracking-[0.25em] mb-2 block">
-              Ensemble Member Profile
-            </span>
-            <h1 className="font-serif text-5xl font-bold text-[#2C2A28] tracking-tight">{profile.name}</h1>
-          </div>
-          <p className="text-sm text-[#353535] mt-2 md:mt-0 font-bold uppercase tracking-wider">
-            {profile.role} at Aayam
-          </p>
-        </header>
+    <div className="bg-[#E7DDD3] text-[#2C2A28] min-h-screen font-sans selection:bg-[#F8E8E4] pt-8 pb-24">
+      <main className="max-w-7xl mx-auto px-6 md:px-12 space-y-12">
+        
+        {/* Navigation Breadcrumb */}
+        <div className="flex items-center justify-between border-b border-[#D5C9BE]/50 pb-4">
+          <Link
+            to="/directory"
+            className="inline-flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-widest text-[#2C2A28] hover:text-[#E85F57] transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Back to Ensemble Directory</span>
+          </Link>
 
-        {/* 3-Column Community Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-          
-          {/* Left Sidebar - Profile Summary */}
-          <aside className="lg:col-span-3 space-y-8 lg:sticky lg:top-28">
-            <div className="bg-[#2C2A28] text-white p-7 rounded-3xl border border-[#353535] shadow-xl flex flex-col items-center text-center">
-              <div className="w-32 h-32 rounded-full overflow-hidden mb-6 border-2 border-[#353535] shadow-md">
-                <img 
-                  className="w-full h-full object-cover filter brightness-95 contrast-105" 
-                  alt={`${profile.name} headshot`} 
+          <div className="flex items-center gap-2 text-xs font-mono text-[#666361]">
+            <span className="text-[#E85F57]">●</span>
+            <span>ID: {profile.member_id}</span>
+          </div>
+        </div>
+
+        {/* Master Profile Hero Header Banner */}
+        <section className="bg-[#2C2A28] text-white rounded-[2.5rem] p-8 md:p-12 border border-[#353535] shadow-2xl relative overflow-hidden">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center relative z-10">
+            
+            {/* Avatar Headshot with Ring */}
+            <div className="md:col-span-4 lg:col-span-3 flex justify-center md:justify-start">
+              <div className="relative w-40 h-40 sm:w-48 sm:h-48 rounded-[2rem] overflow-hidden border-2 border-white/15 shadow-2xl group bg-[#353535]">
+                <img
                   src={profile.image}
+                  alt={profile.name}
+                  className="w-full h-full object-cover object-top filter brightness-95 contrast-105 group-hover:scale-105 transition-transform duration-700"
                 />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#2C2A28] via-transparent to-transparent opacity-40" />
               </div>
-              <h3 className="font-serif text-2xl font-normal text-[#F7F5F0] mb-1">{profile.name}</h3>
-              <p className="text-[10px] font-mono font-semibold text-[#E85F57] uppercase tracking-widest mb-5">{profile.role}</p>
-              
-              <div className="w-full border-t border-white/10 pt-5 space-y-3 text-left">
-                {profile.email && (
-                  <div className="flex items-center gap-3 text-xs text-white/70 truncate">
-                    <Mail className="w-4 h-4 text-[#E85F57] flex-shrink-0" />
-                    <span className="truncate"><strong>Email:</strong> {profile.email}</span>
-                  </div>
+            </div>
+
+            {/* Profile Core Details */}
+            <div className="md:col-span-8 lg:col-span-9 space-y-4 text-center md:text-left">
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-2.5">
+                <span className="bg-[#E85F57] text-white text-[10px] font-mono font-bold uppercase tracking-widest px-3.5 py-1 rounded-full shadow-md">
+                  {profile.tier}
+                </span>
+                {profile.pronouns && (
+                  <span className="bg-[#353535] text-white/70 text-[10px] font-mono px-3 py-1 rounded-full border border-white/10">
+                    {profile.pronouns}
+                  </span>
                 )}
-                <div className="flex items-center gap-3 text-xs text-white/70">
-                  <Calendar className="w-4 h-4 text-[#E85F57] flex-shrink-0" />
-                  <span><strong>Active Since:</strong> {profile.activeSince}</span>
-                </div>
-                <div className="flex items-center gap-3 text-xs text-white/70">
-                  <Shield className="w-4 h-4 text-[#E85F57] flex-shrink-0" />
-                  <span><strong>Ensemble Tier:</strong> {profile.tier}</span>
-                </div>
+                <span className="bg-[#353535] text-white/70 text-[10px] font-mono px-3 py-1 rounded-full border border-white/10 flex items-center gap-1">
+                  <MapPin className="w-3 h-3 text-[#E85F57]" /> {profile.city}, {profile.state}
+                </span>
               </div>
 
-              <div className="flex gap-3 mt-6 w-full">
-                <a
-                  href={`mailto:${profile.email || "ensemble@matinee.club"}`}
-                  className="flex-1 py-3 bg-[#E85F57] text-white rounded-full text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-[#D94538] shadow-md transition-all active:scale-95"
-                >
-                  <Mail className="w-3.5 h-3.5" /> Email
-                </a>
+              <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl text-[#F7F5F0] font-normal tracking-tight leading-tight">
+                {profile.name}
+              </h1>
+
+              <p className="text-sm font-mono text-[#E85F57] tracking-wider uppercase font-semibold">
+                {profile.role}
+              </p>
+
+              <div className="pt-2 flex flex-wrap items-center justify-center md:justify-start gap-4">
+                {profile.email && (
+                  <a
+                    href={`mailto:${profile.email}`}
+                    className="bg-[#E85F57] hover:bg-[#D94538] text-white px-7 py-3 rounded-full text-xs font-mono font-bold uppercase tracking-wider transition-all shadow-md flex items-center gap-2"
+                  >
+                    <Mail className="w-4 h-4" />
+                    <span>Contact Artist</span>
+                  </a>
+                )}
+                <div className="text-xs font-mono text-white/50 flex items-center gap-2 py-3 px-4 rounded-full bg-white/5 border border-white/5">
+                  <Calendar className="w-3.5 h-3.5 text-[#E85F57]" />
+                  <span>Ensemble Member Since {profile.activeSince}</span>
+                </div>
               </div>
             </div>
-            
-            {/* Navigation Link */}
-            <div className="hidden lg:flex flex-col bg-[#2C2A28] text-white rounded-3xl border border-[#353535] p-4 space-y-1">
-              <Link to="/directory" className="px-4 py-2.5 rounded-2xl text-white/80 hover:text-[#E85F57] hover:bg-white/5 text-xs font-mono font-semibold uppercase tracking-wider flex items-center gap-2 transition-all">
-                ← Back to Directory
-              </Link>
-            </div>
-          </aside>
 
-          {/* Center Column - Production Portfolio Feed */}
-          <div className="lg:col-span-6 space-y-8" id="portfolio">
-            <div className="inline-flex items-center gap-2 text-xs font-mono font-semibold uppercase tracking-widest text-[#E85F57]">
-              <span>CURATED PRODUCTION FEED</span>
-            </div>
-            
-            {profile.portfolio.map((item, index) => (
-              <article key={index} className="bg-[#2C2A28] text-white rounded-3xl overflow-hidden border border-[#353535] shadow-xl hover:border-[#E85F57]/50 hover:shadow-2xl transition-all duration-300">
-                <div className="p-7 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-2xl bg-[#353535] flex items-center justify-center text-[#E85F57]">
-                        <Award className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <h4 className="text-base font-normal font-serif text-[#F7F5F0]">{item.role}</h4>
-                        <p className="text-[10px] font-mono text-white/60">{item.year} Production</p>
-                      </div>
-                    </div>
-                    <span className="text-[9px] font-mono font-bold text-[#E85F57] uppercase bg-[#E85F57]/15 border border-[#E85F57]/30 px-3 py-1 rounded-full">
-                      {item.title}
-                    </span>
-                  </div>
-                  <p className="text-xs text-white/70 leading-relaxed font-light">
-                    {item.description}
-                  </p>
-                </div>
-                <div className="aspect-[16/10] relative overflow-hidden bg-[#353535]">
-                  <img 
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-700 filter brightness-90 contrast-105" 
-                    alt={item.title} 
-                    src={item.image || profile.image}
-                    onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).src = profile.image;
-                    }}
-                  />
-                </div>
-              </article>
-            ))}
           </div>
+        </section>
 
-          {/* Right Sidebar - Artistic Statement & Skills */}
-          <aside className="lg:col-span-3 space-y-8">
-            {/* Artistic Statement Card */}
-            <section className="bg-[#2C2A28] text-white p-7 rounded-3xl border border-[#353535] shadow-xl" id="statement">
-              <h3 className="text-xs font-mono font-bold text-[#E85F57] uppercase tracking-widest mb-4 pb-3 border-b border-white/10 flex items-center justify-between">
-                <span>{profile.statementTitle}</span>
-                <BookOpen className="w-4 h-4" />
+        {/* 2-Column Editorial Body: Sidebar (Statement/Skills/Quote) + Portfolio Feed */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+          
+          {/* Left Column: Vision, Skills, Quote (Span 4) */}
+          <div className="lg:col-span-4 space-y-6 lg:sticky lg:top-28">
+            
+            {/* Statement Card */}
+            <div className="bg-[#2C2A28] text-white rounded-[2rem] p-7 md:p-8 border border-[#353535] shadow-xl space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                <span className="text-[10px] font-mono font-bold text-[#E85F57] uppercase tracking-widest">
+                  ARTISTIC STATEMENT
+                </span>
+                <BookOpen className="w-4 h-4 text-[#E85F57]" />
+              </div>
+
+              <h3 className="font-serif text-2xl text-[#F7F5F0] font-normal leading-snug">
+                {profile.statementTitle}
               </h3>
-              <p className="text-xs text-white/70 leading-relaxed mb-4 font-light">
+
+              <p className="text-xs text-white/70 leading-relaxed font-light">
                 {profile.statementBody}
               </p>
-              <p className="text-xs text-white/70 leading-relaxed font-light">
+
+              <p className="text-xs text-white/50 leading-relaxed font-light pt-2 border-t border-white/5">
                 {profile.statementSecondary}
               </p>
-            </section>
+            </div>
 
-            {/* Specializations & Skills */}
-            <section className="bg-[#2C2A28] text-white p-7 rounded-3xl border border-[#353535] shadow-xl">
-              <h3 className="text-xs font-mono font-bold text-[#E85F57] uppercase tracking-widest mb-4 pb-3 border-b border-white/10 flex items-center justify-between">
-                <span>Specializations</span>
-                <Tag className="w-4 h-4" />
-              </h3>
+            {/* Specializations Pills */}
+            <div className="bg-[#2C2A28] text-white rounded-[2rem] p-7 md:p-8 border border-[#353535] shadow-xl space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                <span className="text-[10px] font-mono font-bold text-[#E85F57] uppercase tracking-widest">
+                  THEATRICAL SPECIALIZATIONS
+                </span>
+                <Tag className="w-4 h-4 text-[#E85F57]" />
+              </div>
+
               <div className="flex flex-wrap gap-2">
-                {profile.specializations.map(skill => (
-                  <span key={skill} className="bg-[#353535] text-[#F7F5F0] px-3 py-1.5 rounded-full text-[9px] font-mono font-semibold tracking-wider border border-white/10">
-                    {skill}
+                {profile.specializations.map((spec, i) => (
+                  <span
+                    key={i}
+                    className="bg-[#353535] text-white/90 text-[10px] font-mono font-semibold px-3 py-1.5 rounded-full border border-white/10 tracking-wider uppercase"
+                  >
+                    {spec}
                   </span>
                 ))}
               </div>
-            </section>
+            </div>
 
-            {/* Favorite Quote Card */}
-            <section className="p-6 border-l-2 border-[#E85F57] bg-[#2C2A28] text-white rounded-r-3xl border-t border-b border-r border-[#353535] shadow-xl">
-              <Quote className="w-6 h-6 text-[#E85F57] opacity-80 mb-2" />
-              <p className="text-xs italic text-white/80 leading-relaxed font-light">
+            {/* Dramatic Philosophy Quote */}
+            <div className="bg-[#2C2A28] text-white rounded-[2rem] p-7 md:p-8 border-l-4 border-[#E85F57] border-t border-b border-r border-[#353535] shadow-xl space-y-3">
+              <Quote className="w-6 h-6 text-[#E85F57] opacity-80" />
+              <p className="font-serif text-base italic text-[#F7F5F0] leading-relaxed">
                 "{profile.quote}"
               </p>
-            </section>
-          </aside>
+              <span className="text-[10px] font-mono text-white/40 block uppercase tracking-wider">
+                — {profile.name} // Aayam Dramaturgy
+              </span>
+            </div>
+
+          </div>
+
+          {/* Right Column: Curated Production Works (Span 8) */}
+          <div className="lg:col-span-8 space-y-6">
+            <div className="flex items-center justify-between pb-2 border-b border-[#D5C9BE]/50">
+              <div className="inline-flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-widest text-[#E85F57]">
+                <Layers className="w-4 h-4" />
+                <span>CURATED REPERTOIRE & PRODUCTIONS</span>
+              </div>
+              <span className="text-xs font-mono text-[#666361]">
+                {profile.portfolio.length} Production Works
+              </span>
+            </div>
+
+            <div className="space-y-6">
+              {profile.portfolio.map((item, idx) => (
+                <article
+                  key={idx}
+                  className="bg-[#2C2A28] text-white rounded-[2rem] border border-[#353535] overflow-hidden shadow-xl hover:border-[#E85F57]/50 hover:shadow-2xl transition-all duration-300 group"
+                >
+                  <div className="grid grid-cols-1 md:grid-cols-12 items-stretch">
+                    
+                    {/* Media Preview */}
+                    <div className="md:col-span-5 relative aspect-[16/10] md:aspect-auto min-h-[220px] overflow-hidden bg-[#353535]">
+                      <img
+                        src={item.image || profile.image}
+                        alt={item.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 filter brightness-90 contrast-105"
+                        onError={(e) => {
+                          (e.currentTarget as HTMLImageElement).src = profile.image;
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#2C2A28] via-transparent to-transparent md:hidden" />
+                      <div className="absolute top-4 left-4">
+                        <span className="bg-[#2C2A28]/90 backdrop-blur-md border border-white/10 text-white/90 text-[10px] font-mono px-3 py-1 rounded-full font-bold">
+                          {item.year}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Work Details */}
+                    <div className="md:col-span-7 p-7 md:p-8 flex flex-col justify-between space-y-4">
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-xs font-mono font-bold text-[#E85F57] uppercase tracking-wider">
+                            {item.role}
+                          </span>
+                        </div>
+
+                        <h3 className="font-serif text-2xl md:text-3xl text-[#F7F5F0] group-hover:text-[#E85F57] transition-colors leading-snug">
+                          {item.title}
+                        </h3>
+
+                        <p className="text-xs text-white/70 font-light leading-relaxed">
+                          {item.description}
+                        </p>
+                      </div>
+
+                      <div className="pt-4 border-t border-white/10 flex items-center justify-between text-xs font-mono text-white/50">
+                        <span>Aayam Production Season</span>
+                        <Link to="/plays" className="text-[#E85F57] hover:underline flex items-center gap-1 font-semibold">
+                          View Playbill <ArrowUpRight className="w-3.5 h-3.5" />
+                        </Link>
+                      </div>
+                    </div>
+
+                  </div>
+                </article>
+              ))}
+            </div>
+
+          </div>
 
         </div>
+
       </main>
     </div>
   );

@@ -37,7 +37,7 @@ const navItems: NavItem[] = [
   { label: "Drama Club Home", path: "/", icon: Home, description: "Public landing page" },
   { label: "Member Dashboard", path: "/member", icon: LayoutDashboard, description: "Your rehearsals & schedules" },
   { label: "My Schedule", path: "/schedule", icon: Calendar, description: "Your production schedule" },
-  { label: "Auditions", path: "/auditions", icon: ClipboardList, description: "Apply for play casting" },
+  { label: "Auditions & Casting", path: "/auditions", icon: ClipboardList, description: "Apply for play casting" },
   { label: "Plays & Productions", path: "/member-plays", icon: PlayCircle, description: "Production lineup & scripts" },
   { label: "Script Vault", path: "/member-scripts", icon: FileText, description: "Confidential play scripts" },
   { label: "Rehearsal Studio", path: "/ai-rehearsal", icon: Bot, description: "Interactive voice script rehearsal & memory test" },
@@ -301,13 +301,13 @@ export default function AppLayout() {
                     >
                       Join Club
                     </Link>
-                    <Button
-                      onClick={() => setPortalOpen(true)}
-                      className="bg-[#E85F57] text-white hover:bg-[#D94538] font-bold rounded-full h-9 px-5 transition-all active:scale-95 flex items-center gap-2 shadow-xs"
+                    <Link
+                      to="/login"
+                      className="bg-[#E85F57] text-white hover:bg-[#D94538] font-bold rounded-full h-9 px-5 transition-all active:scale-95 flex items-center gap-2 shadow-xs text-xs uppercase tracking-wider"
                     >
                       <User className="w-3.5 h-3.5" />
-                      <span className="text-xs font-bold uppercase tracking-wider">Portal Access</span>
-                    </Button>
+                      <span>Portal Access</span>
+                    </Link>
                   </div>
                 )}
               </div>

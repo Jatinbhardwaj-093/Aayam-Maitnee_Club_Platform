@@ -29,7 +29,9 @@ interface Application {
 }
 
 export default function AuditionsCasting() {
-  const { activeUser } = useOutletContext<{ activeUser: any }>();
+  const contextData = useOutletContext<{ activeUser: any }>() || {};
+  const activeUser = contextData.activeUser || JSON.parse(sessionStorage.getItem("aayam_active_user") || "null");
+
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<"All" | "Performer" | "Technical Crew" | "Creative Designer" | "Director">("All");
   
@@ -65,52 +67,52 @@ export default function AuditionsCasting() {
     } catch (e) {
       console.error(e);
     }
-    // Fallback Positions synchronized with Maintainer side
+    // Fallback Positions synchronized with Real Aayam Productions
     setOpenPositions([
       {
         id: "1",
         play_id: 1,
-        title: "Tughlaq - Sultan Muhammad bin Tughlaq (Lead)",
+        title: "Karn Ki Yachika - Lead Performer (Karn)",
         category: "Performer",
-        description: "Complex, vision-driven 14th-century ruler torn between idealism and ruthlessness. Requires powerful vocal presence & Hindustani diction.",
-        requirements: "Audition monologue video clip & theatrical resume",
+        description: "Monumental tragic protagonist navigating moral dilemma, honor, and destiny. High-intensity classical Hindi monologue & verse delivery required.",
+        requirements: "Audition monologue video clip (2 mins) & theatrical bio",
         deadline: "Sep 25, 2026"
       },
       {
         id: "2",
         play_id: 2,
-        title: "Tughlaq - Step-Mother / Queen Consort (Antagonist)",
+        title: "Tamashbin Kathputliya - Dholak & Courtyard Chorus Lead",
         category: "Performer",
-        description: "Sharp-witted, politically calculating royal matriarch who challenges Tughlaq's court decrees.",
-        requirements: "Classical drama monologue video & portfolio",
-        deadline: "Sep 25, 2026"
+        description: "High-energy street drama performer skilled in vocal projection, folk rhythm synchronization, and crowd interaction.",
+        requirements: "Live percussion video or street drama reel",
+        deadline: "Sep 22, 2026"
       },
       {
         id: "3",
         play_id: 3,
-        title: "Macbeth - Lead Stage Makeup & Special Effects Stylist",
-        category: "Creative Designer",
-        description: "Head makeup artist responsible for period prosthetics, battle scars, dark theatrical contours, and quick backstage transformations.",
-        requirements: "Technical SFX makeup portfolio PDF & sketch samples",
+        title: "DDDJ - Proscenium Lighting & DMX Rig Operator",
+        category: "Technical Crew",
+        description: "Technical crew member managing DMX lighting console, spot gels, color transitions, and live proscenium stage cues.",
+        requirements: "Technical crew portfolio or stage experience summary",
         deadline: "Sep 28, 2026"
       },
       {
         id: "4",
         play_id: 4,
-        title: "Tamashbin Kathputliya - Soundboard & Acoustic Design Operator",
-        category: "Technical Crew",
-        description: "Technical audio operator responsible for live sound mixing, ambient folk instrument amplification, and microphone balancing.",
-        requirements: "Audio staging portfolio PDF & work resume",
-        deadline: "Sep 22, 2026"
+        title: "Samatvam - Physical Movement & Body Ensemble",
+        category: "Performer",
+        description: "Experimental physical theatre actor exploring body synchronization, Navarasa facial control, and synchronized spatial movement.",
+        requirements: "Movement audition tape & physical theatre bio",
+        deadline: "Sep 30, 2026"
       },
       {
         id: "5",
         play_id: 5,
-        title: "Andha Yug - Costume Assistant & Wardrobe Master",
-        category: "Creative Designer",
-        description: "Backstage wardrobe assistant managing heritage drape costumes, armor fitting, quick-change coordination, and textile maintenance.",
-        requirements: "Costume design portfolio PDF & resume",
-        deadline: "Sep 30, 2026"
+        title: "Speak Up Tara - Assistant Stage Director & Dramaturge",
+        category: "Director",
+        description: "Collaborate with principal director on scene blocking, actor notes, script adaptation, and rehearsal pacing.",
+        requirements: "Directorial concept note or previous play review",
+        deadline: "Oct 05, 2026"
       }
     ]);
   };
@@ -451,7 +453,7 @@ export default function AuditionsCasting() {
       <div className="bg-[#EFE8E1] border border-[#DDD8CE] rounded-2xl p-[24px] md:p-[32px] flex flex-col md:flex-row justify-between items-start md:items-center gap-[24px]">
         <div className="space-y-1">
           <span className="text-xs uppercase tracking-widest text-[#666361]/70 font-semibold">Club Staging</span>
-          <h2 className="text-[32px] font-bold font-serif text-[#353535]">Open Auditions &amp; Positions</h2>
+          <h2 className="text-[32px] font-bold font-serif text-[#353535]">Auditions &amp; Casting</h2>
           <p className="text-sm text-[#666361]">
             Browse and apply for acting ensemble understudies, crew operations, or creative production designs.
           </p>

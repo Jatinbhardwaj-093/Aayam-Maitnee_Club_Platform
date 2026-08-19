@@ -43,7 +43,7 @@ def seed_database():
         ("Samarth Shrivastava", "21f1002840", "samarth123", "coordinator", "22", "Aayam Hub, IITM BS", "Chennai", "Tamil Nadu", "India", "+91 98765 21002",
          "Chief Coordinator of Aayam. Overseeing production logistics, stage design, and inter-collegiate drama fests.",
          "Production Logistics, Stage Lighting, Auditions", "Shrivastava", "+91 98765 21003",
-         "/aayam_assets/profiles/my_pic.jpg"),
+         "/aayam_assets/profiles/samarth_shrivastava.jpg"),
 
         ("Krishna Subramanian", "23f1000655", "krishna123", "coordinator", "21", "IITM BS Campus", "Chennai", "Tamil Nadu", "India", "+91 98765 23006",
          "Dept. Chief Coordinator. Coordinating technical lighting boards, acoustic soundscapes, and live cue management.",
@@ -154,7 +154,7 @@ def seed_database():
             "director": "S. Sri Vaishnavi",
             "cast": "Abay Nandhiga, Utkarsh (Yuuhi), Samarth Shrivastava",
             "season": "2026 Production Season",
-            "image": "/aayam_assets/kky_user_1.jpg",
+            "image": "/aayam_assets/kky_user_5.jpg",
             "venue": "Kashiyatra Stage, IIT BHU / OAT IIT Madras",
             "dates": "Aug 12 - Sep 04, 2026",
             "runtime": "75 Mins (No Intermission)",
@@ -224,7 +224,7 @@ def seed_database():
             "director": "Abay Nandhiga",
             "cast": "Aayam Core Ensemble",
             "season": "Virtual Series 2024",
-            "image": "/aayam_assets/kky_user_5.jpg",
+            "image": "/aayam_assets/aayam_site_img_6.jpg",
             "venue": "Aayam YouTube Channel & Portal",
             "dates": "Available Online",
             "runtime": "50 Mins",
@@ -263,7 +263,7 @@ def seed_database():
             "end_time": time(19, 30),
             "max_participants": 80,
             "poster": "/aayam_assets/tamashbin_user_3.jpg",
-            "status": "Upcoming",
+            "status": "Concluded",
             "admin": admin_abay
         },
         {
@@ -276,7 +276,7 @@ def seed_database():
             "end_time": time(18, 30),
             "max_participants": 40,
             "poster": "/aayam_assets/samatvam_user_4.jpg",
-            "status": "Upcoming",
+            "status": "Concluded",
             "admin": admin_samarth
         },
         {
@@ -289,7 +289,7 @@ def seed_database():
             "end_time": time(18, 30),
             "max_participants": 50,
             "poster": "/aayam_assets/kky_user_2.jpg",
-            "status": "Upcoming",
+            "status": "Concluded",
             "admin": admin_utkarsh
         },
         {
@@ -302,7 +302,7 @@ def seed_database():
             "end_time": time(17, 0),
             "max_participants": 35,
             "poster": "/aayam_assets/krishna_subramanian.jpg",
-            "status": "Upcoming",
+            "status": "Concluded",
             "admin": admin_samarth
         },
         {
@@ -315,7 +315,7 @@ def seed_database():
             "end_time": time(19, 30),
             "max_participants": 60,
             "poster": "/aayam_assets/tamashbin_user_3.jpg",
-            "status": "Upcoming",
+            "status": "Concluded",
             "admin": admin_abay
         },
         {
@@ -323,7 +323,7 @@ def seed_database():
             "description": "Group table-read session for the upcoming festival scripts. Actors assign roles and analyze dialogue subtext.",
             "category": "Meetups",
             "venue": "Aayam Conference Room 2, IITM Campus",
-            "event_date": date(2026, 8, 18),
+            "event_date": date(2026, 8, 23),
             "start_time": time(18, 0),
             "end_time": time(20, 30),
             "max_participants": 45,
@@ -332,24 +332,11 @@ def seed_database():
             "admin": admin_utkarsh
         },
         {
-            "title": "Sahitya Sabha - Chit-Chat & Jamming Session",
-            "description": "Casual script reading, poetry jamming, and creative discussion over hot chai.",
-            "category": "Meetups",
-            "venue": "Aayam Lounge, IITM Campus",
-            "event_date": date(2026, 8, 22),
-            "start_time": time(18, 0),
-            "end_time": time(20, 0),
-            "max_participants": 50,
-            "poster": "/aayam_assets/samatvam_user_4.jpg",
-            "status": "Upcoming",
-            "admin": admin_utkarsh
-        },
-        {
             "title": "Backstage Props & Set Crafting Social",
             "description": "Hands-on set design session. Painting backdrops, crafting stage props, and organizing wardrobe racks for the August showcase.",
             "category": "Meetups",
             "venue": "Aayam Art & Set Studio, IIT Madras",
-            "event_date": date(2026, 8, 25),
+            "event_date": date(2026, 8, 27),
             "start_time": time(15, 0),
             "end_time": time(18, 0),
             "max_participants": 40,
@@ -362,7 +349,7 @@ def seed_database():
             "description": "Monthly showcase performance featuring short plays, original street drama acts, and acoustic musical numbers.",
             "category": "Plays",
             "venue": "Open Air Theatre (OAT), IIT Madras",
-            "event_date": date(2026, 8, 29),
+            "event_date": date(2026, 8, 30),
             "start_time": time(18, 30),
             "end_time": time(21, 30),
             "max_participants": 200,
@@ -375,7 +362,7 @@ def seed_database():
             "description": "Exclusive masterclass on voice modulation, spatial awareness, and classical stage blocking.",
             "category": "Workshops",
             "venue": "CLT Seminar Room, IIT Madras",
-            "event_date": date(2026, 9, 10),
+            "event_date": date(2026, 9, 5),
             "start_time": time(10, 0),
             "end_time": time(14, 0),
             "max_participants": 40,
@@ -384,17 +371,56 @@ def seed_database():
             "admin": admin_samarth
         },
         {
+            "title": "Autumn Street Satire & Dholak Sync Lab",
+            "description": "Intensive rhythm calibration lab for courtyard street drama percussion and high-projection choral dialogue.",
+            "category": "Workshops",
+            "venue": "SAC Courtyard, IIT Madras",
+            "event_date": date(2026, 9, 12),
+            "start_time": time(16, 30),
+            "end_time": time(19, 0),
+            "max_participants": 50,
+            "poster": "/aayam_assets/tamashbin_user_1.jpg",
+            "status": "Upcoming",
+            "admin": admin_utkarsh
+        },
+        {
+            "title": "Classical Monologue & Navarasa Intensive",
+            "description": "Deep-dive session exploring the 9 dramatic rasas through mythological soliloquies and facial control.",
+            "category": "Workshops",
+            "venue": "Rehearsal Hall B, IIT Madras",
+            "event_date": date(2026, 9, 18),
+            "start_time": time(15, 0),
+            "end_time": time(18, 0),
+            "max_participants": 35,
+            "poster": "/aayam_assets/kky_user_5.jpg",
+            "status": "Upcoming",
+            "admin": admin_abay
+        },
+        {
             "title": "Nukkad Natak Guidance Session with Om Bhope",
             "description": "Hands-on street play rehearsal covering crowd engagement, vocal projection, and formation changes.",
             "category": "Workshops",
             "venue": "OAT Stage Grounds, IIT Madras",
-            "event_date": date(2026, 9, 28),
+            "event_date": date(2026, 9, 24),
             "start_time": time(16, 0),
             "end_time": time(18, 30),
             "max_participants": 45,
             "poster": "/aayam_assets/tamashbin_user_4.jpg",
             "status": "Upcoming",
             "admin": admin_utkarsh
+        },
+        {
+            "title": "Proscenium Tech Rehearsal & Live Cue Run",
+            "description": "Full technical run-through with lighting boards, soundscapes, and backstage prop shifts before festival season.",
+            "category": "Plays",
+            "venue": "CLT Auditorium, IIT Madras",
+            "event_date": date(2026, 9, 29),
+            "start_time": time(17, 0),
+            "end_time": time(21, 0),
+            "max_participants": 100,
+            "poster": "/aayam_assets/dddj_user_1.jpg",
+            "status": "Upcoming",
+            "admin": admin_samarth
         },
         {
             "title": "Darpan 2026 Annual Drama Festival",
