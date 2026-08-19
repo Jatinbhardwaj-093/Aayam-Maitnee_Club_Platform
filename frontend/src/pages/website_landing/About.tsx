@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 
 export default function About() {
   return (
-    <div className="min-h-screen bg-[#E7DDD3] text-[#232323] font-sans pb-24 selection:bg-[#F8E8E4]">
+    <div className="min-h-screen bg-[#E7DDD3] text-[#2C2A28] font-sans pb-24 selection:bg-[#F8E8E4]">
       
       {/* 1. MANIFESTO HERO HEADER WITH IMAGE */}
       <section className="relative pt-32 pb-24 md:pt-40 md:pb-32 px-6 md:px-12 overflow-hidden border-b border-[#D5C9BE]/40">
@@ -21,7 +21,7 @@ export default function About() {
             <span>FOUNDING TREATISE // AAYAM 2026</span>
           </div>
 
-          <h1 className="text-5xl sm:text-7xl md:text-8xl font-normal font-serif tracking-tight leading-[0.92] text-[#232323] max-w-4xl mx-auto">
+          <h1 className="text-5xl sm:text-7xl md:text-8xl font-normal font-serif tracking-tight leading-[0.92] text-[#2C2A28] max-w-4xl mx-auto">
             We do not just act. <br />
             <span className="italic font-serif font-light text-[#E85F57]">We inhabit.</span>
           </h1>
@@ -50,7 +50,7 @@ export default function About() {
               <span className="text-xs font-mono font-bold uppercase tracking-widest text-[#E85F57]">
                 ARTICLE I // CONVICTION
               </span>
-              <h3 className="font-serif text-4xl md:text-5xl font-normal text-[#232323] leading-snug">
+              <h3 className="font-serif text-4xl md:text-5xl font-normal text-[#2C2A28] leading-snug">
                 The Stage as an Arena of Truth
               </h3>
             </div>
@@ -62,7 +62,7 @@ export default function About() {
               <p>
                 We reject sterile imitation. Whether performing in the unvarnished dust of the Student Activity Centre courtyard for a <em>Nukkad Natak</em>, or under the calibrated spotlights of the Central Lecture Theatre, every actor at Aayam is trained to dissolve self-consciousness into the character’s moral spine.
               </p>
-              <p className="font-medium text-[#232323]">
+              <p className="font-medium text-[#2C2A28]">
                 Theatre is not a mirror reflecting society; it is a hammer shaping it. We build that hammer through relentless rehearsal, intellectual rigor, and an uncompromising dedication to the ensemble.
               </p>
             </div>
@@ -72,7 +72,7 @@ export default function About() {
              <div className="aspect-[4/5] overflow-hidden rounded-3xl shadow-2xl">
                <img src="/aayam_assets/aayam_site_img_2.jpg" alt="Aayam Performance" className="w-full h-full object-cover filter contrast-125 brightness-90" />
              </div>
-             <div className="absolute -bottom-10 -left-10 bg-[#232323] text-white p-8 rounded-3xl border border-[#353535] shadow-2xl max-w-sm hidden md:block">
+             <div className="absolute -bottom-10 -left-10 bg-[#2C2A28] text-white p-8 rounded-3xl border border-[#353535] shadow-2xl max-w-sm hidden md:block">
                <Quote className="w-8 h-8 text-[#E85F57] opacity-80 mb-4" />
                <p className="font-serif text-lg leading-relaxed">"Theatre does not exist to comfort our certainties. It exists to dismantle them."</p>
              </div>
@@ -87,7 +87,7 @@ export default function About() {
             <div className="inline-flex items-center gap-2 text-xs font-mono font-semibold uppercase tracking-widest text-[#E85F57] mb-3">
               <span>ARTICLE II // PILLARS</span>
             </div>
-            <h2 className="font-serif text-4xl md:text-6xl font-normal text-[#232323] tracking-tight">
+            <h2 className="font-serif text-4xl md:text-6xl font-normal text-[#2C2A28] tracking-tight">
               Artistic Doctrines
             </h2>
             <p className="mt-4 text-[#666361] text-lg">The foundational methodologies that govern our rehearsal spaces and stagecraft.</p>
@@ -101,7 +101,7 @@ export default function About() {
             { id: "03", title: "Physical Expression", desc: "Movement is dialogue. From Navarasa facial control to synchronized ensemble stage blocking, we construct compelling spatial tableaux.", img: "/aayam_assets/samatvam_1.jpg", icon: Compass, tag: "ABHINAYA" },
             { id: "04", title: "Collaborative Craft", desc: "An inclusive home for student actors, scriptwriters, directors, light technicians, costume designers, and cultural patrons.", img: "/aayam_assets/dddj_1.jpg", icon: HeartHandshake, tag: "SANGHA" }
           ].map((doc, idx) => (
-            <div key={idx} className="group bg-[#232323] text-white border border-[#353535] rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 flex flex-col md:flex-row">
+            <div key={idx} className="group bg-[#2C2A28] text-white border border-[#353535] rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 flex flex-col md:flex-row">
               <div className="md:w-2/5 aspect-square md:aspect-auto overflow-hidden">
                 <img src={doc.img} alt={doc.title} className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-700" />
               </div>
@@ -127,18 +127,18 @@ export default function About() {
             <div className="inline-flex items-center justify-center md:justify-start gap-2 text-xs font-mono font-semibold uppercase tracking-widest text-[#E85F57]">
               <span>EXECUTIVE GOVERNANCE</span>
             </div>
-            <h2 className="text-4xl md:text-6xl font-normal font-serif text-[#232323] tracking-tight">
+            <h2 className="text-4xl md:text-6xl font-normal font-serif text-[#2C2A28] tracking-tight">
               Directorial Council
             </h2>
           </div>
-          <Link to="/directory" className="text-xs font-bold text-[#232323] hover:text-[#E85F57] uppercase tracking-widest flex items-center gap-1.5 transition-colors bg-white/40 px-6 py-3 rounded-full border border-[#353535]/10 hover:bg-[#232323] hover:text-white">
+          <Link to="/directory" className="text-xs font-bold text-[#2C2A28] hover:text-[#E85F57] uppercase tracking-widest flex items-center gap-1.5 transition-colors bg-white/40 px-6 py-3 rounded-full border border-[#353535]/10 hover:bg-[#2C2A28] hover:text-white">
             <span>View Ensemble Directory</span> <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {/* Abay */}
-          <div className="bg-[#232323] text-white border border-[#353535] rounded-3xl overflow-hidden p-6 space-y-4 shadow-xl hover:border-[#E85F57]/50 transition-all">
+          <div className="bg-[#2C2A28] text-white border border-[#353535] rounded-3xl overflow-hidden p-6 space-y-4 shadow-xl hover:border-[#E85F57]/50 transition-all">
             <img src="/aayam_assets/profiles/utkarsh_yuuhi.jpg" alt="Abay Nandhiga" className="w-full h-56 object-cover object-top rounded-2xl filter brightness-90 contrast-105" />
             <div>
               <h4 className="font-normal font-serif text-xl text-[#F7F5F0]">Abay Nandhiga</h4>
@@ -150,7 +150,7 @@ export default function About() {
           </div>
 
           {/* Yuuhi */}
-          <div className="bg-[#232323] text-white border border-[#353535] rounded-3xl overflow-hidden p-6 space-y-4 shadow-xl hover:border-[#E85F57]/50 transition-all">
+          <div className="bg-[#2C2A28] text-white border border-[#353535] rounded-3xl overflow-hidden p-6 space-y-4 shadow-xl hover:border-[#E85F57]/50 transition-all">
             <img src="/aayam_assets/profiles/abay_nandhiga.jpg" alt="Yuuhi" className="w-full h-56 object-cover object-top rounded-2xl filter brightness-90 contrast-105" />
             <div>
               <h4 className="font-normal font-serif text-xl text-[#F7F5F0]">Yuuhi</h4>
@@ -162,7 +162,7 @@ export default function About() {
           </div>
 
           {/* Samarth */}
-          <div className="bg-[#232323] text-white border border-[#353535] rounded-3xl overflow-hidden p-6 space-y-4 shadow-xl hover:border-[#E85F57]/50 transition-all">
+          <div className="bg-[#2C2A28] text-white border border-[#353535] rounded-3xl overflow-hidden p-6 space-y-4 shadow-xl hover:border-[#E85F57]/50 transition-all">
             <img src="/aayam_assets/profiles/my_pic.jpg" alt="Samarth Shrivastava" className="w-full h-56 object-cover object-top rounded-2xl filter brightness-90 contrast-105" />
             <div>
               <h4 className="font-normal font-serif text-xl text-[#F7F5F0]">Samarth Shrivastava</h4>
@@ -174,7 +174,7 @@ export default function About() {
           </div>
 
           {/* Swati */}
-          <div className="bg-[#232323] text-white border border-[#353535] rounded-3xl overflow-hidden p-6 space-y-4 shadow-xl hover:border-[#E85F57]/50 transition-all">
+          <div className="bg-[#2C2A28] text-white border border-[#353535] rounded-3xl overflow-hidden p-6 space-y-4 shadow-xl hover:border-[#E85F57]/50 transition-all">
             <img src="/aayam_assets/profiles/swati_singh.jpg" alt="Swati Singh" className="w-full h-56 object-cover object-top rounded-2xl filter brightness-90 contrast-105" />
             <div>
               <h4 className="font-normal font-serif text-xl text-[#F7F5F0]">Swati Singh</h4>
@@ -189,7 +189,7 @@ export default function About() {
 
       {/* 5. OFFICIAL CHANNELS & AUDITIONS CTA */}
       <section className="px-6 md:px-12 pt-12 pb-12">
-        <div className="max-w-7xl mx-auto bg-[#232323] text-white rounded-[3rem] p-12 md:p-24 text-center space-y-8 border border-[#353535] shadow-2xl relative overflow-hidden">
+        <div className="max-w-7xl mx-auto bg-[#2C2A28] text-white rounded-[3rem] p-12 md:p-24 text-center space-y-8 border border-[#353535] shadow-2xl relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-full bg-[url('/aayam_assets/aayam_site_img_3.jpg')] opacity-10 bg-cover bg-center mix-blend-screen pointer-events-none" />
           
           <div className="relative z-10">
