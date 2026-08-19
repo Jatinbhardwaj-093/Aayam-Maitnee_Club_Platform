@@ -45,7 +45,7 @@ const fallbackMembers: Member[] = [
     role: "Chief Coordinator",
     roleType: "Production",
     description: "Chief Coordinator of Aayam. Overseeing production logistics, stage design, and inter-collegiate drama fests.",
-    image: "/aayam_assets/profiles/samarth_shrivastava.jpg",
+    image: "/aayam_assets/profiles/my_pic.jpg",
     isFeatured: true
   },
   {

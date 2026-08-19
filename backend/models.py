@@ -69,7 +69,7 @@ class User(db.Model):
             "Yuuhi": "/aayam_assets/profiles/abay_nandhiga.jpg",
             "Utkarsh / Yuuhi": "/aayam_assets/profiles/abay_nandhiga.jpg",
             "Utkarsh (Yuuhi)": "/aayam_assets/profiles/abay_nandhiga.jpg",
-            "Samarth Shrivastava": "/aayam_assets/profiles/samarth_shrivastava.jpg",
+            "Samarth Shrivastava": "/aayam_assets/profiles/my_pic.jpg",
             "Krishna Subramanian": "/aayam_assets/profiles/krishna_subramanian.jpg",
             "Harsh Aryan": "/aayam_assets/profiles/harsh_aryan.jpg",
             "Swati Singh": "/aayam_assets/profiles/swati_singh.jpg",

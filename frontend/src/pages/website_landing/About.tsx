@@ -197,7 +197,7 @@ export default function About() {
 
           {/* Samarth */}
           <div className="bg-[#232323] text-white border border-[#353535] rounded-3xl overflow-hidden p-6 space-y-4 shadow-xl hover:border-[#E85F57]/50 transition-all">
-            <img src="/aayam_assets/profiles/samarth_shrivastava.jpg" alt="Samarth Shrivastava" className="w-full h-48 object-cover object-top rounded-2xl filter brightness-90 contrast-105" />
+            <img src="/aayam_assets/profiles/my_pic.jpg" alt="Samarth Shrivastava" className="w-full h-48 object-cover object-top rounded-2xl filter brightness-90 contrast-105" />
             <div>
               <h4 className="font-normal font-serif text-xl text-[#F7F5F0]">Samarth Shrivastava</h4>
               <span className="text-[10px] font-mono font-semibold text-[#E85F57] uppercase tracking-wider block">Chief Coordinator</span>

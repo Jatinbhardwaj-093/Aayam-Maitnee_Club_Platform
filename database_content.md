@@ -27,7 +27,7 @@
 |---|------|-------------|----------|------|-----|------|-------------|-------------|-----------|----------|
 | 1 | **Abay Nandhiga** | `23f2000668` | abay123 | maintainer | 22 | Chennai | Secretary of Aayam. Directing operations, stagecraft, national festivals. | `abay_nandhiga.jpg` | MC-1001 | he/him |
 | 2 | **Yuuhi** | `21f1005042` | utkarsh123 | maintainer | 23 | Chennai | Deputy Secretary. Lead Nukkad Natak performer & stage productions. | `abay_nandhiga.jpg` | MC-1002 | she/her |
-| 3 | **Samarth Shrivastava** | `21f1002840` | samarth123 | coordinator | 22 | Chennai | Chief Coordinator. Production logistics, stage design, inter-college fests. | `samarth_shrivastava.jpg` | MC-1003 | he/him |
+| 3 | **Samarth Shrivastava** | `21f1002840` | samarth123 | coordinator | 22 | Chennai | Chief Coordinator. Production logistics, stage design, inter-college fests. | `my_pic.jpg` | MC-1003 | he/him |
 | 4 | **Krishna Subramanian** | `23f1000655` | krishna123 | coordinator | 21 | Chennai | Dept. Chief Coordinator. DMX lighting, acoustic soundscapes, live cues. | `krishna_subramanian.jpg` | MC-1004 | she/her |
 | 5 | **Kaushal Raj** | `22f3003301` | kaushal123 | sponsor | 23 | Bengaluru | Outreach & Sponsorship Head. Corporate partnerships & patron circles. | `sneha_das.jpg` | MC-1005 | he/him |
 | 6 | **Sneha Das** | `23f1000100` | sneha123 | artist | 22 | Kolkata | Design Head. Scenic backdrops, prop design, visual brand identity. | `sylene_bansal.jpg` | MC-1006 | she/her |
@@ -116,7 +116,7 @@ The `User.to_dict()` method in `models.py` maps display names to profile images:
 | Yuuhi | `/aayam_assets/profiles/abay_nandhiga.jpg` |
 | Utkarsh / Yuuhi | `/aayam_assets/profiles/abay_nandhiga.jpg` |
 | Utkarsh (Yuuhi) | `/aayam_assets/profiles/abay_nandhiga.jpg` |
-| Samarth Shrivastava | `/aayam_assets/profiles/samarth_shrivastava.jpg` |
+| Samarth Shrivastava | `/aayam_assets/profiles/my_pic.jpg` |
 | Krishna Subramanian | `/aayam_assets/profiles/krishna_subramanian.jpg` |
 | Harsh Aryan | `/aayam_assets/profiles/harsh_aryan.jpg` |
 | Swati Singh | `/aayam_assets/profiles/swati_singh.jpg` |

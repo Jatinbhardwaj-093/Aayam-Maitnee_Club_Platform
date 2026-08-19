@@ -43,7 +43,7 @@ def seed_database():
         ("Samarth Shrivastava", "21f1002840", "samarth123", "coordinator", "22", "Aayam Hub, IITM BS", "Chennai", "Tamil Nadu", "India", "+91 98765 21002",
          "Chief Coordinator of Aayam. Overseeing production logistics, stage design, and inter-collegiate drama fests.",
          "Production Logistics, Stage Lighting, Auditions", "Shrivastava", "+91 98765 21003",
-         "/aayam_assets/profiles/samarth_shrivastava.jpg"),
+         "/aayam_assets/profiles/my_pic.jpg"),
 
         ("Krishna Subramanian", "23f1000655", "krishna123", "coordinator", "21", "IITM BS Campus", "Chennai", "Tamil Nadu", "India", "+91 98765 23006",
          "Dept. Chief Coordinator. Coordinating technical lighting boards, acoustic soundscapes, and live cue management.",
