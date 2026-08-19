@@ -151,7 +151,7 @@ export default function MediaModeration() {
     };
 
     return (
-        <div className="p-6 md:p-8 max-w-7xl mx-auto space-y-8 bg-[#E7DDD3] min-h-screen text-[#232323]">
+        <div className="p-6 md:p-8 max-w-7xl mx-auto space-y-8 bg-[#E7DDD3] min-h-screen text-[#2C2A28]">
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#D5C9BE]/40 pb-6">
                 <div>
@@ -159,7 +159,7 @@ export default function MediaModeration() {
                         <Cloud className="w-3.5 h-3.5" />
                         <span>Maintainer Media Management</span>
                     </div>
-                    <h1 className="text-3xl md:text-4xl font-serif font-bold text-[#232323]">
+                    <h1 className="text-3xl md:text-4xl font-serif font-bold text-[#2C2A28]">
                         Media Moderation & Gallery Database
                     </h1>
                     <p className="text-sm text-[#666361] mt-1 font-light">
@@ -229,7 +229,7 @@ export default function MediaModeration() {
             ) : filteredItems.length === 0 ? (
                 <div className="text-center py-20 bg-white rounded-3xl border border-[#D5C9BE]/30 p-8">
                     <ImageIcon className="w-12 h-12 text-[#353535]/40 mx-auto mb-3" />
-                    <h3 className="font-serif text-xl font-bold text-[#232323]">No media photos in this folder</h3>
+                    <h3 className="font-serif text-xl font-bold text-[#2C2A28]">No media photos in this folder</h3>
                     <p className="text-xs text-[#666361] mt-1">Select another play folder or click "Add Media to Database" above.</p>
                 </div>
             ) : (
@@ -252,7 +252,7 @@ export default function MediaModeration() {
 
                                 {/* Hover Dark Overlay */}
                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
-                                    <div className="bg-white/90 text-[#232323] px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-md">
+                                    <div className="bg-white/90 text-[#2C2A28] px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-md">
                                         <Maximize2 className="w-3.5 h-3.5" /> Full View
                                     </div>
                                 </div>
@@ -277,7 +277,7 @@ export default function MediaModeration() {
                             {/* Card Details */}
                             <div className="p-4 bg-white border-t border-[#D5C9BE]/15 flex flex-col justify-between space-y-2">
                                 <div>
-                                    <h3 className="font-serif font-bold text-sm text-[#232323] group-hover:text-[#353535] transition-colors truncate">
+                                    <h3 className="font-serif font-bold text-sm text-[#2C2A28] group-hover:text-[#353535] transition-colors truncate">
                                         {item.title}
                                     </h3>
                                     {item.caption && (
@@ -307,7 +307,7 @@ export default function MediaModeration() {
                         <X className="w-6 h-6" />
                     </button>
 
-                    <div className="max-w-4xl w-full bg-[#232323] rounded-3xl overflow-hidden border border-white/10 shadow-2xl flex flex-col md:flex-row max-h-[90vh]">
+                    <div className="max-w-4xl w-full bg-[#2C2A28] rounded-3xl overflow-hidden border border-white/10 shadow-2xl flex flex-col md:flex-row max-h-[90vh]">
                         <div className="md:w-3/5 bg-black flex items-center justify-center p-2 relative overflow-hidden">
                             <img
                                 src={activeLightboxItem.imageUrl}
@@ -364,7 +364,7 @@ export default function MediaModeration() {
             <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
                 <DialogContent className="sm:max-w-lg bg-[#E7DDD3] border-[#D5C9BE]">
                     <DialogHeader>
-                        <DialogTitle className="font-serif text-2xl text-[#232323] flex items-center gap-2">
+                        <DialogTitle className="font-serif text-2xl text-[#2C2A28] flex items-center gap-2">
                             <Plus className="w-5 h-5 text-[#353535]" />
                             <span>Add New Media to Database</span>
                         </DialogTitle>

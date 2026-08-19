@@ -176,7 +176,7 @@ export default function BackstagePass() {
               </select>
             </div>
 
-            <Button type="submit" className="w-full bg-[#E85F57] text-[#232323] hover:bg-[#E85F57]/90 font-semibold rounded-[8px] py-2.5 transition-all shadow-sm">
+            <Button type="submit" className="w-full bg-[#E85F57] text-[#2C2A28] hover:bg-[#E85F57]/90 font-semibold rounded-[8px] py-2.5 transition-all shadow-sm">
               <PlusCircle className="w-4 h-4 mr-2" /> Add Crew Task
             </Button>
           </form>

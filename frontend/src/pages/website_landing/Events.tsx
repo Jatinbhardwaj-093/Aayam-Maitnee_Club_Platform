@@ -290,7 +290,7 @@ export default function Events() {
   const featuredEvent = events.find((e) => e.status === "upcoming") || events[0];
 
   return (
-    <div className="bg-[#E7DDD3] text-[#232323] min-h-screen font-sans selection:bg-[#F8E8E4] pt-8 pb-16">
+    <div className="bg-[#E7DDD3] text-[#2C2A28] min-h-screen font-sans selection:bg-[#F8E8E4] pt-8 pb-16">
       <main className="max-w-7xl mx-auto px-6 md:px-12 space-y-10">
         {isRequestModalOpen ? (
           /* DEDICATED PROPOSE EVENT PAGE VIEW (Only Propose Event Form is Visible) */
@@ -301,7 +301,7 @@ export default function Events() {
               <button
                 type="button"
                 onClick={() => setIsRequestModalOpen(false)}
-                className="px-5 py-2.5 rounded-xl border border-[#D5C9BE] text-[#353535] hover:text-[#232323] hover:bg-[#E7DDD3] text-xs font-bold transition-all flex items-center gap-2"
+                className="px-5 py-2.5 rounded-xl border border-[#D5C9BE] text-[#353535] hover:text-[#2C2A28] hover:bg-[#E7DDD3] text-xs font-bold transition-all flex items-center gap-2"
               >
                 Back to Events
               </button>
@@ -313,7 +313,7 @@ export default function Events() {
                   className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${
                     !isAiProposalMode
                       ? "bg-[#353535] text-white shadow-xs"
-                      : "text-[#666361] hover:text-[#232323]"
+                      : "text-[#666361] hover:text-[#2C2A28]"
                   }`}
                 >
                   Manual Form
@@ -324,7 +324,7 @@ export default function Events() {
                   className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${
                     isAiProposalMode
                       ? "bg-[#666361] text-white shadow-xs"
-                      : "text-[#666361] hover:text-[#232323]"
+                      : "text-[#666361] hover:text-[#2C2A28]"
                   }`}
                 >
                   AI Smart Generator
@@ -333,7 +333,7 @@ export default function Events() {
             </div>
 
             <div className="space-y-1">
-              <h1 className="font-serif text-3xl md:text-4xl font-bold text-[#232323]">
+              <h1 className="font-serif text-3xl md:text-4xl font-bold text-[#2C2A28]">
                 {isAiProposalMode ? "Propose Event by AI" : "Propose Event to Aayam"}
               </h1>
               <p className="text-xs sm:text-sm text-[#666361]">
@@ -351,7 +351,7 @@ export default function Events() {
                     <span className="text-[10px] font-bold uppercase tracking-wider text-[#353535]">
                       AI Smart Brief Extractor
                     </span>
-                    <h3 className="font-serif text-lg font-bold text-[#232323]">
+                    <h3 className="font-serif text-lg font-bold text-[#2C2A28]">
                       Paste Full Event Description / Paragraph
                     </h3>
                   </div>
@@ -368,7 +368,7 @@ export default function Events() {
                     setAiExtractedSuccess(false);
                   }}
                   placeholder="e.g. FabIndia is presenting a grand ethnic costume showcase at the Royal Stage Auditorium on 24th August with an offered budget of ₹1,50,000. Contact Rohan Sharma at rohan@fabindia.com or +91 98110 44321 to discuss stage sidecar branding..."
-                  className="w-full bg-white border border-[#D5C9BE]/80 rounded-2xl p-4 text-xs text-[#232323] focus:outline-none focus:border-[#353535] leading-relaxed shadow-inner"
+                  className="w-full bg-white border border-[#D5C9BE]/80 rounded-2xl p-4 text-xs text-[#2C2A28] focus:outline-none focus:border-[#353535] leading-relaxed shadow-inner"
                 />
 
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-1">
@@ -423,7 +423,7 @@ export default function Events() {
                           sponsorshipTerms: val.includes("Sponsor") ? (proposalForm.sponsorshipTerms || "₹50,000") : ""
                         });
                       }}
-                      className="w-full bg-[#E7DDD3] border border-[#D5C9BE]/80 rounded-xl px-4 py-2.5 text-xs text-[#232323] font-medium focus:outline-none focus:border-[#353535]"
+                      className="w-full bg-[#E7DDD3] border border-[#D5C9BE]/80 rounded-xl px-4 py-2.5 text-xs text-[#2C2A28] font-medium focus:outline-none focus:border-[#353535]"
                     >
                       {activeUser ? (
                         <>
@@ -545,7 +545,7 @@ export default function Events() {
                   placeholder="Describe the production format, audience scope, rehearsal timeline, and deliverables..."
                   value={proposalForm.description}
                   onChange={(e) => setProposalForm({ ...proposalForm, description: e.target.value })}
-                  className="w-full bg-[#E7DDD3] border border-[#D5C9BE]/80 rounded-xl p-3.5 text-xs text-[#232323] focus:outline-none focus:border-[#353535]"
+                  className="w-full bg-[#E7DDD3] border border-[#D5C9BE]/80 rounded-xl p-3.5 text-xs text-[#2C2A28] focus:outline-none focus:border-[#353535]"
                 />
               </div>
 
@@ -577,7 +577,7 @@ export default function Events() {
                   <span className="text-[10px] font-bold text-[#353535] uppercase tracking-[0.25em] mb-1 block">
                     Official Roster & Calendar
                   </span>
-                  <h1 className="font-serif text-3xl md:text-5xl text-[#232323] font-bold tracking-tight">
+                  <h1 className="font-serif text-3xl md:text-5xl text-[#2C2A28] font-bold tracking-tight">
                     Events & Performances
                   </h1>
                   <p className="max-w-xl text-xs md:text-sm text-[#666361] leading-relaxed font-light mt-1.5">
@@ -612,7 +612,7 @@ export default function Events() {
             {/* Bento Grid: Dynamic Calendar + Featured Highlight */}
             <section className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
               {/* Dynamic Calendar Widget */}
-              <div className="lg:col-span-2 bg-[#232323] text-white rounded-3xl border border-[#353535] p-8 shadow-xl">
+              <div className="lg:col-span-2 bg-[#2C2A28] text-white rounded-3xl border border-[#353535] p-8 shadow-xl">
                 <div className="flex items-center justify-between mb-8 pb-4 border-b border-white/10">
                   <h3 className="font-serif text-2xl font-normal text-[#F7F5F0]">Upcoming Production Calendar</h3>
                   <span className="text-xs font-mono text-[#E85F57] uppercase tracking-wider bg-[#E85F57]/15 px-3 py-1 rounded-full border border-[#E85F57]/30">
@@ -677,7 +677,7 @@ export default function Events() {
 
               {/* Dynamic Featured Highlight Card */}
               {featuredEvent && (
-                <div className="bg-[#232323] text-white rounded-3xl p-8 flex flex-col justify-between relative overflow-hidden shadow-xl border border-[#353535] space-y-6">
+                <div className="bg-[#2C2A28] text-white rounded-3xl p-8 flex flex-col justify-between relative overflow-hidden shadow-xl border border-[#353535] space-y-6">
                   <div>
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#E85F57]/15 text-[#E85F57] text-[10px] font-mono font-bold uppercase tracking-widest border border-[#E85F57]/30">
                       <span>FEATURED HIGHLIGHT</span>
@@ -725,7 +725,7 @@ export default function Events() {
             {/* All Events List */}
             <section className="space-y-8">
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 border-b border-[#D5C9BE]/30 pb-6">
-                <h2 className="font-serif text-3xl font-bold text-[#232323] tracking-tight">
+                <h2 className="font-serif text-3xl font-bold text-[#2C2A28] tracking-tight">
                   Event Schedule & Archive
                 </h2>
 
@@ -768,7 +768,7 @@ export default function Events() {
                 {filteredEvents.map((evt, index) => (
                   <div
                     key={index}
-                    className="flex flex-col bg-[#232323] text-white rounded-3xl overflow-hidden border border-[#353535] shadow-xl group hover:border-[#E85F57]/50 hover:shadow-2xl transition-all duration-300 justify-between"
+                    className="flex flex-col bg-[#2C2A28] text-white rounded-3xl overflow-hidden border border-[#353535] shadow-xl group hover:border-[#E85F57]/50 hover:shadow-2xl transition-all duration-300 justify-between"
                   >
                     <div>
                       <div className="relative h-56 overflow-hidden flex-shrink-0 bg-[#353535]">
@@ -780,7 +780,7 @@ export default function Events() {
                             (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=800&auto=format&fit=crop";
                           }}
                         />
-                        <div className="absolute top-4 left-4 bg-[#232323]/90 backdrop-blur-md px-3.5 py-2 rounded-2xl text-center shadow-md border border-[#353535]">
+                        <div className="absolute top-4 left-4 bg-[#2C2A28]/90 backdrop-blur-md px-3.5 py-2 rounded-2xl text-center shadow-md border border-[#353535]">
                           <p className="text-[10px] font-mono font-bold text-[#E85F57] uppercase leading-none">{evt.month}</p>
                           <p className="text-xl font-serif font-normal text-white leading-none mt-1">{evt.day}</p>
                         </div>
@@ -790,14 +790,14 @@ export default function Events() {
                             className={`text-[9px] font-mono font-bold px-3 py-1 rounded-full shadow-md uppercase tracking-wider backdrop-blur-md ${
                               evt.status === "concluded"
                                 ? "bg-[#353535]/80 text-white/60 border border-white/10"
-                                : "bg-[#232323]/90 text-[#E85F57] border border-[#E85F57]/40"
+                                : "bg-[#2C2A28]/90 text-[#E85F57] border border-[#E85F57]/40"
                             }`}
                           >
                             {evt.status === "concluded" ? "Concluded" : "Live Season"}
                           </span>
                         </div>
 
-                        <div className="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-[#232323] via-transparent to-transparent">
+                        <div className="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-[#2C2A28] via-transparent to-transparent">
                           <span className="text-[9px] font-mono font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider bg-[#E85F57] text-white">
                             {evt.category}
                           </span>

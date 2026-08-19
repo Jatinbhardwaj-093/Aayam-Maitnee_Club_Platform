@@ -495,7 +495,7 @@ export default function EventsManagement() {
      ==================================================================== */
   if (isCreatingEvent) {
     return (
-      <div className="flex-1 bg-[#E7DDD3] text-[#232323] font-sans pb-16 space-y-6">
+      <div className="flex-1 bg-[#E7DDD3] text-[#2C2A28] font-sans pb-16 space-y-6">
         <div className="max-w-7xl mx-auto space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#DDD8CE]">
             <div className="flex items-center gap-4">
@@ -554,7 +554,7 @@ export default function EventsManagement() {
                       }`}
                     >
                       <div className="min-w-0 flex-1">
-                        <div className="text-xs font-bold text-[#232323] truncate">{tmpl.name}</div>
+                        <div className="text-xs font-bold text-[#2C2A28] truncate">{tmpl.name}</div>
                         <div className="text-[10px] text-[#666361]/70 truncate">{tmpl.category}</div>
                       </div>
                       {selectedTemplateId === tmpl.id && (
@@ -610,7 +610,7 @@ export default function EventsManagement() {
                       value={newEventForm.description}
                       onChange={(e) => setNewEventForm({ ...newEventForm, description: e.target.value })}
                       rows={4}
-                      className="w-full bg-[#E7DDD3] border border-[#D5C9BE]/60 p-3 rounded-xl text-xs text-[#232323] focus:outline-none"
+                      className="w-full bg-[#E7DDD3] border border-[#D5C9BE]/60 p-3 rounded-xl text-xs text-[#2C2A28] focus:outline-none"
                       placeholder="Provide event details..."
                     />
                   </div>
@@ -627,7 +627,7 @@ export default function EventsManagement() {
      DEFAULT DASHBOARD VIEW (UPCOMING / PAST / PROPOSALS / SPONSOR ADS)
      ==================================================================== */
   return (
-    <div className="flex-1 bg-[#E7DDD3] text-[#232323] font-sans pb-16">
+    <div className="flex-1 bg-[#E7DDD3] text-[#2C2A28] font-sans pb-16">
       <div className="max-w-7xl mx-auto space-y-8">
         
         {/* Page Header */}
@@ -781,7 +781,7 @@ export default function EventsManagement() {
 
                 <div className="p-5 space-y-3 flex-1 flex flex-col justify-between">
                   <div className="space-y-1.5">
-                    <h3 className="font-serif font-bold text-lg text-[#232323]">{evt.title}</h3>
+                    <h3 className="font-serif font-bold text-lg text-[#2C2A28]">{evt.title}</h3>
                     <p className="text-xs text-[#666361]/80 line-clamp-2">{evt.description}</p>
                   </div>
 
@@ -804,7 +804,7 @@ export default function EventsManagement() {
           <div className="space-y-6">
             <div className="bg-white border border-[#DDD8CE] p-5 rounded-2xl shadow-xs space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <h2 className="font-serif font-bold text-xl text-[#232323] flex items-center gap-2">
+                <h2 className="font-serif font-bold text-xl text-[#2C2A28] flex items-center gap-2">
                   <Building className="w-5 h-5 text-[#353535]" /> Corporate Sponsor Ad Requests
                 </h2>
                 <div className="flex items-center gap-2">
@@ -813,7 +813,7 @@ export default function EventsManagement() {
                     placeholder="Filter sponsor requests by keyword..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="px-3.5 py-1.5 rounded-xl border border-[#D5C9BE]/60 bg-[#E7DDD3] text-xs text-[#232323] focus:outline-none focus:border-[#353535] w-64"
+                    className="px-3.5 py-1.5 rounded-xl border border-[#D5C9BE]/60 bg-[#E7DDD3] text-xs text-[#2C2A28] focus:outline-none focus:border-[#353535] w-64"
                   />
                   {searchTerm && (
                     <button
@@ -867,7 +867,7 @@ export default function EventsManagement() {
                       </div>
 
                       <div>
-                        <h3 className="font-serif font-bold text-lg text-[#232323] leading-snug">{ad.ad_title}</h3>
+                        <h3 className="font-serif font-bold text-lg text-[#2C2A28] leading-snug">{ad.ad_title}</h3>
                         <p className="text-xs text-[#353535] font-semibold flex items-center gap-1 mt-0.5">
                           <Building className="w-3.5 h-3.5" /> {ad.sponsor_name}
                         </p>
@@ -886,7 +886,7 @@ export default function EventsManagement() {
                             Phone: <strong>{ad.contact_phone}</strong>
                           </div>
                         )}
-                        <div className="pt-1.5 border-t border-[#DDD8CE] text-[11px] text-[#232323]">
+                        <div className="pt-1.5 border-t border-[#DDD8CE] text-[11px] text-[#2C2A28]">
                           Target Event: <strong>{ad.target_event_name}</strong>
                         </div>
                       </div>
@@ -921,7 +921,7 @@ export default function EventsManagement() {
                                     key={idx}
                                     type="button"
                                     onClick={() => handleKeywordClick(kw)}
-                                    className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-white hover:bg-[#353535] hover:text-white text-[#232323] border border-[#D5C9BE]/50 shadow-2xs transition-all cursor-pointer"
+                                    className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-white hover:bg-[#353535] hover:text-white text-[#2C2A28] border border-[#D5C9BE]/50 shadow-2xs transition-all cursor-pointer"
                                   >
                                     {kw}
                                   </button>
@@ -965,7 +965,7 @@ export default function EventsManagement() {
           <div className="space-y-6">
             <div className="bg-white border border-[#DDD8CE] p-5 rounded-2xl shadow-xs space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <h2 className="font-serif font-bold text-xl text-[#232323] flex items-center gap-2">
+                <h2 className="font-serif font-bold text-xl text-[#2C2A28] flex items-center gap-2">
                   Event Proposals & Member Pitches
                 </h2>
                 <div className="flex items-center gap-2">
@@ -974,7 +974,7 @@ export default function EventsManagement() {
                     placeholder="Filter proposals by keyword..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="px-3.5 py-1.5 rounded-xl border border-[#D5C9BE]/60 bg-[#E7DDD3] text-xs text-[#232323] focus:outline-none focus:border-[#353535] w-64"
+                    className="px-3.5 py-1.5 rounded-xl border border-[#D5C9BE]/60 bg-[#E7DDD3] text-xs text-[#2C2A28] focus:outline-none focus:border-[#353535] w-64"
                   />
                   {searchTerm && (
                     <button
@@ -1028,7 +1028,7 @@ export default function EventsManagement() {
                           </div>
                           <span className="text-[10px] text-emerald-700 font-bold">{prop.budget || prop.sponsorshipDeal || "₹50,000"}</span>
                         </div>
-                        <h4 className="font-bold text-sm text-[#232323] truncate">{prop.name}</h4>
+                        <h4 className="font-bold text-sm text-[#2C2A28] truncate">{prop.name}</h4>
                         <div className="text-[11px] text-[#666361] flex flex-wrap gap-x-2 gap-y-0.5 items-center">
                           <span>By <strong>{prop.submitter?.name || prop.submitter_name || "Ensemble Member"}</strong></span>
                           <span>•</span>
@@ -1066,7 +1066,7 @@ export default function EventsManagement() {
                       </span>
                     </div>
 
-                    <h3 className="font-serif text-xl font-bold text-[#232323] leading-snug">{currentProposal.name}</h3>
+                    <h3 className="font-serif text-xl font-bold text-[#2C2A28] leading-snug">{currentProposal.name}</h3>
 
                     <div className="p-3.5 bg-[#E7DDD3] rounded-xl border border-[#DDD8CE] space-y-2 text-xs">
                       <div className="flex items-center justify-between text-[#666361]">
@@ -1081,7 +1081,7 @@ export default function EventsManagement() {
                           Phone: <strong>{currentProposal.contact_phone}</strong>
                         </div>
                       )}
-                      <div className="pt-1.5 border-t border-[#DDD8CE] text-[11px] text-[#232323]">
+                      <div className="pt-1.5 border-t border-[#DDD8CE] text-[11px] text-[#2C2A28]">
                         Target Stage / Venue: <strong>{currentProposal.venue}</strong>
                       </div>
                     </div>
@@ -1116,7 +1116,7 @@ export default function EventsManagement() {
                                 key={idx}
                                 type="button"
                                 onClick={() => handleKeywordClick(kw)}
-                                className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-white hover:bg-[#353535] hover:text-white text-[#232323] border border-[#D5C9BE]/50 shadow-2xs transition-all cursor-pointer"
+                                className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-white hover:bg-[#353535] hover:text-white text-[#2C2A28] border border-[#D5C9BE]/50 shadow-2xs transition-all cursor-pointer"
                               >
                                 {kw}
                               </button>
@@ -1152,7 +1152,7 @@ export default function EventsManagement() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {pastEvents.map((evt) => (
               <div key={evt.id} className="bg-white border border-[#DDD8CE] rounded-2xl p-5 shadow-2xs space-y-2 opacity-80">
-                <h3 className="font-serif font-bold text-base text-[#232323]">{evt.title}</h3>
+                <h3 className="font-serif font-bold text-base text-[#2C2A28]">{evt.title}</h3>
                 <p className="text-xs text-[#666361]">{evt.date} • {evt.venue}</p>
               </div>
             ))}

@@ -85,7 +85,7 @@ export default function Gallery() {
   }, [activeLightboxIndex, filteredItems.length]);
 
   return (
-    <div className="min-h-screen bg-[#E7DDD3] text-[#232323] font-sans pt-8 pb-20 selection:bg-[#F8E8E4]">
+    <div className="min-h-screen bg-[#E7DDD3] text-[#2C2A28] font-sans pt-8 pb-20 selection:bg-[#F8E8E4]">
       <div className="max-w-7xl mx-auto px-6 md:px-12 space-y-12">
         
         {/* Header Section */}
@@ -95,7 +95,7 @@ export default function Gallery() {
               <div className="inline-flex items-center gap-2 text-xs font-mono font-semibold uppercase tracking-widest text-[#E85F57] mb-2">
                 <span>STAGE ARCHIVE // PRODUCTION GALLERY</span>
               </div>
-              <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl text-[#232323] font-normal tracking-tight">
+              <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl text-[#2C2A28] font-normal tracking-tight">
                 Visual Chronicles of Aayam
               </h1>
               <p className="text-sm md:text-base text-[#666361] max-w-2xl leading-relaxed font-normal mt-3">
@@ -105,7 +105,7 @@ export default function Gallery() {
 
             <div className="flex items-center gap-3 shrink-0 self-start md:self-auto">
               <div className="text-xs font-mono text-[#666361] bg-[#EFE8E1] px-4 py-2 rounded-full border border-[#D5C9BE]/50">
-                ARCHIVED FRAMES: <strong className="text-[#232323]">{filteredItems.length}</strong>
+                ARCHIVED FRAMES: <strong className="text-[#2C2A28]">{filteredItems.length}</strong>
               </div>
             </div>
           </div>
@@ -118,7 +118,7 @@ export default function Gallery() {
               const targetIdx = filteredItems.findIndex(i => i.imageUrl.includes("samatvam_user_3"));
               setActiveLightboxIndex(targetIdx >= 0 ? targetIdx : 0);
             }}
-            className="group relative bg-[#232323] text-white rounded-3xl overflow-hidden border border-[#353535] shadow-2xl cursor-pointer hover:border-[#E85F57]/60 transition-all duration-500"
+            className="group relative bg-[#2C2A28] text-white rounded-3xl overflow-hidden border border-[#353535] shadow-2xl cursor-pointer hover:border-[#E85F57]/60 transition-all duration-500"
           >
             <div className="relative aspect-[16/8] sm:aspect-[21/9] overflow-hidden bg-[#353535]">
               <img
@@ -126,13 +126,13 @@ export default function Gallery() {
                 alt="Samatvam - Intermission Standing Line-up"
                 className="w-full h-full object-cover object-[center_40%] group-hover:scale-105 transition-transform duration-1000 filter brightness-95 contrast-105"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#232323] via-[#232323]/35 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#2C2A28] via-[#2C2A28]/35 to-transparent" />
               
               <div className="absolute top-6 left-6 flex items-center gap-3">
                 <span className="bg-[#E85F57] text-white text-[10px] font-mono font-bold px-3.5 py-1 rounded-full uppercase tracking-wider shadow-md">
                   FEATURED EXHIBITION FRAME
                 </span>
-                <span className="bg-[#232323]/90 text-white/80 border border-white/10 text-[10px] font-mono px-3 py-1 rounded-full uppercase">
+                <span className="bg-[#2C2A28]/90 text-white/80 border border-white/10 text-[10px] font-mono px-3 py-1 rounded-full uppercase">
                   Samatvam Drama
                 </span>
               </div>
@@ -157,7 +157,7 @@ export default function Gallery() {
 
         {/* Filter Controls Bar */}
         <section className="sticky top-20 z-40 bg-[#E7DDD3]/90 backdrop-blur-md py-4 border-b border-[#D5C9BE]/40">
-          <div className="flex flex-wrap items-center justify-between gap-4 bg-[#232323] p-3 md:p-4 rounded-3xl border border-[#353535] shadow-xl">
+          <div className="flex flex-wrap items-center justify-between gap-4 bg-[#2C2A28] p-3 md:p-4 rounded-3xl border border-[#353535] shadow-xl">
             <div className="flex items-center gap-2 text-white/60 text-xs font-mono px-3">
               <Layers className="w-4 h-4 text-[#E85F57]" />
               <span className="hidden sm:inline">SELECT PRODUCTION:</span>
@@ -185,11 +185,11 @@ export default function Gallery() {
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[1, 2, 3, 4, 5, 6].map((n) => (
-              <div key={n} className="h-80 bg-[#232323]/50 animate-pulse rounded-3xl border border-[#353535]"></div>
+              <div key={n} className="h-80 bg-[#2C2A28]/50 animate-pulse rounded-3xl border border-[#353535]"></div>
             ))}
           </div>
         ) : filteredItems.length === 0 ? (
-          <div className="text-center py-20 bg-[#232323] text-white rounded-3xl border border-[#353535] p-12 shadow-xl">
+          <div className="text-center py-20 bg-[#2C2A28] text-white rounded-3xl border border-[#353535] p-12 shadow-xl">
             <ImageIcon className="w-12 h-12 text-[#E85F57] mx-auto mb-4" />
             <h3 className="font-serif text-2xl font-normal text-[#F7F5F0]">No media photos found in this category</h3>
             <p className="text-sm text-white/70 mt-2">Try selecting another category or check back later.</p>
@@ -200,7 +200,7 @@ export default function Gallery() {
               <div
                 key={item.id}
                 onClick={() => setActiveLightboxIndex(idx)}
-                className="group relative bg-[#232323] text-white rounded-3xl overflow-hidden border border-[#353535] shadow-xl hover:border-[#E85F57]/50 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col justify-between"
+                className="group relative bg-[#2C2A28] text-white rounded-3xl overflow-hidden border border-[#353535] shadow-xl hover:border-[#E85F57]/50 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col justify-between"
               >
                 <div>
                   <div className="relative aspect-[16/11] overflow-hidden bg-[#353535]">
@@ -212,10 +212,10 @@ export default function Gallery() {
                         (e.target as HTMLImageElement).src = "/aayam_assets/tamashbin_user_1.jpg";
                       }}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#232323] via-transparent to-transparent"></div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#2C2A28] via-transparent to-transparent"></div>
                     
                     <div className="absolute top-4 left-4">
-                      <span className="bg-[#232323]/90 backdrop-blur-md text-[#E85F57] text-[10px] font-mono font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-md border border-[#E85F57]/30">
+                      <span className="bg-[#2C2A28]/90 backdrop-blur-md text-[#E85F57] text-[10px] font-mono font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-md border border-[#E85F57]/30">
                         {item.category}
                       </span>
                     </div>
@@ -275,7 +275,7 @@ export default function Gallery() {
             {/* Left Prev Arrow */}
             <button
               onClick={handlePrev}
-              className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 bg-[#232323]/80 hover:bg-[#E85F57] text-white p-3 md:p-4 rounded-full border border-white/20 transition-all z-20 shadow-2xl active:scale-95"
+              className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 bg-[#2C2A28]/80 hover:bg-[#E85F57] text-white p-3 md:p-4 rounded-full border border-white/20 transition-all z-20 shadow-2xl active:scale-95"
             >
               <ChevronLeft className="w-6 h-6" />
             </button>
@@ -283,7 +283,7 @@ export default function Gallery() {
             {/* Right Next Arrow */}
             <button
               onClick={handleNext}
-              className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 bg-[#232323]/80 hover:bg-[#E85F57] text-white p-3 md:p-4 rounded-full border border-white/20 transition-all z-20 shadow-2xl active:scale-95"
+              className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 bg-[#2C2A28]/80 hover:bg-[#E85F57] text-white p-3 md:p-4 rounded-full border border-white/20 transition-all z-20 shadow-2xl active:scale-95"
             >
               <ChevronRight className="w-6 h-6" />
             </button>
@@ -291,7 +291,7 @@ export default function Gallery() {
             {/* Main Modal Card */}
             <div 
               onClick={(e) => e.stopPropagation()}
-              className="max-w-5xl w-full bg-[#232323] rounded-3xl overflow-hidden border border-[#353535] shadow-2xl flex flex-col md:flex-row max-h-[90vh]"
+              className="max-w-5xl w-full bg-[#2C2A28] rounded-3xl overflow-hidden border border-[#353535] shadow-2xl flex flex-col md:flex-row max-h-[90vh]"
             >
               {/* Photo Area */}
               <div className="md:w-3/5 bg-black flex items-center justify-center p-4 relative overflow-hidden">

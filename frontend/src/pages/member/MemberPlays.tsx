@@ -127,7 +127,7 @@ export default function MemberPlays() {
                       <span className="text-[10px] font-bold text-[#353535] uppercase tracking-[0.2em] block mb-1">
                         {play.season || "2024-2025 Lineage"}
                       </span>
-                      <h3 className="text-2xl font-bold font-serif text-[#232323] tracking-tight">{play.title}</h3>
+                      <h3 className="text-2xl font-bold font-serif text-[#2C2A28] tracking-tight">{play.title}</h3>
                       <p className="text-xs text-[#353535] font-semibold italic mt-1">{extra.tagline}</p>
                     </div>
                     <Badge className="bg-[#353535]/10 text-[#353535] border border-[#353535]/20 font-bold text-[10px] uppercase tracking-wider px-3 py-1 flex-shrink-0">
@@ -141,42 +141,42 @@ export default function MemberPlays() {
                       <span className="text-[10px] uppercase font-bold text-[#666361]/70 block flex items-center gap-1">
                         <Award className="w-3.5 h-3.5 text-[#353535]" /> Director
                       </span>
-                      <span className="font-bold text-[#232323] truncate block">{play.director || "Ensemble Lead"}</span>
+                      <span className="font-bold text-[#2C2A28] truncate block">{play.director || "Ensemble Lead"}</span>
                     </div>
 
                     <div className="space-y-1">
                       <span className="text-[10px] uppercase font-bold text-[#666361]/70 block flex items-center gap-1">
                         <MapPin className="w-3.5 h-3.5 text-[#353535]" /> Venue
                       </span>
-                      <span className="font-bold text-[#232323] truncate block">{play.venue || "OAT IIT Madras"}</span>
+                      <span className="font-bold text-[#2C2A28] truncate block">{play.venue || "OAT IIT Madras"}</span>
                     </div>
 
                     <div className="space-y-1">
                       <span className="text-[10px] uppercase font-bold text-[#666361]/70 block flex items-center gap-1">
                         <Clock className="w-3.5 h-3.5 text-[#353535]" /> Runtime
                       </span>
-                      <span className="font-bold text-[#232323] truncate block">{play.runtime || "90 Mins"}</span>
+                      <span className="font-bold text-[#2C2A28] truncate block">{play.runtime || "90 Mins"}</span>
                     </div>
 
                     <div className="space-y-1">
                       <span className="text-[10px] uppercase font-bold text-[#666361]/70 block flex items-center gap-1">
                         <Layers className="w-3.5 h-3.5 text-[#353535]" /> Structure
                       </span>
-                      <span className="font-bold text-[#232323] truncate block">{extra.acts}</span>
+                      <span className="font-bold text-[#2C2A28] truncate block">{extra.acts}</span>
                     </div>
 
                     <div className="space-y-1">
                       <span className="text-[10px] uppercase font-bold text-[#666361]/70 block flex items-center gap-1">
                         <Users className="w-3.5 h-3.5 text-[#353535]" /> Cast Size
                       </span>
-                      <span className="font-bold text-[#232323] truncate block">{extra.castCount}</span>
+                      <span className="font-bold text-[#2C2A28] truncate block">{extra.castCount}</span>
                     </div>
 
                     <div className="space-y-1">
                       <span className="text-[10px] uppercase font-bold text-[#666361]/70 block flex items-center gap-1">
                         <Calendar className="w-3.5 h-3.5 text-[#353535]" /> Rehearsals
                       </span>
-                      <span className="font-bold text-[#232323] truncate block">{extra.rehearsalSchedule}</span>
+                      <span className="font-bold text-[#2C2A28] truncate block">{extra.rehearsalSchedule}</span>
                     </div>
                   </div>
 
@@ -192,7 +192,7 @@ export default function MemberPlays() {
                   {play.cast && (
                     <div className="space-y-1.5 pt-2">
                       <span className="text-[10px] font-bold text-[#353535] uppercase tracking-wider block">Featured Performers:</span>
-                      <p className="text-xs font-medium text-[#232323] bg-gray-50 p-2.5 rounded-lg border border-gray-200/60">
+                      <p className="text-xs font-medium text-[#2C2A28] bg-gray-50 p-2.5 rounded-lg border border-gray-200/60">
                         {play.cast}
                       </p>
                     </div>

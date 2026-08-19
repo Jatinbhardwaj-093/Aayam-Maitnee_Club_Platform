@@ -140,7 +140,7 @@ export default function ProductionGallery() {
         </div>
         
         <Dialog open={uploadOpen} onOpenChange={setUploadOpen}>
-          <DialogTrigger render={<Button className="bg-[#E85F57] hover:bg-[#E85F57]/90 text-[#232323] font-semibold rounded-[8px] py-[10px] px-[20px] gap-2 shadow-sm transition-all active:scale-95" />}>
+          <DialogTrigger render={<Button className="bg-[#E85F57] hover:bg-[#E85F57]/90 text-[#2C2A28] font-semibold rounded-[8px] py-[10px] px-[20px] gap-2 shadow-sm transition-all active:scale-95" />}>
             <Upload className="w-4 h-4" /> Upload Stage Photo
           </DialogTrigger>
           <DialogContent className="bg-[#E7DDD3] border border-[#DDD8CE] text-[#666361] max-w-md">
@@ -207,7 +207,7 @@ export default function ProductionGallery() {
                 <Button type="button" variant="outline" onClick={() => setUploadOpen(false)} className="border-2 border-[#E85F57] text-[#E85F57] hover:bg-[#E85F57]/5 rounded-[8px] text-xs">
                   Cancel
                 </Button>
-                <Button type="submit" className="bg-[#E85F57] text-[#232323] hover:bg-[#E85F57]/90 rounded-[8px] font-semibold text-xs">
+                <Button type="submit" className="bg-[#E85F57] text-[#2C2A28] hover:bg-[#E85F57]/90 rounded-[8px] font-semibold text-xs">
                   Upload Photo
                 </Button>
               </DialogFooter>
@@ -226,7 +226,7 @@ export default function ProductionGallery() {
             onClick={() => setCategoryFilter(cat)}
             className={`rounded-[8px] font-semibold text-xs py-1.5 px-4 transition-all ${
               categoryFilter === cat
-                ? "bg-[#E85F57] text-[#232323] hover:bg-[#E85F57]/90"
+                ? "bg-[#E85F57] text-[#2C2A28] hover:bg-[#E85F57]/90"
                 : "border-2 border-[#DDD8CE] text-[#666361] hover:bg-[#EFE8E1]"
             }`}
           >

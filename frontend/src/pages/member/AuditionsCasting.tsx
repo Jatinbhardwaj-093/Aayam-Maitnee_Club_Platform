@@ -245,7 +245,7 @@ export default function AuditionsCasting() {
             <Badge className="bg-[#353535] text-white font-mono text-xs font-bold px-3 py-1">
               {activePosition.category}
             </Badge>
-            <Badge className="bg-[#E85F57]/20 text-[#232323] border-[#E85F57]/40 font-semibold text-xs py-1">
+            <Badge className="bg-[#E85F57]/20 text-[#2C2A28] border-[#E85F57]/40 font-semibold text-xs py-1">
               Deadline: {activePosition.deadline || 'Sep 25, 2026'}
             </Badge>
             <Badge className="bg-emerald-100 text-emerald-800 font-semibold text-xs py-1">
@@ -263,7 +263,7 @@ export default function AuditionsCasting() {
                 <strong className="text-xs font-bold text-[#353535] uppercase tracking-wider block">
                   Character & Role Specifications
                 </strong>
-                <p className="text-xs md:text-sm text-[#232323] leading-relaxed font-light bg-[#E7DDD3] p-4 rounded-xl border border-[#D5C9BE]/40">
+                <p className="text-xs md:text-sm text-[#2C2A28] leading-relaxed font-light bg-[#E7DDD3] p-4 rounded-xl border border-[#D5C9BE]/40">
                   {activePosition.description || "Seeking dedicated ensemble member with strong stage presence, dramatic projection, and commitment to rehearsal schedules."}
                 </p>
               </div>
@@ -272,7 +272,7 @@ export default function AuditionsCasting() {
                 <strong className="text-xs font-bold text-[#353535] uppercase tracking-wider block flex items-center gap-1">
                   <ListChecks className="w-4 h-4 text-[#E85F57]" /> Audition Requirements & Skill Benchmark
                 </strong>
-                <div className="text-xs md:text-sm text-[#232323] bg-[#E7DDD3] p-4 rounded-xl border border-[#D5C9BE]/40 space-y-2">
+                <div className="text-xs md:text-sm text-[#2C2A28] bg-[#E7DDD3] p-4 rounded-xl border border-[#D5C9BE]/40 space-y-2">
                   <p className="leading-relaxed font-medium">
                     {activePosition.requirements || "Audition monologue clip / Technical PDF portfolio submission."}
                   </p>
@@ -332,7 +332,7 @@ export default function AuditionsCasting() {
                       <span className="text-[#666361]/80 truncate max-w-[240px]">
                         {fileName1 || "Upload monologue video clip"}
                       </span>
-                      <label className="cursor-pointer bg-[#E85F57]/20 hover:bg-[#E85F57]/30 text-[#232323] px-3 py-1.5 rounded-lg border border-[#E85F57]/40 transition-all font-semibold flex items-center gap-1">
+                      <label className="cursor-pointer bg-[#E85F57]/20 hover:bg-[#E85F57]/30 text-[#2C2A28] px-3 py-1.5 rounded-lg border border-[#E85F57]/40 transition-all font-semibold flex items-center gap-1">
                         <Upload className="w-3.5 h-3.5" /> File
                         <input 
                           type="file" 
@@ -355,7 +355,7 @@ export default function AuditionsCasting() {
                       <span className="text-[#666361]/80 truncate max-w-[240px]">
                         {fileName2 || "Upload resume PDF"}
                       </span>
-                      <label className="cursor-pointer bg-[#E85F57]/20 hover:bg-[#E85F57]/30 text-[#232323] px-3 py-1.5 rounded-lg border border-[#E85F57]/40 transition-all font-semibold flex items-center gap-1">
+                      <label className="cursor-pointer bg-[#E85F57]/20 hover:bg-[#E85F57]/30 text-[#2C2A28] px-3 py-1.5 rounded-lg border border-[#E85F57]/40 transition-all font-semibold flex items-center gap-1">
                         <Upload className="w-3.5 h-3.5" /> File
                         <input 
                           type="file" 
@@ -377,7 +377,7 @@ export default function AuditionsCasting() {
                       <span className="text-[#666361]/80 truncate max-w-[240px]">
                         {fileName1 || "Upload portfolio PDF"}
                       </span>
-                      <label className="cursor-pointer bg-[#E85F57]/20 hover:bg-[#E85F57]/30 text-[#232323] px-3 py-1.5 rounded-lg border border-[#E85F57]/40 transition-all font-semibold flex items-center gap-1">
+                      <label className="cursor-pointer bg-[#E85F57]/20 hover:bg-[#E85F57]/30 text-[#2C2A28] px-3 py-1.5 rounded-lg border border-[#E85F57]/40 transition-all font-semibold flex items-center gap-1">
                         <Upload className="w-3.5 h-3.5" /> File
                         <input 
                           type="file" 
@@ -397,7 +397,7 @@ export default function AuditionsCasting() {
                       <span className="text-[#666361]/80 truncate max-w-[240px]">
                         {fileName2 || "Upload resume PDF"}
                       </span>
-                      <label className="cursor-pointer bg-[#E85F57]/20 hover:bg-[#E85F57]/30 text-[#232323] px-3 py-1.5 rounded-lg border border-[#E85F57]/40 transition-all font-semibold flex items-center gap-1">
+                      <label className="cursor-pointer bg-[#E85F57]/20 hover:bg-[#E85F57]/30 text-[#2C2A28] px-3 py-1.5 rounded-lg border border-[#E85F57]/40 transition-all font-semibold flex items-center gap-1">
                         <Upload className="w-3.5 h-3.5" /> File
                         <input 
                           type="file" 
@@ -551,7 +551,7 @@ export default function AuditionsCasting() {
                           <div key={idx} className="flex flex-col items-center">
                             <div 
                               className={`w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold border transition-all ${
-                                isCompleted ? "bg-[#E85F57] border-[#E85F57] text-[#232323]" :
+                                isCompleted ? "bg-[#E85F57] border-[#E85F57] text-[#2C2A28]" :
                                 isActive ? "bg-white border-[#E85F57] text-[#E85F57] ring-2 ring-[#E85F57]/20 scale-110" :
                                 "bg-white border-gray-200 text-gray-400"
                               }`}

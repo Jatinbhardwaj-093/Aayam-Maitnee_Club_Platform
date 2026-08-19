@@ -7,7 +7,7 @@
 
 :root {
   --text: #666361;
-  --text-h: #232323;
+  --text-h: #2C2A28;
   --bg: #E7DDD3;
   --border: #D5C9BE;
   --code-bg: #E5E1D8;
@@ -142,11 +142,11 @@ code {
 
   :root {
     --background: #E7DDD3;
-    --foreground: #232323;
+    --foreground: #2C2A28;
     --card: #EFE8E1;
-    --card-foreground: #232323;
+    --card-foreground: #2C2A28;
     --popover: #FFFFFF;
-    --popover-foreground: #232323;
+    --popover-foreground: #2C2A28;
     --primary: #E85F57;
     --primary-foreground: #FFFFFF;
     --secondary: #35383B;
@@ -166,11 +166,11 @@ code {
     --chart-5: #E7DDD3;
     --radius: 0.625rem;
     --sidebar: #E8E4DC;
-    --sidebar-foreground: #232323;
+    --sidebar-foreground: #2C2A28;
     --sidebar-primary: #E85F57;
     --sidebar-primary-foreground: #FFFFFF;
     --sidebar-accent: #DDD8CE;
-    --sidebar-accent-foreground: #232323;
+    --sidebar-accent-foreground: #2C2A28;
     --sidebar-border: #D5C9BE;
     --sidebar-ring: #E85F57;
   }
@@ -272,7 +272,7 @@ code {
 }
 
 .compliance-ledger .text-on-surface {
-  color: #232323 !important;
+  color: #2C2A28 !important;
 }
 
 .compliance-ledger .text-on-surface-variant {
@@ -468,7 +468,7 @@ code {
 .compliance-ledger select option,
 .production-control select option {
   background-color: #ffffff !important;
-  color: #232323 !important;
+  color: #2C2A28 !important;
 }
 
 /* Members Directory scoped styles */
@@ -604,9 +604,9 @@ code {
 }
 
 .members-directory .text-on-surface {
-  color: #232323 !important;
+  color: #2C2A28 !important;
 }
 
 .members-directory .text-on-background {
-  color: #232323 !important;
+  color: #2C2A28 !important;
 }

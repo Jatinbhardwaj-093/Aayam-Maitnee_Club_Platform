@@ -41,14 +41,14 @@ export default function PlatformAnalytics() {
   }, []);
 
   return (
-    <div className="bg-[#E7DDD3] min-h-screen text-[#232323] p-6 md:p-10 font-sans space-y-8 max-w-7xl mx-auto">
+    <div className="bg-[#E7DDD3] min-h-screen text-[#2C2A28] p-6 md:p-10 font-sans space-y-8 max-w-7xl mx-auto">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-[#DDD8CE] pb-6">
         <div>
           <span className="text-[10px] font-bold text-[#353535] uppercase tracking-[0.25em] block mb-1">
             Maintainer Analytics & Ledger
           </span>
-          <h1 className="font-serif text-3xl md:text-4xl font-bold text-[#232323] tracking-tight">
+          <h1 className="font-serif text-3xl md:text-4xl font-bold text-[#2C2A28] tracking-tight">
             Platform Analytics & Financial Status
           </h1>
           <p className="text-xs md:text-sm text-[#666361] mt-1 font-light">
@@ -65,7 +65,7 @@ export default function PlatformAnalytics() {
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${
                   activeTab === tab
                     ? "bg-[#353535] text-white shadow-xs"
-                    : "text-[#666361] hover:text-[#232323]"
+                    : "text-[#666361] hover:text-[#2C2A28]"
                 }`}
               >
                 {tab}
@@ -110,7 +110,7 @@ export default function PlatformAnalytics() {
             </span>
             <TrendingUp className="w-4 h-4 text-emerald-700" />
           </div>
-          <div className="text-3xl font-serif font-bold text-[#232323]">
+          <div className="text-3xl font-serif font-bold text-[#2C2A28]">
             ₹{summary.net_surplus.toLocaleString()}
           </div>
           <p className="text-xs text-[#666361] font-light">
@@ -130,7 +130,7 @@ export default function PlatformAnalytics() {
                   <span className="text-[10px] font-bold text-[#353535] uppercase tracking-wider">
                     Financial Cash Flow Graph
                   </span>
-                  <h2 className="font-serif text-xl font-bold text-[#232323]">
+                  <h2 className="font-serif text-xl font-bold text-[#2C2A28]">
                     Revenue vs Expense Distribution
                   </h2>
                 </div>
@@ -140,7 +140,7 @@ export default function PlatformAnalytics() {
               {/* Graphical Bar Chart representation */}
               <div className="space-y-5 pt-2">
                 <div className="space-y-1.5">
-                  <div className="flex justify-between text-xs font-bold text-[#232323]">
+                  <div className="flex justify-between text-xs font-bold text-[#2C2A28]">
                     <span>Corporate Sponsorships (Red Bull, FabIndia)</span>
                     <span>₹{summary.sponsorship_revenue.toLocaleString()} (54.5%)</span>
                   </div>
@@ -150,7 +150,7 @@ export default function PlatformAnalytics() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <div className="flex justify-between text-xs font-bold text-[#232323]">
+                  <div className="flex justify-between text-xs font-bold text-[#2C2A28]">
                     <span>Cultural Ministry Development Grants</span>
                     <span>₹{summary.grants_revenue.toLocaleString()} (24.2%)</span>
                   </div>
@@ -160,7 +160,7 @@ export default function PlatformAnalytics() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <div className="flex justify-between text-xs font-bold text-[#232323]">
+                  <div className="flex justify-between text-xs font-bold text-[#2C2A28]">
                     <span>Mainstage Ticket Presales</span>
                     <span>₹{summary.ticket_revenue.toLocaleString()} (21.3%)</span>
                   </div>
@@ -187,20 +187,20 @@ export default function PlatformAnalytics() {
                 <span className="text-[10px] font-bold text-[#353535] uppercase tracking-wider">
                   Category Mix
                 </span>
-                <h3 className="font-serif text-lg font-bold text-[#232323]">
+                <h3 className="font-serif text-lg font-bold text-[#2C2A28]">
                   Revenue Stream Share
                 </h3>
               </div>
 
               <div className="space-y-3 text-xs">
                 <div className="p-3 bg-[#E7DDD3] rounded-2xl border border-[#D5C9BE]/40 space-y-1">
-                  <span className="font-bold text-[#232323]">Corporate Brands</span>
+                  <span className="font-bold text-[#2C2A28]">Corporate Brands</span>
                   <p className="text-[#666361]">Mainstage title banners & playbill placements.</p>
                   <span className="text-emerald-700 font-bold block pt-1">₹2,25,000 Total</span>
                 </div>
 
                 <div className="p-3 bg-[#E7DDD3] rounded-2xl border border-[#D5C9BE]/40 space-y-1">
-                  <span className="font-bold text-[#232323]">Public Arts Grants</span>
+                  <span className="font-bold text-[#2C2A28]">Public Arts Grants</span>
                   <p className="text-[#666361]">State theatre development funds.</p>
                   <span className="text-blue-700 font-bold block pt-1">₹1,00,000 Total</span>
                 </div>
@@ -215,7 +215,7 @@ export default function PlatformAnalytics() {
                 <span className="text-[10px] font-bold text-[#353535] uppercase tracking-wider">
                   Backend Secured Ledger
                 </span>
-                <h3 className="font-serif text-xl font-bold text-[#232323]">
+                <h3 className="font-serif text-xl font-bold text-[#2C2A28]">
                   Maintainer Financial Transactions
                 </h3>
               </div>
@@ -233,7 +233,7 @@ export default function PlatformAnalytics() {
                 >
                   <div className="space-y-0.5">
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-[#232323]">{item.title}</span>
+                      <span className="font-bold text-[#2C2A28]">{item.title}</span>
                       <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
                         item.record_type === "Income" ? "bg-emerald-100 text-emerald-800" : "bg-rose-100 text-rose-800"
                       }`}>
@@ -260,10 +260,10 @@ export default function PlatformAnalytics() {
 
       {activeTab === "events" && (
         <div className="bg-white border border-[#DDD8CE] p-8 rounded-3xl shadow-xs space-y-6">
-          <h2 className="font-serif text-2xl font-bold text-[#232323]">Events & Production Proposals Graph</h2>
+          <h2 className="font-serif text-2xl font-bold text-[#2C2A28]">Events & Production Proposals Graph</h2>
           <div className="space-y-4 text-xs text-[#666361]">
             <div className="space-y-1">
-              <div className="flex justify-between font-bold text-[#232323]">
+              <div className="flex justify-between font-bold text-[#2C2A28]">
                 <span>Member Production Pitches (62.5%)</span>
                 <span>5 Proposals</span>
               </div>
@@ -273,7 +273,7 @@ export default function PlatformAnalytics() {
             </div>
 
             <div className="space-y-1">
-              <div className="flex justify-between font-bold text-[#232323]">
+              <div className="flex justify-between font-bold text-[#2C2A28]">
                 <span>Sponsor Ad Deals (37.5%)</span>
                 <span>3 Deals</span>
               </div>
@@ -287,10 +287,10 @@ export default function PlatformAnalytics() {
 
       {activeTab === "auditions" && (
         <div className="bg-white border border-[#DDD8CE] p-8 rounded-3xl shadow-xs space-y-6">
-          <h2 className="font-serif text-2xl font-bold text-[#232323]">Audition Casting Rate Graph</h2>
+          <h2 className="font-serif text-2xl font-bold text-[#2C2A28]">Audition Casting Rate Graph</h2>
           <div className="space-y-4 text-xs text-[#666361]">
             <div className="space-y-1">
-              <div className="flex justify-between font-bold text-[#232323]">
+              <div className="flex justify-between font-bold text-[#2C2A28]">
                 <span>Shortlisted Performers (37.5%)</span>
                 <span>3 Candidates</span>
               </div>
@@ -300,7 +300,7 @@ export default function PlatformAnalytics() {
             </div>
 
             <div className="space-y-1">
-              <div className="flex justify-between font-bold text-[#232323]">
+              <div className="flex justify-between font-bold text-[#2C2A28]">
                 <span>Confirmed Castings (37.5%)</span>
                 <span>3 Performers</span>
               </div>
@@ -314,7 +314,7 @@ export default function PlatformAnalytics() {
 
       {activeTab === "system" && (
         <div className="bg-white border border-[#DDD8CE] p-8 rounded-3xl shadow-xs space-y-6">
-          <h2 className="font-serif text-2xl font-bold text-[#232323]">System Pulse & API Uptime</h2>
+          <h2 className="font-serif text-2xl font-bold text-[#2C2A28]">System Pulse & API Uptime</h2>
           <div className="flex items-center justify-between p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-xs font-bold text-emerald-800">
             <span>Core API Gateway Operational</span>
             <span>99.98% Uptime</span>

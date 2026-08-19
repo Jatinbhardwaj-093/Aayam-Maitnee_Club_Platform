@@ -148,7 +148,7 @@ export default function JoinClub() {
   };
 
   return (
-    <div className="bg-[#E7DDD3] text-[#232323] min-h-screen font-sans selection:bg-[#F8E8E4] pt-8 pb-16">
+    <div className="bg-[#E7DDD3] text-[#2C2A28] min-h-screen font-sans selection:bg-[#F8E8E4] pt-8 pb-16">
       <div className="max-w-4xl mx-auto px-6">
         {!isSubmitted ? (
           <div className="space-y-8 bg-white border border-[#D5C9BE]/30 p-8 md:p-12 rounded-3xl shadow-sm">

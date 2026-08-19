@@ -175,7 +175,7 @@ export default function MemberDashboard() {
             alt="Production Banner"
             className="w-full h-full object-cover object-center"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#232323]/95 via-[#232323]/85 to-[#232323]/50 backdrop-blur-[2px]"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-[#2C2A28]/95 via-[#2C2A28]/85 to-[#2C2A28]/50 backdrop-blur-[2px]"></div>
         </div>
 
         <div className="relative z-10 space-y-[12px] flex-1 text-white">
@@ -296,7 +296,7 @@ export default function MemberDashboard() {
               </div>
               <DialogFooter className="flex sm:justify-between items-center gap-4">
                 <span className="text-[10px] text-[#666361]/60">Format: Standard Matinee Playbook</span>
-                <Button onClick={() => setScriptOpen(false)} className="bg-[#E85F57] text-[#232323] hover:bg-[#E85F57]/90 rounded-[8px]">
+                <Button onClick={() => setScriptOpen(false)} className="bg-[#E85F57] text-[#2C2A28] hover:bg-[#E85F57]/90 rounded-[8px]">
                   Close Reader
                 </Button>
               </DialogFooter>
@@ -354,7 +354,7 @@ export default function MemberDashboard() {
                 </div>
               </div>
               <DialogFooter>
-                <Button onClick={() => setAttendanceOpen(false)} className="bg-[#E85F57] text-[#232323] hover:bg-[#E85F57]/90 rounded-[8px]">
+                <Button onClick={() => setAttendanceOpen(false)} className="bg-[#E85F57] text-[#2C2A28] hover:bg-[#E85F57]/90 rounded-[8px]">
                   Dismiss
                 </Button>
               </DialogFooter>
@@ -507,7 +507,7 @@ export default function MemberDashboard() {
             </div>
           </div>
           <DialogFooter>
-            <Button onClick={() => setCalendarOpen(false)} className="bg-[#E85F57] text-[#232323] hover:bg-[#E85F57]/90 rounded-[8px] w-full">
+            <Button onClick={() => setCalendarOpen(false)} className="bg-[#E85F57] text-[#2C2A28] hover:bg-[#E85F57]/90 rounded-[8px] w-full">
               Close Calendar
             </Button>
           </DialogFooter>

@@ -753,7 +753,7 @@ export default function AiRehearsalStudio() {
               </button>
               <div>
                 <p className="text-[10px] uppercase tracking-widest font-bold text-[#353535]">AI Drama Roleplay</p>
-                <h1 className="font-serif text-xl font-bold text-[#232323]">{currentTitle}</h1>
+                <h1 className="font-serif text-xl font-bold text-[#2C2A28]">{currentTitle}</h1>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -776,7 +776,7 @@ export default function AiRehearsalStudio() {
               {displayScene.characters.map((character: any) => (
                 <div key={character.name} className="flex items-center justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="text-sm font-bold text-[#232323] truncate">{character.name}</p>
+                    <p className="text-sm font-bold text-[#2C2A28] truncate">{character.name}</p>
                     <p className="text-[11px] text-[#666361]/70 truncate">
                       {assignments[character.name] === "ai" ? `AI voice: ${voicePreferences[character.name] || "female"}` : "Human speaker"}
                     </p>
@@ -810,7 +810,7 @@ export default function AiRehearsalStudio() {
             <section className="bg-white border border-[#DDD8CE] rounded-[8px] p-4 space-y-4">
               <div>
                 <p className="text-[10px] uppercase tracking-widest font-bold text-[#353535]">Turn State</p>
-                <h3 className="text-2xl font-serif font-bold text-[#232323]">{activeTurn?.character || "Ready"}</h3>
+                <h3 className="text-2xl font-serif font-bold text-[#2C2A28]">{activeTurn?.character || "Ready"}</h3>
                 <p className="text-xs text-[#666361]/75">
                     {activeTurn ? `${session.speaker_type === "human" ? "Human speaker" : "AI scene partner"} - line ${session.current_turn + 1} of ${session.scene.turns.length}` : "Assign roles and start."}
                 </p>
@@ -857,7 +857,7 @@ export default function AiRehearsalStudio() {
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#DDD8CE] pb-4 mb-6">
                 <div>
                   <p className="text-[10px] uppercase tracking-widest font-bold text-[#353535]">Current Dialogue</p>
-                  <h2 className="font-serif text-2xl font-bold text-[#232323]">{activeTurn?.character || "Scene setup"}</h2>
+                  <h2 className="font-serif text-2xl font-bold text-[#2C2A28]">{activeTurn?.character || "Scene setup"}</h2>
                 </div>
                 <div className="flex items-center gap-2 text-xs font-bold">
                   {session?.status === "HUMAN_TURN" && (
@@ -875,7 +875,7 @@ export default function AiRehearsalStudio() {
 
               {activeTurn ? (
                 <div className="space-y-5">
-                  <div className="font-serif text-3xl sm:text-4xl leading-relaxed text-[#232323]">
+                  <div className="font-serif text-3xl sm:text-4xl leading-relaxed text-[#2C2A28]">
                     {activeTurn.words.map((word: string, index: number) => {
                       const isHuman = session.speaker_type === "human";
                       const activeIndex = isHuman ? humanWordIndex : aiWordIndex;
@@ -889,7 +889,7 @@ export default function AiRehearsalStudio() {
                               ? "bg-[#E85F57] text-[#001e2c]"
                               : spoken
                                 ? "bg-emerald-50 text-emerald-800"
-                                : "text-[#232323]"
+                                : "text-[#2C2A28]"
                           }`}
                         >
                           {word}
@@ -904,7 +904,7 @@ export default function AiRehearsalStudio() {
                         <p className="text-xs font-bold uppercase tracking-wider text-amber-900">Live transcript</p>
                         {!speechSupported && <Badge className="bg-red-100 text-red-700">Unsupported browser</Badge>}
                       </div>
-                      <p className="text-sm text-[#232323] min-h-6">{transcript || "Speak the line when the mic indicator is active."}</p>
+                      <p className="text-sm text-[#2C2A28] min-h-6">{transcript || "Speak the line when the mic indicator is active."}</p>
                       <div className="flex flex-wrap gap-2">
                         <Button onClick={startListening} variant="outline" className="border-amber-300 text-amber-900">
                           <Mic className="h-4 w-4 mr-1" /> Listen
@@ -924,7 +924,7 @@ export default function AiRehearsalStudio() {
               ) : (
                 <div className="text-center py-16 space-y-3">
                   <CheckCircle2 className="h-12 w-12 text-emerald-600 mx-auto" />
-                  <h2 className="font-serif text-3xl font-bold text-[#232323]">Scene Complete</h2>
+                  <h2 className="font-serif text-3xl font-bold text-[#2C2A28]">Scene Complete</h2>
                   <p className="text-sm text-[#666361]">Session ran for about {elapsedMins} minute(s).</p>
                 </div>
               )}
@@ -947,7 +947,7 @@ export default function AiRehearsalStudio() {
                         <span className="text-xs font-bold uppercase tracking-wider text-[#353535]">{turn.character}</span>
                         <span className="text-[10px] text-[#666361]/60">{assignments[turn.character] || turn.type}</span>
                       </div>
-                      <p className="font-serif text-sm text-[#232323] mt-1">{turn.text}</p>
+                      <p className="font-serif text-sm text-[#2C2A28] mt-1">{turn.text}</p>
                     </button>
                   );
                 })}
@@ -967,7 +967,7 @@ export default function AiRehearsalStudio() {
             {/* <Badge className="bg-[#E85F57]/25 text-[#001e2c] border border-[#E85F57]/50">
               GenAI Rehearsal MVP
             </Badge> */}
-            <h1 className="font-serif text-3xl font-bold text-[#232323]">AI Drama Roleplay Studio</h1>
+            <h1 className="font-serif text-3xl font-bold text-[#2C2A28]">AI Drama Roleplay Studio</h1>
             <p className="text-sm leading-relaxed">
               Assign roles, rehearse against AI scene partners, and follow word-level highlighting for human and AI turns.
             </p>
@@ -991,7 +991,7 @@ export default function AiRehearsalStudio() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {scene.characters.map((character: any) => (
                 <div key={character.name} className="flex items-center justify-between border border-[#DDD8CE] rounded-[8px] p-3">
-                  <span className="font-bold text-[#232323]">{character.name}</span>
+                  <span className="font-bold text-[#2C2A28]">{character.name}</span>
                   <div className="flex items-center gap-2">
                     <select
                       value={assignments[character.name] || "ai"}
@@ -1047,7 +1047,7 @@ export default function AiRehearsalStudio() {
                     className="text-left border border-[#DDD8CE] rounded-[8px] p-4 bg-[#E7DDD3] hover:border-[#353535]"
                   >
                     <div className="flex items-start justify-between gap-3">
-                      <h3 className="font-serif font-bold text-[#232323]">{script.title}</h3>
+                      <h3 className="font-serif font-bold text-[#2C2A28]">{script.title}</h3>
                       <Pin className="h-4 w-4 text-[#353535] fill-[#353535]" />
                     </div>
                     <p className="text-xs text-[#666361] mt-1">{script.playwright}</p>
@@ -1078,7 +1078,7 @@ export default function AiRehearsalStudio() {
                         </button>
                       </td>
                       <td className="py-3 px-3">
-                        <p className="font-serif font-bold text-[#232323]">{script.title}</p>
+                        <p className="font-serif font-bold text-[#2C2A28]">{script.title}</p>
                         <p className="text-[#666361]/70">{script.playwright}</p>
                       </td>
                       <td className="py-3 px-3">
@@ -1120,7 +1120,7 @@ export default function AiRehearsalStudio() {
               value={inlineScript}
               onChange={(event) => setInlineScript(event.target.value)}
               rows={12}
-              className="w-full resize-none rounded-[8px] border border-[#DDD8CE] bg-[#E7DDD3] p-3 font-serif text-sm text-[#232323] focus:outline-none focus:ring-2 focus:ring-[#353535]/30"
+              className="w-full resize-none rounded-[8px] border border-[#DDD8CE] bg-[#E7DDD3] p-3 font-serif text-sm text-[#2C2A28] focus:outline-none focus:ring-2 focus:ring-[#353535]/30"
             />
             <Button onClick={() => parseScript()} disabled={parsing} className="w-full bg-[#353535] text-white hover:bg-[#4d4a32]">
               <Loader2 className={`${parsing ? "animate-spin" : "hidden"} h-4 w-4 mr-1`} /> {parsing ? "Parsing..." : "Parse Characters"}

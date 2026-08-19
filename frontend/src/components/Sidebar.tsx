@@ -158,7 +158,7 @@ export default function Sidebar({
           <Link
             to="/profile/view"
               onClick={() => setShowPopover(false)}
-              className="w-full bg-[#E85F57] text-[#232323] hover:bg-[#E85F57]/90 rounded-md text-xs font-semibold py-2 px-3 transition-all text-center block mb-2"
+              className="w-full bg-[#E85F57] text-[#2C2A28] hover:bg-[#E85F57]/90 rounded-md text-xs font-semibold py-2 px-3 transition-all text-center block mb-2"
             >
               See Full Profile
             </Link>

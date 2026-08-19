@@ -52,7 +52,7 @@ export default function ViewProfile() {
   }
 
   return (
-    <div className="flex-1 bg-[#E7DDD3] text-[#232323] font-sans py-2 md:py-4 selection:bg-[#F8E8E4]">
+    <div className="flex-1 bg-[#E7DDD3] text-[#2C2A28] font-sans py-2 md:py-4 selection:bg-[#F8E8E4]">
       <div className="max-w-5xl mx-auto px-6">
         
         {/* Back header */}

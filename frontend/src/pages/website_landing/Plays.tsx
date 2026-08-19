@@ -110,7 +110,7 @@ export default function Plays() {
   }, []);
 
   return (
-    <div className="bg-[#E7DDD3] text-[#232323] min-h-screen font-sans selection:bg-[#F8E8E4] pt-8 pb-20">
+    <div className="bg-[#E7DDD3] text-[#2C2A28] min-h-screen font-sans selection:bg-[#F8E8E4] pt-8 pb-20">
       <main className="max-w-7xl mx-auto px-6 md:px-12 space-y-12">
         {/* Header Section */}
         <section className="border-b border-[#D5C9BE]/40 pb-8">
@@ -119,7 +119,7 @@ export default function Plays() {
               <div className="inline-flex items-center gap-2 text-xs font-mono font-semibold uppercase tracking-widest text-[#E85F57] mb-2">
                 <span>SEASON ARCHIVE // 2026</span>
               </div>
-              <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl text-[#232323] font-normal tracking-tight">
+              <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl text-[#2C2A28] font-normal tracking-tight">
                 Curated Stage Productions
               </h1>
               <p className="text-sm md:text-base text-[#666361] max-w-2xl leading-relaxed font-normal mt-3">
@@ -127,7 +127,7 @@ export default function Plays() {
               </p>
             </div>
             <div className="text-xs font-mono text-[#666361] bg-[#EFE8E1] px-4 py-2 rounded-full border border-[#D5C9BE]/50 shrink-0 self-start md:self-auto">
-              TOTAL PRODUCTIONS: <strong className="text-[#232323]">{productions.length}</strong>
+              TOTAL PRODUCTIONS: <strong className="text-[#2C2A28]">{productions.length}</strong>
             </div>
           </div>
         </section>
@@ -137,7 +137,7 @@ export default function Plays() {
           {productions.map((play, idx) => (
             <div 
               key={play.id} 
-              className="flex flex-col bg-[#232323] text-white border border-[#353535] rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl hover:border-[#E85F57]/50 hover:-translate-y-1 transition-all duration-300 group justify-between"
+              className="flex flex-col bg-[#2C2A28] text-white border border-[#353535] rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl hover:border-[#E85F57]/50 hover:-translate-y-1 transition-all duration-300 group justify-between"
             >
               <div>
                 {/* Playbill Poster Image */}
@@ -147,11 +147,11 @@ export default function Plays() {
                     alt={play.title} 
                     src={play.image}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#232323] via-transparent to-black/20" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#2C2A28] via-transparent to-black/20" />
                   
                   {/* Status Capsule Badge */}
                   <div className="absolute top-4 right-4">
-                    <span className="inline-flex items-center gap-1 px-3 py-1 text-[9px] font-mono font-bold rounded-full uppercase tracking-wider bg-[#232323]/90 text-[#E85F57] border border-[#E85F57]/30 shadow-md backdrop-blur-md">
+                    <span className="inline-flex items-center gap-1 px-3 py-1 text-[9px] font-mono font-bold rounded-full uppercase tracking-wider bg-[#2C2A28]/90 text-[#E85F57] border border-[#E85F57]/30 shadow-md backdrop-blur-md">
                       {play.status}
                     </span>
                   </div>
@@ -224,7 +224,7 @@ export default function Plays() {
         </div>
 
         {/* Custom Staging & Hiring Banner */}
-        <section className="mt-16 bg-[#232323] text-white rounded-3xl p-10 md:p-14 text-center border border-[#353535] space-y-6 shadow-xl">
+        <section className="mt-16 bg-[#2C2A28] text-white rounded-3xl p-10 md:p-14 text-center border border-[#353535] space-y-6 shadow-xl">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#E85F57]/15 text-[#E85F57] text-[10px] font-mono font-bold uppercase tracking-widest border border-[#E85F57]/30">
             <span>COLLECTIVE STAGE CRAFT</span>
           </div>

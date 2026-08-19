@@ -404,7 +404,7 @@ export default function ComplianceLedger() {
                             <button className="w-8 h-8 rounded hover:bg-surface-container font-sans text-xs font-semibold flex items-center justify-center text-on-surface">3</button>
                             <span className="px-2 text-xs font-semibold text-outline">...</span>
                             <button className="w-8 h-8 rounded hover:bg-surface-container font-sans text-xs font-semibold flex items-center justify-center text-on-surface">42</button>
-                            <button className="p-1 rounded hover:bg-surface-container text-[#232323] flex items-center justify-center">
+                            <button className="p-1 rounded hover:bg-surface-container text-[#2C2A28] flex items-center justify-center">
                                 <ChevronRight className="w-4 h-4" />
                             </button>
                         </div>
@@ -475,7 +475,7 @@ export default function ComplianceLedger() {
                                     }`}>
                                     Severity: {activeAnomalyDetail.severity}
                                 </span>
-                                <h4 className="font-serif text-base font-bold text-[#232323] mt-2">{activeAnomalyDetail.title}</h4>
+                                <h4 className="font-serif text-base font-bold text-[#2C2A28] mt-2">{activeAnomalyDetail.title}</h4>
                                 <p className="text-xs text-[#666361] mt-1 leading-relaxed">{activeAnomalyDetail.description}</p>
                             </div>
 
@@ -483,7 +483,7 @@ export default function ComplianceLedger() {
                             <div className="bg-[#fcf9f5] border border-[#D5C9BE]/30 rounded-lg p-3 text-xs space-y-2">
                                 <div className="flex justify-between">
                                     <span className="text-[#7a776c] font-semibold">Flagged Item:</span>
-                                    <span className="font-mono font-bold text-[#232323]">{activeAnomalyDetail.trxId}</span>
+                                    <span className="font-mono font-bold text-[#2C2A28]">{activeAnomalyDetail.trxId}</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-[#7a776c] font-semibold">Trigger Rule:</span>
@@ -513,7 +513,7 @@ export default function ComplianceLedger() {
                         <div className="bg-[#fcf9f5] border-t border-[#D5C9BE]/25 p-4 flex gap-3">
                             <button
                                 onClick={() => setActiveAnomalyDetail(null)}
-                                className="flex-grow border border-[#D5C9BE] text-xs font-semibold py-2 px-3 hover:bg-[#DDD8CE]/40 rounded-lg transition-colors text-[#232323]"
+                                className="flex-grow border border-[#D5C9BE] text-xs font-semibold py-2 px-3 hover:bg-[#DDD8CE]/40 rounded-lg transition-colors text-[#2C2A28]"
                             >
                                 Cancel
                             </button>

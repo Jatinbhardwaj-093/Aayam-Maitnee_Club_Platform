@@ -380,7 +380,7 @@ export default function ScriptBuilder() {
                 <span className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#353535] flex items-center gap-1">
                   <Feather className="w-3 h-3 text-[#353535]" /> Script Studio
                 </span>
-                <h1 className="text-lg sm:text-xl font-bold font-serif text-[#232323] tracking-tight truncate max-w-xs sm:max-w-md">
+                <h1 className="text-lg sm:text-xl font-bold font-serif text-[#2C2A28] tracking-tight truncate max-w-xs sm:max-w-md">
                   {title || "Untitled Production Script"}
                 </h1>
               </div>
@@ -433,7 +433,7 @@ export default function ScriptBuilder() {
                 onClick={() => setCurrentStep(1)}
                 className={`px-3.5 sm:px-4 py-1.5 rounded-xl font-bold transition-all flex items-center gap-1.5 whitespace-nowrap ${currentStep === 1
                   ? "bg-[#353535] text-white shadow-sm"
-                  : "text-[#666361] hover:text-[#232323] hover:bg-white/60"
+                  : "text-[#666361] hover:text-[#2C2A28] hover:bg-white/60"
                   }`}
               >
                 <Sliders className="w-3.5 h-3.5" /> 1. Setup
@@ -443,7 +443,7 @@ export default function ScriptBuilder() {
                 onClick={() => setCurrentStep(2)}
                 className={`px-3.5 sm:px-4 py-1.5 rounded-xl font-bold transition-all flex items-center gap-1.5 whitespace-nowrap ${currentStep === 2
                   ? "bg-[#353535] text-white shadow-sm"
-                  : "text-[#666361] hover:text-[#232323] hover:bg-white/60"
+                  : "text-[#666361] hover:text-[#2C2A28] hover:bg-white/60"
                   }`}
               >
                 <Users className="w-3.5 h-3.5" /> 2. Characters
@@ -453,7 +453,7 @@ export default function ScriptBuilder() {
                 onClick={() => setCurrentStep(3)}
                 className={`px-3.5 sm:px-4 py-1.5 rounded-xl font-bold transition-all flex items-center gap-1.5 whitespace-nowrap ${currentStep === 3
                   ? "bg-[#353535] text-white shadow-sm"
-                  : "text-[#666361] hover:text-[#232323] hover:bg-white/60"
+                  : "text-[#666361] hover:text-[#2C2A28] hover:bg-white/60"
                   }`}
               >
                 <MessageSquare className="w-3.5 h-3.5" /> 3. Storyline
@@ -463,7 +463,7 @@ export default function ScriptBuilder() {
                 onClick={() => setCurrentStep(4)}
                 className={`px-3.5 sm:px-4 py-1.5 rounded-xl font-bold transition-all flex items-center gap-1.5 whitespace-nowrap ${currentStep === 4
                   ? "bg-[#353535] text-white shadow-sm"
-                  : "text-[#666361] hover:text-[#232323] hover:bg-white/60"
+                  : "text-[#666361] hover:text-[#2C2A28] hover:bg-white/60"
                   }`}
               >
                 <BookOpen className="w-3.5 h-3.5" /> 4. Final Preview
@@ -747,7 +747,7 @@ export default function ScriptBuilder() {
                 <span className="text-xs font-sans font-bold uppercase tracking-[0.25em] text-[#353535]">
                   Official Aayam Playbook
                 </span>
-                <h1 className="text-4xl font-bold text-[#232323] tracking-tight">{title || "Untitled Script"}</h1>
+                <h1 className="text-4xl font-bold text-[#2C2A28] tracking-tight">{title || "Untitled Script"}</h1>
                 <p className="text-xs font-sans text-[#666361]">
                   Playwright: <strong>{playwright}</strong> | Genre: {genre} | Language: {language}
                 </p>
@@ -766,11 +766,11 @@ export default function ScriptBuilder() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 font-sans text-xs bg-[#E7DDD3] p-5 rounded-2xl border border-[#DDD8CE]">
                 <div>
                   <strong className="text-[#353535] uppercase tracking-wider block mb-1">Theme & Conflict:</strong>
-                  <span className="text-[#232323] leading-relaxed">{theme || "N/A"}</span>
+                  <span className="text-[#2C2A28] leading-relaxed">{theme || "N/A"}</span>
                 </div>
                 <div>
                   <strong className="text-[#353535] uppercase tracking-wider block mb-1">Setting & Time:</strong>
-                  <span className="text-[#232323] leading-relaxed">{settingInfo || "N/A"}</span>
+                  <span className="text-[#2C2A28] leading-relaxed">{settingInfo || "N/A"}</span>
                 </div>
               </div>
 
@@ -786,7 +786,7 @@ export default function ScriptBuilder() {
                 <strong className="text-[#353535] uppercase tracking-wider block">Dramatis Personae:</strong>
                 <div className="flex flex-wrap gap-2.5">
                   {characters.map((c) => (
-                    <span key={c.id} className="bg-gray-100 border border-gray-200 px-3.5 py-1.5 rounded-full font-semibold text-[#232323]">
+                    <span key={c.id} className="bg-gray-100 border border-gray-200 px-3.5 py-1.5 rounded-full font-semibold text-[#2C2A28]">
                       {c.name} ({Array.isArray(c.traits) ? c.traits.join(", ") : c.traits})
                     </span>
                   ))}

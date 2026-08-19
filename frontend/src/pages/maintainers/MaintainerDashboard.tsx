@@ -35,14 +35,14 @@ export default function MaintainerDashboard() {
   }, []);
 
   return (
-    <div className="bg-[#E7DDD3] min-h-screen text-[#232323] p-6 md:p-10 font-sans space-y-8 max-w-7xl mx-auto">
+    <div className="bg-[#E7DDD3] min-h-screen text-[#2C2A28] p-6 md:p-10 font-sans space-y-8 max-w-7xl mx-auto">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-[#DDD8CE] pb-6">
         <div>
           <span className="text-[10px] font-bold text-[#353535] uppercase tracking-[0.25em] block mb-1">
             Core Maintenance Portal
           </span>
-          <h1 className="font-serif text-3xl md:text-4xl font-bold text-[#232323] tracking-tight">
+          <h1 className="font-serif text-3xl md:text-4xl font-bold text-[#2C2A28] tracking-tight">
             Maintainer Control Center
           </h1>
           <p className="text-xs md:text-sm text-[#666361] mt-1 font-light">
@@ -79,7 +79,7 @@ export default function MaintainerDashboard() {
           </div>
 
           <div>
-            <div className="text-3xl font-serif font-bold text-[#232323]">
+            <div className="text-3xl font-serif font-bold text-[#2C2A28]">
               {stats.events.total_proposals}
             </div>
             <div className="flex items-center justify-between text-xs text-[#666361] mt-1 font-medium">
@@ -110,7 +110,7 @@ export default function MaintainerDashboard() {
           </div>
 
           <div>
-            <div className="text-3xl font-serif font-bold text-[#232323]">
+            <div className="text-3xl font-serif font-bold text-[#2C2A28]">
               {stats.auditions.total_requests}
             </div>
             <div className="flex items-center justify-between text-xs text-[#666361] mt-1 font-medium">
@@ -141,7 +141,7 @@ export default function MaintainerDashboard() {
           </div>
 
           <div>
-            <div className="text-3xl font-serif font-bold text-[#232323]">
+            <div className="text-3xl font-serif font-bold text-[#2C2A28]">
               {stats.members.total_registered}
             </div>
             <div className="flex items-center justify-between text-xs text-[#666361] mt-1 font-medium">
@@ -171,7 +171,7 @@ export default function MaintainerDashboard() {
           </div>
 
           <div>
-            <div className="text-3xl font-serif font-bold text-[#232323]">
+            <div className="text-3xl font-serif font-bold text-[#2C2A28]">
               ₹{stats.financials.net_surplus.toLocaleString()}
             </div>
             <div className="flex items-center justify-between text-xs text-[#666361] mt-1 font-medium">
@@ -201,7 +201,7 @@ export default function MaintainerDashboard() {
               <span className="text-[10px] font-bold text-[#353535] uppercase tracking-wider">
                 Operational Shortcuts
               </span>
-              <h2 className="font-serif text-2xl font-bold text-[#232323]">
+              <h2 className="font-serif text-2xl font-bold text-[#2C2A28]">
                 Maintainer Management Clips
               </h2>
             </div>
@@ -216,7 +216,7 @@ export default function MaintainerDashboard() {
               <span className="text-[10px] font-bold uppercase tracking-wider text-[#353535] bg-[#353535]/10 px-2.5 py-0.5 rounded-full">
                 Events & Proposals
               </span>
-              <h3 className="font-serif text-lg font-bold text-[#232323]">
+              <h3 className="font-serif text-lg font-bold text-[#2C2A28]">
                 Event Proposal Curation
               </h3>
               <p className="text-xs text-[#666361] leading-relaxed font-light">
@@ -234,7 +234,7 @@ export default function MaintainerDashboard() {
               <span className="text-[10px] font-bold uppercase tracking-wider text-[#353535] bg-[#353535]/10 px-2.5 py-0.5 rounded-full">
                 Auditions & Casting
               </span>
-              <h3 className="font-serif text-lg font-bold text-[#232323]">
+              <h3 className="font-serif text-lg font-bold text-[#2C2A28]">
                 Character Role Callings
               </h3>
               <p className="text-xs text-[#666361] leading-relaxed font-light">
@@ -252,7 +252,7 @@ export default function MaintainerDashboard() {
               <span className="text-[10px] font-bold uppercase tracking-wider text-[#353535] bg-[#353535]/10 px-2.5 py-0.5 rounded-full">
                 Script Vault
               </span>
-              <h3 className="font-serif text-lg font-bold text-[#232323]">
+              <h3 className="font-serif text-lg font-bold text-[#2C2A28]">
                 Confidential Play Manuscripts
               </h3>
               <p className="text-xs text-[#666361] leading-relaxed font-light">
@@ -270,7 +270,7 @@ export default function MaintainerDashboard() {
               <span className="text-[10px] font-bold uppercase tracking-wider text-[#353535] bg-[#353535]/10 px-2.5 py-0.5 rounded-full">
                 Financial Ledger
               </span>
-              <h3 className="font-serif text-lg font-bold text-[#232323]">
+              <h3 className="font-serif text-lg font-bold text-[#2C2A28]">
                 Revenue & Expense Analytics
               </h3>
               <p className="text-xs text-[#666361] leading-relaxed font-light">
@@ -288,7 +288,7 @@ export default function MaintainerDashboard() {
         {/* Live System Activity Feed (4 cols) */}
         <div className="lg:col-span-4 bg-white border border-[#DDD8CE] p-6 rounded-3xl shadow-xs space-y-4">
           <div className="flex items-center justify-between pb-3 border-b border-[#DDD8CE]">
-            <h2 className="font-serif text-lg font-bold text-[#232323]">
+            <h2 className="font-serif text-lg font-bold text-[#2C2A28]">
               System Activity Feed
             </h2>
             <span className="text-[10px] font-bold text-gray-400 font-mono">LIVE API</span>
@@ -297,7 +297,7 @@ export default function MaintainerDashboard() {
           <div className="space-y-3 text-xs">
             <div className="p-3 bg-[#E7DDD3] rounded-xl border border-[#D5C9BE]/40 space-y-1">
               <div className="flex items-center justify-between">
-                <span className="font-bold text-[#232323]">Red Bull Sponsorship</span>
+                <span className="font-bold text-[#2C2A28]">Red Bull Sponsorship</span>
                 <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">₹1,50,000</span>
               </div>
               <p className="text-[#666361] text-[11px]">Sponsorship deal registered in database ledger.</p>
@@ -305,7 +305,7 @@ export default function MaintainerDashboard() {
 
             <div className="p-3 bg-[#E7DDD3] rounded-xl border border-[#D5C9BE]/40 space-y-1">
               <div className="flex items-center justify-between">
-                <span className="font-bold text-[#232323]">Audition Slate Submitted</span>
+                <span className="font-bold text-[#2C2A28]">Audition Slate Submitted</span>
                 <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded">Aarav Varma</span>
               </div>
               <p className="text-[#666361] text-[11px]">Applied for Sultan Tughlaq Lead Role.</p>
@@ -313,7 +313,7 @@ export default function MaintainerDashboard() {
 
             <div className="p-3 bg-[#E7DDD3] rounded-xl border border-[#D5C9BE]/40 space-y-1">
               <div className="flex items-center justify-between">
-                <span className="font-bold text-[#232323]">Stage Booking Confirmed</span>
+                <span className="font-bold text-[#2C2A28]">Stage Booking Confirmed</span>
                 <span className="text-[10px] font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded">Royal Stage</span>
               </div>
               <p className="text-[#666361] text-[11px]">Prithvi Theatre venue deposit logged.</p>

@@ -265,7 +265,7 @@ export default function ProductionControlPanel() {
     );
 
     return (
-        <div className="production-control w-full bg-[#E7DDD3] text-[#232323] font-sans antialiased min-h-screen pb-16 selection:bg-[#E85F57]/30 relative">
+        <div className="production-control w-full bg-[#E7DDD3] text-[#2C2A28] font-sans antialiased min-h-screen pb-16 selection:bg-[#E85F57]/30 relative">
             {/* Ambient Background Effect */}
             <div className="absolute inset-0 z-0 pointer-events-none opacity-20" style={{
                 background: "radial-gradient(circle at 80% 20%, #c9e7fa 0%, transparent 50%), radial-gradient(circle at 10% 80%, #fff9d2 0%, transparent 55%)"
@@ -278,7 +278,7 @@ export default function ProductionControlPanel() {
                         <ShieldAlert className="w-4 h-4 text-[#ba1a1a]" />
                         <span>System Maintenance</span>
                     </div>
-                    <h2 className="font-serif text-[40px] md:text-[32px] text-[#232323] font-bold tracking-tight mb-2 leading-tight">
+                    <h2 className="font-serif text-[40px] md:text-[32px] text-[#2C2A28] font-bold tracking-tight mb-2 leading-tight">
                         Production Control Panel: <span className="text-[#353535] italic">Macbeth</span>
                     </h2>
                     <p className="text-lg text-[#666361] max-w-2xl leading-relaxed">
@@ -321,7 +321,7 @@ export default function ProductionControlPanel() {
                     <div className="animate-fadeIn">
                         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-6">
                             <div>
-                                <h3 className="font-serif text-[28px] font-bold text-[#232323] mb-1">Personnel Access</h3>
+                                <h3 className="font-serif text-[28px] font-bold text-[#2C2A28] mb-1">Personnel Access</h3>
                                 <p className="text-sm text-[#666361]/80 leading-normal">Manage roles and technical permissions for the production team.</p>
                             </div>
                             <div className="flex flex-wrap gap-3">
@@ -378,15 +378,15 @@ export default function ProductionControlPanel() {
                                                     )}
                                                 </div>
                                                 <div>
-                                                    <h4 className="font-bold text-[#232323] text-base font-sans">{person.name}</h4>
+                                                    <h4 className="font-bold text-[#2C2A28] text-base font-sans">{person.name}</h4>
                                                     <p className="text-xs text-[#666361]/70 uppercase tracking-wider font-semibold mt-0.5">{person.role}</p>
                                                 </div>
                                             </div>
                                             <span className={`px-2 py-1 text-[11px] font-bold rounded uppercase tracking-wider border ${person.accessScope === 'Full Access'
-                                                ? 'bg-[#FFEBCC] text-[#232323] border-[#D5C9BE]/25'
+                                                ? 'bg-[#FFEBCC] text-[#2C2A28] border-[#D5C9BE]/25'
                                                 : person.accessScope === 'Temporary'
                                                     ? 'bg-[#c9e7fa] text-[#001e2c] border-[#D5C9BE]/25'
-                                                    : 'bg-[#DDD8CE] text-[#232323] border-[#D5C9BE]/25'
+                                                    : 'bg-[#DDD8CE] text-[#2C2A28] border-[#D5C9BE]/25'
                                                 }`}>
                                                 {person.accessScope}
                                             </span>
@@ -396,7 +396,7 @@ export default function ProductionControlPanel() {
                                             <div>
                                                 <label className="block text-xs uppercase font-bold tracking-wider text-[#666361] mb-1">Permission Level</label>
                                                 <select
-                                                    className="matte-input w-full py-2 px-1 text-sm text-[#232323] focus:ring-0 cursor-pointer"
+                                                    className="matte-input w-full py-2 px-1 text-sm text-[#2C2A28] focus:ring-0 cursor-pointer"
                                                     value={person.permissionLevel}
                                                     onChange={(e) => handlePermissionChange(person.id, e.target.value as any)}
                                                 >
@@ -411,7 +411,7 @@ export default function ProductionControlPanel() {
                                                 <div className="flex flex-col gap-3">
                                                     {/* Toggle: Lighting */}
                                                     <label className={`flex items-center justify-between cursor-pointer group ${isRestricted || isViewOnly ? 'opacity-50' : ''}`}>
-                                                        <span className="text-sm text-[#232323] group-hover:text-[#353535] transition-colors">
+                                                        <span className="text-sm text-[#2C2A28] group-hover:text-[#353535] transition-colors">
                                                             Lighting Rig Access
                                                         </span>
                                                         <div className="relative">
@@ -431,7 +431,7 @@ export default function ProductionControlPanel() {
 
                                                     {/* Toggle: Audio Comms */}
                                                     <label className={`flex items-center justify-between cursor-pointer group ${isViewOnly ? 'opacity-50' : ''}`}>
-                                                        <span className="text-sm text-[#232323] group-hover:text-[#353535] transition-colors">
+                                                        <span className="text-sm text-[#2C2A28] group-hover:text-[#353535] transition-colors">
                                                             Audio Console (Comms)
                                                         </span>
                                                         <div className="relative">
@@ -451,7 +451,7 @@ export default function ProductionControlPanel() {
 
                                                     {/* Toggle: Stage Door Override */}
                                                     <label className={`flex items-center justify-between cursor-pointer group ${isRestricted || isViewOnly ? 'opacity-50' : ''}`}>
-                                                        <span className="text-sm text-[#232323] group-hover:text-[#353535] transition-colors">
+                                                        <span className="text-sm text-[#2C2A28] group-hover:text-[#353535] transition-colors">
                                                             Stage Door Security (Override)
                                                         </span>
                                                         <div className="relative">
@@ -482,7 +482,7 @@ export default function ProductionControlPanel() {
                 {activeTab === 'deps' && (
                     <div className="animate-fadeIn">
                         <div className="mb-6">
-                            <h3 className="font-serif text-[28px] font-bold text-[#232323] mb-1">Equipment Logs &amp; Bookings</h3>
+                            <h3 className="font-serif text-[28px] font-bold text-[#2C2A28] mb-1">Equipment Logs &amp; Bookings</h3>
                             <p className="text-sm text-[#666361]/80 leading-normal">Monitor hardware status and resolve space conflicts.</p>
                         </div>
 
@@ -498,7 +498,7 @@ export default function ProductionControlPanel() {
                                             <th className="py-4 px-6 font-bold text-sm text-[#666361] font-sans text-right">Actions</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-[#DDD8CE]/30 font-sans text-xs text-[#232323]">
+                                    <tbody className="divide-y divide-[#DDD8CE]/30 font-sans text-xs text-[#2C2A28]">
                                         {dependencies.map((dep) => {
                                             const isConflict = dep.status === 'Conflict';
                                             return (
@@ -519,7 +519,7 @@ export default function ProductionControlPanel() {
                                                                 )}
                                                             </div>
                                                             <div>
-                                                                <p className="font-bold text-[#232323] text-sm">{dep.name}</p>
+                                                                <p className="font-bold text-[#2C2A28] text-sm">{dep.name}</p>
                                                                 <p className="text-xs text-[#666361]/70 mt-0.5">{dep.desc}</p>
                                                             </div>
                                                         </div>
@@ -618,7 +618,7 @@ export default function ProductionControlPanel() {
                             <div>
                                 <label className="block text-[10px] uppercase font-bold tracking-wider text-[#666361] mb-1">Production Role</label>
                                 <select
-                                    className="w-full bg-[#F8F9FA] border-0 border-b border-[#D5C9BE] focus:ring-0 cursor-pointer font-sans text-xs focus:border-[#353535] py-2 px-1 text-[#232323]"
+                                    className="w-full bg-[#F8F9FA] border-0 border-b border-[#D5C9BE] focus:ring-0 cursor-pointer font-sans text-xs focus:border-[#353535] py-2 px-1 text-[#2C2A28]"
                                     value={tempRole}
                                     onChange={(e) => setTempRole(e.target.value)}
                                 >
@@ -632,7 +632,7 @@ export default function ProductionControlPanel() {
                             <div>
                                 <label className="block text-[10px] uppercase font-bold tracking-wider text-[#666361] mb-1">Clearance Level</label>
                                 <div className="flex gap-4 mt-2">
-                                    <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-[#232323]">
+                                    <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-[#2C2A28]">
                                         <input
                                             type="radio"
                                             className="text-[#353535] focus:ring-0 focus:ring-offset-0"
@@ -642,7 +642,7 @@ export default function ProductionControlPanel() {
                                         />
                                         Standard
                                     </label>
-                                    <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-[#232323]">
+                                    <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-[#2C2A28]">
                                         <input
                                             type="radio"
                                             className="text-[#353535] focus:ring-0 focus:ring-offset-0"
@@ -659,7 +659,7 @@ export default function ProductionControlPanel() {
                                 <button
                                     type="button"
                                     onClick={() => setShowTempAccessModal(false)}
-                                    className="flex-grow border border-[#D5C9BE] text-xs font-semibold py-2 px-3 hover:bg-[#DDD8CE]/40 rounded-lg text-[#232323]"
+                                    className="flex-grow border border-[#D5C9BE] text-xs font-semibold py-2 px-3 hover:bg-[#DDD8CE]/40 rounded-lg text-[#2C2A28]"
                                 >
                                     Cancel
                                 </button>
@@ -704,7 +704,7 @@ export default function ProductionControlPanel() {
                                 <button
                                     type="button"
                                     onClick={() => setShowEditAllocationModal(false)}
-                                    className="flex-grow border border-[#D5C9BE] text-xs font-semibold py-2 px-3 hover:bg-[#DDD8CE]/40 rounded-lg text-[#232323]"
+                                    className="flex-grow border border-[#D5C9BE] text-xs font-semibold py-2 px-3 hover:bg-[#DDD8CE]/40 rounded-lg text-[#2C2A28]"
                                 >
                                     Cancel
                                 </button>

@@ -70,7 +70,7 @@ export default function SponsorDashboard() {
           </div>
 
           <Dialog open={bookingOpen} onOpenChange={setBookingOpen}>
-            <DialogTrigger render={<Button size="sm" className="bg-[#E85F57] text-[#232323] hover:bg-[#E85F57]/90 font-semibold rounded-[8px] py-[10px] px-[20px] transition-all active:scale-95" />}>
+            <DialogTrigger render={<Button size="sm" className="bg-[#E85F57] text-[#2C2A28] hover:bg-[#E85F57]/90 font-semibold rounded-[8px] py-[10px] px-[20px] transition-all active:scale-95" />}>
               Book VIP Lounge Seats
             </DialogTrigger>
             <DialogContent className="bg-[#E7DDD3] border border-[#DDD8CE] text-[#666361]">
@@ -127,7 +127,7 @@ export default function SponsorDashboard() {
                   <Button type="button" variant="outline" onClick={() => setBookingOpen(false)} className="border-2 border-[#E85F57] text-[#E85F57] hover:bg-[#E85F57]/5 rounded-[8px]">
                     Cancel
                   </Button>
-                  <Button type="submit" className="bg-[#E85F57] text-[#232323] hover:bg-[#E85F57]/90 rounded-[8px]">
+                  <Button type="submit" className="bg-[#E85F57] text-[#2C2A28] hover:bg-[#E85F57]/90 rounded-[8px]">
                     Book Reservation
                   </Button>
                 </DialogFooter>

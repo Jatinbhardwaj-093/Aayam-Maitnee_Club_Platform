@@ -97,7 +97,7 @@ export default function ProductionOffice() {
         </div>
 
         <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger render={<Button className="bg-[#E85F57] text-[#232323] hover:bg-[#E85F57]/90 font-semibold rounded-[8px] py-[10px] px-[20px] gap-1.5 transition-all active:scale-95" />}>
+          <DialogTrigger render={<Button className="bg-[#E85F57] text-[#2C2A28] hover:bg-[#E85F57]/90 font-semibold rounded-[8px] py-[10px] px-[20px] gap-1.5 transition-all active:scale-95" />}>
             <PlusCircle className="w-4 h-4" /> New Production
           </DialogTrigger>
           <DialogContent className="bg-[#E7DDD3] border border-[#DDD8CE] text-[#666361]">
@@ -153,7 +153,7 @@ export default function ProductionOffice() {
                 <Button type="button" variant="outline" onClick={() => setOpen(false)} className="border-2 border-[#E85F57] text-[#E85F57] hover:bg-[#E85F57]/5 rounded-[8px]">
                   Cancel
                 </Button>
-                <Button type="submit" className="bg-[#E85F57] text-[#232323] hover:bg-[#E85F57]/90 rounded-[8px]">
+                <Button type="submit" className="bg-[#E85F57] text-[#2C2A28] hover:bg-[#E85F57]/90 rounded-[8px]">
                   Launch Production Member
                 </Button>
               </DialogFooter>

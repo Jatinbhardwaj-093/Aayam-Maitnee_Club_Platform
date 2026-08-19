@@ -326,7 +326,7 @@ export default function MemberScripts() {
             onClick={() => setActiveTab("public")}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${activeTab === "public"
               ? "bg-[#353535] text-white shadow-sm"
-              : "text-[#666361] hover:text-[#232323] hover:bg-[#DDD8CE]/50"
+              : "text-[#666361] hover:text-[#2C2A28] hover:bg-[#DDD8CE]/50"
               }`}
           >
             <BookOpen className="w-4 h-4" /> Public Vault ({publicScripts.length})
@@ -336,7 +336,7 @@ export default function MemberScripts() {
             onClick={() => setActiveTab("drafts")}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${activeTab === "drafts"
               ? "bg-[#353535] text-white shadow-sm"
-              : "text-[#666361] hover:text-[#232323] hover:bg-[#DDD8CE]/50"
+              : "text-[#666361] hover:text-[#2C2A28] hover:bg-[#DDD8CE]/50"
               }`}
           >
             <FilePlus className="w-4 h-4" /> My Scripts ({myDrafts.length})
@@ -347,7 +347,7 @@ export default function MemberScripts() {
               onClick={() => setActiveTab("pending")}
               className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 relative ${activeTab === "pending"
                 ? "bg-[#353535] text-white shadow-sm"
-                : "text-[#666361] hover:text-[#232323] hover:bg-[#DDD8CE]/50"
+                : "text-[#666361] hover:text-[#2C2A28] hover:bg-[#DDD8CE]/50"
                 }`}
             >
               <Clock className="w-4 h-4" /> Pending Requests ({pendingScripts.length})
@@ -388,9 +388,9 @@ export default function MemberScripts() {
                             <span className="text-[10px] font-bold text-[#353535] uppercase tracking-[0.2em] block mb-1">
                               {item.genre} • {item.created_at}
                             </span>
-                            <h3 className="text-2xl font-bold font-serif text-[#232323] tracking-tight">{item.title}</h3>
+                            <h3 className="text-2xl font-bold font-serif text-[#2C2A28] tracking-tight">{item.title}</h3>
                             <p className="text-xs text-[#666361] font-semibold mt-1">
-                              Playwright: <span className="text-[#232323]">{item.playwright}</span>
+                              Playwright: <span className="text-[#2C2A28]">{item.playwright}</span>
                             </p>
                           </div>
 
@@ -412,21 +412,21 @@ export default function MemberScripts() {
                             <span className="text-[10px] uppercase font-bold text-[#666361]/70 flex items-center gap-1">
                               <BookOpen className="w-3.5 h-3.5 text-[#353535]" /> Pages
                             </span>
-                            <span className="font-bold text-[#232323] block">{item.pages}</span>
+                            <span className="font-bold text-[#2C2A28] block">{item.pages}</span>
                           </div>
 
                           <div className="space-y-1">
                             <span className="text-[10px] uppercase font-bold text-[#666361]/70 flex items-center gap-1">
                               <Layers className="w-3.5 h-3.5 text-[#353535]" /> Structure
                             </span>
-                            <span className="font-bold text-[#232323] truncate block">{item.acts}</span>
+                            <span className="font-bold text-[#2C2A28] truncate block">{item.acts}</span>
                           </div>
 
                           <div className="space-y-1">
                             <span className="text-[10px] uppercase font-bold text-[#666361]/70 flex items-center gap-1">
                               <Users className="w-3.5 h-3.5 text-[#353535]" /> Cast
                             </span>
-                            <span className="font-bold text-[#232323] truncate block">{item.rolesCount}</span>
+                            <span className="font-bold text-[#2C2A28] truncate block">{item.rolesCount}</span>
                           </div>
                         </div>
 
@@ -436,7 +436,7 @@ export default function MemberScripts() {
                             <h4 className="text-[11px] font-bold uppercase tracking-wider text-[#353535] flex items-center gap-1">
                               <Tag className="w-3.5 h-3.5 text-[#353535]" /> Excerpt
                             </h4>
-                            <div className="p-3 bg-[#EFE8E1]/60 border border-[#DDD8CE] rounded-xl font-serif text-xs italic text-[#232323] leading-relaxed">
+                            <div className="p-3 bg-[#EFE8E1]/60 border border-[#DDD8CE] rounded-xl font-serif text-xs italic text-[#2C2A28] leading-relaxed">
                               "{item.excerpt}"
                             </div>
                           </div>
@@ -534,9 +534,9 @@ export default function MemberScripts() {
                                 </span>
                               )}
                             </div>
-                            <h3 className="text-2xl font-bold font-serif text-[#232323] tracking-tight">{item.title}</h3>
+                            <h3 className="text-2xl font-bold font-serif text-[#2C2A28] tracking-tight">{item.title}</h3>
                             <p className="text-xs text-[#666361] font-semibold mt-1 flex items-center gap-2 flex-wrap">
-                              <span>Playwright: <span className="text-[#232323]">{item.playwright}</span></span>
+                              <span>Playwright: <span className="text-[#2C2A28]">{item.playwright}</span></span>
                               {item.created_at && (
                                 <span className="text-[10px] text-gray-500 font-normal bg-gray-100 px-2 py-0.5 rounded-full border border-gray-200">
                                   {item.created_at}
@@ -553,20 +553,20 @@ export default function MemberScripts() {
                         <div className="grid grid-cols-3 gap-3 bg-[#E7DDD3] p-3.5 rounded-xl border border-[#DDD8CE]/80 text-xs">
                           <div>
                             <span className="text-[10px] uppercase font-bold text-[#666361]/70 block">Pages</span>
-                            <span className="font-bold text-[#232323]">{item.pages}</span>
+                            <span className="font-bold text-[#2C2A28]">{item.pages}</span>
                           </div>
                           <div>
                             <span className="text-[10px] uppercase font-bold text-[#666361]/70 block">Acts</span>
-                            <span className="font-bold text-[#232323] truncate block">{item.acts}</span>
+                            <span className="font-bold text-[#2C2A28] truncate block">{item.acts}</span>
                           </div>
                           <div>
                             <span className="text-[10px] uppercase font-bold text-[#666361]/70 block">Cast</span>
-                            <span className="font-bold text-[#232323] truncate block">{item.rolesCount}</span>
+                            <span className="font-bold text-[#2C2A28] truncate block">{item.rolesCount}</span>
                           </div>
                         </div>
 
                         {item.excerpt && (
-                          <div className="p-3 bg-gray-50 border border-gray-200 rounded-xl font-serif text-xs italic text-[#232323]">
+                          <div className="p-3 bg-gray-50 border border-gray-200 rounded-xl font-serif text-xs italic text-[#2C2A28]">
                             "{item.excerpt}"
                           </div>
                         )}
@@ -637,9 +637,9 @@ export default function MemberScripts() {
                             <span className="text-[10px] font-bold text-amber-800 uppercase tracking-widest block mb-1">
                               Submission by: {item.author_name} ({item.author_email})
                             </span>
-                            <h3 className="text-2xl font-bold font-serif text-[#232323] tracking-tight">{item.title}</h3>
+                            <h3 className="text-2xl font-bold font-serif text-[#2C2A28] tracking-tight">{item.title}</h3>
                             <p className="text-xs text-[#666361] font-semibold mt-1">
-                              Playwright: <span className="text-[#232323]">{item.playwright}</span>
+                              Playwright: <span className="text-[#2C2A28]">{item.playwright}</span>
                             </p>
                           </div>
                           <Badge className="bg-amber-100 text-amber-900 border border-amber-300 font-bold text-[10px]">
@@ -647,7 +647,7 @@ export default function MemberScripts() {
                           </Badge>
                         </div>
 
-                        <div className="p-3 bg-white border border-amber-200 rounded-xl font-serif text-xs italic text-[#232323]">
+                        <div className="p-3 bg-white border border-amber-200 rounded-xl font-serif text-xs italic text-[#2C2A28]">
                           "{item.excerpt || "No excerpt provided."}"
                         </div>
                       </div>
@@ -883,7 +883,7 @@ export default function MemberScripts() {
                 <span className="text-[10px] font-bold uppercase tracking-widest text-[#353535]">
                   {selectedScript.genre} • {selectedScript.language}
                 </span>
-                <DialogTitle className="font-serif text-3xl font-bold text-[#232323]">{selectedScript.title}</DialogTitle>
+                <DialogTitle className="font-serif text-3xl font-bold text-[#2C2A28]">{selectedScript.title}</DialogTitle>
                 <DialogDescription className="text-xs text-[#666361]">
                   Playwright: <strong>{selectedScript.playwright}</strong> | Added by: {selectedScript.author_name}
                 </DialogDescription>
@@ -892,7 +892,7 @@ export default function MemberScripts() {
               {selectedScript.excerpt && (
                 <div className="space-y-1.5">
                   <h4 className="text-[11px] font-bold uppercase tracking-wider text-[#353535]">Scene Excerpt</h4>
-                  <blockquote className="p-4 bg-[#EFE8E1] border-l-4 border-[#353535] rounded-r-xl font-serif text-sm italic text-[#232323] leading-relaxed">
+                  <blockquote className="p-4 bg-[#EFE8E1] border-l-4 border-[#353535] rounded-r-xl font-serif text-sm italic text-[#2C2A28] leading-relaxed">
                     "{selectedScript.excerpt}"
                   </blockquote>
                 </div>
@@ -911,7 +911,7 @@ export default function MemberScripts() {
                               <span className="text-[11px] font-sans font-bold uppercase tracking-wider" style={{ color: l.color || '#353535' }}>
                                 {l.characterName}
                               </span>
-                              <p className="text-xs text-[#232323] font-serif leading-relaxed pl-3">
+                              <p className="text-xs text-[#2C2A28] font-serif leading-relaxed pl-3">
                                 "{l.text}"
                               </p>
                             </div>

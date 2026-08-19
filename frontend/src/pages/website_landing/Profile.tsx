@@ -398,7 +398,7 @@ export default function Profile() {
 
   if (loading || !profile) {
     return (
-      <div className="bg-[#E7DDD3] text-[#232323] min-h-screen font-sans py-32 text-center">
+      <div className="bg-[#E7DDD3] text-[#2C2A28] min-h-screen font-sans py-32 text-center">
         <div className="max-w-md mx-auto space-y-4">
           <div className="w-12 h-12 rounded-full bg-[#353535]/10 text-[#353535] flex items-center justify-center mx-auto animate-spin">
             🎭
@@ -410,7 +410,7 @@ export default function Profile() {
   }
 
   return (
-    <div className="bg-[#E7DDD3] text-[#232323] min-h-screen font-sans selection:bg-[#F8E8E4] pt-2 pb-12">
+    <div className="bg-[#E7DDD3] text-[#2C2A28] min-h-screen font-sans selection:bg-[#F8E8E4] pt-2 pb-12">
       <main className="max-w-7xl mx-auto px-6 md:px-12">
         {/* Page Header */}
         <header className="mb-16 border-b border-[#D5C9BE]/30 pb-6 flex flex-col md:flex-row md:items-end justify-between">
@@ -418,7 +418,7 @@ export default function Profile() {
             <span className="text-xs font-semibold text-[#353535] uppercase tracking-[0.25em] mb-2 block">
               Ensemble Member Profile
             </span>
-            <h1 className="font-serif text-5xl font-bold text-[#232323] tracking-tight">{profile.name}</h1>
+            <h1 className="font-serif text-5xl font-bold text-[#2C2A28] tracking-tight">{profile.name}</h1>
           </div>
           <p className="text-sm text-[#353535] mt-2 md:mt-0 font-bold uppercase tracking-wider">
             {profile.role} at Aayam
@@ -430,7 +430,7 @@ export default function Profile() {
           
           {/* Left Sidebar - Profile Summary */}
           <aside className="lg:col-span-3 space-y-8 lg:sticky lg:top-28">
-            <div className="bg-[#232323] text-white p-7 rounded-3xl border border-[#353535] shadow-xl flex flex-col items-center text-center">
+            <div className="bg-[#2C2A28] text-white p-7 rounded-3xl border border-[#353535] shadow-xl flex flex-col items-center text-center">
               <div className="w-32 h-32 rounded-full overflow-hidden mb-6 border-2 border-[#353535] shadow-md">
                 <img 
                   className="w-full h-full object-cover filter brightness-95 contrast-105" 
@@ -469,7 +469,7 @@ export default function Profile() {
             </div>
             
             {/* Navigation Link */}
-            <div className="hidden lg:flex flex-col bg-[#232323] text-white rounded-3xl border border-[#353535] p-4 space-y-1">
+            <div className="hidden lg:flex flex-col bg-[#2C2A28] text-white rounded-3xl border border-[#353535] p-4 space-y-1">
               <Link to="/directory" className="px-4 py-2.5 rounded-2xl text-white/80 hover:text-[#E85F57] hover:bg-white/5 text-xs font-mono font-semibold uppercase tracking-wider flex items-center gap-2 transition-all">
                 ← Back to Directory
               </Link>
@@ -483,7 +483,7 @@ export default function Profile() {
             </div>
             
             {profile.portfolio.map((item, index) => (
-              <article key={index} className="bg-[#232323] text-white rounded-3xl overflow-hidden border border-[#353535] shadow-xl hover:border-[#E85F57]/50 hover:shadow-2xl transition-all duration-300">
+              <article key={index} className="bg-[#2C2A28] text-white rounded-3xl overflow-hidden border border-[#353535] shadow-xl hover:border-[#E85F57]/50 hover:shadow-2xl transition-all duration-300">
                 <div className="p-7 space-y-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
@@ -520,7 +520,7 @@ export default function Profile() {
           {/* Right Sidebar - Artistic Statement & Skills */}
           <aside className="lg:col-span-3 space-y-8">
             {/* Artistic Statement Card */}
-            <section className="bg-[#232323] text-white p-7 rounded-3xl border border-[#353535] shadow-xl" id="statement">
+            <section className="bg-[#2C2A28] text-white p-7 rounded-3xl border border-[#353535] shadow-xl" id="statement">
               <h3 className="text-xs font-mono font-bold text-[#E85F57] uppercase tracking-widest mb-4 pb-3 border-b border-white/10 flex items-center justify-between">
                 <span>{profile.statementTitle}</span>
                 <BookOpen className="w-4 h-4" />
@@ -534,7 +534,7 @@ export default function Profile() {
             </section>
 
             {/* Specializations & Skills */}
-            <section className="bg-[#232323] text-white p-7 rounded-3xl border border-[#353535] shadow-xl">
+            <section className="bg-[#2C2A28] text-white p-7 rounded-3xl border border-[#353535] shadow-xl">
               <h3 className="text-xs font-mono font-bold text-[#E85F57] uppercase tracking-widest mb-4 pb-3 border-b border-white/10 flex items-center justify-between">
                 <span>Specializations</span>
                 <Tag className="w-4 h-4" />
@@ -549,7 +549,7 @@ export default function Profile() {
             </section>
 
             {/* Favorite Quote Card */}
-            <section className="p-6 border-l-2 border-[#E85F57] bg-[#232323] text-white rounded-r-3xl border-t border-b border-r border-[#353535] shadow-xl">
+            <section className="p-6 border-l-2 border-[#E85F57] bg-[#2C2A28] text-white rounded-r-3xl border-t border-b border-r border-[#353535] shadow-xl">
               <Quote className="w-6 h-6 text-[#E85F57] opacity-80 mb-2" />
               <p className="text-xs italic text-white/80 leading-relaxed font-light">
                 "{profile.quote}"

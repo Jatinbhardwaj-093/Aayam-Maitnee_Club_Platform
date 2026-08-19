@@ -227,7 +227,7 @@ export default function AppLayout() {
                   to="/"
                   className="group flex items-center gap-2.5"
                 >
-                  <span className="font-serif text-2xl font-semibold tracking-wider text-[#232323] group-hover:text-[#E85F57] transition-colors">
+                  <span className="font-serif text-2xl font-semibold tracking-wider text-[#2C2A28] group-hover:text-[#E85F57] transition-colors">
                     AAYAM
                   </span>
                 </Link>
@@ -238,7 +238,7 @@ export default function AppLayout() {
                     to="/about"
                     className={`text-xs font-bold uppercase tracking-widest transition-all ${location.pathname === "/about" || location.pathname === "/manifesto"
                       ? "text-[#E85F57] border-b-2 border-[#E85F57] pb-1"
-                      : "text-[#666361] hover:text-[#232323]"
+                      : "text-[#666361] hover:text-[#2C2A28]"
                       }`}
                   >
                     Manifesto
@@ -247,7 +247,7 @@ export default function AppLayout() {
                     to="/plays"
                     className={`text-xs font-bold uppercase tracking-widest transition-all ${location.pathname === "/plays"
                       ? "text-[#E85F57] border-b-2 border-[#E85F57] pb-1"
-                      : "text-[#666361] hover:text-[#232323]"
+                      : "text-[#666361] hover:text-[#2C2A28]"
                       }`}
                   >
                     Our Plays
@@ -256,7 +256,7 @@ export default function AppLayout() {
                     to="/events"
                     className={`text-xs font-bold uppercase tracking-widest transition-all ${location.pathname === "/events"
                       ? "text-[#E85F57] border-b-2 border-[#E85F57] pb-1"
-                      : "text-[#666361] hover:text-[#232323]"
+                      : "text-[#666361] hover:text-[#2C2A28]"
                       }`}
                   >
                     Events
@@ -265,7 +265,7 @@ export default function AppLayout() {
                     to="/directory"
                     className={`text-xs font-bold uppercase tracking-widest transition-all ${location.pathname === "/directory"
                       ? "text-[#E85F57] border-b-2 border-[#E85F57] pb-1"
-                      : "text-[#666361] hover:text-[#232323]"
+                      : "text-[#666361] hover:text-[#2C2A28]"
                       }`}
                   >
                     Member Directory
@@ -274,7 +274,7 @@ export default function AppLayout() {
                     to="/gallery"
                     className={`text-xs font-bold uppercase tracking-widest transition-all ${location.pathname === "/gallery" || location.pathname === "/public-gallery"
                       ? "text-[#E85F57] border-b-2 border-[#E85F57] pb-1"
-                      : "text-[#666361] hover:text-[#232323]"
+                      : "text-[#666361] hover:text-[#2C2A28]"
                       }`}
                   >
                     Gallery
@@ -288,7 +288,7 @@ export default function AppLayout() {
                   <div className="flex items-center gap-3">
                     <Link
                       to={isMaintainer ? "/maintainer" : "/member"}
-                      className="bg-[#232323] text-white hover:bg-[#E85F57] px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all shadow-xs"
+                      className="bg-[#2C2A28] text-white hover:bg-[#E85F57] px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all shadow-xs"
                     >
                       Dashboard
                     </Link>
@@ -297,7 +297,7 @@ export default function AppLayout() {
                   <div className="flex items-center gap-3">
                     <Link
                       to="/join"
-                      className="border border-[#232323]/20 text-[#232323] hover:bg-[#232323] hover:text-white px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all"
+                      className="border border-[#2C2A28]/20 text-[#2C2A28] hover:bg-[#2C2A28] hover:text-white px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all"
                     >
                       Join Club
                     </Link>
@@ -433,9 +433,9 @@ export default function AppLayout() {
               {!activeUser && (
                 <Button
                   onClick={() => setPortalOpen(true)}
-                  className="gap-2 bg-[#E85F57] text-[#232323] hover:bg-[#E85F57]/95 font-semibold rounded-[8px] h-9 px-4 transition-all active:scale-95 flex items-center"
+                  className="gap-2 bg-[#E85F57] text-[#2C2A28] hover:bg-[#E85F57]/95 font-semibold rounded-[8px] h-9 px-4 transition-all active:scale-95 flex items-center"
                 >
-                  <User className="w-4 h-4 text-[#232323]" />
+                  <User className="w-4 h-4 text-[#2C2A28]" />
                   <span className="text-xs font-semibold">Portal Access</span>
                 </Button>
               )}
@@ -557,7 +557,7 @@ export default function AppLayout() {
             <footer className="bg-[#E7DDD3] py-16 px-6 md:px-12 border-t border-[#D5C9BE]/50 mt-auto w-full">
               <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
                 <div className="text-center md:text-left space-y-1">
-                  <h3 className="font-serif text-3xl font-normal text-[#232323] tracking-tight">AAYAM</h3>
+                  <h3 className="font-serif text-3xl font-normal text-[#2C2A28] tracking-tight">AAYAM</h3>
                   <p className="text-xs text-[#666361]">Celebrating theatrical excellence and archival stagecraft.</p>
                 </div>
                 <nav className="flex flex-wrap justify-center gap-8 text-xs font-bold uppercase tracking-widest">
@@ -585,7 +585,7 @@ export default function AppLayout() {
                 </div>
                 <Link
                   to="/member"
-                  className="bg-[#E85F57] hover:bg-[#E85F57]/90 text-[#232323] font-semibold text-xs rounded-[8px] py-2.5 px-6 shadow-sm transition-all active:scale-95 flex items-center gap-2"
+                  className="bg-[#E85F57] hover:bg-[#E85F57]/90 text-[#2C2A28] font-semibold text-xs rounded-[8px] py-2.5 px-6 shadow-sm transition-all active:scale-95 flex items-center gap-2"
                 >
                   Return to Dashboard
                 </Link>

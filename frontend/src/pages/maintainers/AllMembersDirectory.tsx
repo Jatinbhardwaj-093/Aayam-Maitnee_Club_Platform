@@ -190,7 +190,7 @@ export default function AllMembersDirectory() {
   };
 
   return (
-    <div className="flex-1 bg-[#E7DDD3] text-[#232323] font-sans pb-16">
+    <div className="flex-1 bg-[#E7DDD3] text-[#2C2A28] font-sans pb-16">
       <div className="max-w-7xl mx-auto space-y-8">
         
         {/* Page Header */}
@@ -451,7 +451,7 @@ export default function AllMembersDirectory() {
 
                   {/* Name & Contact */}
                   <div className="space-y-1">
-                    <h3 className="font-bold text-base text-[#232323] tracking-tight group-hover:text-[#353535] transition-colors">
+                    <h3 className="font-bold text-base text-[#2C2A28] tracking-tight group-hover:text-[#353535] transition-colors">
                       {member.name}
                     </h3>
                     <p className="text-xs text-[#666361]/70 truncate flex items-center gap-1">
@@ -540,7 +540,7 @@ export default function AllMembersDirectory() {
                             </div>
                           )}
                           <div>
-                            <div className="font-bold text-[#232323]">{member.name}</div>
+                            <div className="font-bold text-[#2C2A28]">{member.name}</div>
                             <div className="text-[11px] text-[#666361]/70">{member.email}</div>
                           </div>
                         </div>

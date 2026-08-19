@@ -148,7 +148,7 @@ export default function EditProfile() {
   }
 
   return (
-    <div className="flex-1 bg-[#E7DDD3] text-[#232323] font-sans py-2 md:py-4 selection:bg-[#F8E8E4]">
+    <div className="flex-1 bg-[#E7DDD3] text-[#2C2A28] font-sans py-2 md:py-4 selection:bg-[#F8E8E4]">
       <div className="max-w-4xl mx-auto px-6">
         
         {/* Back header */}
@@ -416,7 +416,7 @@ export default function EditProfile() {
             <Button 
               type="submit" 
               disabled={saving}
-              className="bg-[#E85F57] text-[#232323] hover:bg-[#E85F57]/95 disabled:bg-[#E85F57]/50 rounded-xl flex-1 py-4 font-semibold text-center"
+              className="bg-[#E85F57] text-[#2C2A28] hover:bg-[#E85F57]/95 disabled:bg-[#E85F57]/50 rounded-xl flex-1 py-4 font-semibold text-center"
             >
               {saving ? "Saving Changes..." : "Save Profile Changes"}
             </Button>

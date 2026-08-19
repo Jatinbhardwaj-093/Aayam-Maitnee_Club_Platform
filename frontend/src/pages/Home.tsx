@@ -69,7 +69,7 @@ export default function Home() {
         <div className="flex flex-wrap gap-[16px] justify-center pt-[16px]">
           <Link 
             to="/member" 
-            className={buttonVariants({ size: "lg", className: "bg-[#E85F57] hover:bg-[#E85F57]/90 text-[#232323] font-semibold rounded-[8px] px-[40px] py-[16px] shadow-md transition-all active:scale-95" })}
+            className={buttonVariants({ size: "lg", className: "bg-[#E85F57] hover:bg-[#E85F57]/90 text-[#2C2A28] font-semibold rounded-[8px] px-[40px] py-[16px] shadow-md transition-all active:scale-95" })}
           >
             Enter Aayam <ArrowRight className="w-4 h-4 ml-2" />
           </Link>
@@ -145,7 +145,7 @@ export default function Home() {
                   <Ticket className="w-4 h-4 text-[#E85F57]" />
                   <span>Location: {perf.location}</span>
                 </div>
-                <Button size="sm" className="w-full bg-[#E85F57] text-[#232323] hover:bg-[#E85F57]/90 font-semibold rounded-[8px] py-[10px]">
+                <Button size="sm" className="w-full bg-[#E85F57] text-[#2C2A28] hover:bg-[#E85F57]/90 font-semibold rounded-[8px] py-[10px]">
                   Book Tickets
                 </Button>
               </div>
