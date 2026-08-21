@@ -819,90 +819,106 @@ export default function AuditionsManagement() {
 
           {/* Role Cards Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            {filteredPositions.map((pos) => (
-              <div
-                key={pos.id}
-                className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-[2rem] p-7 hover:border-[#B32D25]/50 hover:shadow-md transition-all flex flex-col justify-between space-y-6 shadow-xs group"
-              >
-                <div className="space-y-3.5">
-                  {/* Subtle top metadata */}
-                  <div className="flex items-baseline justify-between gap-2 border-b border-[#DCBAB2]/40 pb-2.5">
-                    <span className="text-[11px] font-mono text-[#8C5A54] uppercase tracking-wider font-semibold">
-                      {pos.production_name} • {pos.role_category}
-                    </span>
-                    <span
-                      className={`text-[9px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border shrink-0 ${
-                        pos.status === "Open Calling"
-                          ? "bg-emerald-700/15 text-emerald-950 border-emerald-700/30"
-                          : "bg-[#EEDBD5] text-[#6E4742] border-[#D5AAA2]"
-                      }`}
-                    >
-                      {pos.status}
-                    </span>
+            {filteredPositions.map((pos, idx) => {
+              const prodImg = (pos.production_name || "").toLowerCase().includes("hayavadana")
+                ? "/aayam_assets/tamashbin_user_1.jpg"
+                : (pos.production_name || "").toLowerCase().includes("ashadh")
+                ? "/aayam_assets/kky_user_5.jpg"
+                : (pos.production_name || "").toLowerCase().includes("charandas")
+                ? "/aayam_assets/dddj_user_1.jpg"
+                : "/aayam_assets/samatvam_user_1.jpg";
+
+              return (
+                <div
+                  key={pos.id || idx}
+                  className="bg-[#FAF2EE] text-[#2A1816] rounded-[2rem] border border-[#DCBAB2] overflow-hidden shadow-md hover:border-[#B32D25]/50 hover:shadow-xl transition-all duration-300 flex flex-col justify-between group"
+                >
+                  <div>
+                    {/* Visual Card Image Header */}
+                    <div className="relative aspect-[16/9] overflow-hidden bg-[#E8D6CF]">
+                      <img
+                        src={prodImg}
+                        alt={pos.role_name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 filter brightness-95 contrast-105"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#2A1816]/80 via-transparent to-transparent" />
+                      
+                      <div className="absolute top-4 right-4">
+                        <span className={`inline-flex items-center gap-1 px-3 py-1 text-[9px] font-mono font-bold rounded-full uppercase tracking-wider shadow-sm backdrop-blur-md border ${
+                          pos.status === "Open Calling"
+                            ? "bg-[#FAF2EE]/90 text-emerald-950 border-emerald-700/30"
+                            : "bg-[#FAF2EE]/90 text-[#8C5A54] border-[#D5AAA2]"
+                        }`}>
+                          {pos.status}
+                        </span>
+                      </div>
+
+                      <div className="absolute bottom-3 left-5 text-xs font-mono font-bold text-[#FAF2EE] drop-shadow-sm">
+                        {pos.production_name}
+                      </div>
+                    </div>
+
+                    {/* Card Body */}
+                    <div className="p-6 sm:p-7 space-y-4">
+                      <div className="space-y-1">
+                        <span className="text-[10px] font-mono uppercase font-bold text-[#8C241E]">
+                          {pos.role_category}
+                        </span>
+                        <h3 className="font-serif text-2xl font-normal text-[#2A1816] group-hover:text-[#8C241E] transition-colors leading-snug">
+                          {pos.role_name}
+                        </h3>
+                      </div>
+
+                      <p className="text-xs text-[#5C3B37] leading-relaxed font-light line-clamp-2">
+                        {pos.character_description}
+                      </p>
+
+                      <div className="bg-[#F5EAE6] p-3.5 rounded-xl border border-[#DEBEB7] text-xs text-[#5C3B37] space-y-1">
+                        <div className="truncate"><strong>Slots Available:</strong> {pos.slots_available} Slot{pos.slots_available > 1 ? "s" : ""}</div>
+                        <div className="truncate text-[#6E4742]"><strong>Requires:</strong> {pos.requirements || "Preparation & readiness"}</div>
+                      </div>
+                    </div>
                   </div>
 
-                  <h3 className="text-2xl font-serif text-[#2A1816] tracking-tight font-normal group-hover:text-[#8C241E] transition-colors leading-snug">
-                    {pos.role_name}
-                  </h3>
-
-                  <p className="text-xs text-[#5C3B37] font-light leading-relaxed">
-                    {pos.character_description}
-                  </p>
-
-                  {pos.requirements && (
-                    <p className="text-xs text-[#6E4742] pt-1 leading-relaxed">
-                      <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#8C5A54] mr-1.5">
-                        Requires:
-                      </span>
-                      {pos.requirements}
-                    </p>
-                  )}
-
-                  <div className="flex items-center gap-3 text-xs font-mono text-[#6E4742] pt-1">
-                    <span>{pos.slots_available} Slots Open</span>
-                    <span>•</span>
-                    <span className="font-bold text-[#2A1816]">{pos.applicant_count || 0} Candidates</span>
-                  </div>
-                </div>
-
-                {/* Card Footer Actions */}
-                <div className="pt-4 border-t border-[#DCBAB2]/60 flex items-center justify-between gap-2">
-                  <button
-                    onClick={() => {
-                      setSelectedPosFilter(pos.role_name);
-                      setActiveTab("applications");
-                    }}
-                    className="text-xs font-mono font-bold text-[#8C241E] hover:text-[#731B16] flex items-center gap-1 cursor-pointer uppercase tracking-wider"
-                  >
-                    <span>View Candidates ({pos.applicant_count || 0})</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
-
-                  <div className="flex items-center gap-2">
+                  {/* Card Footer Actions */}
+                  <div className="p-6 sm:p-7 pt-0 flex items-center justify-between border-t border-[#DCBAB2]/60 text-xs font-mono pt-4">
                     <button
                       onClick={() => {
-                        setSelectedPosForEdit(pos);
-                        setEditPosOpen(true);
+                        setSelectedPosFilter(pos.role_name);
+                        setActiveTab("applications");
                       }}
-                      className="p-2 rounded-full bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] hover:text-[#2A1816] border border-[#D5AAA2] transition-all cursor-pointer"
-                      title="Edit calling details"
+                      className="text-xs font-mono font-bold text-[#8C241E] hover:text-[#731B16] flex items-center gap-1 cursor-pointer uppercase tracking-wider"
                     >
-                      <Edit3 className="w-3.5 h-3.5 text-[#8C241E]" />
+                      <span>Candidates ({pos.applicant_count || 0})</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
                     </button>
-                    <button
-                      onClick={() => handleTogglePositionStatus(pos)}
-                      className={`text-[10px] font-mono font-bold uppercase px-3 py-1.5 rounded-full border transition-all cursor-pointer ${
-                        pos.status === "Open Calling"
-                          ? "border-[#D5AAA2] text-[#8C5A54] hover:bg-[#EEDBD5]"
-                          : "bg-[#8C241E] text-white border-[#A6352F]"
-                      }`}
-                    >
-                      {pos.status === "Open Calling" ? "Close" : "Re-open"}
-                    </button>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => {
+                          setSelectedPosForEdit(pos);
+                          setEditPosOpen(true);
+                        }}
+                        className="p-2 rounded-full bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] hover:text-[#2A1816] border border-[#D5AAA2] transition-all cursor-pointer shadow-xs"
+                        title="Edit calling details"
+                      >
+                        <Edit3 className="w-3.5 h-3.5 text-[#8C241E]" />
+                      </button>
+                      <button
+                        onClick={() => handleTogglePositionStatus(pos)}
+                        className={`text-[10px] font-mono font-bold uppercase px-3 py-1.5 rounded-full border transition-all cursor-pointer ${
+                          pos.status === "Open Calling"
+                            ? "border-[#D5AAA2] text-[#8C5A54] hover:bg-[#EEDBD5]"
+                            : "bg-[#8C241E] text-white border-[#A6352F]"
+                        }`}
+                      >
+                        {pos.status === "Open Calling" ? "Close" : "Re-open"}
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </section>
       )}

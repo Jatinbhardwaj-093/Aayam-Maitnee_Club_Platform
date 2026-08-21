@@ -504,48 +504,67 @@ export default function AuditionsCasting() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredPositions.map((pos) => {
+          {filteredPositions.map((pos, idx) => {
             const hasApplied = applications.some(a => String(a.position_id) === String(pos.id) || a.role_name === (pos.role_name || pos.title));
+            
+            const prodImg = (pos.production_name || "").toLowerCase().includes("hayavadana")
+              ? "/aayam_assets/tamashbin_user_1.jpg"
+              : (pos.production_name || "").toLowerCase().includes("ashadh")
+              ? "/aayam_assets/kky_user_5.jpg"
+              : (pos.production_name || "").toLowerCase().includes("charandas")
+              ? "/aayam_assets/dddj_user_1.jpg"
+              : "/aayam_assets/samatvam_user_1.jpg";
 
             return (
               <div
-                key={pos.id}
-                className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-[2rem] p-7 hover:border-[#B32D25]/50 hover:shadow-md transition-all flex flex-col justify-between space-y-6 shadow-xs group"
+                key={pos.id || idx}
+                className="bg-[#FAF2EE] text-[#2A1816] rounded-[2rem] border border-[#DCBAB2] overflow-hidden shadow-md hover:border-[#B32D25]/50 hover:shadow-xl transition-all duration-300 flex flex-col justify-between group"
               >
-                <div className="space-y-3.5">
-                  {/* Subtle editorial header string */}
-                  <div className="flex items-baseline justify-between gap-2 border-b border-[#DCBAB2]/40 pb-2.5">
-                    <span className="text-[11px] font-mono text-[#8C5A54] uppercase tracking-wider font-semibold">
-                      {pos.production_name || "Premiere"} • {pos.role_category || pos.category || "Role"}
-                    </span>
-                    <span className="text-[10px] font-mono text-[#8C5A54]">
-                      {pos.slots_available ? `${pos.slots_available} Slot${pos.slots_available > 1 ? "s" : ""}` : "Open"}
-                    </span>
+                <div>
+                  {/* Visual Card Image Header */}
+                  <div className="relative aspect-[16/9] overflow-hidden bg-[#E8D6CF]">
+                    <img
+                      src={prodImg}
+                      alt={pos.role_name || pos.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 filter brightness-95 contrast-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#2A1816]/80 via-transparent to-transparent" />
+                    
+                    <div className="absolute top-4 right-4">
+                      <span className="inline-flex items-center gap-1 px-3 py-1 text-[9px] font-mono font-bold rounded-full uppercase tracking-wider bg-[#FAF2EE]/90 text-[#8C241E] border border-[#D5AAA2] shadow-sm backdrop-blur-md">
+                        {pos.slots_available ? `${pos.slots_available} Slot${pos.slots_available > 1 ? "s" : ""}` : "Open"}
+                      </span>
+                    </div>
+
+                    <div className="absolute bottom-3 left-5 text-xs font-mono font-bold text-[#FAF2EE] drop-shadow-sm">
+                      {pos.production_name || "Upcoming Premiere"}
+                    </div>
                   </div>
 
-                  {/* Clean title */}
-                  <h3 className="text-2xl font-serif text-[#2A1816] tracking-tight font-normal leading-snug">
-                    {pos.role_name || pos.title}
-                  </h3>
-
-                  {/* Character synopsis */}
-                  <p className="text-xs text-[#5C3B37] font-light leading-relaxed">
-                    {pos.character_description || pos.description}
-                  </p>
-
-                  {/* Understated requirement line */}
-                  {pos.requirements && (
-                    <p className="text-xs text-[#6E4742] pt-1 leading-relaxed">
-                      <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#8C5A54] mr-1.5">
-                        Requires:
+                  {/* Card Body */}
+                  <div className="p-6 sm:p-7 space-y-4">
+                    <div className="space-y-1">
+                      <span className="text-[10px] font-mono uppercase font-bold text-[#8C241E]">
+                        {pos.role_category || pos.category || "Role Calling"}
                       </span>
-                      {pos.requirements}
+                      <h3 className="font-serif text-2xl font-normal text-[#2A1816] group-hover:text-[#8C241E] transition-colors leading-snug">
+                        {pos.role_name || pos.title}
+                      </h3>
+                    </div>
+
+                    <p className="text-xs text-[#5C3B37] leading-relaxed font-light line-clamp-2">
+                      {pos.character_description || pos.description}
                     </p>
-                  )}
+
+                    <div className="bg-[#F5EAE6] p-3.5 rounded-xl border border-[#DEBEB7] text-xs text-[#5C3B37] space-y-1">
+                      <div className="truncate"><strong>Department:</strong> {pos.role_category || pos.category}</div>
+                      <div className="truncate text-[#6E4742]"><strong>Requires:</strong> {pos.requirements || "Audition slate & role readiness"}</div>
+                    </div>
+                  </div>
                 </div>
 
-                {/* Card Footer */}
-                <div className="pt-3 border-t border-[#DCBAB2]/50 flex items-center justify-between gap-3">
+                {/* Card Actions */}
+                <div className="p-6 sm:p-7 pt-0 flex items-center justify-between border-t border-[#DCBAB2]/60 text-xs font-mono pt-4">
                   <span className="text-[10px] font-mono text-[#8C5A54]">
                     Due: {pos.deadline || "Sep 25, 2026"}
                   </span>

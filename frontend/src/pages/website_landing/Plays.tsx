@@ -212,91 +212,107 @@ export default function Plays() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {displayedPlays.map((play) => (
+              {displayedPlays.map((play, idx) => (
                 <div
-                  key={play.id}
-                  className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-[2rem] p-6 sm:p-7 hover:border-[#B32D25]/50 hover:shadow-md transition-all flex flex-col justify-between space-y-6 shadow-xs group"
+                  key={play.id || idx}
+                  className="bg-[#FAF2EE] text-[#2A1816] rounded-[2rem] border border-[#DCBAB2] overflow-hidden shadow-md hover:border-[#B32D25]/50 hover:shadow-xl transition-all duration-300 flex flex-col justify-between group"
                 >
-                  <div className="space-y-4">
-                    {/* Header meta */}
-                    <div className="flex items-start justify-between gap-3 border-b border-[#DCBAB2]/50 pb-3">
-                      <div className="space-y-0.5">
-                        <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
-                          {play.genre || "Classical Drama"} • {play.language || "Hindi / English"}
+                  <div>
+                    {/* Visual Card Image Header */}
+                    <div className="relative aspect-[16/9] overflow-hidden bg-[#E8D6CF]">
+                      {play.image ? (
+                        <img
+                          src={play.image}
+                          alt={play.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 filter brightness-95 contrast-105"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-[#EEDBD5] text-[#8C5A54] font-serif italic text-sm">
+                          Aayam Repertory
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#2A1816]/80 via-transparent to-transparent" />
+                      
+                      <div className="absolute top-4 right-4">
+                        <span className={`inline-flex items-center gap-1 px-3 py-1 text-[9px] font-mono font-bold rounded-full uppercase tracking-wider shadow-sm backdrop-blur-md border ${
+                          !play.is_past
+                            ? "bg-[#FAF2EE]/90 text-emerald-950 border-emerald-700/30"
+                            : "bg-[#FAF2EE]/90 text-[#8C5A54] border-[#D5AAA2]"
+                        }`}>
+                          {!play.is_past ? "Upcoming Premiere" : "Repertory"}
                         </span>
-                        {play.acts && (
-                          <span className="text-[10px] font-mono text-[#8C5A54] block">
-                            {play.acts}
-                          </span>
+                      </div>
+
+                      <div className="absolute bottom-3 left-5 text-xs font-mono font-bold text-[#FAF2EE] drop-shadow-sm">
+                        0{idx + 1} // {play.genre || "Drama"}
+                      </div>
+                    </div>
+
+                    {/* Card Body */}
+                    <div className="p-6 sm:p-7 space-y-4">
+                      <div className="space-y-1">
+                        <h3 className="font-serif text-2xl font-normal text-[#2A1816] group-hover:text-[#8C241E] transition-colors leading-snug">
+                          {play.title}
+                        </h3>
+                        {play.playwright && (
+                          <p className="text-xs text-[#6E4742] font-serif italic">
+                            by <span className="font-normal text-[#2A1816]">{play.playwright}</span>
+                          </p>
                         )}
                       </div>
-                      <span className={`text-[9px] font-mono font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${
-                        !play.is_past
-                          ? "bg-emerald-700/15 text-emerald-950 border-emerald-700/30"
-                          : "bg-[#EEDBD5] text-[#5C3B37] border-[#D5AAA2]"
-                      }`}>
-                        {!play.is_past ? "Upcoming Premiere" : "Repertory Archive"}
-                      </span>
-                    </div>
 
-                    {/* Title & Playwright */}
-                    <div className="space-y-1">
-                      <h3 className="text-2xl font-serif text-[#2A1816] tracking-tight font-normal leading-tight">
-                        {play.title}
-                      </h3>
-                      {play.playwright && (
-                        <p className="text-xs text-[#6E4742] font-serif italic">
-                          by <span className="font-normal text-[#2A1816]">{play.playwright}</span>
-                        </p>
-                      )}
-                    </div>
+                      <p className="text-xs text-[#5C3B37] leading-relaxed font-light line-clamp-2">
+                        {play.description}
+                      </p>
 
-                    {/* Production Meta Line */}
-                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-mono text-[#6E4742]">
-                      <span><strong className="text-[#2A1816] font-semibold">Dir:</strong> {play.director}</span>
-                      <span>•</span>
-                      <span><strong className="text-[#2A1816] font-semibold">Venue:</strong> {play.venue || "IIT Madras"}</span>
-                      <span>•</span>
-                      <span><strong className="text-[#2A1816] font-semibold">Dates:</strong> {play.dates || "Autumn 2026"}</span>
-                    </div>
+                      <div className="grid grid-cols-2 gap-2 pt-3 border-t border-[#DCBAB2]/60 text-xs font-mono text-[#5C3B37]">
+                        <div className="flex items-center gap-1.5 truncate">
+                          <MapPin className="w-3.5 h-3.5 text-[#8C241E] shrink-0" />
+                          <span className="truncate">{play.venue || "CLT Main Stage"}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 truncate">
+                          <Clock className="w-3.5 h-3.5 text-[#8C241E] shrink-0" />
+                          <span className="truncate">{play.runtime || "90 Mins"}</span>
+                        </div>
+                      </div>
 
-                    {/* Synopsis */}
-                    <p className="text-xs text-[#5C3B37] font-light leading-relaxed">
-                      {play.description}
-                    </p>
+                      <div className="bg-[#F5EAE6] p-3.5 rounded-xl border border-[#DEBEB7] text-xs text-[#5C3B37] space-y-1">
+                        <div className="truncate"><strong>Director:</strong> {play.director}</div>
+                        {play.cast && <div className="truncate text-[#6E4742]"><strong>Cast:</strong> {play.cast}</div>}
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Actions */}
-                  <div className="pt-3 border-t border-[#DCBAB2]/60 flex flex-col gap-2.5">
+                  {/* Card Actions */}
+                  <div className="p-6 sm:p-7 pt-0 flex items-center justify-between border-t border-[#DCBAB2]/60 text-xs font-mono pt-4">
+                    <span className="text-[#8C241E] font-bold">{play.price || "Free Entry"}</span>
+
                     {!play.is_past ? (
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => handleReservePass(play.title)}
-                          className="flex-1 bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] py-2.5 rounded-full text-xs font-mono font-bold uppercase tracking-wider shadow-sm flex items-center justify-center gap-1.5 transition-all cursor-pointer border border-[#A6352F]"
+                          className="px-4 py-2 rounded-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer border border-[#A6352F] shadow-sm flex items-center gap-1"
                         >
                           <Ticket className="w-3.5 h-3.5" />
-                          <span>Reserve Free Pass</span>
+                          <span>Reserve</span>
                         </button>
                         <button
                           onClick={() => handleOpenVolunteer(play)}
-                          className="px-4 py-2.5 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
+                          className="px-3.5 py-2 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1 transition-all cursor-pointer"
                           title="Volunteer for Backstage Crew"
                         >
                           <HeartHandshake className="w-3.5 h-3.5 text-[#8C241E]" />
-                          <span>Volunteer</span>
+                          <span>Crew</span>
                         </button>
                       </div>
                     ) : (
-                      <div className="flex items-center justify-between text-xs font-mono text-[#8C5A54]">
-                        <span>Archived Repertory</span>
-                        <Link
-                          to="/member-scripts"
-                          className="text-[#8C241E] font-bold hover:underline flex items-center gap-1"
-                        >
-                          <FileText className="w-3.5 h-3.5" />
-                          <span>Read Script</span>
-                        </Link>
-                      </div>
+                      <Link
+                        to="/member-scripts"
+                        className="text-[#8C241E] font-bold hover:underline flex items-center gap-1 uppercase tracking-wider text-xs"
+                      >
+                        <FileText className="w-3.5 h-3.5" />
+                        <span>Script</span>
+                      </Link>
                     )}
                   </div>
                 </div>
