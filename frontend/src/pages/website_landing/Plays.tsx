@@ -90,6 +90,10 @@ export default function Plays() {
   };
 
   const handleOpenDetails = (play: PlayItem) => {
+    const past = Boolean(play.is_past) ||
+      ["archive", "concluded", "past", "completed", "closed", "historical"].some(
+        (kw) => (play.status || "").toLowerCase().includes(kw)
+      );
     setSelectedDetailPlay({
       id: play.id,
       title: play.title,
@@ -97,8 +101,8 @@ export default function Plays() {
       director: play.director,
       genre: play.genre,
       language: play.language,
-      status: play.status || (!play.is_past ? "Upcoming Premiere" : "Archived Production"),
-      is_past: play.is_past,
+      status: play.status || (past ? "Archived Production" : "Upcoming Premiere"),
+      is_past: past,
       tagline: play.tagline,
       acts: play.acts,
       description: play.description,
@@ -132,8 +136,14 @@ export default function Plays() {
       });
   }, []);
 
-  const upcomingPlays = plays.filter(p => !p.is_past);
-  const pastPlays = plays.filter(p => p.is_past);
+  const isPastPlay = (p: PlayItem) =>
+    Boolean(p.is_past) ||
+    ["archive", "concluded", "past", "completed", "closed", "historical"].some(
+      (kw) => (p.status || "").toLowerCase().includes(kw)
+    );
+
+  const upcomingPlays = plays.filter(p => !isPastPlay(p));
+  const pastPlays = plays.filter(p => isPastPlay(p));
   const displayedPlays = activeTab === "upcoming" ? upcomingPlays : pastPlays;
 
   const handleOpenVolunteer = (play: PlayItem) => {
@@ -285,11 +295,13 @@ export default function Plays() {
                       
                       <div className="absolute top-4 right-4">
                         <span className={`inline-flex items-center gap-1 px-3 py-1 text-[9px] font-mono font-bold rounded-full uppercase tracking-wider shadow-md backdrop-blur-md border ${
-                          !play.is_past
+                          !isPastPlay(play)
                             ? "bg-[#2C2A28]/90 text-emerald-300 border-emerald-500/40"
                             : "bg-[#2C2A28]/90 text-white/60 border-white/20"
                         }`}>
-                          {!play.is_past ? "Upcoming Premiere" : "Repertory"}
+                          {!isPastPlay(play)
+                            ? (play.status || "Upcoming Premiere")
+                            : "Repertory Archive"}
                         </span>
                       </div>
 
@@ -351,7 +363,7 @@ export default function Plays() {
                       Script
                     </button>
 
-                    {!play.is_past ? (
+                    {!isPastPlay(play) ? (
                       <>
                         <button
                           onClick={() => handleReservePass(play.title)}

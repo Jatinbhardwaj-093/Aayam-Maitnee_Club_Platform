@@ -601,7 +601,12 @@ class Play(db.Model):
             'language': self.language or "Hindi & English",
             'status': self.status or ("Archived Production" if self.is_past else "Upcoming Premiere"),
             'statusColor': self.status_color or ("bg-[#E4D9D2]/80 text-[#6B5550] border-[#CBB3AC]" if self.is_past else "bg-emerald-700/15 text-emerald-950 border-emerald-700/30"),
-            'is_past': self.is_past or (self.status and "archive" in self.status.lower()),
+            'is_past': bool(self.is_past) or bool(
+                self.status and any(
+                    kw in self.status.lower()
+                    for kw in ("archive", "concluded", "past", "completed", "closed", "historical")
+                )
+            ),
             'tagline': self.tagline or "",
             'acts': self.acts or "Full Length Drama",
             'description': self.description,
