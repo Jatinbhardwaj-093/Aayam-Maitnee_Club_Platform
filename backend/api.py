@@ -955,22 +955,48 @@ def approve_proposal(prop_id):
     p = SharedEvent.query.get(prop_id)
     if not p:
         return jsonify({'error': 'Proposal not found'}), 404
-    p.status = 'approved'
     
-    from datetime import time, date
+    data = request.json or {}
+    p.status = 'approved'
+    if 'title' in data and data['title']:
+        p.title = data['title']
+    if 'description' in data and data['description']:
+        p.description = data['description']
+    if 'venue' in data and data['venue']:
+        p.location_or_link = data['venue']
+    if 'budget' in data and data['budget']:
+        p.budget = data['budget']
+    
+    from datetime import time, date, datetime
+    parsed_date = date.today()
+    if data.get('event_date'):
+        try:
+            parsed_date = datetime.strptime(data['event_date'], '%Y-%m-%d').date()
+        except Exception:
+            try:
+                parsed_date = datetime.strptime(data['event_date'], '%b %d, %Y').date()
+            except Exception:
+                pass
+    elif p.event_date:
+        parsed_date = p.event_date.date()
+
+    title_l = (data.get('title') or p.title or '').lower()
+    category = data.get('category') or ('Workshops' if any(k in title_l for k in ['workshop', 'intensive', 'masterclass', 'jam']) else 'Meetups')
+
     new_event = Event(
-        title=p.title,
-        description=p.description,
-        category='Meetups',
-        venue=p.location_or_link or 'Studio Lounge',
-        event_date=p.event_date.date() if p.event_date else date.today(),
-        start_time=time(18, 0),
+        title=data.get('title') or p.title,
+        description=data.get('description') or p.description,
+        category=category,
+        venue=data.get('venue') or p.location_or_link or 'SAC Main Studio, IIT Madras',
+        event_date=parsed_date,
+        start_time=time(17, 30),
         end_time=time(20, 0),
+        max_participants=int(data.get('max_participants') or 60),
         status='Upcoming'
     )
     db.session.add(new_event)
     db.session.commit()
-    return jsonify({'status': 'success'})
+    return jsonify({'status': 'success', 'event': new_event.to_dict(), 'proposal': p.to_dict()})
 
 @api_bp.route('/proposals/<int:prop_id>/reject', methods=['POST'])
 def reject_proposal(prop_id):
@@ -980,21 +1006,29 @@ def reject_proposal(prop_id):
         return jsonify({'error': 'Proposal not found'}), 404
     p.status = 'rejected'
     db.session.commit()
-    return jsonify({'status': 'success'})
+    return jsonify({'status': 'success', 'proposal': p.to_dict()})
 
 @api_bp.route('/proposals/<int:prop_id>/update', methods=['POST'])
 def update_proposal(prop_id):
     from models import SharedEvent, db
-    data = request.json
+    data = request.json or {}
     p = SharedEvent.query.get(prop_id)
     if not p:
         return jsonify({'error': 'Proposal not found'}), 404
+    if 'title' in data:
+        p.title = data['title']
     if 'description' in data:
         p.description = data['description']
     if 'venue' in data:
         p.location_or_link = data['venue']
+    if 'budget' in data:
+        p.budget = data['budget']
+    if 'status' in data:
+        p.status = data['status']
+    if 'proposal_type' in data:
+        p.proposal_type = data['proposal_type']
     db.session.commit()
-    return jsonify({'status': 'success'})
+    return jsonify({'status': 'success', 'proposal': p.to_dict()})
 
 @api_bp.route('/events/create', methods=['POST'])
 def create_event_backend():
