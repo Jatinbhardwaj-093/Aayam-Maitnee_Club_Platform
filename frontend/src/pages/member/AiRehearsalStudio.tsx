@@ -1636,10 +1636,10 @@ export default function AiRehearsalStudio() {
       )}
 
       {/* MAIN 2-COLUMN STUDIO LAYOUT: VAULT ROSTER (LEFT) & CUSTOM PARSER (RIGHT) */}
-      <section className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-5 w-full items-start">
+      <section className="grid grid-cols-1 lg:grid-cols-[1.05fr_0.95fr] gap-5 w-full items-start">
         
         {/* LEFT: SCRIPT VAULT SELECTION ROSTER */}
-        <div className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-2xl p-5 space-y-4 shadow-xs">
+        <div className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-2xl p-4 sm:p-5 space-y-4 shadow-xs">
           
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#DCBAB2]/70 pb-3">
             <div className="space-y-0.5">
@@ -1653,7 +1653,7 @@ export default function AiRehearsalStudio() {
             </div>
 
             {/* Themed Search Bar */}
-            <div className="relative min-w-[200px]">
+            <div className="relative min-w-[170px]">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3 h-3 text-[#8C5A54]" />
               <input
                 value={searchQuery}
@@ -1683,7 +1683,7 @@ export default function AiRehearsalStudio() {
                       <Pin className={`w-4 h-4 ${isPinned ? "fill-[#8C241E] text-[#8C241E]" : ""}`} />
                     </button>
 
-                    <div className="space-y-0.5 min-w-0">
+                    <div className="space-y-1 min-w-0">
                       <div className="flex items-center gap-1.5 min-w-0 leading-none">
                         <span className="text-[9px] font-mono font-bold uppercase text-[#8C241E] bg-[#EEDBD5] px-2 py-0.5 rounded-full border border-[#D5AAA2] whitespace-nowrap">
                           {script.genre || "Drama"}
@@ -1695,19 +1695,19 @@ export default function AiRehearsalStudio() {
                         )}
                       </div>
 
-                      <div className="flex items-baseline gap-1.5 min-w-0 leading-tight">
-                        <h3 className="font-serif text-[15px] md:text-base text-[#2A1816] group-hover:text-[#8C241E] transition-colors font-normal truncate">
+                      <div className="min-w-0">
+                        <h3 className="font-serif text-[15px] text-[#2A1816] group-hover:text-[#8C241E] transition-colors font-normal truncate leading-tight">
                           {script.title}
                         </h3>
-                        <span className="font-serif text-[11px] italic text-[#6E4742] truncate shrink">
-                          · {script.playwright}
-                        </span>
+                        <p className="font-serif text-[11px] italic text-[#6E4742] truncate leading-tight pt-0.5">
+                          by {script.playwright}
+                        </p>
                       </div>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
-                    <div className="font-mono text-[9px] text-[#8C5A54] hidden md:flex flex-col items-end gap-0.5 leading-tight whitespace-nowrap border-r border-[#DCBAB2]/80 pr-2.5">
+                    <div className="font-mono text-[9px] text-[#8C5A54] hidden sm:flex flex-col items-end gap-0.5 leading-tight whitespace-nowrap border-r border-[#DCBAB2]/80 pr-2.5">
                       <span className="font-bold text-[#2A1816]">{script.rolesCount || `${script.charactersCount || 6} Roles`}</span>
                       <span>{script.pages ? `${script.pages} Pages` : "3 Acts"}</span>
                     </div>
