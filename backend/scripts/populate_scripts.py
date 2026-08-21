@@ -507,6 +507,102 @@ scripts_seed_list = [
         "author_email": "abay123@ds.study.iitm.ac.in",
         "author_name": "Abay Nandhiga",
         "status": "Public"
+    },
+    {
+        "title": "The Midnight Archives",
+        "playwright": "Abay Nandhiga",
+        "genre": "Psychological Mystery",
+        "language": "English & Hindi",
+        "acts": "1 Act (1 Scene)",
+        "pages": 12,
+        "roles_count": "2 Roles (Vikram, Tara)",
+        "rehearsal_focus": "Subtext, Pacing & Dramatic Tension",
+        "excerpt": "[MIDNIGHT ARCHIVES] VIKRAM: You should not be inside the archives at midnight, Tara. Some plays are buried for a reason.",
+        "abstract": "In the locked heritage archives of the drama society at midnight, a seasoned archivist confronts a passionate dramaturg who has unearthed a banned 1974 manuscript.",
+        "theme": "Censorship, Artistic Courage & Heritage",
+        "settingInfo": "Locked archival room beneath the auditorium. Dim halogen desk lamp casting long shadows against rows of vintage iron lockers.",
+        "labels": "Psychological Drama, Mystery, 2-Character Dialogue",
+        "characters": [
+            {
+                "id": "char-301",
+                "name": "Vikram",
+                "traits": "Veteran drama society archivist and director",
+                "color": "#8C241E",
+                "voiceCue": "Low, gravelly, cautious, observant",
+                "role": "Protagonist"
+            },
+            {
+                "id": "char-302",
+                "name": "Tara",
+                "traits": "Fierce investigative dramaturg and lead actress",
+                "color": "#059669",
+                "voiceCue": "Sharp, articulate, passionate, fearless",
+                "role": "Protagonist"
+            }
+        ],
+        "lines": [
+            { "id": "m-1", "characterId": "char-301", "characterName": "Vikram", "color": "#8C241E", "text": "You should not be inside the archives at midnight, Tara. The faculty locked these cabinets fifty years ago." },
+            { "id": "m-2", "characterId": "char-302", "characterName": "Tara", "color": "#059669", "text": "Because the truth was written on these pages, Vikram. Why did the society erase the final act of the 1974 production?" },
+            { "id": "m-3", "characterId": "char-301", "characterName": "Vikram", "color": "#8C241E", "text": "They did not erase it to hide the truth. They buried it to protect the actors who dared to stage it." },
+            { "id": "m-4", "characterId": "char-302", "characterName": "Tara", "color": "#059669", "text": "Art does not ask for protection. It demands an audience. Every line here belongs under the stage lights." },
+            { "id": "m-5", "characterId": "char-301", "characterName": "Vikram", "color": "#8C241E", "text": "Look at the ink on the margins. Those are not director notes, those are state censorship stamps." },
+            { "id": "m-6", "characterId": "char-302", "characterName": "Tara", "color": "#059669", "text": "Then our ensemble will finish what they started. We will stage the banned monologue tomorrow night." },
+            { "id": "m-7", "characterId": "char-301", "characterName": "Vikram", "color": "#8C241E", "text": "If the council discovers this manuscript on the podium, they will revoke our proscenium charter forever." },
+            { "id": "m-8", "characterId": "char-302", "characterName": "Tara", "color": "#059669", "text": "Let them revoke the hall. Theatre does not live in concrete walls, Vikram, it lives in the voices of the actors." },
+            { "id": "m-9", "characterId": "char-301", "characterName": "Vikram", "color": "#8C241E", "text": "You speak with the exact same fire as the founder. Hand me the script, let us mark the cue lines together." },
+            { "id": "m-10", "characterId": "char-302", "characterName": "Tara", "color": "#059669", "text": "Curtain rises at dawn. Let the prologue begin." }
+        ],
+        "author_email": "23f2000668@ds.study.iitm.ac.in",
+        "author_name": "Abay Nandhiga",
+        "status": "Draft"
+    },
+    {
+        "title": "Dhoop Ki Chhanv",
+        "playwright": "Aditi",
+        "genre": "Contemporary Social Drama",
+        "language": "Hindi & Hindustani",
+        "acts": "1 Act (1 Scene)",
+        "pages": 14,
+        "roles_count": "2 Roles (Aditi, Kabir)",
+        "rehearsal_focus": "Street Play Energy, Dialogue Timing & Vocal Power",
+        "excerpt": "[OAT STEPS] ADITI: Yeh OAT ki seedhiyan aaj bhi wahi daastan sunati hain Kabir. Kitne saal beet gaye humein yahan rehearse kiye hue?",
+        "abstract": "On the steps of the open-air theatre, a street play director reunites with a former companion to rekindle the raw, unfiltered truth of grassroots community theatre.",
+        "theme": "Identity, Nostalgia, Social Truth & Street Theatre",
+        "settingInfo": "Sunlit concrete steps of the Open Air Theatre. Dholak resting on the lower step, sound of afternoon birds.",
+        "labels": "Nukkad Natak, Realistic Drama, 2-Character Dialogue",
+        "characters": [
+            {
+                "id": "char-401",
+                "name": "Aditi",
+                "traits": "Dynamic street theatre director and activist",
+                "color": "#8C241E",
+                "voiceCue": "Projected, rhythmic, emotive, warm",
+                "role": "Protagonist"
+            },
+            {
+                "id": "char-402",
+                "name": "Kabir",
+                "traits": "Method actor returning to his theatrical roots",
+                "color": "#2563eb",
+                "voiceCue": "Resonant, gentle, introspective",
+                "role": "Protagonist"
+            }
+        ],
+        "lines": [
+            { "id": "k-1", "characterId": "char-401", "characterName": "Aditi", "color": "#8C241E", "text": "Yeh OAT ki seedhiyan aaj bhi wahi daastan sunati hain, Kabir. Kitne saal beet gaye humein yahan rehearse kiye hue?" },
+            { "id": "k-2", "characterId": "char-402", "characterName": "Kabir", "color": "#2563eb", "text": "Waqt badal gaya Aditi, par tumhari aawaz mein nukkad natak ka wahi tejasvi junoon aaj bhi zinda hai." },
+            { "id": "k-3", "characterId": "char-401", "characterName": "Aditi", "color": "#8C241E", "text": "Kyunki samaj ke sawaal nahi badle. Aaj bhi humein janta ke beech jakar sach ka aaina dikhana padta hai." },
+            { "id": "k-4", "characterId": "char-402", "characterName": "Kabir", "color": "#2563eb", "text": "Lekin ab proscenium ka daur hai. Log AC auditorium mein baith kar shaant natak dekhna chahte hain." },
+            { "id": "k-5", "characterId": "char-401", "characterName": "Aditi", "color": "#8C241E", "text": "Rangmanch deewaron ka mohtaaj nahi hota. Ek dholak ki thaap aur do sachhi aawazein poore maidan ko jaga sakti hain." },
+            { "id": "k-6", "characterId": "char-402", "characterName": "Kabir", "color": "#2563eb", "text": "Tumhara yahi vishwas mujhe wapas khinch laya. Main apne commercial plays chhod kar tumhare sath aane ko taiyar hoon." },
+            { "id": "k-7", "characterId": "char-401", "characterName": "Aditi", "color": "#8C241E", "text": "Kya sach mein? Street play mein koi vanity vans ya retakes nahi milte Kabir, sirf janta ki seeli aankhein aur taaliyan milti hain." },
+            { "id": "k-8", "characterId": "char-402", "characterName": "Kabir", "color": "#2563eb", "text": "Wahi sachha abhinay hai jiske liye maine pehli baar rangmanch par kadam rakha tha." },
+            { "id": "k-9", "characterId": "char-401", "characterName": "Aditi", "color": "#8C241E", "text": "Toh phir dholak uthao aur pehla dialogue bolo. Agla show aadhe ghante mein shuru ho raha hai!" },
+            { "id": "k-10", "characterId": "char-402", "characterName": "Kabir", "color": "#2563eb", "text": "Suno suno hey doston! Aayam ka naya kissa shuru hota hai abhi aur yahi!" }
+        ],
+        "author_email": "aditi.drama@handle.com",
+        "author_name": "Aditi",
+        "status": "Draft"
     }
 ]
 
