@@ -176,6 +176,7 @@ export default function AiRehearsalStudio() {
   const [speechSupported, setSpeechSupported] = useState(true);
   const [sessionStartedAt, setSessionStartedAt] = useState<number | null>(null);
   const [audioStatus, setAudioStatus] = useState("Stage Idle");
+  const [activeVoiceName, setActiveVoiceName] = useState("Microsoft Neural");
   const [parsing, setParsing] = useState(false);
   const [showCastConfig, setShowCastConfig] = useState(false);
 
@@ -194,6 +195,11 @@ export default function AiRehearsalStudio() {
   const activeTurnRef = useRef<any | null>(null);
   const micBlockedRef = useRef(false);
 
+  // Scroll to top whenever view or script changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  }, [scriptId, session ? 1 : 0]);
+
   const applySessionState = (nextSession: any) => {
     sessionRef.current = nextSession;
     activeTurnRef.current = nextSession?.currentTurn || null;
@@ -204,7 +210,7 @@ export default function AiRehearsalStudio() {
     stopListening();
     if (audioPlayerRef.current) {
       audioPlayerRef.current.pause();
-      audioPlayerRef.current = null;
+      audioPlayerRef.current.src = "";
     }
     window.speechSynthesis?.cancel();
     if (aiTimerRef.current) {
@@ -235,6 +241,7 @@ export default function AiRehearsalStudio() {
   const returnToStudio = () => {
     clearRehearsalState();
     navigate("/ai-rehearsal", { replace: false });
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
   };
 
   useEffect(() => {
@@ -342,6 +349,13 @@ export default function AiRehearsalStudio() {
     setSessionStartedAt(Date.now());
     setAudioStatus("Starting Scene...");
     currentProcessingTurnRef.current = null;
+    window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+
+    // Initialize audio player on user interaction to avoid autoplay restrictions
+    if (!audioPlayerRef.current) {
+      audioPlayerRef.current = new Audio();
+    }
+
     try {
       const payload = activeScript
         ? {
@@ -384,7 +398,6 @@ export default function AiRehearsalStudio() {
     stopListening();
     if (audioPlayerRef.current) {
       audioPlayerRef.current.pause();
-      audioPlayerRef.current = null;
     }
     window.speechSynthesis?.cancel();
     currentProcessingTurnRef.current = null;
@@ -402,7 +415,6 @@ export default function AiRehearsalStudio() {
       stopListening();
       if (audioPlayerRef.current) {
         audioPlayerRef.current.pause();
-        audioPlayerRef.current = null;
       }
       window.speechSynthesis?.cancel();
       currentProcessingTurnRef.current = null;
@@ -413,7 +425,6 @@ export default function AiRehearsalStudio() {
       stopListening();
       if (audioPlayerRef.current) {
         audioPlayerRef.current.pause();
-        audioPlayerRef.current = null;
       }
       window.speechSynthesis?.cancel();
       setAudioStatus("Scene Complete");
@@ -429,7 +440,6 @@ export default function AiRehearsalStudio() {
       currentProcessingTurnRef.current = null;
       if (audioPlayerRef.current) {
         audioPlayerRef.current.pause();
-        audioPlayerRef.current = null;
       }
       window.speechSynthesis?.cancel();
       setAudioStatus("Awaiting Actor Speech");
@@ -489,7 +499,6 @@ export default function AiRehearsalStudio() {
     stopListening();
     if (audioPlayerRef.current) {
       audioPlayerRef.current.pause();
-      audioPlayerRef.current = null;
     }
     window.speechSynthesis?.cancel();
     try {
@@ -644,7 +653,10 @@ export default function AiRehearsalStudio() {
 
     const voices = window.speechSynthesis.getVoices();
     const voice = selectBrowserVoice(voices, pref);
-    if (voice) utterance.voice = voice;
+    if (voice) {
+      utterance.voice = voice;
+      setActiveVoiceName(voice.name);
+    }
 
     const startedAt = performance.now();
     if (aiTimerRef.current) window.clearInterval(aiTimerRef.current);
@@ -680,7 +692,6 @@ export default function AiRehearsalStudio() {
 
     if (audioPlayerRef.current) {
       audioPlayerRef.current.pause();
-      audioPlayerRef.current = null;
     }
     window.speechSynthesis?.cancel();
     setAiWordIndex(-1);
@@ -688,11 +699,20 @@ export default function AiRehearsalStudio() {
 
     const words = payload.words || [];
 
-    // 1. Play Studio Neural Audio Stream (Edge-TTS)
+    // 1. Play Studio Neural Audio Stream (Edge-TTS Microsoft Neural)
     if (payload.audio_url) {
       try {
-        const audio = new Audio(payload.audio_url);
-        audioPlayerRef.current = audio;
+        if (!audioPlayerRef.current) {
+          audioPlayerRef.current = new Audio();
+        }
+        const audio = audioPlayerRef.current;
+        audio.pause();
+        audio.src = payload.audio_url;
+        audio.load();
+
+        const voiceLabel = payload.voice || (payload.voice_preference === "female" ? "Aria Neural" : "Guy Neural");
+        setActiveVoiceName(voiceLabel);
+        console.log(`[AI Roleplay] Streaming Studio Neural Voice: ${voiceLabel}`);
 
         const startedAt = performance.now();
         if (aiTimerRef.current) window.clearInterval(aiTimerRef.current);
@@ -710,18 +730,17 @@ export default function AiRehearsalStudio() {
           if (aiTimerRef.current) window.clearInterval(aiTimerRef.current);
           setAiWordIndex(-1);
           setAudioStatus("AI Turn Complete");
-          audioPlayerRef.current = null;
           completeAiTurn(nextSession.session_id);
         };
 
         audio.onerror = (e) => {
-          console.warn("Audio playback error, falling back to speech synth:", e);
+          console.warn("Audio stream playback failed, using fallback:", e);
           if (aiTimerRef.current) window.clearInterval(aiTimerRef.current);
           fallbackBrowserSpeak(nextSession, payload, words);
         };
 
         audio.play().catch((err) => {
-          console.warn("Audio autoplay prevented, falling back:", err);
+          console.warn("Autoplay audio blocked, using fallback:", err);
           fallbackBrowserSpeak(nextSession, payload, words);
         });
         return;
@@ -770,7 +789,7 @@ export default function AiRehearsalStudio() {
       <div className="space-y-6 w-full max-w-4xl mx-auto pb-24 font-sans text-[#5C3B37] transition-all">
         
         {/* MINIMALIST TOP NAV & SCENE HEADER */}
-        <header className="flex items-center justify-between gap-4 px-2">
+        <header className="flex items-center justify-between gap-4 px-2 pt-2">
           <button
             onClick={returnToStudio}
             className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider text-[#8C5A54] hover:text-[#8C241E] transition-colors cursor-pointer"
@@ -806,7 +825,7 @@ export default function AiRehearsalStudio() {
             </h1>
             
             {activeTurn && (
-              <div className="pt-2">
+              <div className="pt-2 flex items-center justify-center gap-2 flex-wrap">
                 <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#EEDBD5] border border-[#D5AAA2] text-xs font-mono font-bold uppercase tracking-widest text-[#8C241E] shadow-2xs">
                   <span>{activeTurn.character}</span>
                   <span className="text-[#8C5A54]/60">•</span>
@@ -814,6 +833,12 @@ export default function AiRehearsalStudio() {
                     {assignments[activeTurn.character] === "human" ? "Your Cue (Actor)" : "AI Partner"}
                   </span>
                 </span>
+
+                {isAiTurn && (
+                  <span className="text-[10px] font-mono font-medium text-[#8C5A54] bg-[#F5EAE6] px-3 py-1 rounded-full border border-[#DCBAB2]">
+                    Voice: {activeVoiceName}
+                  </span>
+                )}
               </div>
             )}
           </div>
@@ -874,7 +899,7 @@ export default function AiRehearsalStudio() {
                 ) : isAiTurn ? (
                   <div className="inline-flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider text-[#8C241E] bg-[#EEDBD5]/60 px-4 py-1.5 rounded-full border border-[#D5AAA2]">
                     <Volume2 className="w-3.5 h-3.5 animate-pulse text-[#8C241E]" />
-                    <span>AI Studio Neural Voice Speaking...</span>
+                    <span>Neural Voice Delivery Active</span>
                   </div>
                 ) : null}
               </div>
@@ -972,7 +997,7 @@ export default function AiRehearsalStudio() {
                         {character.name}
                       </span>
                       <span className="text-[9px] font-mono uppercase text-[#8C5A54]">
-                        {isHuman ? "Actor" : `AI (${currentVoice})`}
+                        {isHuman ? "Actor" : `AI (${currentVoice === "female" ? "Aria" : "Guy"})`}
                       </span>
                     </div>
 
@@ -990,14 +1015,14 @@ export default function AiRehearsalStudio() {
                         type="button"
                         onClick={() => setAssignments({ ...assignments, [character.name]: "ai" })}
                         className={`py-1 px-1.5 rounded-lg text-[10px] font-mono font-bold uppercase transition-colors cursor-pointer ${
-                          isAi ? "bg-[#8C241E] text-[#FDF8F7] shadow-xs" : "text-[#5C3B37] hover:text-[#2A1816]"
+                          !isHuman ? "bg-[#8C241E] text-[#FDF8F7] shadow-xs" : "text-[#5C3B37] hover:text-[#2A1816]"
                         }`}
                       >
                         AI Voice
                       </button>
                     </div>
 
-                    {isAi && (
+                    {!isHuman && (
                       <div className="grid grid-cols-2 gap-1 p-0.5 bg-[#FAF2EE] rounded-lg border border-[#DCBAB2]/70">
                         <button
                           type="button"
@@ -1006,7 +1031,7 @@ export default function AiRehearsalStudio() {
                             currentVoice === "female" ? "bg-[#5C3B37] text-[#FAF2EE]" : "text-[#8C5A54] hover:text-[#2A1816]"
                           }`}
                         >
-                          Female
+                          Aria (Female)
                         </button>
                         <button
                           type="button"
@@ -1015,7 +1040,7 @@ export default function AiRehearsalStudio() {
                             currentVoice === "male" ? "bg-[#5C3B37] text-[#FAF2EE]" : "text-[#8C5A54] hover:text-[#2A1816]"
                           }`}
                         >
-                          Male
+                          Guy (Male)
                         </button>
                       </div>
                     )}
@@ -1317,7 +1342,7 @@ export default function AiRehearsalStudio() {
                           {character.name}
                         </span>
                         <span className="text-[9px] font-mono uppercase text-[#8C5A54] font-semibold">
-                          {isHuman ? "Actor (You)" : `AI (${currentVoice})`}
+                          {isHuman ? "Actor (You)" : `AI (${currentVoice === "female" ? "Aria" : "Guy"})`}
                         </span>
                       </div>
 
@@ -1351,7 +1376,7 @@ export default function AiRehearsalStudio() {
                               currentVoice === "female" ? "bg-[#5C3B37] text-[#FAF2EE]" : "text-[#8C5A54] hover:text-[#2A1816]"
                             }`}
                           >
-                            Female
+                            Aria (Female)
                           </button>
                           <button
                             type="button"
@@ -1360,7 +1385,7 @@ export default function AiRehearsalStudio() {
                               currentVoice === "male" ? "bg-[#5C3B37] text-[#FAF2EE]" : "text-[#8C5A54] hover:text-[#2A1816]"
                             }`}
                           >
-                            Male
+                            Guy (Male)
                           </button>
                         </div>
                       )}
