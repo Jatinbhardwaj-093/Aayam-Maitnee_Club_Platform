@@ -21,8 +21,12 @@ import {
   FileText
 } from "lucide-react";
 import ScriptPreviewModal from "@/components/ScriptPreviewModal";
+import ProductionDetailModal from "@/components/ProductionDetailModal";
+import type { ProductionDetailData } from "@/components/ProductionDetailModal";
+import ProductionEditModal from "@/components/ProductionEditModal";
 import { getPlaybookForTitle } from "@/data/playbooksData";
 import type { Playbook } from "@/data/playbooksData";
+import { Info, Edit3 } from "lucide-react";
 
 interface PlayItem {
   id: number;
@@ -47,10 +51,21 @@ interface PlayItem {
 }
 
 export default function Plays() {
+  const activeUser = JSON.parse(sessionStorage.getItem("aayam_active_user") || "null");
+  const isMaintainer = Boolean(
+    activeUser?.is_maintainer || 
+    activeUser?.role === "Maintainer" ||
+    (activeUser?.roles && Array.isArray(activeUser.roles) && activeUser.roles.some((r: any) => typeof r === "string" ? r.toLowerCase().includes("maintainer") || r.toLowerCase().includes("admin") || r.toLowerCase().includes("director") : (r.name || "").toLowerCase().includes("maintainer") || (r.name || "").toLowerCase().includes("admin")))
+  );
+
   const [plays, setPlays] = useState<PlayItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"upcoming" | "past">("upcoming");
   
+  // Production Detail & Edit Modal States
+  const [selectedDetailPlay, setSelectedDetailPlay] = useState<ProductionDetailData | null>(null);
+  const [selectedEditPlay, setSelectedEditPlay] = useState<ProductionDetailData | null>(null);
+
   // Volunteer Modal State
   const [volunteerOpen, setVolunteerOpen] = useState(false);
   const [selectedPlayForVolunteer, setSelectedPlayForVolunteer] = useState<PlayItem | null>(null);
@@ -74,6 +89,58 @@ export default function Plays() {
     const playbook = getPlaybookForTitle(play.title);
     setPreviewScript(playbook);
     setScriptModalOpen(true);
+  };
+
+  const handleOpenDetails = (play: PlayItem) => {
+    setSelectedDetailPlay({
+      id: play.id,
+      title: play.title,
+      playwright: play.playwright,
+      director: play.director,
+      genre: play.genre,
+      language: play.language,
+      status: play.status || (!play.is_past ? "Upcoming Premiere" : "Archived Production"),
+      is_past: play.is_past,
+      tagline: play.tagline,
+      acts: play.acts,
+      description: play.description,
+      cast: play.cast,
+      season: play.season,
+      image: play.image,
+      venue: play.venue,
+      dates: play.dates,
+      runtime: play.runtime,
+      price: play.price,
+      category: "Stage Play"
+    });
+  };
+
+  const handleOpenEdit = (play: PlayItem) => {
+    setSelectedEditPlay({
+      id: play.id,
+      title: play.title,
+      playwright: play.playwright,
+      director: play.director,
+      genre: play.genre,
+      language: play.language,
+      status: play.status || (!play.is_past ? "Upcoming Premiere" : "Archived Production"),
+      is_past: play.is_past,
+      tagline: play.tagline,
+      acts: play.acts,
+      description: play.description,
+      cast: play.cast,
+      season: play.season,
+      image: play.image,
+      venue: play.venue,
+      dates: play.dates,
+      runtime: play.runtime,
+      price: play.price,
+      category: "Stage Play"
+    });
+  };
+
+  const handlePlayEditSuccess = (updated: ProductionDetailData) => {
+    setPlays(prev => prev.map(p => p.id === updated.id ? { ...p, ...updated } : p));
   };
 
   useEffect(() => {
@@ -302,6 +369,15 @@ export default function Plays() {
 
                     <div className="flex items-center gap-2 flex-wrap">
                       <button
+                        onClick={() => handleOpenDetails(play)}
+                        className="px-3 py-1.5 rounded-full border border-white/20 hover:bg-white/10 text-white text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1 transition-all cursor-pointer"
+                        title="View full production dossier"
+                      >
+                        <Info className="w-3.5 h-3.5 text-[#E85F57]" />
+                        <span>Details</span>
+                      </button>
+
+                      <button
                         onClick={() => handleOpenScriptPreview(play)}
                         className="px-3 py-1.5 rounded-full border border-white/20 hover:bg-white/10 text-white text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1 transition-all cursor-pointer"
                         title="Preview Script & Playbook"
@@ -309,6 +385,17 @@ export default function Plays() {
                         <FileText className="w-3.5 h-3.5 text-[#E85F57]" />
                         <span>Script</span>
                       </button>
+
+                      {isMaintainer && (
+                        <button
+                          onClick={() => handleOpenEdit(play)}
+                          className="px-3 py-1.5 rounded-full bg-[#E85F57]/20 border border-[#E85F57]/40 hover:bg-[#E85F57]/30 text-white text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1 transition-all cursor-pointer"
+                          title={play.is_past ? "Update archival artwork (Metadata locked)" : "Edit full production details"}
+                        >
+                          <Edit3 className="w-3.5 h-3.5 text-[#E85F57]" />
+                          <span>Edit</span>
+                        </button>
+                      )}
 
                       {!play.is_past && (
                         <>
@@ -497,6 +584,25 @@ export default function Plays() {
           script={previewScript}
         />
 
+        {/* PRODUCTION FULL DOSSIER DETAIL MODAL */}
+        <ProductionDetailModal
+          open={Boolean(selectedDetailPlay)}
+          onClose={() => setSelectedDetailPlay(null)}
+          production={selectedDetailPlay}
+          onOpenScript={(title) => {
+            const pb = getPlaybookForTitle(title);
+            setPreviewScript(pb);
+            setScriptModalOpen(true);
+          }}
+        />
+
+        {/* PRODUCTION MAINTAINER EDIT MODAL (PAST IMAGE LOCK RULE) */}
+        <ProductionEditModal
+          open={Boolean(selectedEditPlay)}
+          onClose={() => setSelectedEditPlay(null)}
+          production={selectedEditPlay}
+          onSuccess={handlePlayEditSuccess}
+        />
       </main>
     </div>
   );

@@ -168,6 +168,101 @@ def get_play(play_id):
         return jsonify(play.to_dict())
     return jsonify({'error': 'Play not found'}), 404
 
+@api_bp.route('/plays/<int:play_id>', methods=['PUT', 'POST'])
+def update_play(play_id):
+    play = Play.query.get(play_id)
+    if not play:
+        return jsonify({'error': 'Play not found'}), 404
+    data = request.json or {}
+    
+    # Check if play is past / archived
+    if play.is_past:
+        # Past Play: Only allow editing image/script
+        if 'image' in data:
+            play.image = data['image']
+        db.session.commit()
+        return jsonify({'status': 'success', 'message': 'Past play image updated', 'play': play.to_dict()})
+    
+    # Upcoming Play: Full maintainer liberty to edit all production details
+    if 'title' in data and data['title']:
+        play.title = data['title']
+    if 'playwright' in data:
+        play.playwright = data['playwright']
+    if 'genre' in data:
+        play.genre = data['genre']
+    if 'language' in data:
+        play.language = data['language']
+    if 'tagline' in data:
+        play.tagline = data['tagline']
+    if 'acts' in data:
+        play.acts = data['acts']
+    if 'description' in data:
+        play.description = data['description']
+    if 'director' in data:
+        play.director = data['director']
+    if 'cast' in data:
+        play.cast = data['cast']
+    if 'season' in data:
+        play.season = data['season']
+    if 'image' in data:
+        play.image = data['image']
+    if 'venue' in data:
+        play.venue = data['venue']
+    if 'dates' in data:
+        play.dates = data['dates']
+    if 'runtime' in data:
+        play.runtime = data['runtime']
+    if 'price' in data:
+        play.price = data['price']
+    if 'status' in data:
+        play.status = data['status']
+    
+    db.session.commit()
+    return jsonify({'status': 'success', 'message': 'Play details updated successfully', 'play': play.to_dict()})
+
+@api_bp.route('/events/<int:event_id>', methods=['PUT', 'POST'])
+def update_event(event_id):
+    event = Event.query.get(event_id)
+    if not event:
+        return jsonify({'error': 'Event not found'}), 404
+    data = request.json or {}
+    
+    is_past = (event.status or '').lower() == 'concluded'
+    if is_past:
+        # Past Event: Only allow editing poster/image
+        if 'image' in data or 'poster' in data:
+            event.poster = data.get('image') or data.get('poster')
+        db.session.commit()
+        return jsonify({'status': 'success', 'message': 'Past event image updated'})
+    
+    # Upcoming Event: Full maintainer liberty to edit
+    if 'title' in data and data['title']:
+        event.title = data['title']
+    if 'description' in data:
+        event.description = data['description']
+    if 'category' in data:
+        event.category = data['category']
+    if 'venue' in data:
+        event.venue = data['venue']
+    if 'poster' in data or 'image' in data:
+        event.poster = data.get('poster') or data.get('image')
+    if 'max_participants' in data:
+        event.max_participants = int(data['max_participants'])
+    if 'status' in data:
+        event.status = data['status']
+    if 'event_date' in data and data['event_date']:
+        from datetime import datetime
+        try:
+            event.event_date = datetime.strptime(data['event_date'], '%Y-%m-%d').date()
+        except Exception:
+            try:
+                event.event_date = datetime.strptime(data['event_date'], '%b %d, %Y').date()
+            except Exception:
+                pass
+    
+    db.session.commit()
+    return jsonify({'status': 'success', 'message': 'Event updated successfully'})
+
 @api_bp.route('/open-positions', methods=['GET'])
 def get_open_positions():
     positions = OpenPosition.query.filter_by(status='Open').all()

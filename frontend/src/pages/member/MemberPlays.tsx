@@ -17,8 +17,12 @@ import {
   ClipboardList
 } from "lucide-react";
 import ScriptPreviewModal from "@/components/ScriptPreviewModal";
+import ProductionDetailModal from "@/components/ProductionDetailModal";
+import type { ProductionDetailData } from "@/components/ProductionDetailModal";
+import ProductionEditModal from "@/components/ProductionEditModal";
 import { getPlaybookForTitle } from "@/data/playbooksData";
 import type { Playbook } from "@/data/playbooksData";
+import { Info, Edit3 } from "lucide-react";
 
 interface Play {
   id: number;
@@ -47,9 +51,19 @@ export default function MemberPlays() {
   const contextData = useOutletContext<{ activeUser: any }>() || {};
   const activeUser = contextData.activeUser || JSON.parse(sessionStorage.getItem("aayam_active_user") || "null");
 
+  const isMaintainer = Boolean(
+    activeUser?.is_maintainer || 
+    activeUser?.role === "Maintainer" ||
+    (activeUser?.roles && Array.isArray(activeUser.roles) && activeUser.roles.some((r: any) => typeof r === "string" ? r.toLowerCase().includes("maintainer") || r.toLowerCase().includes("admin") || r.toLowerCase().includes("director") : (r.name || "").toLowerCase().includes("maintainer") || (r.name || "").toLowerCase().includes("admin")))
+  );
+
   const [plays, setPlays] = useState<Play[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"upcoming" | "past">("upcoming");
+
+  // Production Detail & Edit Modal States
+  const [selectedDetailPlay, setSelectedDetailPlay] = useState<ProductionDetailData | null>(null);
+  const [selectedEditPlay, setSelectedEditPlay] = useState<ProductionDetailData | null>(null);
 
   // Volunteer Modal State
   const [volunteerOpen, setVolunteerOpen] = useState(false);
@@ -71,6 +85,58 @@ export default function MemberPlays() {
     const playbook = getPlaybookForTitle(play.title);
     setPreviewScript(playbook);
     setScriptModalOpen(true);
+  };
+
+  const handleOpenDetails = (play: Play) => {
+    setSelectedDetailPlay({
+      id: play.id,
+      title: play.title,
+      playwright: play.playwright,
+      director: play.director,
+      genre: play.genre,
+      language: play.language,
+      status: play.status,
+      is_past: play.is_past,
+      tagline: play.tagline,
+      acts: play.acts,
+      description: play.description,
+      cast: play.cast,
+      season: play.season,
+      image: play.image,
+      venue: play.venue,
+      dates: play.dates,
+      runtime: play.runtime,
+      price: play.price,
+      category: "Stage Play"
+    });
+  };
+
+  const handleOpenEdit = (play: Play) => {
+    setSelectedEditPlay({
+      id: play.id,
+      title: play.title,
+      playwright: play.playwright,
+      director: play.director,
+      genre: play.genre,
+      language: play.language,
+      status: play.status,
+      is_past: play.is_past,
+      tagline: play.tagline,
+      acts: play.acts,
+      description: play.description,
+      cast: play.cast,
+      season: play.season,
+      image: play.image,
+      venue: play.venue,
+      dates: play.dates,
+      runtime: play.runtime,
+      price: play.price,
+      category: "Stage Play"
+    });
+  };
+
+  const handlePlayEditSuccess = (updated: ProductionDetailData) => {
+    setPlays(prev => prev.map(p => p.id === updated.id ? { ...p, ...updated } : p));
   };
 
   const fetchPlays = () => {
@@ -304,15 +370,40 @@ export default function MemberPlays() {
                 </div>
 
                 {/* Card Actions */}
-                <div className="p-6 sm:p-7 pt-0 flex items-center justify-between border-t border-[#DCBAB2]/60 text-xs font-mono pt-4">
-                  <button
-                    type="button"
-                    onClick={() => handleOpenScriptPreview(play)}
-                    className="text-xs font-mono font-bold text-[#8C241E] hover:text-[#731B16] flex items-center gap-1.5 uppercase tracking-wider cursor-pointer transition-colors"
-                  >
-                    <FileText className="w-3.5 h-3.5" />
-                    <span>Read Script</span>
-                  </button>
+                <div className="p-6 sm:p-7 pt-0 flex items-center justify-between border-t border-[#DCBAB2]/60 text-xs font-mono pt-4 gap-2 flex-wrap">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <button
+                      type="button"
+                      onClick={() => handleOpenDetails(play)}
+                      className="text-xs font-mono font-bold text-[#5C3B37] hover:text-[#2A1816] flex items-center gap-1 uppercase tracking-wider cursor-pointer transition-colors bg-[#F5EAE6] hover:bg-[#EEDBD5] px-3 py-1.5 rounded-full border border-[#D5AAA2] shadow-xs"
+                      title="View full production dossier"
+                    >
+                      <Info className="w-3.5 h-3.5 text-[#8C241E]" />
+                      <span>Details</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleOpenScriptPreview(play)}
+                      className="text-xs font-mono font-bold text-[#8C241E] hover:text-[#731B16] flex items-center gap-1 uppercase tracking-wider cursor-pointer transition-colors bg-[#F5EAE6] hover:bg-[#EEDBD5] px-3 py-1.5 rounded-full border border-[#D5AAA2] shadow-xs"
+                      title="Read Playbook Script"
+                    >
+                      <FileText className="w-3.5 h-3.5" />
+                      <span>Script</span>
+                    </button>
+
+                    {isMaintainer && (
+                      <button
+                        type="button"
+                        onClick={() => handleOpenEdit(play)}
+                        className="text-xs font-mono font-bold text-[#2A1816] hover:text-[#8C241E] flex items-center gap-1 uppercase tracking-wider cursor-pointer transition-colors bg-[#EEDBD5] hover:bg-[#E3CEC6] px-3 py-1.5 rounded-full border border-[#D5AAA2] shadow-xs"
+                        title={play.is_past ? "Update archival artwork (Metadata locked)" : "Edit full production details"}
+                      >
+                        <Edit3 className="w-3.5 h-3.5 text-[#8C241E]" />
+                        <span>Edit</span>
+                      </button>
+                    )}
+                  </div>
 
                   {isUpcoming ? (
                     <button
@@ -323,7 +414,7 @@ export default function MemberPlays() {
                       <span>Volunteer</span>
                     </button>
                   ) : (
-                    <span className="font-mono text-[10px] text-[#8C5A54] uppercase tracking-wider">
+                    <span className="font-mono text-[10px] text-[#8C5A54] uppercase tracking-wider font-semibold">
                       Archived
                     </span>
                   )}
@@ -480,6 +571,26 @@ export default function MemberPlays() {
         open={scriptModalOpen}
         onClose={() => setScriptModalOpen(false)}
         script={previewScript}
+      />
+
+      {/* PRODUCTION FULL DOSSIER DETAIL MODAL */}
+      <ProductionDetailModal
+        open={Boolean(selectedDetailPlay)}
+        onClose={() => setSelectedDetailPlay(null)}
+        production={selectedDetailPlay}
+        onOpenScript={(title) => {
+          const pb = getPlaybookForTitle(title);
+          setPreviewScript(pb);
+          setScriptModalOpen(true);
+        }}
+      />
+
+      {/* PRODUCTION MAINTAINER EDIT MODAL (PAST IMAGE LOCK RULE) */}
+      <ProductionEditModal
+        open={Boolean(selectedEditPlay)}
+        onClose={() => setSelectedEditPlay(null)}
+        production={selectedEditPlay}
+        onSuccess={handlePlayEditSuccess}
       />
     </div>
   );

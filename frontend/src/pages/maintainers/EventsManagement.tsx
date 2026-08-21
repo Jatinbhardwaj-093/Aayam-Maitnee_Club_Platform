@@ -6,9 +6,12 @@ import {
   CheckCircle2, DollarSign, Building, Tag, ExternalLink, Activity, PlayCircle,
   Sparkles, X, HeartHandshake, ClipboardList, Check, AlertCircle, Video, Star,
   SlidersHorizontal, ChevronRight, RefreshCw, UserCheck, UserX, MessageSquare,
-  BookOpen, Edit3, Send, CheckSquare, XCircle, ArrowUpRight
+  BookOpen, Edit3, Send, CheckSquare, XCircle, ArrowUpRight, Info
 } from "lucide-react";
 import ScriptPreviewModal from "@/components/ScriptPreviewModal";
+import ProductionDetailModal from "@/components/ProductionDetailModal";
+import type { ProductionDetailData } from "@/components/ProductionDetailModal";
+import ProductionEditModal from "@/components/ProductionEditModal";
 import { getPlaybookForTitle } from "@/data/playbooksData";
 import type { Playbook } from "@/data/playbooksData";
 
@@ -22,6 +25,15 @@ interface EventItem {
   status: string;
   description?: string;
   play_id?: number;
+  playwright?: string;
+  director?: string;
+  image?: string;
+  cast?: string;
+  genre?: string;
+  language?: string;
+  tagline?: string;
+  acts?: string;
+  price?: string;
   auditionCount?: number;
   applicantCount?: number;
   volunteerCount?: number;
@@ -76,6 +88,10 @@ export default function EventsManagement() {
   const [previewScript, setPreviewScript] = useState<Playbook | null>(null);
   const [scriptModalOpen, setScriptModalOpen] = useState<boolean>(false);
 
+  // Production Detail & Edit Modals
+  const [selectedDetailProd, setSelectedDetailProd] = useState<ProductionDetailData | null>(null);
+  const [selectedEditProd, setSelectedEditProd] = useState<ProductionDetailData | null>(null);
+
   // Review & Edit Pitch Modal
   const [editingPitch, setEditingPitch] = useState<ProposalItem | null>(null);
   const [editFormData, setEditFormData] = useState({
@@ -93,6 +109,83 @@ export default function EventsManagement() {
     const playbook = getPlaybookForTitle(eventItem.title);
     setPreviewScript(playbook);
     setScriptModalOpen(true);
+  };
+
+  const handleOpenDetails = (ev: EventItem) => {
+    const isPast = ev.status.includes("Archive") || ev.status.includes("Concluded") || ev.status.includes("Repertory");
+    setSelectedDetailProd({
+      id: ev.id,
+      title: ev.title,
+      category: ev.category,
+      venue: ev.venue,
+      dates: ev.date,
+      runtime: ev.timeRange,
+      status: ev.status,
+      is_past: isPast,
+      description: ev.description,
+      playwright: ev.playwright || "Aayam Repertory",
+      director: ev.director || "Aayam Directorial Council",
+      image: ev.image || (isPast ? "/aayam_assets/dddj_user_1.jpg" : "/aayam_assets/tamashbin_user_1.jpg"),
+      cast: ev.cast || "",
+      genre: ev.genre,
+      language: ev.language,
+      tagline: ev.tagline,
+      acts: ev.acts,
+      price: ev.price || "Free Society Pass"
+    });
+  };
+
+  const handleOpenEdit = (ev: EventItem) => {
+    const isPast = ev.status.includes("Archive") || ev.status.includes("Concluded") || ev.status.includes("Repertory");
+    setSelectedEditProd({
+      id: ev.id,
+      title: ev.title,
+      category: ev.category,
+      venue: ev.venue,
+      dates: ev.date,
+      runtime: ev.timeRange,
+      status: ev.status,
+      is_past: isPast,
+      description: ev.description,
+      playwright: ev.playwright || "Aayam Repertory",
+      director: ev.director || "Aayam Directorial Council",
+      image: ev.image || (isPast ? "/aayam_assets/dddj_user_1.jpg" : "/aayam_assets/tamashbin_user_1.jpg"),
+      cast: ev.cast || "",
+      genre: ev.genre,
+      language: ev.language,
+      tagline: ev.tagline,
+      acts: ev.acts,
+      season: "Autumn 2026",
+      price: ev.price || "Free Society Pass"
+    });
+  };
+
+  const handleProductionEditSuccess = (updated: ProductionDetailData) => {
+    setEventsList(prev => prev.map(item => {
+      if (item.id === updated.id || String(item.id).endsWith(String(updated.id))) {
+        return {
+          ...item,
+          title: updated.title,
+          description: updated.description,
+          venue: updated.venue,
+          date: updated.dates,
+          timeRange: updated.runtime,
+          image: updated.image,
+          status: updated.status,
+          playwright: updated.playwright,
+          director: updated.director,
+          cast: updated.cast,
+          genre: updated.genre,
+          language: updated.language,
+          tagline: updated.tagline,
+          acts: updated.acts,
+          price: updated.price
+        };
+      }
+      return item;
+    }));
+    setActionSuccessMsg(`Production '${updated.title}' updated successfully.`);
+    setTimeout(() => setActionSuccessMsg(null), 4000);
   };
 
   // Load backend data
@@ -142,6 +235,15 @@ export default function EventsManagement() {
             timeRange: p.runtime || "110 Mins",
             status: !p.is_past ? "Open Production" : "Repertory Archive",
             description: p.description || p.tagline,
+            playwright: p.playwright,
+            director: p.director,
+            genre: p.genre,
+            language: p.language,
+            tagline: p.tagline,
+            acts: p.acts,
+            cast: p.cast,
+            image: p.image,
+            price: p.price,
             auditionCount: playPositions.length,
             applicantCount: playApps.length,
             volunteerCount: playVols.length
@@ -175,6 +277,7 @@ export default function EventsManagement() {
               timeRange: ev.timeRange || "17:30 - 20:00",
               status: ev.status === "concluded" ? "Concluded" : "Scheduled",
               description: ev.description,
+              image: ev.image,
               auditionCount: evPositions.length,
               applicantCount: evApps.length,
               volunteerCount: evVols.length
@@ -699,36 +802,57 @@ export default function EventsManagement() {
                     </div>
 
                     {/* ACTION BUTTONS */}
-                    <div className="pt-4 border-t border-[#DCBAB2]/60 flex items-center gap-2 flex-wrap sm:flex-nowrap">
-                      {/* Button 1: Auditions */}
-                      <button
-                        onClick={() => setSelectedEventForAuditions(ev)}
-                        className="flex-1 min-w-[100px] px-3 py-2 rounded-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer shadow-xs flex items-center justify-center gap-1.5 border border-[#A6352F]"
-                        title="View open auditions & candidate reels"
-                      >
-                        <ClipboardList className="w-3.5 h-3.5 text-[#FFD0CC]" />
-                        <span className="truncate">Auditions ({eventApps.length})</span>
-                      </button>
+                    <div className="pt-4 border-t border-[#DCBAB2]/60 space-y-2">
+                      {/* Row 1: Auditions, Volunteers, Script */}
+                      <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+                        <button
+                          onClick={() => setSelectedEventForAuditions(ev)}
+                          className="flex-1 min-w-[100px] px-3 py-2 rounded-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer shadow-xs flex items-center justify-center gap-1.5 border border-[#A6352F]"
+                          title="View open auditions & candidate reels"
+                        >
+                          <ClipboardList className="w-3.5 h-3.5 text-[#FFD0CC]" />
+                          <span className="truncate">Auditions ({eventApps.length})</span>
+                        </button>
 
-                      {/* Button 2: Volunteers */}
-                      <button
-                        onClick={() => setSelectedEventForVolunteers(ev)}
-                        className="flex-1 min-w-[100px] px-3 py-2 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] hover:text-[#2A1816] text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-xs"
-                        title="View backstage crew applications"
-                      >
-                        <HeartHandshake className="w-3.5 h-3.5 text-[#8C241E]" />
-                        <span className="truncate">Volunteers ({eventVols.length})</span>
-                      </button>
+                        <button
+                          onClick={() => setSelectedEventForVolunteers(ev)}
+                          className="flex-1 min-w-[100px] px-3 py-2 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] hover:text-[#2A1816] text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-xs"
+                          title="View backstage crew applications"
+                        >
+                          <HeartHandshake className="w-3.5 h-3.5 text-[#8C241E]" />
+                          <span className="truncate">Volunteers ({eventVols.length})</span>
+                        </button>
 
-                      {/* Button 3: Script Preview */}
-                      <button
-                        onClick={() => handleOpenScriptPreview(ev)}
-                        className="px-3.5 py-2 rounded-full border border-[#D5AAA2] bg-[#F5EAE6] hover:bg-[#EEDBD5] text-[#8C241E] text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-1 transition-all cursor-pointer shadow-xs shrink-0"
-                        title="Preview Society Playbook Script"
-                      >
-                        <FileText className="w-3.5 h-3.5 text-[#8C241E]" />
-                        <span>Script</span>
-                      </button>
+                        <button
+                          onClick={() => handleOpenScriptPreview(ev)}
+                          className="px-3.5 py-2 rounded-full border border-[#D5AAA2] bg-[#F5EAE6] hover:bg-[#EEDBD5] text-[#8C241E] text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-1 transition-all cursor-pointer shadow-xs shrink-0"
+                          title="Preview Society Playbook Script"
+                        >
+                          <FileText className="w-3.5 h-3.5 text-[#8C241E]" />
+                          <span>Script</span>
+                        </button>
+                      </div>
+
+                      {/* Row 2: Full Dossier Details & Maintainer Edit */}
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => handleOpenDetails(ev)}
+                          className="flex-1 px-3 py-1.5 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] hover:text-[#2A1816] text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-xs"
+                          title="View detailed production dossier & cast roster"
+                        >
+                          <Info className="w-3.5 h-3.5 text-[#8C241E]" />
+                          <span>Full Details</span>
+                        </button>
+
+                        <button
+                          onClick={() => handleOpenEdit(ev)}
+                          className="flex-1 px-3 py-1.5 rounded-full border border-[#D5AAA2] bg-[#EEDBD5] hover:bg-[#E3CEC6] text-[#2A1816] text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-xs"
+                          title={ev.status.includes("Archive") ? "Update archival artwork (Metadata locked)" : "Edit full production details"}
+                        >
+                          <Edit3 className="w-3.5 h-3.5 text-[#8C241E]" />
+                          <span>Edit</span>
+                        </button>
+                      </div>
                     </div>
                   </div>
                 );
@@ -1322,6 +1446,26 @@ export default function EventsManagement() {
         open={scriptModalOpen}
         onClose={() => setScriptModalOpen(false)}
         script={previewScript}
+      />
+
+      {/* PRODUCTION FULL DOSSIER DETAIL MODAL */}
+      <ProductionDetailModal
+        open={Boolean(selectedDetailProd)}
+        onClose={() => setSelectedDetailProd(null)}
+        production={selectedDetailProd}
+        onOpenScript={(title) => {
+          const pb = getPlaybookForTitle(title);
+          setPreviewScript(pb);
+          setScriptModalOpen(true);
+        }}
+      />
+
+      {/* PRODUCTION MAINTAINER EDIT MODAL (PAST IMAGE LOCK RULE) */}
+      <ProductionEditModal
+        open={Boolean(selectedEditProd)}
+        onClose={() => setSelectedEditProd(null)}
+        production={selectedEditProd}
+        onSuccess={handleProductionEditSuccess}
       />
     </div>
   );
