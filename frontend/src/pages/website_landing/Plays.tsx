@@ -20,6 +20,9 @@ import {
   Layers,
   FileText
 } from "lucide-react";
+import ScriptPreviewModal from "@/components/ScriptPreviewModal";
+import { getPlaybookForTitle } from "@/data/playbooksData";
+import type { Playbook } from "@/data/playbooksData";
 
 interface PlayItem {
   id: number;
@@ -62,6 +65,16 @@ export default function Plays() {
 
   // Reservation Modal State
   const [reserveSuccess, setReserveSuccess] = useState<string | null>(null);
+
+  // Script Preview Modal State
+  const [previewScript, setPreviewScript] = useState<Playbook | null>(null);
+  const [scriptModalOpen, setScriptModalOpen] = useState<boolean>(false);
+
+  const handleOpenScriptPreview = (play: PlayItem) => {
+    const playbook = getPlaybookForTitle(play.title);
+    setPreviewScript(playbook);
+    setScriptModalOpen(true);
+  };
 
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005"}/api/plays`)
@@ -284,36 +297,39 @@ export default function Plays() {
                   </div>
 
                   {/* Card Actions */}
-                  <div className="p-6 sm:p-7 pt-0 flex items-center justify-between border-t border-white/10 text-xs font-mono pt-4">
+                  <div className="p-6 sm:p-7 pt-0 flex items-center justify-between border-t border-white/10 text-xs font-mono pt-4 gap-2 flex-wrap">
                     <span className="text-[#E85F57] font-bold">{play.price || "Free Entry"}</span>
 
-                    {!play.is_past ? (
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => handleReservePass(play.title)}
-                          className="px-4 py-2 rounded-full bg-[#E85F57] hover:bg-[#D94538] text-white text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer shadow-md flex items-center gap-1"
-                        >
-                          <Ticket className="w-3.5 h-3.5" />
-                          <span>Reserve</span>
-                        </button>
-                        <button
-                          onClick={() => handleOpenVolunteer(play)}
-                          className="px-3.5 py-2 rounded-full border border-white/20 hover:bg-white/10 text-white text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1 transition-all cursor-pointer"
-                          title="Volunteer for Backstage Crew"
-                        >
-                          <HeartHandshake className="w-3.5 h-3.5 text-[#E85F57]" />
-                          <span>Crew</span>
-                        </button>
-                      </div>
-                    ) : (
-                      <Link
-                        to="/member-scripts"
-                        className="text-[#E85F57] font-bold hover:underline flex items-center gap-1 uppercase tracking-wider text-xs"
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <button
+                        onClick={() => handleOpenScriptPreview(play)}
+                        className="px-3 py-1.5 rounded-full border border-white/20 hover:bg-white/10 text-white text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1 transition-all cursor-pointer"
+                        title="Preview Script & Playbook"
                       >
-                        <FileText className="w-3.5 h-3.5" />
+                        <FileText className="w-3.5 h-3.5 text-[#E85F57]" />
                         <span>Script</span>
-                      </Link>
-                    )}
+                      </button>
+
+                      {!play.is_past && (
+                        <>
+                          <button
+                            onClick={() => handleReservePass(play.title)}
+                            className="px-4 py-1.5 rounded-full bg-[#E85F57] hover:bg-[#D94538] text-white text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer shadow-md flex items-center gap-1"
+                          >
+                            <Ticket className="w-3.5 h-3.5" />
+                            <span>Reserve</span>
+                          </button>
+                          <button
+                            onClick={() => handleOpenVolunteer(play)}
+                            className="px-3 py-1.5 rounded-full border border-white/20 hover:bg-white/10 text-white text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1 transition-all cursor-pointer"
+                            title="Volunteer for Backstage Crew"
+                          >
+                            <HeartHandshake className="w-3.5 h-3.5 text-[#E85F57]" />
+                            <span>Crew</span>
+                          </button>
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}
@@ -473,6 +489,13 @@ export default function Plays() {
             </div>
           </div>
         )}
+
+        {/* SCRIPT PREVIEW MODAL */}
+        <ScriptPreviewModal
+          open={scriptModalOpen}
+          onClose={() => setScriptModalOpen(false)}
+          script={previewScript}
+        />
 
       </main>
     </div>

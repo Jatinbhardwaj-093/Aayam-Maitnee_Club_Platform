@@ -5,8 +5,11 @@ import {
   Calendar, Search, Plus, MapPin, Clock, Users, Shield, FileText, ArrowRight,
   CheckCircle2, DollarSign, Building, Tag, ExternalLink, Activity, PlayCircle,
   Sparkles, X, HeartHandshake, ClipboardList, Check, AlertCircle, Video, Star,
-  SlidersHorizontal, ChevronRight, RefreshCw, UserCheck, UserX, MessageSquare
+  SlidersHorizontal, ChevronRight, RefreshCw, UserCheck, UserX, MessageSquare, BookOpen
 } from "lucide-react";
+import ScriptPreviewModal from "@/components/ScriptPreviewModal";
+import { getPlaybookForTitle } from "@/data/playbooksData";
+import type { Playbook } from "@/data/playbooksData";
 
 interface EventItem {
   id: string | number;
@@ -39,6 +42,16 @@ export default function EventsManagement() {
   const [selectedEventForAuditions, setSelectedEventForAuditions] = useState<EventItem | null>(null);
   const [selectedEventForVolunteers, setSelectedEventForVolunteers] = useState<EventItem | null>(null);
   const [actionSuccessMsg, setActionSuccessMsg] = useState<string | null>(null);
+
+  // Script Preview Modal
+  const [previewScript, setPreviewScript] = useState<Playbook | null>(null);
+  const [scriptModalOpen, setScriptModalOpen] = useState<boolean>(false);
+
+  const handleOpenScriptPreview = (eventItem: EventItem) => {
+    const playbook = getPlaybookForTitle(eventItem.title);
+    setPreviewScript(playbook);
+    setScriptModalOpen(true);
+  };
 
   // Proposals & Sponsors
   const [proposals, setProposals] = useState([
@@ -421,12 +434,12 @@ export default function EventsManagement() {
                       </div>
                     </div>
 
-                    {/* TWO DEDICATED ACTION BUTTONS */}
+                    {/* ACTION BUTTONS */}
                     <div className="pt-4 border-t border-[#DCBAB2]/60 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                       {/* Button 1: Auditions & Casting Calls */}
                       <button
                         onClick={() => setSelectedEventForAuditions(ev)}
-                        className="flex-1 px-4 py-2.5 rounded-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer shadow-xs flex items-center justify-center gap-1.5 border border-[#A6352F]"
+                        className="flex-1 px-3 py-2 rounded-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer shadow-xs flex items-center justify-center gap-1.5 border border-[#A6352F]"
                         title="View open auditions & review candidate applications"
                       >
                         <ClipboardList className="w-3.5 h-3.5 text-[#FFD0CC]" />
@@ -436,11 +449,21 @@ export default function EventsManagement() {
                       {/* Button 2: Crew Volunteer Requests */}
                       <button
                         onClick={() => setSelectedEventForVolunteers(ev)}
-                        className="flex-1 px-4 py-2.5 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] hover:text-[#2A1816] text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-xs"
+                        className="flex-1 px-3 py-2 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] hover:text-[#2A1816] text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-xs"
                         title="View and approve backstage crew volunteer applications"
                       >
                         <HeartHandshake className="w-3.5 h-3.5 text-[#8C241E]" />
                         <span>Volunteers ({eventVols.length})</span>
+                      </button>
+
+                      {/* Button 3: Script & Playbook Preview */}
+                      <button
+                        onClick={() => handleOpenScriptPreview(ev)}
+                        className="px-3.5 py-2 rounded-full border border-[#D5AAA2] bg-[#F5EAE6] hover:bg-[#EEDBD5] text-[#8C241E] text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-1 transition-all cursor-pointer shadow-xs"
+                        title="Preview Society Playbook Script"
+                      >
+                        <FileText className="w-3.5 h-3.5 text-[#8C241E]" />
+                        <span>Script</span>
                       </button>
                     </div>
                   </div>
@@ -798,6 +821,13 @@ export default function EventsManagement() {
           </div>
         </section>
       )}
+
+      {/* SCRIPT PREVIEW MODAL */}
+      <ScriptPreviewModal
+        open={scriptModalOpen}
+        onClose={() => setScriptModalOpen(false)}
+        script={previewScript}
+      />
     </div>
   );
 }

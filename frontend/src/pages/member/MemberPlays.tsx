@@ -16,6 +16,9 @@ import {
   Sparkles,
   ClipboardList
 } from "lucide-react";
+import ScriptPreviewModal from "@/components/ScriptPreviewModal";
+import { getPlaybookForTitle } from "@/data/playbooksData";
+import type { Playbook } from "@/data/playbooksData";
 
 interface Play {
   id: number;
@@ -59,6 +62,16 @@ export default function MemberPlays() {
   const [volNotes, setVolNotes] = useState("");
   const [submittingVol, setSubmittingVol] = useState(false);
   const [volSuccessMsg, setVolSuccessMsg] = useState("");
+
+  // Script Preview Modal State
+  const [previewScript, setPreviewScript] = useState<Playbook | null>(null);
+  const [scriptModalOpen, setScriptModalOpen] = useState<boolean>(false);
+
+  const handleOpenScriptPreview = (play: Play) => {
+    const playbook = getPlaybookForTitle(play.title);
+    setPreviewScript(playbook);
+    setScriptModalOpen(true);
+  };
 
   const fetchPlays = () => {
     fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005"}/api/plays`)
@@ -292,12 +305,14 @@ export default function MemberPlays() {
 
                 {/* Card Actions */}
                 <div className="p-6 sm:p-7 pt-0 flex items-center justify-between border-t border-[#DCBAB2]/60 text-xs font-mono pt-4">
-                  <Link
-                    to="/member-scripts"
-                    className="text-xs font-mono font-bold text-[#8C241E] hover:text-[#731B16] flex items-center gap-1 uppercase tracking-wider"
+                  <button
+                    type="button"
+                    onClick={() => handleOpenScriptPreview(play)}
+                    className="text-xs font-mono font-bold text-[#8C241E] hover:text-[#731B16] flex items-center gap-1.5 uppercase tracking-wider cursor-pointer transition-colors"
                   >
-                    <FileText className="w-3.5 h-3.5" /> Read Script
-                  </Link>
+                    <FileText className="w-3.5 h-3.5" />
+                    <span>Read Script</span>
+                  </button>
 
                   {isUpcoming ? (
                     <button
@@ -459,6 +474,13 @@ export default function MemberPlays() {
           </div>
         </div>
       )}
+
+      {/* SCRIPT PREVIEW MODAL */}
+      <ScriptPreviewModal
+        open={scriptModalOpen}
+        onClose={() => setScriptModalOpen(false)}
+        script={previewScript}
+      />
     </div>
   );
 }
