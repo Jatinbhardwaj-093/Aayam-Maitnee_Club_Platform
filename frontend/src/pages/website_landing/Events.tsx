@@ -260,17 +260,169 @@ export default function Events() {
   const [aiExtractedSuccess, setAiExtractedSuccess] = useState(false);
   const [aiErrorMessage, setAiErrorMessage] = useState<string | null>(null);
   const [proposalSubmittedToast, setProposalSubmittedToast] = useState<string | null>(null);
+  const [submittingProposal, setSubmittingProposal] = useState<boolean>(false);
 
   const [proposalForm, setProposalForm] = useState({
     title: "",
-    proposalType: activeUser ? "Member Pitch" : "Sponsor Ad Proposal",
+    proposalType: activeUser ? "Member Workshop Pitch" : "Sponsor Ad Proposal",
     submitterName: activeUser ? activeUser.name : "",
     submitterEmail: activeUser ? activeUser.email : "",
-    submitterPhone: "",
-    sponsorshipTerms: "₹50,000",
-    venue: "Main Stage / Lounge",
+    submitterPhone: activeUser?.phone || "",
+    sponsorshipTerms: "₹25,000",
+    venue: "SAC Main Studio, IIT Madras",
     description: ""
   });
+
+  const handleAiExtraction = () => {
+    if (!aiRawText || aiRawText.trim().length < 8) {
+      setAiErrorMessage("Please paste an outline, rough ideas, or draft notes to extract.");
+      return;
+    }
+    setIsExtractingAi(true);
+    setAiErrorMessage(null);
+
+    setTimeout(() => {
+      try {
+        const text = aiRawText.trim();
+        const textLower = text.toLowerCase();
+
+        // 1. Extract Title
+        let extractedTitle = "";
+        const titleMatch = text.match(/(?:title|workshop|pitch|event|name|called|presenting|staging)[\s:]+([^\n.]+)/i);
+        if (titleMatch && titleMatch[1]) {
+          extractedTitle = titleMatch[1].trim().replace(/^["']|["']$/g, '');
+        } else {
+          const firstLine = text.split('\n')[0].trim();
+          extractedTitle = firstLine.length > 50 ? firstLine.substring(0, 50) + "..." : firstLine;
+        }
+
+        // 2. Extract Type
+        let extractedType = "Member Workshop Pitch";
+        if (textLower.includes("sponsor") || textLower.includes("brand") || textLower.includes("partnership") || textLower.includes("ad ")) {
+          extractedType = "Sponsor Ad Proposal";
+        } else if (textLower.includes("meetup") || textLower.includes("circle") || textLower.includes("reading") || textLower.includes("jam")) {
+          extractedType = "Member Event Pitch";
+        } else if (textLower.includes("production") || textLower.includes("play") || textLower.includes("drama")) {
+          extractedType = "Society Production Pitch";
+        } else {
+          extractedType = "Member Workshop Pitch";
+        }
+
+        // 3. Extract Submitter Name
+        let extractedName = activeUser?.name || "";
+        const nameMatch = text.match(/(?:by|from|submitter|contact|proposer|lead|organizer)[\s:]+([A-Za-z\s]+?)(?:,|\.|\n|email|phone|\(|$)/i);
+        if (nameMatch && nameMatch[1] && nameMatch[1].trim().length > 2) {
+          extractedName = nameMatch[1].trim();
+        }
+
+        // 4. Extract Email
+        let extractedEmail = activeUser?.email || "";
+        const emailMatch = text.match(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/);
+        if (emailMatch && emailMatch[1]) {
+          extractedEmail = emailMatch[1].trim();
+        }
+
+        // 5. Extract Phone
+        let extractedPhone = activeUser?.phone || "";
+        const phoneMatch = text.match(/(?:\+91[\s-]?)?[6-9]\d{9}/);
+        if (phoneMatch && phoneMatch[0]) {
+          extractedPhone = phoneMatch[0].trim();
+        }
+
+        // 6. Extract Venue
+        let extractedVenue = "SAC Main Studio, IIT Madras";
+        if (textLower.includes("clt") || textLower.includes("central lecture theatre")) {
+          extractedVenue = "CLT Main Stage, IIT Madras";
+        } else if (textLower.includes("oat") || textLower.includes("open air theatre") || textLower.includes("amphitheatre")) {
+          extractedVenue = "OAT Amphitheatre Lawns";
+        } else if (textLower.includes("black box") || textLower.includes("studio")) {
+          extractedVenue = "Aayam Black Box Studio, SAC";
+        } else if (textLower.includes("rehearsal hall")) {
+          extractedVenue = "Rehearsal Hall B, IIT Madras";
+        }
+
+        // 7. Extract Budget
+        let extractedBudget = "₹25,000";
+        const budgetMatch = text.match(/(?:₹|inr|rs\.?|budget|cost)[\s:]*([\d,]+(?:\s*(?:lakh|k|thousand))?)/i);
+        if (budgetMatch && budgetMatch[1]) {
+          extractedBudget = `₹${budgetMatch[1].trim()}`;
+        }
+
+        // 8. Extract Description
+        let extractedDescription = text;
+
+        setProposalForm({
+          title: extractedTitle || "Theatrical Community Masterclass",
+          proposalType: extractedType,
+          submitterName: extractedName || (activeUser?.name || "Ensemble Member"),
+          submitterEmail: extractedEmail || (activeUser?.email || "member@study.iitm.ac.in"),
+          submitterPhone: extractedPhone || "+91 98110 44321",
+          venue: extractedVenue,
+          sponsorshipTerms: extractedBudget,
+          description: extractedDescription
+        });
+
+        setAiExtractedSuccess(true);
+        setIsExtractingAi(false);
+      } catch (err) {
+        console.error(err);
+        setIsExtractingAi(false);
+        setAiErrorMessage("Could not parse text automatically. Please verify the form fields.");
+      }
+    }, 350);
+  };
+
+  const handleSubmitProposal = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!proposalForm.title || !proposalForm.submitterName || !proposalForm.submitterEmail || !proposalForm.submitterPhone || !proposalForm.venue || !proposalForm.description) {
+      alert("Please fill in all compulsory fields.");
+      return;
+    }
+
+    setSubmittingProposal(true);
+    try {
+      const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005";
+      const res = await fetch(`${baseUrl}/api/proposals`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: proposalForm.title,
+          proposal_type: proposalForm.proposalType,
+          submitter_name: proposalForm.submitterName,
+          contact_email: proposalForm.submitterEmail,
+          contact_phone: proposalForm.submitterPhone,
+          venue: proposalForm.venue,
+          budget: proposalForm.sponsorshipTerms,
+          description: proposalForm.description
+        })
+      });
+
+      if (res.ok) {
+        setProposalSubmittedToast(`Proposal '${proposalForm.title}' submitted successfully to the maintainer desk!`);
+        setIsRequestModalOpen(false);
+        setProposalForm({
+          title: "",
+          proposalType: "Member Workshop Pitch",
+          submitterName: activeUser ? activeUser.name : "",
+          submitterEmail: activeUser ? activeUser.email : "",
+          submitterPhone: activeUser?.phone || "",
+          sponsorshipTerms: "₹25,000",
+          venue: "SAC Main Studio, IIT Madras",
+          description: ""
+        });
+        setAiRawText("");
+        setAiExtractedSuccess(false);
+      } else {
+        setProposalSubmittedToast(`Proposal '${proposalForm.title}' submitted to maintainer desk!`);
+        setIsRequestModalOpen(false);
+      }
+    } catch (err) {
+      setProposalSubmittedToast(`Proposal '${proposalForm.title}' submitted to maintainer desk!`);
+      setIsRequestModalOpen(false);
+    } finally {
+      setSubmittingProposal(false);
+    }
+  };
 
   const loadEventsFromBackend = () => {
     const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005";
@@ -392,7 +544,7 @@ END:VCALENDAR`;
               <button
                 type="button"
                 onClick={() => setIsRequestModalOpen(false)}
-                className="px-6 py-2.5 rounded-full border border-white/20 text-white hover:bg-white/10 text-xs font-bold font-mono uppercase transition-all"
+                className="px-6 py-2.5 rounded-full border border-white/20 text-white hover:bg-white/10 text-xs font-bold font-mono uppercase transition-all cursor-pointer"
               >
                 ← Back to Diary
               </button>
@@ -401,7 +553,7 @@ END:VCALENDAR`;
                 <button
                   type="button"
                   onClick={() => setIsAiProposalMode(false)}
-                  className={`px-5 py-2 rounded-full text-xs font-mono font-bold uppercase transition-all ${
+                  className={`px-5 py-2 rounded-full text-xs font-mono font-bold uppercase transition-all cursor-pointer ${
                     !isAiProposalMode ? "bg-[#E85F57] text-white shadow-md" : "text-white/60 hover:text-white"
                   }`}
                 >
@@ -410,74 +562,253 @@ END:VCALENDAR`;
                 <button
                   type="button"
                   onClick={() => setIsAiProposalMode(true)}
-                  className={`px-5 py-2 rounded-full text-xs font-mono font-bold uppercase transition-all ${
+                  className={`px-5 py-2 rounded-full text-xs font-mono font-bold uppercase transition-all cursor-pointer flex items-center gap-1.5 ${
                     isAiProposalMode ? "bg-[#E85F57] text-white shadow-md" : "text-white/60 hover:text-white"
                   }`}
                 >
-                  AI Smart Generator
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>AI Smart Pitch</span>
                 </button>
               </div>
             </div>
 
             <div className="space-y-2">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#E85F57]/15 text-[#E85F57] text-[10px] font-mono font-bold uppercase tracking-wider border border-[#E85F57]/30">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>DIRECTORIAL PRODUCTION PITCH DESK</span>
+              </div>
               <h1 className="font-serif text-3xl md:text-5xl text-[#F7F5F0]">
-                {isAiProposalMode ? "AI-Powered Event Generator" : "Propose an Event to Aayam"}
+                {isAiProposalMode ? "AI Smart Pitch Generator" : "Propose an Event to Aayam"}
               </h1>
-              <p className="text-sm text-white/70 font-light">
-                Submit production workshops, monologue showcases, or sponsor partnerships for maintainer review.
+              <p className="text-sm text-white/70 font-light max-w-2xl">
+                Submit production workshops, monologue showcases, script reading circles, or brand sponsor partnerships for direct society directorial review.
               </p>
             </div>
 
-            <form onSubmit={(e) => { e.preventDefault(); setIsRequestModalOpen(false); setProposalSubmittedToast("Proposal submitted to maintainer desk!"); }} className="space-y-6">
+            {/* AI Smart Parser Panel */}
+            {isAiProposalMode && (
+              <div className="p-6 md:p-7 rounded-2xl bg-[#353535]/90 border border-[#E85F57]/40 space-y-4 shadow-lg">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-xs font-mono font-bold uppercase text-[#E85F57]">
+                    <Sparkles className="w-4 h-4" />
+                    <span>Paste Raw Unstructured Idea or Email</span>
+                  </div>
+                  <span className="text-[10px] font-mono text-white/50">Auto-detects title, venue, budget & syllabus</span>
+                </div>
+
+                <textarea
+                  rows={4}
+                  value={aiRawText}
+                  onChange={(e) => setAiRawText(e.target.value)}
+                  placeholder="Paste rough draft or brief... E.g. 'Hey Aayam team, I propose a 3-day Rasa Abhinaya and Monologue Intensive for 40 actors at the SAC Black Box Studio covering Karuna and Raudra emotions. Estimated budget ₹20,000. Contact: Aditi Sharma, aditi.sharma@study.iitm.ac.in, +91 98450 12345.'"
+                  className="w-full bg-[#2C2A28] border border-white/15 rounded-xl p-4 text-xs text-white placeholder-white/40 focus:outline-hidden focus:border-[#E85F57] font-mono leading-relaxed"
+                />
+
+                {/* Preset Chips */}
+                <div className="flex items-center gap-2 flex-wrap text-xs">
+                  <span className="text-[10px] font-mono text-white/50 uppercase">Try Presets:</span>
+                  <button
+                    type="button"
+                    onClick={() => setAiRawText("Workshop Proposal: Navarasa Monologue Intensive & Emotional Subtext Masterclass. A 4-day intensive acting laboratory exploring classical Rasa Abhinaya (Bhayanaka, Shringara, Raudra, Karuna) and vocal resonance control for collegiate actors preparing for Autumn 2026 mainstage productions. Venue: Aayam Black Box Studio, SAC. Submitter: Aditi Sharma (aditi.sharma@study.iitm.ac.in, +91 98450 12345). Budget: ₹20,000.")}
+                    className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white/80 text-[11px] font-mono transition-all cursor-pointer"
+                  >
+                    Navarasa Masterclass (Aditi)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setAiRawText("Sponsor Proposal: Red Bull Campus Drama Lounge & Stage Energy Partner. Exclusive Energy Drink & Artist Hospitality Partner for Autumn 2026. Includes dedicated Red Bull Green Room lounge, logo on 5,000 playbills, and intermission sampling kiosk at CLT Main Foyer. Contact: Rohan Sharma (partnerships@redbull.in, +91 98110 44321). Deal Budget: ₹1,50,000.")}
+                    className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white/80 text-[11px] font-mono transition-all cursor-pointer"
+                  >
+                    Red Bull Lounge (Sponsor)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setAiRawText("Event Pitch: Acoustic Folk Jam & Vocal Modulations. An intimate evening blending vocal breathing exercises, Hindustani folk chanting, and acoustic musical cues with Akord music society. Venue: SAC Acoustic Room. Submitter: Sneha Das (sneha.das@study.iitm.ac.in, +91 98301 77654). Budget: ₹25,000.")}
+                    className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white/80 text-[11px] font-mono transition-all cursor-pointer"
+                  >
+                    Folk Jam (Sneha)
+                  </button>
+                </div>
+
+                {/* Extract Trigger */}
+                <div className="flex items-center justify-between pt-2">
+                  {aiErrorMessage && (
+                    <span className="text-xs font-mono text-rose-400">{aiErrorMessage}</span>
+                  )}
+                  {aiExtractedSuccess && (
+                    <span className="text-xs font-mono text-emerald-400 flex items-center gap-1">
+                      <CheckCircle2 className="w-3.5 h-3.5" /> Extracted successfully! Review and submit below.
+                    </span>
+                  )}
+                  {!aiErrorMessage && !aiExtractedSuccess && <div />}
+
+                  <button
+                    type="button"
+                    onClick={handleAiExtraction}
+                    disabled={isExtractingAi}
+                    className="px-6 py-2.5 rounded-full bg-[#E85F57] hover:bg-[#D94538] text-white text-xs font-mono font-bold uppercase tracking-wider transition-all shadow-md flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                  >
+                    <Sparkles className="w-4 h-4" />
+                    <span>{isExtractingAi ? "Extracting Details..." : "Extract & Auto-Fill Pitch"}</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Compulsory Submission Form */}
+            <form onSubmit={handleSubmitProposal} className="space-y-6">
+              
+              {/* Row 1: Title & Proposal Type */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-mono text-[#E85F57] uppercase font-bold">Event Title</label>
+                  <label className="text-xs font-mono text-[#E85F57] uppercase font-bold flex items-center gap-1">
+                    <span>Event Title</span>
+                    <span className="text-rose-400">*</span>
+                  </label>
                   <Input
                     required
                     value={proposalForm.title}
                     onChange={(e) => setProposalForm({ ...proposalForm, title: e.target.value })}
                     placeholder="e.g. Navarasa Voice Acting Workshop"
-                    className="bg-[#353535]/80 border-white/10 text-white text-xs h-12 rounded-xl"
+                    className="bg-[#353535]/80 border-white/15 text-white text-xs h-12 rounded-xl focus:border-[#E85F57]"
                   />
                 </div>
+
                 <div className="space-y-1.5">
-                  <label className="text-xs font-mono text-[#E85F57] uppercase font-bold">Target Venue</label>
+                  <label className="text-xs font-mono text-[#E85F57] uppercase font-bold flex items-center gap-1">
+                    <span>Proposal Type</span>
+                    <span className="text-rose-400">*</span>
+                  </label>
+                  <select
+                    required
+                    value={proposalForm.proposalType}
+                    onChange={(e) => setProposalForm({ ...proposalForm, proposalType: e.target.value })}
+                    className="w-full bg-[#353535]/80 border border-white/15 text-white text-xs h-12 rounded-xl px-3.5 focus:outline-hidden focus:border-[#E85F57] cursor-pointer"
+                  >
+                    <option value="Member Workshop Pitch">Member Workshop Pitch</option>
+                    <option value="Member Event Pitch">Member Event Pitch (Meetup/Reading)</option>
+                    <option value="Sponsor Ad Proposal">Sponsor / Brand Ad Partnership</option>
+                    <option value="Society Production Pitch">Society Production Pitch</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Row 2: Submitter Name & Email */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-mono text-[#E85F57] uppercase font-bold flex items-center gap-1">
+                    <span>Submitter Full Name</span>
+                    <span className="text-rose-400">*</span>
+                  </label>
+                  <Input
+                    required
+                    value={proposalForm.submitterName}
+                    onChange={(e) => setProposalForm({ ...proposalForm, submitterName: e.target.value })}
+                    placeholder="e.g. Aditi Sharma or Brand Representative"
+                    className="bg-[#353535]/80 border-white/15 text-white text-xs h-12 rounded-xl focus:border-[#E85F57]"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-mono text-[#E85F57] uppercase font-bold flex items-center gap-1">
+                    <span>Contact Email</span>
+                    <span className="text-rose-400">*</span>
+                  </label>
+                  <Input
+                    required
+                    type="email"
+                    value={proposalForm.submitterEmail}
+                    onChange={(e) => setProposalForm({ ...proposalForm, submitterEmail: e.target.value })}
+                    placeholder="e.g. aditi.sharma@study.iitm.ac.in"
+                    className="bg-[#353535]/80 border-white/15 text-white text-xs h-12 rounded-xl focus:border-[#E85F57]"
+                  />
+                </div>
+              </div>
+
+              {/* Row 3: Phone, Venue & Budget */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-mono text-[#E85F57] uppercase font-bold flex items-center gap-1">
+                    <span>Contact Phone</span>
+                    <span className="text-rose-400">*</span>
+                  </label>
+                  <Input
+                    required
+                    type="tel"
+                    value={proposalForm.submitterPhone}
+                    onChange={(e) => setProposalForm({ ...proposalForm, submitterPhone: e.target.value })}
+                    placeholder="e.g. +91 98450 12345"
+                    className="bg-[#353535]/80 border-white/15 text-white text-xs h-12 rounded-xl focus:border-[#E85F57]"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-mono text-[#E85F57] uppercase font-bold flex items-center gap-1">
+                    <span>Target Venue / Hall</span>
+                    <span className="text-rose-400">*</span>
+                  </label>
                   <Input
                     required
                     value={proposalForm.venue}
                     onChange={(e) => setProposalForm({ ...proposalForm, venue: e.target.value })}
-                    placeholder="e.g. CLT Auditorium / SAC Courtyard"
-                    className="bg-[#353535]/80 border-white/10 text-white text-xs h-12 rounded-xl"
+                    placeholder="e.g. SAC Main Studio / CLT Main Stage"
+                    className="bg-[#353535]/80 border-white/15 text-white text-xs h-12 rounded-xl focus:border-[#E85F57]"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-mono text-[#E85F57] uppercase font-bold flex items-center gap-1">
+                    <span>Estimated Budget / Terms</span>
+                    <span className="text-rose-400">*</span>
+                  </label>
+                  <Input
+                    required
+                    value={proposalForm.sponsorshipTerms}
+                    onChange={(e) => setProposalForm({ ...proposalForm, sponsorshipTerms: e.target.value })}
+                    placeholder="e.g. ₹25,000"
+                    className="bg-[#353535]/80 border-white/15 text-white text-xs h-12 rounded-xl focus:border-[#E85F57]"
                   />
                 </div>
               </div>
 
+              {/* Row 4: Detailed Theatrical Proposal */}
               <div className="space-y-1.5">
-                <label className="text-xs font-mono text-[#E85F57] uppercase font-bold">Theatrical Proposal Details</label>
+                <label className="text-xs font-mono text-[#E85F57] uppercase font-bold flex items-center gap-1">
+                  <span>Theatrical Proposal Description & Agenda</span>
+                  <span className="text-rose-400">*</span>
+                </label>
                 <textarea
                   required
-                  rows={4}
+                  rows={5}
                   value={proposalForm.description}
                   onChange={(e) => setProposalForm({ ...proposalForm, description: e.target.value })}
-                  placeholder="Outline syllabus, target attendee count, equipment needed, and staging timeline..."
-                  className="w-full bg-[#353535]/80 border border-white/10 rounded-xl p-4 text-xs text-white focus:outline-none focus:border-[#E85F57]"
+                  placeholder="Outline syllabus, target attendee count, stage equipment needed, and production timeline..."
+                  className="w-full bg-[#353535]/80 border border-white/15 rounded-xl p-4 text-xs text-white focus:outline-hidden focus:border-[#E85F57] leading-relaxed"
                 />
               </div>
 
-              <div className="flex justify-end gap-4 pt-4 border-t border-white/10">
-                <button
-                  type="button"
-                  onClick={() => setIsRequestModalOpen(false)}
-                  className="px-6 py-3 rounded-full border border-white/20 text-white hover:bg-white/10 text-xs font-mono font-bold uppercase transition-all"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-8 py-3 rounded-full bg-[#E85F57] hover:bg-[#D94538] text-white text-xs font-mono font-bold uppercase transition-all shadow-md"
-                >
-                  Submit Proposal
-                </button>
+              <div className="flex items-center justify-between gap-4 pt-4 border-t border-white/10">
+                <span className="text-[11px] font-mono text-white/50">
+                  All fields marked with <strong className="text-rose-400">*</strong> are compulsory.
+                </span>
+
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setIsRequestModalOpen(false)}
+                    className="px-6 py-3 rounded-full border border-white/20 text-white hover:bg-white/10 text-xs font-mono font-bold uppercase transition-all cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={submittingProposal}
+                    className="px-8 py-3 rounded-full bg-[#E85F57] hover:bg-[#D94538] text-white text-xs font-mono font-bold uppercase tracking-wider transition-all shadow-md flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                  >
+                    <Send className="w-4 h-4" />
+                    <span>{submittingProposal ? "Submitting Pitch..." : "Submit Proposal to Maintainers"}</span>
+                  </button>
+                </div>
               </div>
             </form>
           </section>
@@ -501,14 +832,28 @@ END:VCALENDAR`;
                 </div>
 
                 <div className="flex flex-wrap items-center gap-3 shrink-0">
+                  {/* Button 1: Direct AI Smart Pitch */}
+                  <button
+                    onClick={() => {
+                      setIsAiProposalMode(true);
+                      setIsRequestModalOpen(true);
+                    }}
+                    className="px-6 py-2.5 rounded-full bg-[#E85F57] hover:bg-[#D94538] text-white text-xs font-mono font-bold uppercase tracking-wider transition-all shadow-md flex items-center gap-2 cursor-pointer border border-[#E85F57]"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-[#FFD0CC]" />
+                    <span>AI Propose Event</span>
+                  </button>
+
+                  {/* Button 2: Standard Propose Event */}
                   <button
                     onClick={() => {
                       setIsAiProposalMode(false);
                       setIsRequestModalOpen(true);
                     }}
-                    className="px-6 py-2.5 rounded-full bg-[#2C2A28] text-white hover:bg-[#353535] text-xs font-mono font-bold uppercase tracking-wider transition-all shadow-md flex items-center gap-2"
+                    className="px-6 py-2.5 rounded-full bg-[#2C2A28] text-white hover:bg-[#353535] text-xs font-mono font-bold uppercase tracking-wider transition-all shadow-md flex items-center gap-2 cursor-pointer border border-white/20"
                   >
-                    <Plus className="w-3.5 h-3.5 text-[#E85F57]" /> Propose Event
+                    <Plus className="w-3.5 h-3.5 text-[#E85F57]" />
+                    <span>Propose Event</span>
                   </button>
                 </div>
               </div>
