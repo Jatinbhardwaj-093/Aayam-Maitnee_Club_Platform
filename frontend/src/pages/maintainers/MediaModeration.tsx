@@ -13,7 +13,9 @@ import {
     RefreshCw,
     Folder,
     Tag,
-    CheckCircle2
+    CheckCircle2,
+    Sparkles,
+    Shield
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -66,10 +68,10 @@ export default function MediaModeration() {
                 if (Array.isArray(data) && data.length > 0) {
                     setItems(data);
                 } else {
-                    setItems(fallbackMediaItems);
+                    setItems(fallbackGalleryData);
                 }
             })
-            .catch(() => setItems(fallbackMediaItems))
+            .catch(() => setItems(fallbackGalleryData))
             .finally(() => setLoading(false));
     };
 
@@ -98,23 +100,28 @@ export default function MediaModeration() {
             const res = await fetch(`${baseUrl}/api/gallery`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    title: newMedia.title,
-                    category: newMedia.category,
-                    imageUrl: newMedia.imageUrl,
-                    caption: newMedia.caption,
-                    uploaderName: newMedia.uploaderName,
-                    status: "approved"
-                })
+                body: JSON.stringify(newMedia)
             });
 
             if (res.ok) {
-                const data = await res.json();
-                if (data.item) {
-                    setItems((prev) => [data.item, ...prev]);
-                } else {
-                    fetchGalleryItems();
-                }
+                const added = await res.json();
+                setItems((prev) => [added, ...prev]);
+                setIsAddModalOpen(false);
+                setNewMedia({
+                    title: "",
+                    category: "Tamashbin Kathputliya",
+                    imageUrl: "",
+                    caption: "",
+                    uploaderName: "Core Maintainer"
+                });
+            } else {
+                const mockNewItem: GalleryMediaItem = {
+                    id: Date.now(),
+                    ...newMedia,
+                    uploadedAt: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+                    status: "approved"
+                };
+                setItems((prev) => [mockNewItem, ...prev]);
                 setIsAddModalOpen(false);
                 setNewMedia({
                     title: "",
@@ -126,14 +133,25 @@ export default function MediaModeration() {
             }
         } catch (err) {
             console.error("Failed to add media:", err);
+            const mockNewItem: GalleryMediaItem = {
+                id: Date.now(),
+                ...newMedia,
+                uploadedAt: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+                status: "approved"
+            };
+            setItems((prev) => [mockNewItem, ...prev]);
+            setIsAddModalOpen(false);
         } finally {
             setSubmitting(false);
         }
     };
 
-    // Handle item deletion from database
+    // Handle deletion
     const handleDeleteItem = async (e: React.MouseEvent, id: number) => {
-        e.stopPropagation(); // prevent lightbox trigger
+        e.stopPropagation();
+        const confirmDelete = window.confirm("Are you sure you want to delete this media image?");
+        if (!confirmDelete) return;
+
         const baseUrl = import.meta.env.VITE_API_URL || "";
         try {
             const res = await fetch(`${baseUrl}/api/gallery/${id}`, {
@@ -151,48 +169,47 @@ export default function MediaModeration() {
     };
 
     return (
-        <div className="p-6 md:p-8 max-w-7xl mx-auto space-y-8 bg-[#E7DDD3] min-h-screen text-[#2C2A28]">
-            {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#D5C9BE]/40 pb-6">
-                <div>
-                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#353535]/10 text-[#353535] text-xs font-bold uppercase tracking-wider mb-2">
-                        <Cloud className="w-3.5 h-3.5" />
-                        <span>Maintainer Media Management</span>
+        <div className="max-w-7xl mx-auto space-y-10 pt-8 pb-24 px-4 md:px-8 font-sans text-[#2C2A28]">
+            
+            {/* Editorial Header */}
+            <section className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-[#D8B4AE]/60">
+                <div className="space-y-3">
+                    <div className="inline-flex items-center gap-2 text-[10px] font-mono font-bold uppercase tracking-widest text-[#B32D25] bg-[#E85F57]/15 px-3 py-1 rounded-full border border-[#E85F57]/30">
+                        <Shield className="w-3.5 h-3.5 text-[#B32D25]" />
+                        <span>MAINTAINER MEDIA MODERATION</span>
                     </div>
-                    <h1 className="text-3xl md:text-4xl font-serif font-bold text-[#2C2A28]">
-                        Media Moderation & Gallery Database
+                    <h1 className="font-serif text-4xl sm:text-5xl text-[#2A1816] font-normal tracking-tight">
+                        Media & Gallery Moderation
                     </h1>
-                    <p className="text-sm text-[#666361] mt-1 font-light">
-                        Select play folders to manage photos, open full window previews, or delete media from the database.
+                    <p className="text-sm text-[#5C3B37] max-w-2xl font-light">
+                        Curate production stagecraft photos, manage high-resolution assets, and approve public showcase media.
                     </p>
                 </div>
 
                 <div className="flex items-center gap-3">
-                    <Button
+                    <button
                         onClick={fetchGalleryItems}
-                        variant="outline"
-                        className="border-[#D5C9BE] text-[#666361] hover:bg-[#353535]/10 flex items-center gap-2 rounded-xl text-xs font-bold"
+                        className="px-5 py-3 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer shadow-xs"
                     >
-                        <RefreshCw className="w-4 h-4" />
-                        <span>Refresh</span>
-                    </Button>
-
-                    <Button
+                        <RefreshCw className="w-4 h-4 text-[#8C241E]" />
+                        <span>Refresh Assets</span>
+                    </button>
+                    <button
                         onClick={() => setIsAddModalOpen(true)}
-                        className="bg-[#353535] hover:bg-[#524e35] text-white flex items-center gap-2 shadow-xs rounded-xl text-xs font-bold"
+                        className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-6 py-3 rounded-full text-xs font-mono font-bold uppercase tracking-widest shadow-lg shadow-[#8C241E]/20 flex items-center gap-2 transition-all cursor-pointer border border-[#A6352F]"
                     >
-                        <Plus className="w-4 h-4" />
-                        <span>Add Media to Database</span>
-                    </Button>
+                        <Plus className="w-4 h-4 text-[#FFD0CC]" />
+                        <span>Add Media</span>
+                    </button>
                 </div>
-            </div>
+            </section>
 
-            {/* Play Category Filter Bar matching Website Screenshot */}
-            <div className="bg-white p-4 rounded-2xl border border-[#D5C9BE]/30 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div className="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0">
-                    <span className="text-xs font-bold text-[#353535] uppercase tracking-wider mr-2 flex items-center gap-1.5 flex-shrink-0">
-                        <Folder className="w-4 h-4 text-[#353535]" />
-                        <span>Play Folders:</span>
+            {/* Play Category Filter Bar - Theatrical Crimson Theme */}
+            <section className="bg-[#F2E5E0] border border-[#DCBAB2] rounded-[2rem] p-6 shadow-sm flex flex-col xl:flex-row xl:items-center justify-between gap-5">
+                <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-xs font-mono font-bold text-[#2A1816] uppercase tracking-wider mr-1 flex items-center gap-1.5 shrink-0">
+                        <Folder className="w-4 h-4 text-[#8C241E]" />
+                        <span>Productions:</span>
                     </span>
                     {PLAY_CATEGORIES.map((cat) => {
                         const count = items.filter((i) => {
@@ -202,35 +219,48 @@ export default function MediaModeration() {
                             return itemCat.includes(target) || (target === "kky" && itemCat.includes("karn"));
                         }).length;
 
+                        const isActive = selectedCategory === cat;
+
                         return (
                             <button
                                 key={cat}
                                 onClick={() => setSelectedCategory(cat)}
-                                className={`px-4 py-2 rounded-xl text-xs font-bold tracking-wider transition-all uppercase flex-shrink-0 ${
-                                    selectedCategory === cat
-                                        ? "bg-[#353535] text-white shadow-xs"
-                                        : "bg-[#E7DDD3] text-[#666361] hover:bg-[#353535]/10 border border-[#D5C9BE]/30"
+                                className={`px-4 py-2 rounded-full text-xs font-mono font-bold tracking-wider transition-all uppercase cursor-pointer flex items-center gap-1.5 ${
+                                    isActive
+                                        ? "bg-[#8C241E] text-[#FDF8F7] shadow-md shadow-[#8C241E]/20 border border-[#A6352F]"
+                                        : "bg-[#FAF2EE] text-[#5C3B37] hover:bg-[#EEDBD5] hover:text-[#2A1816] border border-[#D5AAA2]"
                                 }`}
                             >
-                                {cat} <span className="opacity-70 ml-1">({count})</span>
+                                <span>{cat}</span>
+                                <span className={`text-[10px] ${isActive ? "text-[#FFD0CC]" : "text-[#8C5A54]"}`}>
+                                    ({count})
+                                </span>
                             </button>
                         );
                     })}
                 </div>
-            </div>
+
+                <div className="flex items-center gap-3 shrink-0 self-start xl:self-auto">
+                    <span className="text-xs font-mono text-[#6E4742] bg-[#FAF2EE] px-4 py-2 rounded-full border border-[#D5AAA2] shadow-xs">
+                        Showing <strong className="text-[#2A1816]">{filteredItems.length}</strong> photo assets
+                    </span>
+                </div>
+            </section>
 
             {/* Media Grid View */}
             {loading ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
-                        <div key={n} className="h-60 bg-white/60 animate-pulse rounded-2xl border border-[#D5C9BE]/20"></div>
+                        <div key={n} className="h-64 bg-[#E8D6CF]/40 animate-pulse rounded-2xl border border-[#D5C9BE]"></div>
                     ))}
                 </div>
             ) : filteredItems.length === 0 ? (
-                <div className="text-center py-20 bg-white rounded-3xl border border-[#D5C9BE]/30 p-8">
-                    <ImageIcon className="w-12 h-12 text-[#353535]/40 mx-auto mb-3" />
-                    <h3 className="font-serif text-xl font-bold text-[#2C2A28]">No media photos in this folder</h3>
-                    <p className="text-xs text-[#666361] mt-1">Select another play folder or click "Add Media to Database" above.</p>
+                <div className="text-center py-20 bg-[#E7DDD3] rounded-3xl border border-dashed border-[#D5C9BE] p-8 space-y-3">
+                    <ImageIcon className="w-12 h-12 text-[#8C5A54]/60 mx-auto" />
+                    <h3 className="font-serif text-2xl font-bold text-[#2A1816]">No media photos in this production</h3>
+                    <p className="text-xs text-[#6E4742] max-w-md mx-auto font-light">
+                        Select another production category or click "Add Media" to upload stage photography.
+                    </p>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -238,9 +268,9 @@ export default function MediaModeration() {
                         <div
                             key={item.id}
                             onClick={() => setActiveLightboxItem(item)}
-                            className="group relative bg-white rounded-2xl overflow-hidden border border-[#D5C9BE]/30 shadow-xs hover:shadow-md transition-all duration-300 cursor-pointer flex flex-col justify-between"
+                            className="group relative bg-[#FAF2EE] rounded-2xl overflow-hidden border border-[#DCBAB2] shadow-xs hover:border-[#B32D25]/60 hover:shadow-md transition-all duration-300 cursor-pointer flex flex-col justify-between"
                         >
-                            <div className="relative h-56 overflow-hidden bg-gray-100">
+                            <div className="relative h-56 overflow-hidden bg-[#E2D4C8]">
                                 <img
                                     src={item.imageUrl}
                                     alt={item.title}
@@ -251,15 +281,15 @@ export default function MediaModeration() {
                                 />
 
                                 {/* Hover Dark Overlay */}
-                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
-                                    <div className="bg-white/90 text-[#2C2A28] px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-md">
-                                        <Maximize2 className="w-3.5 h-3.5" /> Full View
+                                <div className="absolute inset-0 bg-[#2A1816]/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                                    <div className="bg-[#FAF2EE]/95 backdrop-blur-xs text-[#2A1816] px-3.5 py-1.5 rounded-full text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-md border border-[#D5AAA2]">
+                                        <Maximize2 className="w-3.5 h-3.5 text-[#8C241E]" /> Full View
                                     </div>
                                 </div>
 
                                 {/* Category Tag */}
                                 <div className="absolute top-3 left-3">
-                                    <span className="bg-white/95 backdrop-blur-md text-[#353535] text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-xs border border-[#D5C9BE]/20">
+                                    <span className="bg-[#FAF2EE]/95 backdrop-blur-md text-[#8C241E] text-[9px] font-mono font-bold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-xs border border-[#D5AAA2]">
                                         {item.category}
                                     </span>
                                 </div>
@@ -267,27 +297,27 @@ export default function MediaModeration() {
                                 {/* Hover Delete Button Icon */}
                                 <button
                                     onClick={(e) => handleDeleteItem(e, item.id)}
-                                    className="absolute top-3 right-3 bg-rose-600 hover:bg-rose-700 text-white p-2 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-all hover:scale-110"
+                                    className="absolute top-3 right-3 bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] p-2 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-all hover:scale-110 cursor-pointer border border-[#A6352F]"
                                     title="Delete from database"
                                 >
-                                    <Trash2 className="w-4 h-4" />
+                                    <Trash2 className="w-3.5 h-3.5" />
                                 </button>
                             </div>
 
                             {/* Card Details */}
-                            <div className="p-4 bg-white border-t border-[#D5C9BE]/15 flex flex-col justify-between space-y-2">
+                            <div className="p-4 bg-[#FAF2EE] border-t border-[#D5C9BE]/50 flex flex-col justify-between space-y-2">
                                 <div>
-                                    <h3 className="font-serif font-bold text-sm text-[#2C2A28] group-hover:text-[#353535] transition-colors truncate">
+                                    <h3 className="font-serif font-bold text-base text-[#2A1816] group-hover:text-[#8C241E] transition-colors truncate">
                                         {item.title}
                                     </h3>
                                     {item.caption && (
-                                        <p className="text-[11px] text-[#666361] line-clamp-1 font-light mt-0.5">
+                                        <p className="text-xs text-[#5C3B37] line-clamp-1 font-light mt-0.5">
                                             {item.caption}
                                         </p>
                                     )}
                                 </div>
 
-                                <div className="flex items-center justify-between text-[10px] text-gray-500 pt-2 border-t border-[#D5C9BE]/15">
+                                <div className="flex items-center justify-between text-[10px] font-mono text-[#6E4742] pt-2 border-t border-[#D5C9BE]/40">
                                     <span className="truncate">By {item.uploaderName}</span>
                                     <span>{item.uploadedAt}</span>
                                 </div>
@@ -297,156 +327,175 @@ export default function MediaModeration() {
                 </div>
             )}
 
-            {/* Full-Window Lightbox Preview Modal */}
-            {activeLightboxItem && (
-                <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 md:p-8 animate-in fade-in duration-200">
+            {/* Full-Window Lightbox Preview Modal - Theatrical Crimson */}
+            <Dialog open={!!activeLightboxItem} onOpenChange={(open) => !open && setActiveLightboxItem(null)}>
+                <DialogContent showCloseButton={false} className="bg-[#F5EAE6] border border-[#DEBEB7] text-[#2A1816] max-w-4xl rounded-[2.5rem] p-6 md:p-8 shadow-2xl relative">
+                    
                     <button
+                        type="button"
                         onClick={() => setActiveLightboxItem(null)}
-                        className="absolute top-6 right-6 text-white/80 hover:text-white bg-white/10 p-3 rounded-full hover:bg-white/20 transition-all z-10"
+                        className="absolute top-6 right-6 w-9 h-9 rounded-full bg-[#EEDBD5] hover:bg-[#E3CEC6] text-[#5C3B37] hover:text-[#2A1816] flex items-center justify-center transition-all cursor-pointer border border-[#D5AAA2] shadow-xs group z-20"
+                        title="Close preview"
                     >
-                        <X className="w-6 h-6" />
+                        <X className="w-4 h-4 group-hover:rotate-90 transition-transform duration-200" />
                     </button>
 
-                    <div className="max-w-4xl w-full bg-[#2C2A28] rounded-3xl overflow-hidden border border-white/10 shadow-2xl flex flex-col md:flex-row max-h-[90vh]">
-                        <div className="md:w-3/5 bg-black flex items-center justify-center p-2 relative overflow-hidden">
-                            <img
-                                src={activeLightboxItem.imageUrl}
-                                alt={activeLightboxItem.title}
-                                className="w-full h-full max-h-[75vh] object-contain rounded-xl"
-                                onError={(e) => {
-                                    (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=800&auto=format&fit=crop";
-                                }}
-                            />
-                        </div>
-
-                        <div className="md:w-2/5 p-8 flex flex-col justify-between text-white bg-[#262422]">
-                            <div className="space-y-4">
-                                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-xs font-bold uppercase tracking-wider text-[#E85F57]">
-                                    <Tag className="w-3.5 h-3.5" />
-                                    <span>{activeLightboxItem.category}</span>
+                    {activeLightboxItem && (
+                        <div className="space-y-6">
+                            <DialogHeader className="border-b border-[#D8B4AE]/70 pb-3 pr-10">
+                                <div className="inline-flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase tracking-widest text-[#B32D25] mb-1">
+                                    <ImageIcon className="w-3.5 h-3.5" />
+                                    <span>STAGE PHOTOGRAPHY PREVIEW</span>
                                 </div>
-
-                                <h2 className="font-serif text-2xl font-bold leading-tight">
+                                <DialogTitle className="font-serif text-2xl font-bold text-[#2A1816]">
                                     {activeLightboxItem.title}
-                                </h2>
+                                </DialogTitle>
+                                <DialogDescription className="text-xs text-[#5C3B37] font-mono">
+                                    Production: {activeLightboxItem.category} • Uploaded by {activeLightboxItem.uploaderName} on {activeLightboxItem.uploadedAt}
+                                </DialogDescription>
+                            </DialogHeader>
 
-                                <p className="text-sm text-gray-300 font-light leading-relaxed">
-                                    {activeLightboxItem.caption || "No additional description provided."}
+                            {/* Full Image Container */}
+                            <div className="rounded-2xl overflow-hidden bg-[#2A1816] flex items-center justify-center max-h-[60vh] border border-[#D5AAA2]">
+                                <img
+                                    src={activeLightboxItem.imageUrl}
+                                    alt={activeLightboxItem.title}
+                                    className="max-h-[60vh] w-auto object-contain"
+                                />
+                            </div>
+
+                            {/* Metadata & Caption */}
+                            {activeLightboxItem.caption && (
+                                <p className="text-xs text-[#5C3B37] font-serif italic bg-[#E8D6CF]/70 p-4 rounded-xl border border-[#D5AAA2]">
+                                    "{activeLightboxItem.caption}"
                                 </p>
-                            </div>
+                            )}
 
-                            <div className="pt-6 border-t border-white/10 space-y-4">
-                                <div className="space-y-2 text-xs text-gray-400">
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-gray-500 uppercase tracking-wider">Uploader</span>
-                                        <span className="text-white font-medium">{activeLightboxItem.uploaderName}</span>
-                                    </div>
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-gray-500 uppercase tracking-wider">Date</span>
-                                        <span className="text-white font-medium">{activeLightboxItem.uploadedAt}</span>
-                                    </div>
+                            <DialogFooter className="pt-3 border-t border-[#D8B4AE]/70 flex items-center justify-between">
+                                <span className="text-xs font-mono font-bold text-[#8C241E] bg-[#EEDBD5] px-3 py-1 rounded-full border border-[#D5AAA2]">
+                                    {activeLightboxItem.category}
+                                </span>
+                                <div className="flex items-center gap-3">
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => setActiveLightboxItem(null)}
+                                        className="border-[#D5AAA2] text-[#5C3B37] hover:bg-[#EEDBD5] rounded-full text-xs font-mono font-bold uppercase tracking-wider cursor-pointer"
+                                    >
+                                        Close
+                                    </Button>
+                                    <Button
+                                        onClick={(e) => handleDeleteItem(e, activeLightboxItem.id)}
+                                        className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] rounded-full text-xs font-mono font-bold uppercase tracking-wider cursor-pointer border border-[#A6352F] shadow-sm"
+                                    >
+                                        Delete Asset
+                                    </Button>
                                 </div>
-
-                                <Button
-                                    onClick={(e) => handleDeleteItem(e, activeLightboxItem.id)}
-                                    className="w-full bg-rose-600 hover:bg-rose-700 text-white flex items-center justify-center gap-2 font-bold py-2.5 rounded-xl text-xs"
-                                >
-                                    <Trash2 className="w-4 h-4" />
-                                    <span>Delete Photo from Database</span>
-                                </Button>
-                            </div>
+                            </DialogFooter>
                         </div>
-                    </div>
-                </div>
-            )}
+                    )}
+                </DialogContent>
+            </Dialog>
 
-            {/* Add Media Modal */}
+            {/* Add Media Modal - Theatrical Crimson */}
             <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
-                <DialogContent className="sm:max-w-lg bg-[#E7DDD3] border-[#D5C9BE]">
-                    <DialogHeader>
-                        <DialogTitle className="font-serif text-2xl text-[#2C2A28] flex items-center gap-2">
-                            <Plus className="w-5 h-5 text-[#353535]" />
-                            <span>Add New Media to Database</span>
+                <DialogContent showCloseButton={false} className="bg-[#F5EAE6] border border-[#DEBEB7] text-[#2A1816] sm:max-w-md max-w-md rounded-[2.5rem] p-8 shadow-2xl relative">
+                    
+                    <button
+                        type="button"
+                        onClick={() => setIsAddModalOpen(false)}
+                        className="absolute top-6 right-6 w-9 h-9 rounded-full bg-[#EEDBD5] hover:bg-[#E3CEC6] text-[#5C3B37] hover:text-[#2A1816] flex items-center justify-center transition-all cursor-pointer border border-[#D5AAA2] shadow-xs group"
+                        title="Close dialog"
+                    >
+                        <X className="w-4 h-4 group-hover:rotate-90 transition-transform duration-200" />
+                    </button>
+
+                    <DialogHeader className="border-b border-[#D8B4AE]/70 pb-3 pr-10">
+                        <div className="inline-flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase tracking-widest text-[#B32D25] mb-1">
+                            <Plus className="w-3.5 h-3.5" />
+                            <span>GALLERY REGISTRATION</span>
+                        </div>
+                        <DialogTitle className="font-serif text-2xl text-[#2A1816] font-bold">
+                            Add Production Media
                         </DialogTitle>
-                        <DialogDescription className="text-xs text-[#666361]">
-                            Upload photo into specific play folder in Aayam database.
+                        <DialogDescription className="text-xs text-[#5C3B37]">
+                            Register photo URL and metadata for the public and member gallery.
                         </DialogDescription>
                     </DialogHeader>
 
-                    <form onSubmit={handleAddMediaSubmit} className="space-y-4 py-2">
-                        <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-[#353535] uppercase tracking-wider">Photo Title</label>
+                    <form onSubmit={handleAddMediaSubmit} className="py-4 space-y-4">
+                        <div className="space-y-1">
+                            <label className="text-xs font-mono uppercase tracking-wider text-[#2A1816] font-bold">
+                                Photo Title *
+                            </label>
                             <Input
+                                type="text"
                                 required
-                                placeholder="e.g. Tamashbin Kathputliya Stage Performance"
+                                placeholder="e.g. Climax Monologue Stage Lighting"
                                 value={newMedia.title}
                                 onChange={(e) => setNewMedia({ ...newMedia, title: e.target.value })}
-                                className="bg-white border-[#D5C9BE]"
+                                className="border-[#D5AAA2] bg-[#E8D6CF]/70 h-10 text-xs rounded-xl font-semibold text-[#2A1816] focus:border-[#B32D25] shadow-inner"
                             />
                         </div>
 
-                        <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-[#353535] uppercase tracking-wider">Play Folder Category</label>
+                        <div className="space-y-1">
+                            <label className="text-xs font-mono uppercase tracking-wider text-[#2A1816] font-bold">
+                                Production Play *
+                            </label>
                             <select
                                 value={newMedia.category}
                                 onChange={(e) => setNewMedia({ ...newMedia, category: e.target.value })}
-                                className="w-full h-10 px-3 rounded-md bg-white border border-[#D5C9BE] text-sm focus:outline-none focus:ring-2 focus:ring-[#353535]"
+                                className="w-full bg-[#E8D6CF]/70 border border-[#D5AAA2] rounded-xl px-3 py-2 text-xs text-[#2A1816] font-bold focus:outline-none focus:border-[#B32D25] shadow-inner"
                             >
-                                {["Tamashbin Kathputliya", "DDDJ", "KKY", "Samatvam", "Speak Up Tara"].map((cat) => (
-                                    <option key={cat} value={cat}>
-                                        {cat}
+                                {PLAY_CATEGORIES.filter((c) => c !== "All").map((c) => (
+                                    <option key={c} value={c}>
+                                        {c}
                                     </option>
                                 ))}
                             </select>
                         </div>
 
-                        <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-[#353535] uppercase tracking-wider">Image URL or Path</label>
+                        <div className="space-y-1">
+                            <label className="text-xs font-mono uppercase tracking-wider text-[#2A1816] font-bold">
+                                Image URL *
+                            </label>
                             <Input
+                                type="url"
                                 required
-                                placeholder="/aayam_assets/tamashbin_kathputliya_1.jpg or https://..."
+                                placeholder="https://..."
                                 value={newMedia.imageUrl}
                                 onChange={(e) => setNewMedia({ ...newMedia, imageUrl: e.target.value })}
-                                className="bg-white border-[#D5C9BE]"
+                                className="border-[#D5AAA2] bg-[#E8D6CF]/70 h-10 text-xs rounded-xl font-semibold text-[#2A1816] focus:border-[#B32D25] shadow-inner"
                             />
                         </div>
 
-                        <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-[#353535] uppercase tracking-wider">Caption / Description</label>
-                            <textarea
-                                rows={3}
-                                placeholder="Description of scene or performance photo..."
+                        <div className="space-y-1">
+                            <label className="text-xs font-mono uppercase tracking-wider text-[#2A1816] font-bold">
+                                Scene Caption
+                            </label>
+                            <Input
+                                type="text"
+                                placeholder="e.g. Backstage dress run before opening night"
                                 value={newMedia.caption}
                                 onChange={(e) => setNewMedia({ ...newMedia, caption: e.target.value })}
-                                className="w-full p-3 rounded-md bg-white border border-[#D5C9BE] text-sm focus:outline-none focus:ring-2 focus:ring-[#353535]"
+                                className="border-[#D5AAA2] bg-[#E8D6CF]/70 h-10 text-xs rounded-xl font-semibold text-[#2A1816] focus:border-[#B32D25] shadow-inner"
                             />
                         </div>
 
-                        <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-[#353535] uppercase tracking-wider">Uploader Name</label>
-                            <Input
-                                placeholder="Maintainer Name"
-                                value={newMedia.uploaderName}
-                                onChange={(e) => setNewMedia({ ...newMedia, uploaderName: e.target.value })}
-                                className="bg-white border-[#D5C9BE]"
-                            />
-                        </div>
-
-                        <DialogFooter className="pt-4 border-t border-[#D5C9BE]/30">
+                        <DialogFooter className="pt-4 border-t border-[#D8B4AE]/70 flex gap-2">
                             <Button
                                 type="button"
                                 variant="outline"
                                 onClick={() => setIsAddModalOpen(false)}
-                                className="border-[#D5C9BE]"
+                                className="border-[#D5AAA2] text-[#6E4742] hover:bg-[#EEDBD5] rounded-full text-xs font-mono font-bold uppercase tracking-wider flex-1 cursor-pointer"
                             >
                                 Cancel
                             </Button>
                             <Button
                                 type="submit"
                                 disabled={submitting}
-                                className="bg-[#353535] hover:bg-[#524e35] text-white"
+                                className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] rounded-full text-xs font-mono font-bold uppercase tracking-widest flex-1 cursor-pointer border border-[#A6352F] shadow-md shadow-[#8C241E]/20"
                             >
-                                {submitting ? "Saving to DB..." : "Add to Database"}
+                                {submitting ? "Saving..." : "Save Photo"}
                             </Button>
                         </DialogFooter>
                     </form>

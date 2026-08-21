@@ -141,3 +141,28 @@ def test_pin_already_pinned(client):
     )
 
     assert response.status_code in (200,409)
+
+
+def test_inline_roleplay_can_parse_and_start(client):
+    """The Rehearsal Studio's custom scene flow can create a live session."""
+    script = "Aditi: Are you ready for rehearsal?\nRavi: The stage is ours."
+    parsed = client.post(
+        "/api/rehearsal/parse",
+        json={"title": "Studio Test Scene", "script": script},
+    )
+
+    assert parsed.status_code == 200
+    assert len(parsed.get_json()["scene"]["turns"]) == 2
+
+    started = client.post(
+        "/api/rehearsal/roleplay/start",
+        json={
+            "title": "Studio Test Scene",
+            "script": script,
+            "assignments": {"Aditi": "human", "Ravi": "ai"},
+            "voice_preferences": {"Aditi": "female", "Ravi": "male"},
+        },
+    )
+
+    assert started.status_code == 200
+    assert started.get_json()["session"]["session_id"]

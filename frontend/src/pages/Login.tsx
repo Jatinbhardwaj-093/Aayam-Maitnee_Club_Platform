@@ -12,7 +12,9 @@ import {
   AlertCircle,
   KeyRound,
   Layers,
-  BookOpen
+  BookOpen,
+  Eye,
+  EyeOff
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
@@ -23,6 +25,7 @@ export default function Login() {
 
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -175,12 +178,24 @@ export default function Login() {
                     <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40 w-4 h-4" />
                     <Input
                       required
-                      type="password"
+                      type={showPassword ? "text" : "password"}
                       placeholder="••••••••"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="bg-[#353535]/80 border-white/10 text-xs text-white pl-11 h-12 rounded-2xl focus:border-[#E85F57]"
+                      className="bg-[#353535]/80 border-white/10 text-xs text-white pl-11 pr-11 h-12 rounded-2xl focus:border-[#E85F57]"
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors cursor-pointer p-1"
+                      title={showPassword ? "Hide password" : "Show password"}
+                    >
+                      {showPassword ? (
+                        <EyeOff className="w-4 h-4" />
+                      ) : (
+                        <Eye className="w-4 h-4" />
+                      )}
+                    </button>
                   </div>
                 </div>
 

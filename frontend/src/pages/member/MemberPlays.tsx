@@ -82,19 +82,19 @@ export default function MemberPlays() {
   return (
     <div className="space-y-[32px] font-sans text-[#666361]">
       {/* Header Banner - Clean Text Style without Image Overlay */}
-      <div className="bg-[#EFE8E1] border border-[#DDD8CE] rounded-[16px] p-[28px] md:p-[36px] flex flex-col md:flex-row justify-between items-start md:items-center gap-[24px] shadow-xs">
+      <div className="bg-[#E7DDD3] border border-[#D5C9BE]/70 rounded-[16px] p-[28px] md:p-[36px] flex flex-col md:flex-row justify-between items-start md:items-center gap-[24px] shadow-xs">
         <div className="space-y-[12px] flex-1">
           <Badge className="bg-[#353535] text-white border-0 rounded-[4px] uppercase tracking-wider text-[10px] font-bold">
             Repertoire & Production Vault
           </Badge>
-          <h2 className="text-[32px] font-bold font-serif text-[#353535] tracking-tight">Production Plays</h2>
+          <h2 className="text-[32px] font-bold font-serif text-[#2C2A28] tracking-tight">Production Plays</h2>
           <p className="text-[14px] text-[#666361] max-w-3xl leading-relaxed font-light">
             Comprehensive production guides, staging details, cast rosters, and rehearsal specifications for Aayam theatrical works. Clean, bannerless cards detailed for directors, performers, and technical crew.
           </p>
         </div>
         <div className="flex-shrink-0">
           <Link to="/member-scripts">
-            <Button className="bg-[#E85F57] hover:bg-[#E85F57]/90 text-[#001e2c] font-bold rounded-[8px] py-[12px] px-[22px] gap-2 shadow-sm transition-all active:scale-95">
+            <Button className="bg-[#E85F57] hover:bg-[#E85F57]/90 text-[#001e2c] font-bold rounded-xl py-[12px] px-[22px] gap-2 shadow-sm transition-all active:scale-95">
               <FileText className="w-4.5 h-4.5 text-[#001e2c]" /> Open Script Library
             </Button>
           </Link>
@@ -118,63 +118,63 @@ export default function MemberPlays() {
             return (
               <div 
                 key={play.id} 
-                className="bg-white border border-[#DDD8CE] rounded-2xl p-6 md:p-8 hover:border-[#353535] hover:shadow-lg transition-all duration-300 flex flex-col justify-between space-y-6"
+                className="bg-[#F7F5F0] border border-[#D5C9BE]/70 rounded-[2rem] rounded-2xl p-6 md:p-8 hover:border-[#353535] hover:shadow-lg transition-all duration-300 flex flex-col justify-between space-y-6"
               >
                 {/* Header Info */}
                 <div className="space-y-4">
-                  <div className="flex items-start justify-between gap-4 border-b border-[#DDD8CE]/60 pb-4">
+                  <div className="flex items-start justify-between gap-4 border-b border-[#D5C9BE]/70/60 pb-4">
                     <div>
-                      <span className="text-[10px] font-bold text-[#353535] uppercase tracking-[0.2em] block mb-1">
+                      <span className="text-[10px] font-bold text-[#2C2A28] uppercase tracking-[0.2em] block mb-1">
                         {play.season || "2024-2025 Lineage"}
                       </span>
                       <h3 className="text-2xl font-bold font-serif text-[#2C2A28] tracking-tight">{play.title}</h3>
-                      <p className="text-xs text-[#353535] font-semibold italic mt-1">{extra.tagline}</p>
+                      <p className="text-xs text-[#2C2A28] font-semibold italic mt-1">{extra.tagline}</p>
                     </div>
-                    <Badge className="bg-[#353535]/10 text-[#353535] border border-[#353535]/20 font-bold text-[10px] uppercase tracking-wider px-3 py-1 flex-shrink-0">
+                    <Badge className="bg-[#353535]/10 text-[#2C2A28] border border-[#353535]/20 font-bold text-[10px] uppercase tracking-wider px-3 py-1 flex-shrink-0">
                       {play.status || "Active Repertoire"}
                     </Badge>
                   </div>
 
                   {/* Key Specifications Grid */}
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 bg-[#E7DDD3] p-4 rounded-xl border border-[#DDD8CE]/80 text-xs">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 bg-[#E7DDD3] p-4 rounded-xl border border-[#D5C9BE]/70/80 text-xs">
                     <div className="space-y-1">
                       <span className="text-[10px] uppercase font-bold text-[#666361]/70 block flex items-center gap-1">
-                        <Award className="w-3.5 h-3.5 text-[#353535]" /> Director
+                        <Award className="w-3.5 h-3.5 text-[#2C2A28]" /> Director
                       </span>
                       <span className="font-bold text-[#2C2A28] truncate block">{play.director || "Ensemble Lead"}</span>
                     </div>
 
                     <div className="space-y-1">
                       <span className="text-[10px] uppercase font-bold text-[#666361]/70 block flex items-center gap-1">
-                        <MapPin className="w-3.5 h-3.5 text-[#353535]" /> Venue
+                        <MapPin className="w-3.5 h-3.5 text-[#2C2A28]" /> Venue
                       </span>
                       <span className="font-bold text-[#2C2A28] truncate block">{play.venue || "OAT IIT Madras"}</span>
                     </div>
 
                     <div className="space-y-1">
                       <span className="text-[10px] uppercase font-bold text-[#666361]/70 block flex items-center gap-1">
-                        <Clock className="w-3.5 h-3.5 text-[#353535]" /> Runtime
+                        <Clock className="w-3.5 h-3.5 text-[#2C2A28]" /> Runtime
                       </span>
                       <span className="font-bold text-[#2C2A28] truncate block">{play.runtime || "90 Mins"}</span>
                     </div>
 
                     <div className="space-y-1">
                       <span className="text-[10px] uppercase font-bold text-[#666361]/70 block flex items-center gap-1">
-                        <Layers className="w-3.5 h-3.5 text-[#353535]" /> Structure
+                        <Layers className="w-3.5 h-3.5 text-[#2C2A28]" /> Structure
                       </span>
                       <span className="font-bold text-[#2C2A28] truncate block">{extra.acts}</span>
                     </div>
 
                     <div className="space-y-1">
                       <span className="text-[10px] uppercase font-bold text-[#666361]/70 block flex items-center gap-1">
-                        <Users className="w-3.5 h-3.5 text-[#353535]" /> Cast Size
+                        <Users className="w-3.5 h-3.5 text-[#2C2A28]" /> Cast Size
                       </span>
                       <span className="font-bold text-[#2C2A28] truncate block">{extra.castCount}</span>
                     </div>
 
                     <div className="space-y-1">
                       <span className="text-[10px] uppercase font-bold text-[#666361]/70 block flex items-center gap-1">
-                        <Calendar className="w-3.5 h-3.5 text-[#353535]" /> Rehearsals
+                        <Calendar className="w-3.5 h-3.5 text-[#2C2A28]" /> Rehearsals
                       </span>
                       <span className="font-bold text-[#2C2A28] truncate block">{extra.rehearsalSchedule}</span>
                     </div>
@@ -182,7 +182,7 @@ export default function MemberPlays() {
 
                   {/* Synopsis Description */}
                   <div className="space-y-2">
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-[#353535]">Production Synopsis & Themes</h4>
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-[#2C2A28]">Production Synopsis & Themes</h4>
                     <p className="text-xs text-[#666361] leading-relaxed font-light">
                       {play.description}
                     </p>
@@ -191,7 +191,7 @@ export default function MemberPlays() {
                   {/* Featured Cast Roster */}
                   {play.cast && (
                     <div className="space-y-1.5 pt-2">
-                      <span className="text-[10px] font-bold text-[#353535] uppercase tracking-wider block">Featured Performers:</span>
+                      <span className="text-[10px] font-bold text-[#2C2A28] uppercase tracking-wider block">Featured Performers:</span>
                       <p className="text-xs font-medium text-[#2C2A28] bg-gray-50 p-2.5 rounded-lg border border-gray-200/60">
                         {play.cast}
                       </p>
@@ -200,7 +200,7 @@ export default function MemberPlays() {
                 </div>
 
                 {/* Footer Action Buttons */}
-                <div className="pt-4 border-t border-[#DDD8CE] flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div className="pt-4 border-t border-[#D5C9BE]/70 flex flex-col sm:flex-row items-center justify-between gap-3">
                   <div className="flex items-center gap-2 text-[11px] text-[#666361] font-semibold">
                     <Tag className="w-3.5 h-3.5 text-[#E85F57]" /> {extra.theme}
                   </div>

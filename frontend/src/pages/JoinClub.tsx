@@ -20,7 +20,10 @@ import {
   Upload,
   ChevronDown,
   Clock,
-  Award
+  Award,
+  Lock,
+  Eye,
+  EyeOff
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
@@ -154,10 +157,13 @@ export default function JoinClub() {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [generatedCredentials, setGeneratedCredentials] = useState<{ email: string; password: string } | null>(null);
+  const [showFormPassword, setShowFormPassword] = useState(false);
+  const [showGeneratedPassword, setShowGeneratedPassword] = useState(true);
 
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    password: "",
     phone: "",
     state: "",
     country: "India",
@@ -583,6 +589,38 @@ export default function JoinClub() {
                     </div>
                   </div>
 
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-mono uppercase text-[#E85F57] font-bold block">
+                      Account Password / Access Code (Optional)
+                    </label>
+                    <div className="relative">
+                      <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/40 w-4 h-4" />
+                      <Input
+                        type={showFormPassword ? "text" : "password"}
+                        name="password"
+                        placeholder="Create a password (or leave blank to auto-generate)"
+                        value={formData.password}
+                        onChange={handleChange}
+                        className="bg-[#353535]/80 border-white/10 text-xs text-white pl-10 pr-10 h-11 rounded-xl focus:border-[#E85F57]"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowFormPassword(!showFormPassword)}
+                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors cursor-pointer p-1"
+                        title={showFormPassword ? "Hide password" : "Show password"}
+                      >
+                        {showFormPassword ? (
+                          <EyeOff className="w-4 h-4" />
+                        ) : (
+                          <Eye className="w-4 h-4" />
+                        )}
+                      </button>
+                    </div>
+                    <p className="text-[10px] font-mono text-white/40">
+                      Leave blank to automatically receive an easy-to-remember password on pass generation.
+                    </p>
+                  </div>
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
                       <label className="text-[11px] font-mono uppercase text-white/80 font-bold block">
@@ -773,8 +811,20 @@ export default function JoinClub() {
                     <span className="text-white">{generatedCredentials.email}</span>
                   </div>
                   <div className="flex justify-between items-center text-[11px]">
-                    <span className="text-white/60">Auto Password:</span>
-                    <span className="text-emerald-400 font-bold">{generatedCredentials.password}</span>
+                    <span className="text-white/60">Access Password:</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-emerald-400 font-bold">
+                        {showGeneratedPassword ? generatedCredentials.password : "••••••••••••"}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setShowGeneratedPassword(!showGeneratedPassword)}
+                        className="text-white/50 hover:text-white transition-colors cursor-pointer"
+                        title={showGeneratedPassword ? "Hide password" : "Show password"}
+                      >
+                        {showGeneratedPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                      </button>
+                    </div>
                   </div>
                 </>
               )}

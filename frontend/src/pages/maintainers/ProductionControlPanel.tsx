@@ -279,7 +279,7 @@ export default function ProductionControlPanel() {
                         <span>System Maintenance</span>
                     </div>
                     <h2 className="font-serif text-[40px] md:text-[32px] text-[#2C2A28] font-bold tracking-tight mb-2 leading-tight">
-                        Production Control Panel: <span className="text-[#353535] italic">Macbeth</span>
+                        Production Control Panel: <span className="text-[#2C2A28] italic">Macbeth</span>
                     </h2>
                     <p className="text-lg text-[#666361] max-w-2xl leading-relaxed">
                         Technical oversight, access management, and system dependencies.
@@ -287,13 +287,13 @@ export default function ProductionControlPanel() {
                 </div>
 
                 {/* Tabs Navigation */}
-                <div className="mb-8 border-b border-[#DDD8CE]">
+                <div className="mb-8 border-b border-[#D5C9BE]/70">
                     <div className="flex gap-8" role="tablist">
                         <button
                             aria-selected={activeTab === 'access'}
                             className={`py-4 text-sm font-semibold transition-all focus:outline-none flex items-center gap-2 border-b-2 ${activeTab === 'access'
-                                ? 'text-[#353535] border-[#353535]'
-                                : 'text-[#666361]/60 border-transparent hover:text-[#353535] hover:border-[#D5C9BE]'
+                                ? 'text-[#2C2A28] border-[#353535]'
+                                : 'text-[#666361]/60 border-transparent hover:text-[#2C2A28] hover:border-[#D5C9BE]'
                                 }`}
                             onClick={() => setActiveTab('access')}
                             role="tab"
@@ -304,8 +304,8 @@ export default function ProductionControlPanel() {
                         <button
                             aria-selected={activeTab === 'deps'}
                             className={`py-4 text-sm font-semibold transition-all focus:outline-none flex items-center gap-2 border-b-2 ${activeTab === 'deps'
-                                ? 'text-[#353535] border-[#353535]'
-                                : 'text-[#666361]/60 border-transparent hover:text-[#353535] hover:border-[#D5C9BE]'
+                                ? 'text-[#2C2A28] border-[#353535]'
+                                : 'text-[#666361]/60 border-transparent hover:text-[#2C2A28] hover:border-[#D5C9BE]'
                                 }`}
                             onClick={() => setActiveTab('deps')}
                             role="tab"
@@ -370,9 +370,9 @@ export default function ProductionControlPanel() {
                                     >
                                         <div className="flex justify-between items-start">
                                             <div className="flex items-center gap-4">
-                                                <div className={`w-12 h-12 rounded border border-[#D5C9BE]/30 flex items-center justify-center ${person.accessScope === 'Full Access' ? 'bg-white/50' : 'bg-[#DDD8CE]/50'}`}>
+                                                <div className={`w-12 h-12 rounded border border-[#D5C9BE]/30 flex items-center justify-center ${person.accessScope === 'Full Access' ? 'bg-[#F7F5F0]/50' : 'bg-[#DDD8CE]/50'}`}>
                                                     {person.avatarIcon === 'person' ? (
-                                                        <User className="w-6 h-6 text-[#353535]" />
+                                                        <User className="w-6 h-6 text-[#2C2A28]" />
                                                     ) : (
                                                         <Tv className="w-6 h-6 text-[#666361]" />
                                                     )}
@@ -406,12 +406,12 @@ export default function ProductionControlPanel() {
                                                 </select>
                                             </div>
 
-                                            <div className="pt-2 border-t border-[#DDD8CE]/60">
+                                            <div className="pt-2 border-t border-[#D5C9BE]/70/60">
                                                 <p className="text-xs uppercase font-bold tracking-wider text-[#666361] mb-3">System Toggles</p>
                                                 <div className="flex flex-col gap-3">
                                                     {/* Toggle: Lighting */}
                                                     <label className={`flex items-center justify-between cursor-pointer group ${isRestricted || isViewOnly ? 'opacity-50' : ''}`}>
-                                                        <span className="text-sm text-[#2C2A28] group-hover:text-[#353535] transition-colors">
+                                                        <span className="text-sm text-[#2C2A28] group-hover:text-[#2C2A28] transition-colors">
                                                             Lighting Rig Access
                                                         </span>
                                                         <div className="relative">
@@ -422,7 +422,7 @@ export default function ProductionControlPanel() {
                                                                 checked={person.toggles.lighting}
                                                                 onChange={() => handleToggle(person.id, 'lighting')}
                                                             />
-                                                            <div className={`w-10 h-5 bg-[#DDD8CE] rounded-full peer ${isRestricted || isViewOnly ? '' : 'peer-focus:ring-2 peer-focus:ring-[#E85F57] peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[\'\'] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#E85F57]'}`}></div>
+                                                            <div className={`w-10 h-5 bg-[#DDD8CE] rounded-full peer ${isRestricted || isViewOnly ? '' : 'peer-focus:ring-2 peer-focus:ring-[#E85F57] peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[\'\'] after:absolute after:top-[2px] after:left-[2px] after:bg-[#F7F5F0] after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#E85F57]'}`}></div>
                                                             {(isRestricted || isViewOnly) && (
                                                                 <Lock className="w-3.5 h-3.5 text-[#666361]/70 absolute right-1 top-1/2 -translate-y-1/2" />
                                                             )}
@@ -431,7 +431,7 @@ export default function ProductionControlPanel() {
 
                                                     {/* Toggle: Audio Comms */}
                                                     <label className={`flex items-center justify-between cursor-pointer group ${isViewOnly ? 'opacity-50' : ''}`}>
-                                                        <span className="text-sm text-[#2C2A28] group-hover:text-[#353535] transition-colors">
+                                                        <span className="text-sm text-[#2C2A28] group-hover:text-[#2C2A28] transition-colors">
                                                             Audio Console (Comms)
                                                         </span>
                                                         <div className="relative">
@@ -442,7 +442,7 @@ export default function ProductionControlPanel() {
                                                                 checked={person.toggles.audio}
                                                                 onChange={() => handleToggle(person.id, 'audio')}
                                                             />
-                                                            <div className={`w-10 h-5 bg-[#DDD8CE] rounded-full peer ${isViewOnly ? '' : 'peer-focus:ring-2 peer-focus:ring-[#E85F57] peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[\'\'] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#E85F57]'}`}></div>
+                                                            <div className={`w-10 h-5 bg-[#DDD8CE] rounded-full peer ${isViewOnly ? '' : 'peer-focus:ring-2 peer-focus:ring-[#E85F57] peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[\'\'] after:absolute after:top-[2px] after:left-[2px] after:bg-[#F7F5F0] after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#E85F57]'}`}></div>
                                                             {isViewOnly && (
                                                                 <Lock className="w-3.5 h-3.5 text-[#666361]/70 absolute right-1 top-1/2 -translate-y-1/2" />
                                                             )}
@@ -451,7 +451,7 @@ export default function ProductionControlPanel() {
 
                                                     {/* Toggle: Stage Door Override */}
                                                     <label className={`flex items-center justify-between cursor-pointer group ${isRestricted || isViewOnly ? 'opacity-50' : ''}`}>
-                                                        <span className="text-sm text-[#2C2A28] group-hover:text-[#353535] transition-colors">
+                                                        <span className="text-sm text-[#2C2A28] group-hover:text-[#2C2A28] transition-colors">
                                                             Stage Door Security (Override)
                                                         </span>
                                                         <div className="relative">
@@ -462,7 +462,7 @@ export default function ProductionControlPanel() {
                                                                 checked={person.toggles.security}
                                                                 onChange={() => handleToggle(person.id, 'security')}
                                                             />
-                                                            <div className={`w-10 h-5 bg-[#DDD8CE] rounded-full peer ${isRestricted || isViewOnly ? '' : 'peer-focus:ring-2 peer-focus:ring-[#E85F57] peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[\'\'] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#E85F57]'}`}></div>
+                                                            <div className={`w-10 h-5 bg-[#DDD8CE] rounded-full peer ${isRestricted || isViewOnly ? '' : 'peer-focus:ring-2 peer-focus:ring-[#E85F57] peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[\'\'] after:absolute after:top-[2px] after:left-[2px] after:bg-[#F7F5F0] after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#E85F57]'}`}></div>
                                                             {(isRestricted || isViewOnly) && (
                                                                 <Lock className="w-3.5 h-3.5 text-[#666361]/70 absolute right-1 top-1/2 -translate-y-1/2" />
                                                             )}
@@ -487,11 +487,11 @@ export default function ProductionControlPanel() {
                         </div>
 
                         {/* Dependencies Table */}
-                        <div className="bg-white/50 backdrop-blur-sm border border-[#E1E2E6] rounded-lg overflow-hidden shadow-sm">
+                        <div className="bg-[#F7F5F0]/50 backdrop-blur-sm border border-[#E1E2E6] rounded-lg overflow-hidden shadow-sm">
                             <div className="overflow-x-auto">
                                 <table className="w-full text-left border-collapse">
                                     <thead>
-                                        <tr className="border-b border-[#DDD8CE]/50 bg-[#EFE8E1]/50 font-sans">
+                                        <tr className="border-b border-[#D5C9BE]/70/50 bg-[#E7DDD3]/50 font-sans">
                                             <th className="py-4 px-6 font-bold text-sm text-[#666361] font-sans">Resource / Dependency</th>
                                             <th className="py-4 px-6 font-bold text-sm text-[#666361] font-sans">Status</th>
                                             <th className="py-4 px-6 font-bold text-sm text-[#666361] font-sans">Time / Allocation</th>
@@ -509,13 +509,13 @@ export default function ProductionControlPanel() {
                                                 >
                                                     <td className="py-4 px-6">
                                                         <div className="flex items-center gap-3">
-                                                            <div className="w-8 h-8 rounded bg-white/80 border border-[#D5C9BE]/30 flex items-center justify-center">
+                                                            <div className="w-8 h-8 rounded bg-[#F7F5F0]/80 border border-[#D5C9BE]/30 flex items-center justify-center">
                                                                 {dep.icon === 'theater_comedy' ? (
                                                                     <Tv className="w-4 h-4 text-[#666361]" />
                                                                 ) : dep.icon === 'highlight' ? (
                                                                     <Lightbulb className="w-4 h-4 text-amber-500" />
                                                                 ) : (
-                                                                    <Mic className="w-4 h-4 text-[#353535]" />
+                                                                    <Mic className="w-4 h-4 text-[#2C2A28]" />
                                                                 )}
                                                             </div>
                                                             <div>
@@ -569,7 +569,7 @@ export default function ProductionControlPanel() {
                                                             ) : dep.status === 'Active' ? (
                                                                 <button
                                                                     onClick={() => openEditAllocation(dep)}
-                                                                    className="p-2 text-[#666361]/60 hover:text-[#353535] transition-colors focus:outline-none"
+                                                                    className="p-2 text-[#666361]/60 hover:text-[#2C2A28] transition-colors focus:outline-none"
                                                                     title="Edit Allocation"
                                                                 >
                                                                     <Edit2 className="w-5 h-5" />
@@ -591,8 +591,8 @@ export default function ProductionControlPanel() {
             {/* Grant Temporary Access Modal */}
             {showTempAccessModal && (
                 <div className="fixed inset-0 bg-[#31302d]/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <div className="bg-white border border-[#D5C9BE]/65 rounded-xl max-w-sm w-full shadow-2xl overflow-hidden flex flex-col">
-                        <div className="bg-[#EFE8E1] px-6 py-4 border-b border-[#D5C9BE]/40 flex items-center justify-between">
+                    <div className="bg-[#F7F5F0] border border-[#D5C9BE]/65 rounded-xl max-w-sm w-full shadow-2xl overflow-hidden flex flex-col">
+                        <div className="bg-[#E7DDD3] px-6 py-4 border-b border-[#D5C9BE]/40 flex items-center justify-between">
                             <h3 className="font-serif text-sm font-bold text-[#666361] uppercase tracking-wider">Grant Temporary Access</h3>
                             <button
                                 onClick={() => setShowTempAccessModal(false)}
@@ -635,7 +635,7 @@ export default function ProductionControlPanel() {
                                     <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-[#2C2A28]">
                                         <input
                                             type="radio"
-                                            className="text-[#353535] focus:ring-0 focus:ring-offset-0"
+                                            className="text-[#2C2A28] focus:ring-0 focus:ring-offset-0"
                                             name="tempLevel"
                                             checked={tempLevel === 'Standard Contributor'}
                                             onChange={() => setTempLevel('Standard Contributor')}
@@ -645,7 +645,7 @@ export default function ProductionControlPanel() {
                                     <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-[#2C2A28]">
                                         <input
                                             type="radio"
-                                            className="text-[#353535] focus:ring-0 focus:ring-offset-0"
+                                            className="text-[#2C2A28] focus:ring-0 focus:ring-offset-0"
                                             name="tempLevel"
                                             checked={tempLevel === 'View Only'}
                                             onChange={() => setTempLevel('View Only')}
@@ -678,8 +678,8 @@ export default function ProductionControlPanel() {
             {/* Edit Allocation Modal */}
             {showEditAllocationModal && editDep && (
                 <div className="fixed inset-0 bg-[#31302d]/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <div className="bg-white border border-[#D5C9BE]/65 rounded-xl max-w-sm w-full shadow-2xl overflow-hidden flex flex-col">
-                        <div className="bg-[#EFE8E1] px-6 py-4 border-b border-[#D5C9BE]/40 flex items-center justify-between">
+                    <div className="bg-[#F7F5F0] border border-[#D5C9BE]/65 rounded-xl max-w-sm w-full shadow-2xl overflow-hidden flex flex-col">
+                        <div className="bg-[#E7DDD3] px-6 py-4 border-b border-[#D5C9BE]/40 flex items-center justify-between">
                             <h3 className="font-serif text-sm font-bold text-[#666361] uppercase tracking-wider">Edit Allocation: {editDep.name}</h3>
                             <button
                                 onClick={() => setShowEditAllocationModal(false)}

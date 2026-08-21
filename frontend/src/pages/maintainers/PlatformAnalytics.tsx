@@ -43,9 +43,9 @@ export default function PlatformAnalytics() {
   return (
     <div className="bg-[#E7DDD3] min-h-screen text-[#2C2A28] p-6 md:p-10 font-sans space-y-8 max-w-7xl mx-auto">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-[#DDD8CE] pb-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-[#D5C9BE]/70 pb-6">
         <div>
-          <span className="text-[10px] font-bold text-[#353535] uppercase tracking-[0.25em] block mb-1">
+          <span className="text-[10px] font-bold text-[#2C2A28] uppercase tracking-[0.25em] block mb-1">
             Maintainer Analytics & Ledger
           </span>
           <h1 className="font-serif text-3xl md:text-4xl font-bold text-[#2C2A28] tracking-tight">
@@ -57,7 +57,7 @@ export default function PlatformAnalytics() {
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="flex bg-white p-1 rounded-xl border border-[#D5C9BE]">
+          <div className="flex bg-[#F7F5F0] p-1 rounded-xl border border-[#D5C9BE]">
             {(["financials", "events", "auditions", "system"] as const).map((tab) => (
               <button
                 key={tab}
@@ -77,8 +77,8 @@ export default function PlatformAnalytics() {
 
       {/* Financial Status Summary Cards (Maintainer Only) */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        <div className="bg-white border border-[#DDD8CE] p-6 rounded-3xl shadow-xs space-y-2">
-          <div className="flex items-center justify-between text-[#353535]">
+        <div className="bg-[#F7F5F0] border border-[#D5C9BE]/70 rounded-[2rem] p-6 rounded-3xl shadow-xs space-y-2">
+          <div className="flex items-center justify-between text-[#2C2A28]">
             <span className="text-[10px] font-bold uppercase tracking-wider">Total Revenue / Income</span>
             <DollarSign className="w-4 h-4" />
           </div>
@@ -90,7 +90,7 @@ export default function PlatformAnalytics() {
           </p>
         </div>
 
-        <div className="bg-white border border-[#DDD8CE] p-6 rounded-3xl shadow-xs space-y-2">
+        <div className="bg-[#F7F5F0] border border-[#D5C9BE]/70 rounded-[2rem] p-6 rounded-3xl shadow-xs space-y-2">
           <div className="flex items-center justify-between text-rose-700">
             <span className="text-[10px] font-bold uppercase tracking-wider">Total Season Expenses</span>
             <Activity className="w-4 h-4" />
@@ -104,7 +104,7 @@ export default function PlatformAnalytics() {
         </div>
 
         <div className="bg-gradient-to-br from-[#FFF9D2] to-[#f5eeaf] border border-[#D5C9BE] p-6 rounded-3xl shadow-xs space-y-2">
-          <div className="flex items-center justify-between text-[#353535]">
+          <div className="flex items-center justify-between text-[#2C2A28]">
             <span className="text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
               <ShieldCheck className="w-3.5 h-3.5" /> Net Profit Surplus
             </span>
@@ -124,10 +124,10 @@ export default function PlatformAnalytics() {
         <div className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
             {/* Financial Trend Visualizer */}
-            <div className="lg:col-span-8 bg-white border border-[#DDD8CE] p-6 rounded-3xl shadow-xs space-y-6">
-              <div className="flex items-center justify-between pb-3 border-b border-[#DDD8CE]">
+            <div className="lg:col-span-8 bg-[#F7F5F0] border border-[#D5C9BE]/70 rounded-[2rem] p-6 rounded-3xl shadow-xs space-y-6">
+              <div className="flex items-center justify-between pb-3 border-b border-[#D5C9BE]/70">
                 <div>
-                  <span className="text-[10px] font-bold text-[#353535] uppercase tracking-wider">
+                  <span className="text-[10px] font-bold text-[#2C2A28] uppercase tracking-wider">
                     Financial Cash Flow Graph
                   </span>
                   <h2 className="font-serif text-xl font-bold text-[#2C2A28]">
@@ -169,7 +169,7 @@ export default function PlatformAnalytics() {
                   </div>
                 </div>
 
-                <div className="space-y-1.5 pt-3 border-t border-[#DDD8CE]">
+                <div className="space-y-1.5 pt-3 border-t border-[#D5C9BE]/70">
                   <div className="flex justify-between text-xs font-bold text-rose-800">
                     <span>Operating Expenses (Venue Deposit, Stage Props, Audio)</span>
                     <span>₹{summary.total_expenses.toLocaleString()} (28.9% of Revenue)</span>
@@ -182,9 +182,9 @@ export default function PlatformAnalytics() {
             </div>
 
             {/* Financial Revenue Category Breakdown */}
-            <div className="lg:col-span-4 bg-white border border-[#DDD8CE] p-6 rounded-3xl shadow-xs space-y-4">
-              <div className="pb-3 border-b border-[#DDD8CE]">
-                <span className="text-[10px] font-bold text-[#353535] uppercase tracking-wider">
+            <div className="lg:col-span-4 bg-[#F7F5F0] border border-[#D5C9BE]/70 rounded-[2rem] p-6 rounded-3xl shadow-xs space-y-4">
+              <div className="pb-3 border-b border-[#D5C9BE]/70">
+                <span className="text-[10px] font-bold text-[#2C2A28] uppercase tracking-wider">
                   Category Mix
                 </span>
                 <h3 className="font-serif text-lg font-bold text-[#2C2A28]">
@@ -209,10 +209,10 @@ export default function PlatformAnalytics() {
           </div>
 
           {/* RESTRICTED MAINTAINER FINANCIAL TRANSACTIONS LEDGER */}
-          <div className="bg-white border border-[#DDD8CE] p-6 rounded-3xl shadow-xs space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-[#DDD8CE]">
+          <div className="bg-[#F7F5F0] border border-[#D5C9BE]/70 rounded-[2rem] p-6 rounded-3xl shadow-xs space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-[#D5C9BE]/70">
               <div>
-                <span className="text-[10px] font-bold text-[#353535] uppercase tracking-wider">
+                <span className="text-[10px] font-bold text-[#2C2A28] uppercase tracking-wider">
                   Backend Secured Ledger
                 </span>
                 <h3 className="font-serif text-xl font-bold text-[#2C2A28]">
@@ -220,7 +220,7 @@ export default function PlatformAnalytics() {
                 </h3>
               </div>
 
-              <span className="text-xs font-bold text-[#353535] bg-[#353535]/10 px-3 py-1 rounded-xl">
+              <span className="text-xs font-bold text-[#2C2A28] bg-[#353535]/10 px-3 py-1 rounded-xl">
                 {financialRecords.length} Verified Entries
               </span>
             </div>
@@ -259,7 +259,7 @@ export default function PlatformAnalytics() {
       )}
 
       {activeTab === "events" && (
-        <div className="bg-white border border-[#DDD8CE] p-8 rounded-3xl shadow-xs space-y-6">
+        <div className="bg-[#F7F5F0] border border-[#D5C9BE]/70 rounded-[2rem] p-8 rounded-3xl shadow-xs space-y-6">
           <h2 className="font-serif text-2xl font-bold text-[#2C2A28]">Events & Production Proposals Graph</h2>
           <div className="space-y-4 text-xs text-[#666361]">
             <div className="space-y-1">
@@ -286,7 +286,7 @@ export default function PlatformAnalytics() {
       )}
 
       {activeTab === "auditions" && (
-        <div className="bg-white border border-[#DDD8CE] p-8 rounded-3xl shadow-xs space-y-6">
+        <div className="bg-[#F7F5F0] border border-[#D5C9BE]/70 rounded-[2rem] p-8 rounded-3xl shadow-xs space-y-6">
           <h2 className="font-serif text-2xl font-bold text-[#2C2A28]">Audition Casting Rate Graph</h2>
           <div className="space-y-4 text-xs text-[#666361]">
             <div className="space-y-1">
@@ -313,7 +313,7 @@ export default function PlatformAnalytics() {
       )}
 
       {activeTab === "system" && (
-        <div className="bg-white border border-[#DDD8CE] p-8 rounded-3xl shadow-xs space-y-6">
+        <div className="bg-[#F7F5F0] border border-[#D5C9BE]/70 rounded-[2rem] p-8 rounded-3xl shadow-xs space-y-6">
           <h2 className="font-serif text-2xl font-bold text-[#2C2A28]">System Pulse & API Uptime</h2>
           <div className="flex items-center justify-between p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-xs font-bold text-emerald-800">
             <span>Core API Gateway Operational</span>

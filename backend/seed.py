@@ -33,7 +33,7 @@ def seed_database():
         ("Abay Nandhiga", "23f2000668", "abay123", "maintainer", "22", "IIT Madras BS Campus", "Chennai", "Tamil Nadu", "India", "+91 98765 23001",
          "Secretary of Aayam - IIT Madras BS Drama Society. Directing society operations, stagecraft productions, and national festival representations.",
          "Directing, Playwriting, Society Leadership", "Nandhiga", "+91 98765 23002",
-         "/aayam_assets/profiles/abay_nandhiga.jpg"),
+         "/aayam_assets/profiles/utkarsh_yuuhi.jpg"),
          
         ("Yuuhi", "21f1005042", "utkarsh123", "maintainer", "23", "IIT Madras BS Campus", "Chennai", "Tamil Nadu", "India", "+91 98765 21005",
          "Deputy Secretary of Aayam. Lead performer in Nukkad Natak street plays and stage productions.",

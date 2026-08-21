@@ -3,7 +3,6 @@ import { createEditor, Editor, Transforms, Element as SlateElement } from "slate
 import type { Descendant } from "slate";
 import { Slate, Editable, withReact } from "slate-react";
 import { withHistory } from "slate-history";
-import { Button } from "./ui/button";
 import {
     Bold,
     Italic,
@@ -385,150 +384,180 @@ export const PlateEditor: React.FC<PlateEditorProps> = ({ markdownContent, onCha
     }, []);
 
     return (
-        <div className="flex flex-col h-full bg-[#E7DDD3] border border-[#D5C9BE] rounded-2xl overflow-hidden shadow-xs min-h-[460px]">
-            {/* Tiny rich text styling floating/anchored toolbar */}
+        <div className="flex flex-col h-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-[2rem] overflow-hidden shadow-xs min-h-[480px]">
+            {/* Theatrical rich text toolbar */}
             {!readOnly && (
-                <div className="flex flex-wrap items-center gap-1.5 p-2 bg-[#f4efe8]/80 border-b border-[#D5C9BE]/40 select-none backdrop-blur-xs">
-                    <Button
-                        size="icon-xs"
-                        variant={isMarkActive(editor, "bold") ? "secondary" : "ghost"}
+                <div className="flex flex-wrap items-center gap-1.5 p-2.5 bg-[#F5EAE6] border-b border-[#DCBAB2] select-none">
+                    <button
+                        type="button"
                         onMouseDown={(e) => {
                             e.preventDefault();
                             toggleMark(editor, "bold");
                         }}
                         title="Bold (Ctrl+B)"
-                        className="w-8 h-8 rounded-lg cursor-pointer"
+                        className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all cursor-pointer ${
+                            isMarkActive(editor, "bold")
+                                ? "bg-[#8C241E] text-[#FDF8F7]"
+                                : "text-[#5C3B37] hover:text-[#2A1816] hover:bg-[#EEDBD5]"
+                        }`}
                     >
                         <Bold className="w-3.5 h-3.5" />
-                    </Button>
+                    </button>
 
-                    <Button
-                        size="icon-xs"
-                        variant={isMarkActive(editor, "italic") ? "secondary" : "ghost"}
+                    <button
+                        type="button"
                         onMouseDown={(e) => {
                             e.preventDefault();
                             toggleMark(editor, "italic");
                         }}
                         title="Italic (Ctrl+I)"
-                        className="w-8 h-8 rounded-lg cursor-pointer"
+                        className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all cursor-pointer ${
+                            isMarkActive(editor, "italic")
+                                ? "bg-[#8C241E] text-[#FDF8F7]"
+                                : "text-[#5C3B37] hover:text-[#2A1816] hover:bg-[#EEDBD5]"
+                        }`}
                     >
                         <Italic className="w-3.5 h-3.5" />
-                    </Button>
+                    </button>
 
-                    <Button
-                        size="icon-xs"
-                        variant={isMarkActive(editor, "underline") ? "secondary" : "ghost"}
+                    <button
+                        type="button"
                         onMouseDown={(e) => {
                             e.preventDefault();
                             toggleMark(editor, "underline");
                         }}
                         title="Underline (Ctrl+U)"
-                        className="w-8 h-8 rounded-lg cursor-pointer"
+                        className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all cursor-pointer ${
+                            isMarkActive(editor, "underline")
+                                ? "bg-[#8C241E] text-[#FDF8F7]"
+                                : "text-[#5C3B37] hover:text-[#2A1816] hover:bg-[#EEDBD5]"
+                        }`}
                     >
                         <Underline className="w-3.5 h-3.5" />
-                    </Button>
+                    </button>
 
-                    <Button
-                        size="icon-xs"
-                        variant={isMarkActive(editor, "strikethrough") ? "secondary" : "ghost"}
+                    <button
+                        type="button"
                         onMouseDown={(e) => {
                             e.preventDefault();
                             toggleMark(editor, "strikethrough");
                         }}
                         title="Strikethrough"
-                        className="w-8 h-8 rounded-lg cursor-pointer"
+                        className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all cursor-pointer ${
+                            isMarkActive(editor, "strikethrough")
+                                ? "bg-[#8C241E] text-[#FDF8F7]"
+                                : "text-[#5C3B37] hover:text-[#2A1816] hover:bg-[#EEDBD5]"
+                        }`}
                     >
                         <Strikethrough className="w-3.5 h-3.5" />
-                    </Button>
+                    </button>
 
-                    <Button
-                        size="icon-xs"
-                        variant={isMarkActive(editor, "code") ? "secondary" : "ghost"}
+                    <button
+                        type="button"
                         onMouseDown={(e) => {
                             e.preventDefault();
                             toggleMark(editor, "code");
                         }}
-                        title="Monospace Code"
-                        className="w-8 h-8 rounded-lg cursor-pointer"
+                        title="Monospace Stage Note"
+                        className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all cursor-pointer ${
+                            isMarkActive(editor, "code")
+                                ? "bg-[#8C241E] text-[#FDF8F7]"
+                                : "text-[#5C3B37] hover:text-[#2A1816] hover:bg-[#EEDBD5]"
+                        }`}
                     >
                         <Code className="w-3.5 h-3.5" />
-                    </Button>
+                    </button>
 
-                    <div className="w-px h-5 bg-border mx-1" />
+                    <div className="w-px h-5 bg-[#DCBAB2] mx-1" />
 
-                    <Button
-                        size="icon-xs"
-                        variant={isBlockActive(editor, "heading-one") ? "secondary" : "ghost"}
+                    <button
+                        type="button"
                         onMouseDown={(e) => {
                             e.preventDefault();
                             toggleBlock(editor, "heading-one");
                         }}
-                        title="Heading 1"
-                        className="w-8 h-8 rounded-lg cursor-pointer"
+                        title="Act / Scene Header"
+                        className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all cursor-pointer ${
+                            isBlockActive(editor, "heading-one")
+                                ? "bg-[#8C241E] text-[#FDF8F7]"
+                                : "text-[#5C3B37] hover:text-[#2A1816] hover:bg-[#EEDBD5]"
+                        }`}
                     >
                         <Heading1 className="w-3.5 h-3.5" />
-                    </Button>
+                    </button>
 
-                    <Button
-                        size="icon-xs"
-                        variant={isBlockActive(editor, "heading-two") ? "secondary" : "ghost"}
+                    <button
+                        type="button"
                         onMouseDown={(e) => {
                             e.preventDefault();
                             toggleBlock(editor, "heading-two");
                         }}
-                        title="Heading 2"
-                        className="w-8 h-8 rounded-lg cursor-pointer"
+                        title="Character Cue Header"
+                        className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all cursor-pointer ${
+                            isBlockActive(editor, "heading-two")
+                                ? "bg-[#8C241E] text-[#FDF8F7]"
+                                : "text-[#5C3B37] hover:text-[#2A1816] hover:bg-[#EEDBD5]"
+                        }`}
                     >
                         <Heading2 className="w-3.5 h-3.5" />
-                    </Button>
+                    </button>
 
-                    <Button
-                        size="icon-xs"
-                        variant={isBlockActive(editor, "block-quote") ? "secondary" : "ghost"}
+                    <button
+                        type="button"
                         onMouseDown={(e) => {
                             e.preventDefault();
                             toggleBlock(editor, "block-quote");
                         }}
-                        title="Blockquote"
-                        className="w-8 h-8 rounded-lg cursor-pointer"
+                        title="Stage Direction Block"
+                        className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all cursor-pointer ${
+                            isBlockActive(editor, "block-quote")
+                                ? "bg-[#8C241E] text-[#FDF8F7]"
+                                : "text-[#5C3B37] hover:text-[#2A1816] hover:bg-[#EEDBD5]"
+                        }`}
                     >
                         <Quote className="w-3.5 h-3.5" />
-                    </Button>
+                    </button>
 
-                    <Button
-                        size="icon-xs"
-                        variant={isBlockActive(editor, "bulleted-list") ? "secondary" : "ghost"}
+                    <button
+                        type="button"
                         onMouseDown={(e) => {
                             e.preventDefault();
                             toggleBlock(editor, "bulleted-list");
                         }}
                         title="Bulleted List"
-                        className="w-8 h-8 rounded-lg cursor-pointer"
+                        className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all cursor-pointer ${
+                            isBlockActive(editor, "bulleted-list")
+                                ? "bg-[#8C241E] text-[#FDF8F7]"
+                                : "text-[#5C3B37] hover:text-[#2A1816] hover:bg-[#EEDBD5]"
+                        }`}
                     >
                         <List className="w-3.5 h-3.5" />
-                    </Button>
+                    </button>
 
-                    <Button
-                        size="icon-xs"
-                        variant={isBlockActive(editor, "numbered-list") ? "secondary" : "ghost"}
+                    <button
+                        type="button"
                         onMouseDown={(e) => {
                             e.preventDefault();
                             toggleBlock(editor, "numbered-list");
                         }}
                         title="Numbered List"
-                        className="w-8 h-8 rounded-lg cursor-pointer"
+                        className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all cursor-pointer ${
+                            isBlockActive(editor, "numbered-list")
+                                ? "bg-[#8C241E] text-[#FDF8F7]"
+                                : "text-[#5C3B37] hover:text-[#2A1816] hover:bg-[#EEDBD5]"
+                        }`}
                     >
                         <ListOrdered className="w-3.5 h-3.5" />
-                    </Button>
+                    </button>
                 </div>
             )}
 
             {/* Scrollable editing page */}
-            <div className="flex-1 overflow-y-auto p-5 pt-4 select-text">
+            <div className="flex-1 overflow-y-auto p-6 pt-5 select-text custom-scrollbar">
                 <Slate editor={editor} initialValue={value} onChange={setValue}>
                     <Editable
-                        className="outline-none min-h-full font-serif text-lg leading-relaxed text-foreground placeholder:text-muted-foreground select-text selection:bg-primary/20"
-                        placeholder={readOnly ? "No story content yet." : "Type your story here..."}
+                        className="outline-none min-h-full font-serif text-base sm:text-lg leading-relaxed text-[#2A1816] placeholder:text-[#8C5A54]/50 select-text selection:bg-[#8C241E]/20"
+                        placeholder={readOnly ? "No story content yet." : "Draft play scenes, character dialogue, and stage blocking here..."}
                         style={{ fontFamily: "'Georgia', 'Times New Roman', serif" }}
                         renderElement={renderElement}
                         renderLeaf={renderLeaf}
@@ -537,12 +566,12 @@ export const PlateEditor: React.FC<PlateEditorProps> = ({ markdownContent, onCha
                 </Slate>
             </div>
 
-            <div className="mx-5 py-3 border-t border-border flex items-center justify-between text-xs text-muted-foreground select-none">
-                <div className="font-semibold text-muted-foreground">
-                    Words: <span className="font-mono font-bold text-foreground bg-muted px-2 py-0.5 rounded border border-border/80">{serializeToText(value).split(/\s+/).filter(Boolean).length}</span>
+            <div className="px-6 py-3 border-t border-[#DCBAB2] flex items-center justify-between text-xs text-[#8C5A54] select-none bg-[#F5EAE6]">
+                <div className="font-mono text-xs">
+                    Words: <span className="font-bold text-[#2A1816] bg-[#FAF2EE] px-2.5 py-0.5 rounded-full border border-[#DCBAB2]">{serializeToText(value).split(/\s+/).filter(Boolean).length}</span>
                 </div>
-                <div className="italic text-[11px] text-muted-foreground/80">
-                    1.5s auto-extraction active
+                <div className="italic font-serif text-[11px] text-[#8C5A54]">
+                    Real-time script stream active
                 </div>
             </div>
         </div>

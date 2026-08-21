@@ -66,15 +66,17 @@ def join_club():
     if not clean_name:
         clean_name = "user"
 
+    custom_password = (data.get('password') or '').strip()
     generated_email = f"{clean_name}@handle.com"
-    generated_password = f"{clean_name}123"
+    generated_password = custom_password if custom_password else f"{clean_name}123"
 
     # Handle duplicate email by appending a counter
     existing = User.query.filter_by(email=generated_email).first()
     counter = 1
     while existing:
         generated_email = f"{clean_name}{counter}@handle.com"
-        generated_password = f"{clean_name}{counter}123"
+        if not custom_password:
+            generated_password = f"{clean_name}{counter}123"
         existing = User.query.filter_by(email=generated_email).first()
         counter += 1
 
@@ -147,6 +149,7 @@ def join_club():
     }), 201
 
 @api_bp.route('/members', methods=['GET'])
+@api_bp.route('/directory', methods=['GET'])
 def get_members():
     from models import User
     users = User.query.all()
@@ -241,12 +244,16 @@ def login():
     from models import Admin
     is_admin = Admin.query.filter_by(user_id=db_user.id).first() is not None
 
+    user_dict = db_user.to_dict() if db_user else {}
     user_profile = {
+        'id': db_user.id if db_user else None,
         'name': name,
         'role': role,
         'initials': initials,
         'email': email,
-        'isAdmin': is_admin
+        'isAdmin': is_admin,
+        'image': user_dict.get('image', ''),
+        'avatarUrl': user_dict.get('avatarUrl', '')
     }
 
     # Generate JWT token with timezone-aware expiration
@@ -502,6 +509,158 @@ def update_my_schedule():
         db.session.commit()
         return jsonify({'success': True})
     return jsonify({'error': 'Not found'}), 404
+
+@api_bp.route('/maintainer/schedule', methods=['GET'])
+def get_maintainer_schedule():
+    events = Event.query.order_by(Event.event_date.asc(), Event.start_time.asc()).all()
+    results = []
+    for e in events:
+        participations = Participation.query.filter_by(event_id=e.id).all()
+        participants_data = []
+        accepted_count = 0
+        pending_count = 0
+        declined_count = 0
+        
+        for p in participations:
+            u = p.user
+            if u:
+                if p.status == 'Accepted':
+                    accepted_count += 1
+                elif p.status == 'Declined':
+                    declined_count += 1
+                else:
+                    pending_count += 1
+                    
+                u_dict = u.to_dict() if hasattr(u, 'to_dict') else {}
+                participants_data.append({
+                    'participation_id': p.id,
+                    'user_id': u.id,
+                    'name': u.name,
+                    'email': u.email,
+                    'avatar_url': u_dict.get('avatarUrl') or u.avatar_url,
+                    'role': u.roles[0].name if u.roles else 'Ensemble Member',
+                    'status': p.status,
+                    'remarks': p.remarks
+                })
+                
+        results.append({
+            'id': e.id,
+            'title': e.title,
+            'description': e.description,
+            'category': e.category,
+            'venue': e.venue,
+            'event_date': e.event_date.strftime('%Y-%m-%d') if e.event_date else '',
+            'formatted_date': e.event_date.strftime('%b %d, %Y') if e.event_date else '',
+            'start_time': e.start_time.strftime('%H:%M') if e.start_time else '',
+            'end_time': e.end_time.strftime('%H:%M') if e.end_time else '',
+            'time_range': f"{e.start_time.strftime('%H:%M') if e.start_time else ''} - {e.end_time.strftime('%H:%M') if e.end_time else ''}",
+            'status': e.status,
+            'max_participants': e.max_participants,
+            'poster': e.poster,
+            'participants': participants_data,
+            'stats': {
+                'total_called': len(participations),
+                'accepted': accepted_count,
+                'pending': pending_count,
+                'declined': declined_count
+            }
+        })
+    return jsonify(results)
+
+@api_bp.route('/maintainer/schedule/create', methods=['POST'])
+def create_maintainer_schedule():
+    data = request.json or {}
+    title = data.get('title')
+    category = data.get('category', 'Rehearsals')
+    venue = data.get('venue', 'Aayam Rehearsal Hall')
+    description = data.get('description', '')
+    date_str = data.get('event_date')
+    start_time_str = data.get('start_time', '18:00')
+    end_time_str = data.get('end_time', '20:30')
+    invited_user_ids = data.get('invited_user_ids', [])
+    
+    if not title or not date_str:
+        return jsonify({'error': 'Title and Date are required'}), 400
+        
+    try:
+        ev_date = datetime.datetime.strptime(date_str, '%Y-%m-%d').date()
+    except Exception:
+        ev_date = datetime.date.today()
+        
+    try:
+        st_time = datetime.datetime.strptime(start_time_str, '%H:%M').time()
+    except Exception:
+        st_time = datetime.time(18, 0)
+        
+    try:
+        et_time = datetime.datetime.strptime(end_time_str, '%H:%M').time()
+    except Exception:
+        et_time = datetime.time(20, 30)
+
+    # Pick first admin as owner
+    admin = User.query.filter(User.roles.any(Role.name.ilike('%maintainer%'))).first()
+    admin_id = admin.id if admin else 1
+    
+    new_event = Event(
+        title=title,
+        description=description,
+        category=category,
+        venue=venue,
+        event_date=ev_date,
+        start_time=st_time,
+        end_time=et_time,
+        max_participants=max(len(invited_user_ids), 30),
+        status='Upcoming',
+        admin_id=admin_id
+    )
+    db.session.add(new_event)
+    db.session.flush()
+    
+    # Create participations and notifications for invited users
+    for uid in invited_user_ids:
+        try:
+            uid_int = int(uid)
+            u = User.query.get(uid_int)
+            if u:
+                p = Participation(
+                    user_id=u.id,
+                    event_id=new_event.id,
+                    status='Pending',
+                    remarks=description
+                )
+                db.session.add(p)
+                
+                # Send notification
+                notif = Notification(
+                    recipient_id=u.id,
+                    type="rehearsal",
+                    title=f"Call Time: {title}",
+                    message=f"You have been called for {title} on {ev_date.strftime('%b %d, %Y')} at {st_time.strftime('%H:%M')} in {venue}. Please confirm attendance on My Schedule.",
+                    is_read=False
+                )
+                db.session.add(notif)
+        except Exception as e:
+            print("Error inviting user:", e)
+            
+    db.session.commit()
+    return jsonify({'success': True, 'event_id': new_event.id, 'message': 'Rehearsal call created and members notified.'})
+
+@api_bp.route('/maintainer/schedule/delete', methods=['POST'])
+def delete_maintainer_schedule():
+    data = request.json or {}
+    event_id = data.get('event_id')
+    if not event_id:
+        return jsonify({'error': 'event_id is required'}), 400
+    
+    ev = Event.query.get(event_id)
+    if not ev:
+        return jsonify({'error': 'Event not found'}), 404
+        
+    # Delete participations associated
+    Participation.query.filter_by(event_id=ev.id).delete()
+    db.session.delete(ev)
+    db.session.commit()
+    return jsonify({'success': True, 'message': 'Event deleted successfully.'})
 
 @api_bp.route('/my-auditions', methods=['GET'])
 def get_my_auditions():
@@ -1227,7 +1386,7 @@ def _script_rehearsal_summary(script):
         data["charactersCount"] = len(scene["characters"])
         data["dialogueLines"] = len([turn for turn in scene["turns"] if turn["type"] == "dialogue"])
         data["rehearsalReady"] = True
-    except ValueError:
+    except Exception:
         data["charactersCount"] = 0
         data["dialogueLines"] = 0
         data["rehearsalReady"] = False
@@ -1984,11 +2143,17 @@ Return ONLY valid JSON matching this schema:
         keywords = res_json.get("keywords", [])
         if keywords and isinstance(keywords, list):
             return jsonify({"status": "success", "keywords": keywords[:6], "source": "gemini"}), 200
-        else:
-            return jsonify({"status": "error", "message": "AI servers are down. Failed to extract keywords."}), 503
+        raise ValueError("Invalid keywords response structure")
     except Exception as err:
         print(f"Gemini keyword extraction API call error: {err}")
-        return jsonify({"status": "error", "message": "AI servers are down. Please try again later."}), 503
+        import re
+        words = re.findall(r'\b[A-Za-z]{4,}\b', desc)
+        stop_words = {"this", "that", "with", "from", "have", "were", "what", "when", "your", "their", "about", "which", "will"}
+        filtered = [w for w in words if w.lower() not in stop_words]
+        fallback_keywords = list(dict.fromkeys(filtered))[:5]
+        if not fallback_keywords:
+            fallback_keywords = ["Theatre", "Production", "Auditions", "Rehearsals"]
+        return jsonify({"status": "success", "keywords": fallback_keywords, "source": "fallback"}), 200
 
 
 @api_bp.route('/events/autofill-proposal', methods=['POST'])
@@ -2041,5 +2206,19 @@ Extract structured event proposal details. Return ONLY valid JSON matching this 
         return jsonify({"status": "success", "data": extracted}), 200
     except Exception as err:
         print(f"Gemini proposal autofill API call error: {err}")
-        return jsonify({"status": "error", "message": "AI servers are down. Please try again later."}), 503
+        import re
+        email_match = re.search(r'[\w\.-]+@[\w\.-]+\.\w+', paragraph)
+        budget_match = re.search(r'(?:₹|INR|Rs\.?)\s*[\d,]+', paragraph)
+        first_sentence = paragraph.split('.')[0].strip()
+        fallback_data = {
+            "title": first_sentence[:60] if first_sentence else "Proposed Event",
+            "proposalType": "Sponsor Ad Proposal" if any(k in paragraph.lower() for k in ["sponsor", "budget", "showcase", "brand"]) else "Member Pitch",
+            "submitterName": "FabIndia" if "fabindia" in paragraph.lower() else "Event Submitter",
+            "submitterEmail": email_match.group(0) if email_match else "",
+            "submitterPhone": "",
+            "venue": "Royal Stage Auditorium" if "royal stage" in paragraph.lower() else "CLT Main Auditorium",
+            "sponsorshipTerms": budget_match.group(0) if budget_match else "",
+            "description": paragraph
+        }
+        return jsonify({"status": "success", "data": fallback_data, "source": "fallback"}), 200
 

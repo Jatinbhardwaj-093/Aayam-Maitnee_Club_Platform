@@ -83,16 +83,34 @@ class ScriptParser:
 
     def _turns_from_text(self, text, title):
         turns = []
-        for raw_line in text.splitlines():
+        lines = text.splitlines()
+        current_speaker = None
+
+        for raw_line in lines:
             line = raw_line.strip()
             if not line:
                 continue
             if self._is_stage_direction(line):
                 turns.append(self._make_turn(len(turns), "Stage Direction", line, "stage_direction", title))
                 continue
+            
+            # Check for inline speaker e.g. "SUTRADHAR: Hello"
             match = re.match(r"^([A-Za-z][A-Za-z0-9 ._'/-]{0,48})\s*:\s*(.+)$", line)
             if match:
                 turns.append(self._make_turn(len(turns), match.group(1).strip(), match.group(2).strip(), "dialogue", title))
+                current_speaker = match.group(1).strip()
+                continue
+                
+            # Check for standalone speaker e.g. "SUTRADHAR:"
+            speaker_only = re.match(r"^([A-Za-z][A-Za-z0-9 ._'/-]{0,48})\s*:$", line)
+            if speaker_only:
+                current_speaker = speaker_only.group(1).strip()
+                continue
+                
+            # If we have an active speaker, this is their dialogue
+            if current_speaker:
+                turns.append(self._make_turn(len(turns), current_speaker, line, "dialogue", title))
+                
         if not turns and text.strip():
             turns.append(self._make_turn(0, "Lead Character", text.strip(), "dialogue", title))
         return turns

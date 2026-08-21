@@ -24,6 +24,7 @@ import MediaModeration from "./pages/maintainers/MediaModeration";
 import EventsManagement from "./pages/maintainers/EventsManagement";
 import AllMembersDirectory from "./pages/maintainers/AllMembersDirectory";
 import AuditionsManagement from "./pages/maintainers/AuditionsManagement";
+import MaintainerSchedule from "./pages/maintainers/MaintainerSchedule";
 
 // Landing pages
 import Landing from "./pages/website_landing/Landing";
@@ -72,7 +73,7 @@ export default function App() {
           <Route path="admin" element={<ProductionOffice />} />
           <Route path="backstage" element={<BackstagePass />} />
           <Route path="maintainer" element={<MaintainerDashboard />} />
-          <Route path="schedule-admin" element={<MySchedule />} />
+          <Route path="schedule-admin" element={<MaintainerSchedule />} />
           <Route path="analytics" element={<PlatformAnalytics />} />
           <Route path="control-panel" element={<ProductionControlPanel />} />
           <Route path="profile-audit" element={<MemberProfileAudit />} />

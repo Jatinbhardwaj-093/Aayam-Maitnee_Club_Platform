@@ -155,32 +155,32 @@ export default function EditProfile() {
         <div className="mb-6 flex justify-between items-center">
           <button
             onClick={() => navigate(activeUser?.role.toLowerCase().includes("maintainer") ? "/maintainer" : "/member")}
-            className="flex items-center gap-2 text-xs font-semibold text-[#353535] hover:text-[#353535]/80 transition-all"
+            className="flex items-center gap-2 text-xs font-semibold text-[#2C2A28] hover:text-[#2C2A28]/80 transition-all"
           >
             <ArrowLeft className="w-4 h-4" /> Back to Dashboard
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-8 bg-white border border-[#D5C9BE]/30 p-8 md:p-12 rounded-3xl shadow-sm">
+        <form onSubmit={handleSubmit} className="space-y-8 bg-[#F7F5F0] border border-[#D5C9BE]/30 p-8 md:p-12 rounded-3xl shadow-sm">
           
           {/* Form Header */}
-          <div className="border-b border-[#DDD8CE]/60 pb-6 flex items-start justify-between flex-wrap gap-4">
+          <div className="border-b border-[#D5C9BE]/70/60 pb-6 flex items-start justify-between flex-wrap gap-4">
             <div>
               <span className="inline-block px-3 py-1.5 rounded-full bg-[#F8E8E4] text-[#E85F57] text-xs font-bold uppercase tracking-wider mb-3">
                 Member Profile Editor
               </span>
-              <h1 className="font-serif text-3xl md:text-4xl text-[#353535] font-bold tracking-tight">Edit Your Account</h1>
+              <h1 className="font-serif text-3xl md:text-4xl text-[#2C2A28] font-bold tracking-tight">Edit Your Account</h1>
               <p className="text-xs text-[#666361] mt-1 leading-relaxed">
                 Updating these fields writes changes directly to the SQLite backend.
               </p>
             </div>
             
-            <div className="flex items-center gap-3 bg-[#EFE8E1] border border-[#DDD8CE] p-3 rounded-2xl">
-              <div className="w-10 h-10 rounded-full bg-[#353535]/10 flex items-center justify-center text-[#353535] font-bold text-md">
+            <div className="flex items-center gap-3 bg-[#E7DDD3] border border-[#D5C9BE]/70 p-3 rounded-2xl">
+              <div className="w-10 h-10 rounded-full bg-[#353535]/10 flex items-center justify-center text-[#2C2A28] font-bold text-md">
                 {activeUser?.initials}
               </div>
               <div className="text-left leading-tight">
-                <p className="text-xs font-bold text-[#353535] truncate max-w-[120px]">{name}</p>
+                <p className="text-xs font-bold text-[#2C2A28] truncate max-w-[120px]">{name}</p>
                 <p className="text-[10px] text-[#666361]/70 truncate max-w-[120px]">{activeUser?.role}</p>
               </div>
             </div>
@@ -203,27 +203,27 @@ export default function EditProfile() {
 
           {/* Section 1: Personal Info */}
           <div className="space-y-6">
-            <h2 className="text-xs font-bold uppercase tracking-widest text-[#353535] flex items-center gap-2 border-b border-[#DDD8CE]/40 pb-2">
+            <h2 className="text-xs font-bold uppercase tracking-widest text-[#2C2A28] flex items-center gap-2 border-b border-[#D5C9BE]/70/40 pb-2">
               <User className="w-4 h-4 text-[#E85F57]" /> 1. Personal Information
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="space-y-1 text-left">
-                <label className="text-xs font-semibold text-[#353535]">Display Name</label>
+                <label className="text-xs font-semibold text-[#2C2A28]">Display Name</label>
                 <Input
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="border-[#DDD8CE] focus-visible:ring-[#E85F57] text-sm h-10 bg-white"
+                  className="border-[#D5C9BE]/70 focus-visible:ring-[#E85F57] text-sm h-10 bg-[#F7F5F0]"
                   required
                 />
               </div>
 
               <div className="space-y-1 text-left">
-                <label className="text-xs font-semibold text-[#353535]">Pronouns</label>
+                <label className="text-xs font-semibold text-[#2C2A28]">Pronouns</label>
                 <Select value={pronouns} onValueChange={(val) => setPronouns(val ?? "he/him")}>
-                  <SelectTrigger className="w-full border-[#DDD8CE] bg-white text-[#666361] hover:bg-gray-50 focus:ring-[#E85F57] text-sm h-10 px-3 flex items-center justify-between rounded-lg">
+                  <SelectTrigger className="w-full border-[#D5C9BE]/70 bg-[#F7F5F0] text-[#666361] hover:bg-gray-50 focus:ring-[#E85F57] text-sm h-10 px-3 flex items-center justify-between rounded-lg">
                     <SelectValue placeholder="Pronouns" />
                   </SelectTrigger>
-                  <SelectContent className="bg-white border border-[#DDD8CE] text-[#666361] rounded-lg shadow-md mt-1 z-50">
+                  <SelectContent className="bg-[#F7F5F0] border border-[#D5C9BE]/70 rounded-[2rem] text-[#666361] rounded-lg shadow-md mt-1 z-50">
                     <SelectGroup>
                       <SelectItem value="he/him" className="hover:bg-[#E85F57]/10 rounded-md py-1.5 px-3 cursor-pointer">he/him</SelectItem>
                       <SelectItem value="she/her" className="hover:bg-[#E85F57]/10 rounded-md py-1.5 px-3 cursor-pointer">she/her</SelectItem>
@@ -235,12 +235,12 @@ export default function EditProfile() {
               </div>
 
               <div className="space-y-1 text-left">
-                <label className="text-xs font-semibold text-[#353535]">Age</label>
+                <label className="text-xs font-semibold text-[#2C2A28]">Age</label>
                 <Input
                   value={age}
                   placeholder="e.g. 26"
                   onChange={(e) => setAge(e.target.value)}
-                  className="border-[#DDD8CE] focus-visible:ring-[#E85F57] text-sm h-10 bg-white"
+                  className="border-[#D5C9BE]/70 focus-visible:ring-[#E85F57] text-sm h-10 bg-[#F7F5F0]"
                 />
               </div>
             </div>
@@ -248,28 +248,28 @@ export default function EditProfile() {
 
           {/* Section 2: Contact & Location */}
           <div className="space-y-6">
-            <h2 className="text-xs font-bold uppercase tracking-widest text-[#353535] flex items-center gap-2 border-b border-[#DDD8CE]/40 pb-2">
+            <h2 className="text-xs font-bold uppercase tracking-widest text-[#2C2A28] flex items-center gap-2 border-b border-[#D5C9BE]/70/40 pb-2">
               <Phone className="w-4 h-4 text-[#E85F57]" /> 2. Contact Details & Location
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-1 text-left">
-                <label className="text-xs font-semibold text-[#353535]">Email Address</label>
+                <label className="text-xs font-semibold text-[#2C2A28]">Email Address</label>
                 <Input
                   type="email"
                   value={email}
                   disabled
                   title="Used as unique account ID. Cannot be modified."
-                  className="border-[#DDD8CE] text-sm h-10 bg-gray-50 text-gray-500 cursor-not-allowed"
+                  className="border-[#D5C9BE]/70 text-sm h-10 bg-gray-50 text-gray-500 cursor-not-allowed"
                 />
               </div>
 
               <div className="space-y-1 text-left">
-                <label className="text-xs font-semibold text-[#353535]">Phone Number</label>
+                <label className="text-xs font-semibold text-[#2C2A28]">Phone Number</label>
                 <Input
                   value={phone}
                   placeholder="+91 98765 00000"
                   onChange={(e) => setPhone(e.target.value)}
-                  className="border-[#DDD8CE] focus-visible:ring-[#E85F57] text-sm h-10 bg-white"
+                  className="border-[#D5C9BE]/70 focus-visible:ring-[#E85F57] text-sm h-10 bg-[#F7F5F0]"
                   required
                 />
               </div>
@@ -277,32 +277,32 @@ export default function EditProfile() {
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               <div className="md:col-span-2 space-y-1 text-left">
-                <label className="text-xs font-semibold text-[#353535]">Street Address</label>
+                <label className="text-xs font-semibold text-[#2C2A28]">Street Address</label>
                 <Input
                   value={address}
                   placeholder="e.g. 102 Juhu Scheme"
                   onChange={(e) => setAddress(e.target.value)}
-                  className="border-[#DDD8CE] focus-visible:ring-[#E85F57] text-sm h-10 bg-white"
+                  className="border-[#D5C9BE]/70 focus-visible:ring-[#E85F57] text-sm h-10 bg-[#F7F5F0]"
                 />
               </div>
 
               <div className="space-y-1 text-left">
-                <label className="text-xs font-semibold text-[#353535]">City</label>
+                <label className="text-xs font-semibold text-[#2C2A28]">City</label>
                 <Input
                   value={city}
                   placeholder="e.g. Mumbai"
                   onChange={(e) => setCity(e.target.value)}
-                  className="border-[#DDD8CE] focus-visible:ring-[#E85F57] text-sm h-10 bg-white"
+                  className="border-[#D5C9BE]/70 focus-visible:ring-[#E85F57] text-sm h-10 bg-[#F7F5F0]"
                 />
               </div>
 
               <div className="space-y-1 text-left">
-                <label className="text-xs font-semibold text-[#353535]">State / UT</label>
+                <label className="text-xs font-semibold text-[#2C2A28]">State / UT</label>
                 <Input
                   value={state}
                   placeholder="e.g. Maharashtra"
                   onChange={(e) => setState(e.target.value)}
-                  className="border-[#DDD8CE] focus-visible:ring-[#E85F57] text-sm h-10 bg-white"
+                  className="border-[#D5C9BE]/70 focus-visible:ring-[#E85F57] text-sm h-10 bg-[#F7F5F0]"
                 />
               </div>
             </div>
@@ -310,18 +310,18 @@ export default function EditProfile() {
 
           {/* Section 3: Theatrical Details */}
           <div className="space-y-6">
-            <h2 className="text-xs font-bold uppercase tracking-widest text-[#353535] flex items-center gap-2 border-b border-[#DDD8CE]/40 pb-2">
+            <h2 className="text-xs font-bold uppercase tracking-widest text-[#2C2A28] flex items-center gap-2 border-b border-[#D5C9BE]/70/40 pb-2">
               <Award className="w-4 h-4 text-[#E85F57]" /> 3. Theatrical Profile & Skillsets
             </h2>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="space-y-1 text-left">
-                <label className="text-xs font-semibold text-[#353535]">Primary Interest</label>
+                <label className="text-xs font-semibold text-[#2C2A28]">Primary Interest</label>
                 <Select value={interest} onValueChange={(val) => setInterest(val ?? "Acting")}>
-                  <SelectTrigger className="w-full border-[#DDD8CE] bg-white text-[#666361] hover:bg-gray-50 focus:ring-[#E85F57] text-sm h-10 px-3 flex items-center justify-between rounded-lg">
+                  <SelectTrigger className="w-full border-[#D5C9BE]/70 bg-[#F7F5F0] text-[#666361] hover:bg-gray-50 focus:ring-[#E85F57] text-sm h-10 px-3 flex items-center justify-between rounded-lg">
                     <SelectValue placeholder="Interest" />
                   </SelectTrigger>
-                  <SelectContent className="bg-white border border-[#DDD8CE] text-[#666361] rounded-lg shadow-md mt-1 z-50">
+                  <SelectContent className="bg-[#F7F5F0] border border-[#D5C9BE]/70 rounded-[2rem] text-[#666361] rounded-lg shadow-md mt-1 z-50">
                     <SelectGroup>
                       <SelectItem value="Acting" className="hover:bg-[#E85F57]/10 rounded-md py-1.5 px-3 cursor-pointer">Acting</SelectItem>
                       <SelectItem value="Direction" className="hover:bg-[#E85F57]/10 rounded-md py-1.5 px-3 cursor-pointer">Direction</SelectItem>
@@ -335,12 +335,12 @@ export default function EditProfile() {
               </div>
 
               <div className="space-y-1 text-left">
-                <label className="text-xs font-semibold text-[#353535]">Rehearsal Availability</label>
+                <label className="text-xs font-semibold text-[#2C2A28]">Rehearsal Availability</label>
                 <Select value={availability} onValueChange={(val) => setAvailability(val ?? "Weekends")}>
-                  <SelectTrigger className="w-full border-[#DDD8CE] bg-white text-[#666361] hover:bg-gray-50 focus:ring-[#E85F57] text-sm h-10 px-3 flex items-center justify-between rounded-lg">
+                  <SelectTrigger className="w-full border-[#D5C9BE]/70 bg-[#F7F5F0] text-[#666361] hover:bg-gray-50 focus:ring-[#E85F57] text-sm h-10 px-3 flex items-center justify-between rounded-lg">
                     <SelectValue placeholder="Availability" />
                   </SelectTrigger>
-                  <SelectContent className="bg-white border border-[#DDD8CE] text-[#666361] rounded-lg shadow-md mt-1 z-50">
+                  <SelectContent className="bg-[#F7F5F0] border border-[#D5C9BE]/70 rounded-[2rem] text-[#666361] rounded-lg shadow-md mt-1 z-50">
                     <SelectGroup>
                       <SelectItem value="Weekends" className="hover:bg-[#E85F57]/10 rounded-md py-1.5 px-3 cursor-pointer">Weekends Only</SelectItem>
                       <SelectItem value="Weekdays" className="hover:bg-[#E85F57]/10 rounded-md py-1.5 px-3 cursor-pointer">Weekdays Only</SelectItem>
@@ -351,52 +351,52 @@ export default function EditProfile() {
               </div>
 
               <div className="space-y-1 text-left">
-                <label className="text-xs font-semibold text-[#353535]">Portfolio / Github Link</label>
+                <label className="text-xs font-semibold text-[#2C2A28]">Portfolio / Github Link</label>
                 <Input
                   value={portfolio}
                   placeholder="https://github.com/profile"
                   onChange={(e) => setPortfolio(e.target.value)}
-                  className="border-[#DDD8CE] focus-visible:ring-[#E85F57] text-sm h-10 bg-white"
+                  className="border-[#D5C9BE]/70 focus-visible:ring-[#E85F57] text-sm h-10 bg-[#F7F5F0]"
                 />
               </div>
             </div>
 
             <div className="space-y-1 text-left">
-              <label className="text-xs font-semibold text-[#353535]">Short Biography</label>
+              <label className="text-xs font-semibold text-[#2C2A28]">Short Biography</label>
               <textarea
                 value={bio}
                 rows={4}
                 onChange={(e) => setBio(e.target.value)}
                 placeholder="Share your experience, previous productions, and training..."
-                className="w-full border border-[#DDD8CE] focus:outline-none focus:ring-1 focus:ring-[#E85F57] text-sm rounded-lg p-3 bg-white text-[#666361]"
+                className="w-full border border-[#D5C9BE]/70 focus:outline-none focus:ring-1 focus:ring-[#E85F57] text-sm rounded-lg p-3 bg-[#F7F5F0] text-[#666361]"
               />
             </div>
           </div>
 
           {/* Section 4: Emergency Contacts */}
           <div className="space-y-6">
-            <h2 className="text-xs font-bold uppercase tracking-widest text-[#353535] flex items-center gap-2 border-b border-[#DDD8CE]/40 pb-2">
+            <h2 className="text-xs font-bold uppercase tracking-widest text-[#2C2A28] flex items-center gap-2 border-b border-[#D5C9BE]/70/40 pb-2">
               <ShieldAlert className="w-4 h-4 text-[#E85F57]" /> 4. Emergency Contacts
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-1 text-left">
-                <label className="text-xs font-semibold text-[#353535]">Contact Name</label>
+                <label className="text-xs font-semibold text-[#2C2A28]">Contact Name</label>
                 <Input
                   value={emergencyName}
                   placeholder="e.g. Spouse / Parent name"
                   onChange={(e) => setEmergencyName(e.target.value)}
-                  className="border-[#DDD8CE] focus-visible:ring-[#E85F57] text-sm h-10 bg-white"
+                  className="border-[#D5C9BE]/70 focus-visible:ring-[#E85F57] text-sm h-10 bg-[#F7F5F0]"
                   required
                 />
               </div>
 
               <div className="space-y-1 text-left">
-                <label className="text-xs font-semibold text-[#353535]">Contact Phone</label>
+                <label className="text-xs font-semibold text-[#2C2A28]">Contact Phone</label>
                 <Input
                   value={emergencyPhone}
                   placeholder="+91 98765 00000"
                   onChange={(e) => setEmergencyPhone(e.target.value)}
-                  className="border-[#DDD8CE] focus-visible:ring-[#E85F57] text-sm h-10 bg-white"
+                  className="border-[#D5C9BE]/70 focus-visible:ring-[#E85F57] text-sm h-10 bg-[#F7F5F0]"
                   required
                 />
               </div>
@@ -404,12 +404,12 @@ export default function EditProfile() {
           </div>
 
           {/* Action buttons */}
-          <div className="mt-8 pt-6 border-t border-[#DDD8CE] flex flex-col sm:flex-row gap-4">
+          <div className="mt-8 pt-6 border-t border-[#D5C9BE]/70 flex flex-col sm:flex-row gap-4">
             <Button
               type="button"
               variant="outline"
               onClick={() => navigate(activeUser?.role.toLowerCase().includes("maintainer") ? "/maintainer" : "/member")}
-              className="border-2 border-[#DDD8CE] text-[#666361] hover:bg-[#EFE8E1] rounded-xl flex-1 py-4 font-semibold"
+              className="border-2 border-[#D5C9BE]/70 text-[#666361] hover:bg-[#E7DDD3] rounded-xl flex-1 py-4 font-semibold"
             >
               Cancel
             </Button>
