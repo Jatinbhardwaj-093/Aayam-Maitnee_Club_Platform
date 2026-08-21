@@ -352,19 +352,20 @@ export default function MemberScripts() {
 
   const fetchScripts = async () => {
     setLoading(true);
-    const baseUrl = import.meta.env.VITE_API_URL || "";
+    const baseUrl = import.meta.env.VITE_API_BASE_URL ?? import.meta.env.VITE_API_URL ?? "";
     try {
       const email = activeUser?.email || "member@matinee.club";
-      const res = await fetch(`${baseUrl}/api/scripts?user_email=${encodeURIComponent(email)}`);
+      const res = await fetch(`${baseUrl}/api/scripts?user_email=${encodeURIComponent(email)}&email=${encodeURIComponent(email)}`);
       if (res.ok) {
         const data = await res.json();
-        if (data.public_scripts && data.public_scripts.length > 0) {
-          setPublicScripts(data.public_scripts);
+        const pub = (data.public_scripts && data.public_scripts.length > 0) ? data.public_scripts : (data.public || []);
+        if (pub.length > 0) {
+          setPublicScripts(pub);
         } else {
           setPublicScripts(fallbackPublicScripts);
         }
-        setMyDrafts(data.my_drafts || []);
-        setPendingScripts(data.pending_scripts || []);
+        setMyDrafts(data.my_drafts || data.drafts || []);
+        setPendingScripts(data.pending_scripts || data.pending || []);
       } else {
         setPublicScripts(fallbackPublicScripts);
       }

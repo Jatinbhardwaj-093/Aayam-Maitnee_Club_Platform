@@ -1677,7 +1677,7 @@ export default function AiRehearsalStudio() {
       )}
 
       {/* MAIN 2-COLUMN STUDIO LAYOUT: VAULT ROSTER (LEFT) & CUSTOM PARSER (RIGHT) */}
-      <section className="grid grid-cols-1 lg:grid-cols-[1.05fr_0.95fr] gap-5 w-full items-start">
+      <section className="grid grid-cols-1 lg:grid-cols-[1.35fr_1fr] gap-5 w-full items-start">
         
         {/* LEFT: SCRIPT VAULT SELECTION ROSTER */}
         <div className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-2xl p-4 sm:p-5 space-y-4 shadow-xs">
