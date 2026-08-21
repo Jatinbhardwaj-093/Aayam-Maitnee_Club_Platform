@@ -16,3 +16,4 @@ moviepy>=2.0.0
 numpy>=2.0.0
 Pillow>=11.0.0
 litellm==1.42.5
+edge-tts>=7.0.0

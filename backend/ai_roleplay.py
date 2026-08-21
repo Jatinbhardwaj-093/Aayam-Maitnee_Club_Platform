@@ -1,3 +1,5 @@
+import asyncio
+import base64
 import json
 import logging
 import re
@@ -5,6 +7,11 @@ import time
 import uuid
 from difflib import SequenceMatcher
 
+try:
+    import edge_tts
+    HAS_EDGE_TTS = True
+except ImportError:
+    HAS_EDGE_TTS = False
 
 logger = logging.getLogger(__name__)
 
@@ -180,6 +187,64 @@ class BrowserTTSProvider(TTSProvider):
         }
 
 
+class EdgeTTSProvider(TTSProvider):
+    def __init__(self):
+        self.fallback = BrowserTTSProvider()
+
+    async def _generate_async(self, text, voice="en-US-AriaNeural", rate="+0%", pitch="+0Hz"):
+        communicate = edge_tts.Communicate(text, voice, rate=rate, pitch=pitch)
+        audio_data = bytearray()
+        async for chunk in communicate.stream():
+            if chunk["type"] == "audio":
+                audio_data.extend(chunk["data"])
+        return bytes(audio_data)
+
+    def synthesize(self, text, voice="female", performance=None):
+        voice_key = (voice or "female").lower()
+        if "female" in voice_key:
+            chosen_voice = "en-US-AriaNeural"
+            chosen_pitch = "+0Hz"
+            chosen_rate = "-3%"
+        elif "male" in voice_key:
+            chosen_voice = "en-US-GuyNeural"
+            chosen_pitch = "-2Hz"
+            chosen_rate = "-4%"
+        else:
+            chosen_voice = "en-US-AriaNeural"
+            chosen_pitch = "+0Hz"
+            chosen_rate = "-3%"
+
+        words = split_words(text)
+        timings = []
+        cursor = 0.08
+        pace = (performance or {}).get("pace", "moderate")
+        pace_multiplier = {"slow": 1.18, "moderate": 1.0, "brisk": 0.86}.get(pace, 1.0)
+        for word in words:
+            duration = max(0.18, min(0.58, len(normalize_word(word)) * 0.055 + 0.14)) * pace_multiplier
+            timings.append({"word": word, "start": round(cursor, 2), "end": round(cursor + duration, 2)})
+            cursor += duration + (0.06 * pace_multiplier)
+
+        audio_b64 = None
+        if HAS_EDGE_TTS:
+            try:
+                raw_audio = asyncio.run(self._generate_async(text, chosen_voice, chosen_rate, chosen_pitch))
+                if raw_audio:
+                    audio_b64 = f"data:audio/mp3;base64,{base64.b64encode(raw_audio).decode('utf-8')}"
+            except Exception as exc:
+                logger.warning("edge-tts audio generation failed, using fallback: %s", exc)
+
+        return {
+            "text": text,
+            "audio_url": audio_b64,
+            "voice": chosen_voice,
+            "voice_preference": voice,
+            "words": timings,
+            "duration": round(cursor, 2),
+            "provider": "edge-tts" if audio_b64 else "browser-speech-synthesis",
+            "performance": performance,
+        }
+
+
 def split_words(text):
     return re.findall(r"[\w']+|[^\s\w]", text, flags=re.UNICODE)
 
@@ -232,7 +297,7 @@ class RehearsalService:
         self.stt = BrowserTranscriptProvider()
         self.llm = ScriptedDialogueProvider()
         self.performance_provider = performance_provider
-        self.tts = BrowserTTSProvider()
+        self.tts = EdgeTTSProvider() if HAS_EDGE_TTS else BrowserTTSProvider()
         self.sessions = {}
 
     def parse_script(self, script):

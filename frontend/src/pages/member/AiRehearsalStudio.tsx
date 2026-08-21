@@ -86,38 +86,30 @@ const localMatchSpokenWords = (expectedWords: string[], transcriptText: string) 
   };
 };
 
-// Premium voice scorer to select natural human voices across browsers
+// Premium voice scorer to select natural human voices across browsers as fallback
 const rankVoice = (voice: SpeechSynthesisVoice, preference: VoicePreference): number => {
   const name = voice.name.toLowerCase();
   const lang = (voice.lang || "").toLowerCase();
   let score = 0;
 
-  // Prefer English
   if (lang.startsWith("en")) score += 40;
   if (lang.includes("en-us") || lang.includes("en-gb") || lang.includes("en-in") || lang.includes("en-au")) score += 20;
 
-  // Premium / Natural AI markers
   if (name.includes("natural") || name.includes("online (natural)")) score += 150;
   if (name.includes("premium") || name.includes("enhanced")) score += 120;
   if (name.includes("neural") || name.includes("google")) score += 90;
 
-  // Heavy penalty for mechanical / legacy system synths
   if (
     name.includes("compact") ||
     name.includes("espeak") ||
     name.includes("whisper") ||
     name.includes("zarvox") ||
     name.includes("trinoids") ||
-    name.includes("cellos") ||
-    name.includes("bad news") ||
-    name.includes("good news") ||
-    name.includes("bells") ||
-    name.includes("boing")
+    name.includes("cellos")
   ) {
     score -= 200;
   }
 
-  // Female voice candidates
   if (preference === "female") {
     if (
       name.includes("female") ||
@@ -130,10 +122,7 @@ const rankVoice = (voice: SpeechSynthesisVoice, preference: VoicePreference): nu
       name.includes("moira") ||
       name.includes("tessa") ||
       name.includes("victoria") ||
-      name.includes("ava") ||
-      name.includes("allison") ||
-      name.includes("susan") ||
-      name.includes("zira")
+      name.includes("ava")
     ) {
       score += 70;
     }
@@ -142,7 +131,6 @@ const rankVoice = (voice: SpeechSynthesisVoice, preference: VoicePreference): nu
     }
   }
 
-  // Male voice candidates
   if (preference === "male") {
     if (
       (name.includes("male") && !name.includes("female")) ||
@@ -153,11 +141,7 @@ const rankVoice = (voice: SpeechSynthesisVoice, preference: VoicePreference): nu
       name.includes("oliver") ||
       name.includes("alex") ||
       name.includes("david") ||
-      name.includes("mark") ||
-      name.includes("rishi") ||
-      name.includes("george") ||
-      name.includes("tom") ||
-      name.includes("arthur")
+      name.includes("mark")
     ) {
       score += 70;
     }
@@ -174,8 +158,6 @@ const selectBrowserVoice = (voices: SpeechSynthesisVoice[], preference: VoicePre
   const sorted = [...voices].sort((a, b) => rankVoice(b, preference) - rankVoice(a, preference));
   return sorted[0] || voices[0] || null;
 };
-
-const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
 
 export default function AiRehearsalStudio() {
   const { activeUser } = useOutletContext<any>() || {};
@@ -214,6 +196,7 @@ export default function AiRehearsalStudio() {
   const silenceTimerRef = useRef<number | null>(null);
   const aiTimerRef = useRef<number | null>(null);
   const aiPreparingRef = useRef(false);
+  const audioPlayerRef = useRef<HTMLAudioElement | null>(null);
   const lastTranscriptRef = useRef("");
   const lastSentTranscriptRef = useRef("");
   const lastSentAtRef = useRef(0);
@@ -248,6 +231,10 @@ export default function AiRehearsalStudio() {
 
   const clearRehearsalState = () => {
     stopListening();
+    if (audioPlayerRef.current) {
+      audioPlayerRef.current.pause();
+      audioPlayerRef.current = null;
+    }
     window.speechSynthesis?.cancel();
     if (aiTimerRef.current) {
       window.clearInterval(aiTimerRef.current);
@@ -424,6 +411,10 @@ export default function AiRehearsalStudio() {
   const stopSession = async () => {
     if (!session?.session_id) return;
     stopListening();
+    if (audioPlayerRef.current) {
+      audioPlayerRef.current.pause();
+      audioPlayerRef.current = null;
+    }
     window.speechSynthesis?.cancel();
     try {
       await fetch(`${baseUrl}/api/rehearsal/roleplay/${session.session_id}/stop`, { method: "POST" });
@@ -437,6 +428,10 @@ export default function AiRehearsalStudio() {
     if (!session) return;
     if (session.scene_status === "complete") {
       stopListening();
+      if (audioPlayerRef.current) {
+        audioPlayerRef.current.pause();
+        audioPlayerRef.current = null;
+      }
       window.speechSynthesis?.cancel();
       setAudioStatus("Scene Complete");
       return;
@@ -610,31 +605,21 @@ export default function AiRehearsalStudio() {
     }
   };
 
-  // High-fidelity natural voice synthesizer
-  const speakAiTurn = (nextSession: any) => {
-    const payload = nextSession.ai_payload;
-    if (!payload?.text) {
-      completeAiTurn(nextSession.session_id);
-      return;
-    }
+  const fallbackBrowserSpeak = (nextSession: any, payload: any, words: any[]) => {
     if (!("speechSynthesis" in window)) {
-      setError("Browser audio synthesis unavailable. Advancing cue automatically.");
+      setError("Audio synthesis unavailable. Advancing cue automatically.");
       window.setTimeout(() => completeAiTurn(nextSession.session_id), 1400);
       return;
     }
 
     window.speechSynthesis.cancel();
-    setAiWordIndex(-1);
-    setAudioStatus("AI Partner Speaking");
-
     const utterance = new SpeechSynthesisUtterance(payload.text);
     const pref: VoicePreference =
-      (payload.voice as VoicePreference) ||
+      (payload.voice_preference as VoicePreference) ||
       voicePreferences[nextSession.current_speaker] ||
       voicePreferences[payload.character] ||
       "female";
 
-    // Natural theatrical pacing & pitch
     if (pref === "female") {
       utterance.rate = 0.94;
       utterance.pitch = 1.0;
@@ -650,7 +635,6 @@ export default function AiRehearsalStudio() {
       utterance.voice = voice;
     }
 
-    const words = payload.words || [];
     const startedAt = performance.now();
     if (aiTimerRef.current) window.clearInterval(aiTimerRef.current);
     aiTimerRef.current = window.setInterval(() => {
@@ -664,12 +648,6 @@ export default function AiRehearsalStudio() {
       }
     }, 60);
 
-    utterance.onboundary = (event: any) => {
-      if (event.name !== "word") return;
-      const spokenPrefix = payload.text.slice(0, event.charIndex);
-      const idx = wordSpans(spokenPrefix).filter((word) => normalize(word)).length;
-      setAiWordIndex(idx);
-    };
     utterance.onend = () => {
       if (aiTimerRef.current) window.clearInterval(aiTimerRef.current);
       setAiWordIndex(-1);
@@ -682,6 +660,71 @@ export default function AiRehearsalStudio() {
       completeAiTurn(nextSession.session_id);
     };
     window.speechSynthesis.speak(utterance);
+  };
+
+  // High-fidelity neural voice synthesizer with Edge-TTS studio audio stream
+  const speakAiTurn = (nextSession: any) => {
+    const payload = nextSession.ai_payload;
+    if (!payload?.text) {
+      completeAiTurn(nextSession.session_id);
+      return;
+    }
+
+    if (audioPlayerRef.current) {
+      audioPlayerRef.current.pause();
+      audioPlayerRef.current = null;
+    }
+    window.speechSynthesis?.cancel();
+    setAiWordIndex(-1);
+    setAudioStatus("AI Partner Speaking");
+
+    const words = payload.words || [];
+
+    // 1. Play Studio-Grade Edge-TTS Neural Audio Stream
+    if (payload.audio_url) {
+      try {
+        const audio = new Audio(payload.audio_url);
+        audioPlayerRef.current = audio;
+
+        const startedAt = performance.now();
+        if (aiTimerRef.current) window.clearInterval(aiTimerRef.current);
+        aiTimerRef.current = window.setInterval(() => {
+          const elapsed = (performance.now() - startedAt) / 1000;
+          const idx = words.findIndex((word: any) => elapsed >= word.start && elapsed <= word.end);
+          if (idx >= 0) {
+            setAiWordIndex(idx);
+          } else {
+            const lastSpoken = words.findLastIndex((word: any) => elapsed > word.end);
+            if (lastSpoken >= 0) setAiWordIndex(lastSpoken);
+          }
+        }, 60);
+
+        audio.onended = () => {
+          if (aiTimerRef.current) window.clearInterval(aiTimerRef.current);
+          setAiWordIndex(-1);
+          setAudioStatus("AI Turn Complete");
+          audioPlayerRef.current = null;
+          completeAiTurn(nextSession.session_id);
+        };
+
+        audio.onerror = (e) => {
+          console.warn("Edge-TTS audio stream error, falling back to browser speech", e);
+          if (aiTimerRef.current) window.clearInterval(aiTimerRef.current);
+          fallbackBrowserSpeak(nextSession, payload, words);
+        };
+
+        audio.play().catch((err) => {
+          console.warn("Audio autoplay prevented, falling back:", err);
+          fallbackBrowserSpeak(nextSession, payload, words);
+        });
+        return;
+      } catch (err) {
+        console.warn("Audio initialization error:", err);
+      }
+    }
+
+    // 2. Fallback to Browser Speech Synthesis if edge-tts not returned
+    fallbackBrowserSpeak(nextSession, payload, words);
   };
 
   const completeAiTurn = async (sessionId: string) => {
@@ -816,7 +859,7 @@ export default function AiRehearsalStudio() {
                 ) : isAiTurn ? (
                   <div className="inline-flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider text-[#8C241E] bg-[#EEDBD5]/60 px-4 py-1.5 rounded-full border border-[#D5AAA2]">
                     <Volume2 className="w-3.5 h-3.5 animate-pulse text-[#8C241E]" />
-                    <span>AI Partner Speaking...</span>
+                    <span>AI Studio Neural Voice Speaking...</span>
                   </div>
                 ) : null}
               </div>
@@ -1040,7 +1083,7 @@ export default function AiRehearsalStudio() {
             Rehearsal Studio
           </h1>
           <p className="font-sans text-xs text-[#5C3B37] leading-relaxed">
-            Select a play from the repertoire or import a custom scene to rehearse with natural AI roleplay.
+            Select a play from the repertoire or import a custom scene to rehearse with natural Edge-TTS AI roleplay.
           </p>
         </div>
 
