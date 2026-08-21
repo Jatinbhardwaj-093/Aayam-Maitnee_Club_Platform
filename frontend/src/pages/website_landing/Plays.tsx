@@ -363,11 +363,11 @@ export default function Plays() {
                     </div>
                   </div>
 
-                  {/* Card Actions - ALL IN ONE SINGLE LINE WITH NO ICONS */}
-                  <div className="p-4 sm:p-5 pt-0 border-t border-white/10 pt-3.5 flex items-center gap-1.5 w-full flex-nowrap">
+                  {/* Card Actions - CLEAN SINGLE LINE WITHOUT ICONS */}
+                  <div className="p-4 sm:p-5 pt-0 border-t border-white/10 pt-3.5 flex items-center gap-2 w-full flex-nowrap">
                     <button
                       onClick={() => handleOpenDetails(play)}
-                      className="flex-1 py-2 px-1 rounded-full border border-white/20 hover:bg-white/10 text-white text-[11px] font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer truncate"
+                      className="flex-1 py-2 px-2 rounded-full border border-white/20 hover:bg-white/10 text-white text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer truncate"
                       title="View full production dossier"
                     >
                       Details
@@ -375,29 +375,30 @@ export default function Plays() {
 
                     <button
                       onClick={() => handleOpenScriptPreview(play)}
-                      className="flex-1 py-2 px-1 rounded-full border border-white/20 hover:bg-white/10 text-[#E85F57] text-[11px] font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer truncate"
+                      className="flex-1 py-2 px-2 rounded-full border border-white/20 hover:bg-white/10 text-[#E85F57] text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer truncate"
                       title="Preview Script & Playbook"
                     >
                       Script
                     </button>
 
-                    <button
-                      onClick={() => handleOpenEdit(play)}
-                      className="flex-1 py-2 px-1 rounded-full bg-[#E85F57]/20 border border-[#E85F57]/40 hover:bg-[#E85F57]/30 text-white text-[11px] font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer truncate"
-                      title={play.is_past ? "Update archival artwork & upload script" : "Edit full production details"}
-                    >
-                      Edit
-                    </button>
-
                     {!play.is_past ? (
-                      <button
-                        onClick={() => handleReservePass(play.title)}
-                        className="flex-1 py-2 px-1 rounded-full bg-[#E85F57] hover:bg-[#D94538] text-white text-[11px] font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer shadow-md truncate"
-                      >
-                        Reserve
-                      </button>
+                      <>
+                        <button
+                          onClick={() => handleReservePass(play.title)}
+                          className="flex-1 py-2 px-2 rounded-full bg-[#E85F57] hover:bg-[#D94538] text-white text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer shadow-md truncate"
+                        >
+                          Reserve
+                        </button>
+                        <button
+                          onClick={() => handleOpenVolunteer(play)}
+                          className="flex-1 py-2 px-2 rounded-full border border-white/20 hover:bg-white/10 text-white text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer truncate"
+                          title="Volunteer for Backstage Crew"
+                        >
+                          Crew
+                        </button>
+                      </>
                     ) : (
-                      <span className="flex-1 py-2 px-1 rounded-full bg-white/10 border border-white/10 text-white/60 text-[10px] font-mono font-bold uppercase tracking-wider text-center truncate">
+                      <span className="flex-1 py-2 px-2 rounded-full bg-white/10 border border-white/10 text-white/60 text-xs font-mono font-bold uppercase tracking-wider text-center truncate">
                         Archived
                       </span>
                     )}

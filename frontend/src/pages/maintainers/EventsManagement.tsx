@@ -1096,35 +1096,28 @@ export default function EventsManagement() {
                 return (
                   <div 
                     key={ev.id} 
-                    className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-[2rem] p-6 sm:p-7 hover:border-[#B32D25]/50 hover:shadow-md transition-all flex flex-col justify-between group space-y-5 shadow-xs overflow-hidden"
+                    className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-3xl p-6 sm:p-7 hover:border-[#B32D25]/50 hover:shadow-md transition-all flex flex-col justify-between group space-y-5 shadow-xs"
                   >
-                    <div className="space-y-4">
+                    <div className="space-y-3.5">
                       {/* Top Category & Status Header */}
-                      <div className="flex items-start justify-between gap-2 border-b border-[#DCBAB2]/50 pb-3">
-                        <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className="inline-block px-3 py-0.5 bg-[#EEDBD5] text-[#8C241E] border border-[#D5AAA2] rounded-full text-[10px] font-mono font-bold uppercase tracking-wider truncate">
-                            {ev.category}
-                          </span>
-
-                          {/* Sponsorship Badge */}
-                          {ev.is_sponsored ? (
-                            <span className="inline-block px-2.5 py-0.5 bg-amber-700/15 text-amber-950 border border-amber-700/30 rounded-full text-[9px] font-mono font-bold uppercase tracking-wider truncate">
-                              Sponsored: {ev.sponsor_name || "Partner"}
-                            </span>
-                          ) : (
-                            <span className="inline-block px-2.5 py-0.5 bg-emerald-700/15 text-emerald-950 border border-emerald-700/30 rounded-full text-[9px] font-mono font-bold uppercase tracking-wider truncate">
-                              Society / Member Run
-                            </span>
-                          )}
-                        </div>
-
-                        <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border shrink-0 bg-emerald-700/15 text-emerald-950 border-emerald-700/30">
-                          {ev.status || "Upcoming"}
+                      <div className="flex items-center justify-between gap-2 border-b border-[#DCBAB2]/50 pb-3">
+                        <span className="text-[11px] font-mono text-[#8C5A54] uppercase tracking-wider font-semibold truncate">
+                          {ev.category} • {ev.date}
                         </span>
+
+                        {ev.is_sponsored ? (
+                          <span className="inline-block px-2.5 py-0.5 bg-amber-700/15 text-amber-950 border border-amber-700/30 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider shrink-0">
+                            Sponsored: {ev.sponsor_name || "Partner"}
+                          </span>
+                        ) : (
+                          <span className="inline-block px-2.5 py-0.5 bg-emerald-700/15 text-emerald-950 border border-emerald-700/30 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider shrink-0">
+                            Society Run
+                          </span>
+                        )}
                       </div>
 
                       {/* Event Title */}
-                      <h3 className="font-serif text-xl sm:text-2xl text-[#2A1816] leading-snug font-normal group-hover:text-[#8C241E] transition-colors break-words">
+                      <h3 className="font-serif text-2xl text-[#2A1816] leading-snug font-normal group-hover:text-[#8C241E] transition-colors break-words">
                         {ev.title}
                       </h3>
 
@@ -1135,52 +1128,37 @@ export default function EventsManagement() {
                         </p>
                       )}
 
-                      {/* Schedule & Venue Metadata */}
-                      <div className="space-y-1.5 pt-2 border-t border-[#DCBAB2]/40 text-xs font-mono text-[#5C3B37]">
-                        <p className="flex items-center gap-1.5 truncate">
-                          <Calendar className="w-3.5 h-3.5 text-[#8C241E] shrink-0" />
-                          <span className="truncate">{ev.date}</span>
-                        </p>
-                        <p className="flex items-center gap-1.5 truncate">
-                          <MapPin className="w-3.5 h-3.5 text-[#8C241E] shrink-0" />
-                          <span className="truncate">{ev.venue}</span>
-                        </p>
-                      </div>
-
-                      {/* Sponsorship & Patronage Ribbon */}
-                      <div className="p-3 bg-[#F5EAE6] rounded-xl border border-[#DEBEB7] space-y-1.5 text-xs font-mono">
-                        {ev.is_sponsored ? (
-                          <div className="flex items-center justify-between">
-                            <span className="text-[#8C5A54] uppercase text-[10px] font-bold">Sponsorship Deal</span>
-                            <span className="font-bold text-amber-950">{ev.sponsor_amount || "Fully Funded"}</span>
-                          </div>
-                        ) : (
-                          <div className="flex items-center justify-between">
-                            <div className="space-y-0.5">
-                              <span className="text-[#8C5A54] uppercase text-[10px] font-bold block">Patronage Donations</span>
-                              <span className="text-emerald-950 font-bold">{ev.donations_collected || "₹0"} / {ev.target_budget || "₹25,000"}</span>
-                            </div>
-                            <button
-                              onClick={() => setSelectedEventForDonation(ev)}
-                              className="px-3 py-1 bg-[#FAF2EE] hover:bg-[#EEDBD5] border border-[#DCBAB2] text-[#8C241E] text-[10px] font-bold uppercase rounded-lg transition-all cursor-pointer flex items-center gap-1"
-                              title="Pledge society donation or manage funding"
-                            >
-                              <Heart className="w-3 h-3" />
-                              <span>Donate / Fund</span>
-                            </button>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Clean Stats Counters (No Emojis) */}
-                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 pt-1 text-[11px] font-mono">
-                        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#F5EAE6] border border-[#DEBEB7] text-[#5C3B37] truncate">
-                          <Users className="w-3.5 h-3.5 text-[#8C241E] shrink-0" />
-                          <span className="truncate">{eventPositions.length} Roles ({eventApps.length} Candidates)</span>
+                      {/* Unified Calm Editorial Specifications Panel */}
+                      <div className="bg-[#F5EAE6] p-3.5 rounded-2xl border border-[#DEBEB7] space-y-2 text-xs font-mono text-[#5C3B37]">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-[#8C5A54] text-[10px] uppercase font-bold">Venue</span>
+                          <span className="text-[#2A1816] font-medium truncate">{ev.venue}</span>
                         </div>
-                        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#F5EAE6] border border-[#DEBEB7] text-[#5C3B37] truncate">
-                          <HeartHandshake className="w-3.5 h-3.5 text-[#8C241E] shrink-0" />
-                          <span className="truncate">{eventVols.length} Volunteers</span>
+
+                        <div className="flex items-center justify-between gap-2 pt-1 border-t border-[#DCBAB2]/40">
+                          <span className="text-[#8C5A54] text-[10px] uppercase font-bold">
+                            {ev.is_sponsored ? "Sponsorship" : "Patronage"}
+                          </span>
+                          {ev.is_sponsored ? (
+                            <span className="font-bold text-amber-950">{ev.sponsor_amount || "Fully Funded"}</span>
+                          ) : (
+                            <div className="flex items-center gap-2">
+                              <span className="font-bold text-emerald-950">{ev.donations_collected || "₹0"} / {ev.target_budget || "₹25,000"}</span>
+                              <button
+                                onClick={() => setSelectedEventForDonation(ev)}
+                                className="text-[10px] font-bold text-[#8C241E] underline hover:text-[#731B16] cursor-pointer"
+                              >
+                                Donate
+                              </button>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="flex items-center justify-between gap-2 pt-1 border-t border-[#DCBAB2]/40 text-[11px]">
+                          <span className="text-[#8C5A54] text-[10px] uppercase font-bold">Roster</span>
+                          <span className="text-[#2A1816]">
+                            {eventPositions.length} Roles ({eventApps.length} Applicants) • {eventVols.length} Crew
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -1322,11 +1300,11 @@ export default function EventsManagement() {
                 return (
                   <div
                     key={pitch.id}
-                    className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-[2rem] p-7 hover:border-[#B32D25]/50 hover:shadow-md transition-all flex flex-col justify-between space-y-6 shadow-xs group"
+                    className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-3xl p-6 sm:p-7 hover:border-[#B32D25]/50 hover:shadow-md transition-all flex flex-col justify-between space-y-5 shadow-xs group"
                   >
-                    <div className="space-y-4">
+                    <div className="space-y-3.5">
                       {/* Top Header: Submitter & Type Tag */}
-                      <div className="flex items-start justify-between gap-3 border-b border-[#DCBAB2]/50 pb-3">
+                      <div className="flex items-center justify-between gap-3 border-b border-[#DCBAB2]/50 pb-3">
                         <div className="flex items-center gap-2.5 min-w-0">
                           <div className="w-8 h-8 rounded-full bg-[#EEDBD5] border border-[#D5AAA2] text-[#8C241E] font-mono text-xs font-bold flex items-center justify-center shrink-0">
                             {pitch.submitter?.initials || (isMember ? "M" : "SP")}
@@ -1347,7 +1325,7 @@ export default function EventsManagement() {
                               ? "bg-[#EEDBD5] text-[#8C241E] border-[#D5AAA2]"
                               : "bg-amber-700/15 text-amber-950 border-amber-700/30"
                           }`}>
-                            {isMember ? "Member Pitch (Unfunded)" : "Sponsor Pitch (Funded)"}
+                            {isMember ? "Member Pitch" : "Sponsor Pitch"}
                           </span>
 
                           <span className={`text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${
@@ -1368,63 +1346,52 @@ export default function EventsManagement() {
                       </h3>
 
                       {/* Description */}
-                      <p className="text-xs text-[#5C3B37] font-light leading-relaxed">
+                      <p className="text-xs text-[#5C3B37] font-light leading-relaxed line-clamp-2">
                         {pitch.description}
                       </p>
 
-                      {/* Metadata Grid */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 border-t border-[#DCBAB2]/40 text-xs font-mono text-[#5C3B37]">
-                        <div className="flex items-center gap-1.5 truncate">
-                          <MapPin className="w-3.5 h-3.5 text-[#8C241E] shrink-0" />
-                          <span className="truncate">{pitch.venue || pitch.location_or_link || "SAC Rehearsal Studio"}</span>
+                      {/* Specifications Panel */}
+                      <div className="bg-[#F5EAE6] p-3.5 rounded-2xl border border-[#DEBEB7] space-y-2 text-xs font-mono text-[#5C3B37]">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-[#8C5A54] text-[10px] uppercase font-bold">Venue</span>
+                          <span className="text-[#2A1816] font-medium truncate">{pitch.venue || pitch.location_or_link || "SAC Rehearsal Studio"}</span>
                         </div>
-                        <div className="flex items-center gap-1.5 truncate">
-                          <DollarSign className="w-3.5 h-3.5 text-[#8C241E] shrink-0" />
-                          <span className="truncate font-bold text-emerald-950">{pitch.budget || "₹25,000"}</span>
+                        <div className="flex items-center justify-between gap-2 pt-1 border-t border-[#DCBAB2]/40">
+                          <span className="text-[#8C5A54] text-[10px] uppercase font-bold">Budget & Terms</span>
+                          <span className="text-[#2A1816] font-bold text-emerald-950">{pitch.budget || "₹25,000"}</span>
                         </div>
                       </div>
                     </div>
 
-                    {/* Bottom Action Controls */}
-                    <div className="pt-4 border-t border-[#DCBAB2]/60 flex items-center justify-between gap-3">
-                      <div className="text-[10px] font-mono text-[#8C5A54]">
-                        Proposed: {pitch.date || "Sep 2026"}
-                      </div>
+                    {/* Bottom Action Controls in Single Line */}
+                    <div className="pt-3.5 border-t border-[#DCBAB2]/60 flex items-center gap-2 w-full flex-nowrap">
+                      <button
+                        onClick={() => handleOpenEditPitch(pitch)}
+                        className="flex-1 py-2 px-2 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] hover:text-[#2A1816] text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer shadow-xs truncate"
+                        title="Review pitch details, adjust date/venue/budget, and approve to upcoming events"
+                      >
+                        Review & Edit
+                      </button>
 
-                      <div className="flex items-center gap-2">
-                        {/* Review & Edit Modal Trigger */}
+                      {!isApproved && (
                         <button
-                          onClick={() => handleOpenEditPitch(pitch)}
-                          className="px-4 py-2 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] hover:text-[#2A1816] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
-                          title="Review pitch details, adjust date/venue/budget, and approve to upcoming events"
+                          onClick={() => handleQuickApprove(pitch)}
+                          className="flex-1 py-2 px-2 rounded-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer shadow-xs border border-[#A6352F] truncate"
+                          title="Quick approve and schedule to upcoming events"
                         >
-                          <Edit3 className="w-3.5 h-3.5 text-[#8C241E]" />
-                          <span>Review & Edit</span>
+                          Approve
                         </button>
+                      )}
 
-                        {/* Quick Approve (if not already approved) */}
-                        {!isApproved && (
-                          <button
-                            onClick={() => handleQuickApprove(pitch)}
-                            className="px-4 py-2 rounded-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1 transition-all cursor-pointer shadow-xs border border-[#A6352F]"
-                            title="Quick approve and schedule to upcoming events"
-                          >
-                            <Check className="w-3.5 h-3.5 text-[#FFD0CC]" />
-                            <span>Approve</span>
-                          </button>
-                        )}
-
-                        {/* Quick Reject (if pending) */}
-                        {!isApproved && !isRejected && (
-                          <button
-                            onClick={() => handleRejectPitch(pitch.id)}
-                            className="p-2 rounded-full border border-[#D5AAA2] hover:bg-stone-200 text-stone-600 hover:text-stone-900 transition-all cursor-pointer"
-                            title="Decline proposal"
-                          >
-                            <X className="w-3.5 h-3.5" />
-                          </button>
-                        )}
-                      </div>
+                      {!isApproved && !isRejected && (
+                        <button
+                          onClick={() => handleRejectPitch(pitch.id)}
+                          className="py-2 px-3 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-stone-200 text-stone-600 hover:text-stone-900 text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer shadow-xs truncate"
+                          title="Decline proposal"
+                        >
+                          Decline
+                        </button>
+                      )}
                     </div>
                   </div>
                 );
