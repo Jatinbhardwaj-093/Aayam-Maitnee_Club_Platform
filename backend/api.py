@@ -1710,6 +1710,7 @@ def delete_script(script_id):
     return jsonify({'status': 'success'})
 
 @api_bp.route('/scripts/<int:script_id>/request-publish', methods=['POST'])
+@api_bp.route('/scripts/<int:script_id>/publish-request', methods=['POST'])
 def request_publish_script(script_id):
     from models import Script, Notification, User, db
     s = Script.query.get(script_id)
@@ -1740,6 +1741,8 @@ def request_publish_script(script_id):
     return jsonify({'status': 'success', 'script': s.to_dict()})
 
 @api_bp.route('/scripts/<int:script_id>/approve-publish', methods=['POST'])
+@api_bp.route('/scripts/<int:script_id>/approve', methods=['POST'])
+@api_bp.route('/scripts/<int:script_id>/publish', methods=['POST'])
 def approve_publish_script(script_id):
     from models import Script, Notification, User, db
     s = Script.query.get(script_id)
@@ -1767,6 +1770,7 @@ def approve_publish_script(script_id):
     return jsonify({'status': 'success', 'script': s.to_dict()})
 
 @api_bp.route('/scripts/<int:script_id>/reject-publish', methods=['POST'])
+@api_bp.route('/scripts/<int:script_id>/reject', methods=['POST'])
 def reject_publish_script(script_id):
     from models import Script, Notification, User, db
     s = Script.query.get(script_id)

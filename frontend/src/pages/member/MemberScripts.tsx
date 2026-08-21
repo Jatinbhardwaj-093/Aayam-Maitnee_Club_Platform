@@ -474,15 +474,13 @@ export default function MemberScripts() {
   };
 
   const handleRequestPublish = async (id: number) => {
-    const baseUrl = import.meta.env.VITE_API_URL || "";
+    const baseUrl = import.meta.env.VITE_API_BASE_URL ?? import.meta.env.VITE_API_URL ?? "";
     try {
-      const res = await fetch(`${baseUrl}/api/scripts/${id}/publish`, { method: "POST" });
+      const res = await fetch(`${baseUrl}/api/scripts/${id}/request-publish`, { method: "POST" });
       if (res.ok) {
         await fetchScripts();
-        alert("Script publication request sent to Maintainers!");
       } else {
-        setMyDrafts((prev) => prev.map((s) => (s.id === id ? { ...s, status: "Pending Approval" } : s)));
-        alert("Script publication request sent to Maintainers!");
+        setMyDrafts((prev) => prev.map((s) => (s.id === id ? { ...s, status: "Pending" } : s)));
       }
     } catch (err) {
       console.error(err);
@@ -490,16 +488,16 @@ export default function MemberScripts() {
   };
 
   const handleApprovePublish = async (id: number) => {
-    const baseUrl = import.meta.env.VITE_API_URL || "";
+    const baseUrl = import.meta.env.VITE_API_BASE_URL ?? import.meta.env.VITE_API_URL ?? "";
     try {
-      const res = await fetch(`${baseUrl}/api/scripts/${id}/approve`, { method: "POST" });
+      const res = await fetch(`${baseUrl}/api/scripts/${id}/approve-publish`, { method: "POST" });
       if (res.ok) {
         await fetchScripts();
-        alert("Script approved and published to Public Vault!");
       } else {
-        const approvedItem = pendingScripts.find((s) => s.id === id);
+        const approvedItem = pendingScripts.find((s) => s.id === id) || myDrafts.find((s) => s.id === id);
         if (approvedItem) {
           setPendingScripts((prev) => prev.filter((s) => s.id !== id));
+          setMyDrafts((prev) => prev.filter((s) => s.id !== id));
           setPublicScripts((prev) => [{ ...approvedItem, status: "Public" }, ...prev]);
         }
       }
@@ -509,9 +507,9 @@ export default function MemberScripts() {
   };
 
   const handleRejectPublish = async (id: number) => {
-    const baseUrl = import.meta.env.VITE_API_URL || "";
+    const baseUrl = import.meta.env.VITE_API_BASE_URL ?? import.meta.env.VITE_API_URL ?? "";
     try {
-      const res = await fetch(`${baseUrl}/api/scripts/${id}/reject`, { method: "POST" });
+      const res = await fetch(`${baseUrl}/api/scripts/${id}/reject-publish`, { method: "POST" });
       if (res.ok) {
         await fetchScripts();
       } else {
@@ -822,12 +820,19 @@ export default function MemberScripts() {
                             </span>
                           </div>
 
-                          <span className={`px-3 py-1 rounded-full text-[9px] font-mono font-bold uppercase border shrink-0 ${
-                            item.status === "Pending Approval"
-                              ? "bg-amber-100 text-amber-950 border-amber-300"
+                          <span className={`px-3 py-1 rounded-full text-[9px] font-mono font-bold uppercase border shrink-0 flex items-center gap-1 ${
+                            item.status === "Pending" || item.status === "Pending Approval"
+                              ? "bg-amber-700/15 text-amber-950 border-amber-700/30"
                               : "bg-[#EEDBD5] text-[#8C241E] border-[#D5AAA2]"
                           }`}>
-                            {item.status}
+                            {item.status === "Pending" || item.status === "Pending Approval" ? (
+                              <>
+                                <Clock className="w-2.5 h-2.5 text-amber-900" />
+                                <span>Pending Review</span>
+                              </>
+                            ) : (
+                              <span>Private Draft</span>
+                            )}
                           </span>
                         </div>
 
@@ -892,15 +897,32 @@ export default function MemberScripts() {
                           </button>
                         </div>
 
-                        <div className="flex items-center gap-2">
-                          {item.status !== "Pending Approval" && (
+                        <div className="flex items-center gap-2 flex-wrap">
+                          {isMaintainer ? (
+                            <button
+                              onClick={() => handleApprovePublish(item.id)}
+                              className="px-4 py-2 rounded-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 border border-[#A6352F] cursor-pointer shadow-xs"
+                              title="Directly publish draft to the public society vault"
+                            >
+                              <BookOpen className="w-3.5 h-3.5 text-[#FFD0CC]" />
+                              <span>Publish to Vault</span>
+                            </button>
+                          ) : item.status === "Pending" || item.status === "Pending Approval" ? (
+                            <span className="px-3.5 py-1.5 rounded-full bg-amber-700/15 text-amber-950 text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 border border-amber-700/30">
+                              <Clock className="w-3.5 h-3.5 text-amber-900" />
+                              <span>Pending Review</span>
+                            </span>
+                          ) : (
                             <button
                               onClick={() => handleRequestPublish(item.id)}
-                              className="px-4 py-2 rounded-full bg-emerald-800 hover:bg-emerald-900 text-[#FDF8F7] text-xs font-mono font-bold uppercase flex items-center gap-1.5 border border-emerald-900 cursor-pointer shadow-xs"
+                              className="px-4 py-2 rounded-full bg-emerald-800 hover:bg-emerald-900 text-[#FDF8F7] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 border border-emerald-900 cursor-pointer shadow-xs"
+                              title="Submit draft to maintainers for publication approval"
                             >
-                              <Send className="w-3.5 h-3.5 text-[#FFD0CC]" /> Submit
+                              <Send className="w-3.5 h-3.5 text-[#FFD0CC]" />
+                              <span>Submit for Review</span>
                             </button>
                           )}
+
                           <button
                             onClick={() => handleDelete(item.id)}
                             className="w-8 h-8 rounded-full text-[#8C5A54] hover:text-rose-700 hover:bg-rose-50 border border-[#DCBAB2] flex items-center justify-center cursor-pointer transition-all"
