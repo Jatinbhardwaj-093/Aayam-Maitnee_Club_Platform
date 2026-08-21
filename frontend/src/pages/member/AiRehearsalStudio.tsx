@@ -9,6 +9,7 @@ import {
   CheckCircle2,
   ChevronDown,
   ChevronUp,
+  FastForward,
   Headphones,
   Layers,
   Loader2,
@@ -21,11 +22,14 @@ import {
   Settings2,
   Sparkles,
   Square,
+  Trophy,
   Users,
   Volume2,
   Wand2,
   FileText,
-  Edit3
+  Edit3,
+  BarChart3,
+  Award
 } from "lucide-react";
 
 interface ScriptItem {
@@ -47,6 +51,18 @@ interface ScriptItem {
   charactersCount?: number;
   dialogueLines?: number;
   rehearsalReady?: boolean;
+}
+
+interface TurnReportItem {
+  turnIndex: number;
+  character: string;
+  speakerType: "human" | "ai";
+  scriptText: string;
+  words: string[];
+  spokenTranscript: string;
+  matchedIndices: number[];
+  skipped: boolean;
+  accuracy: number; // 0 - 100
 }
 
 type Assignment = "human" | "ai";
@@ -180,6 +196,10 @@ export default function AiRehearsalStudio() {
   const [parsing, setParsing] = useState(false);
   const [showCastConfig, setShowCastConfig] = useState(false);
 
+  // Performance Report State
+  const [turnReports, setTurnReports] = useState<Record<number, TurnReportItem>>({});
+  const [isSceneFinished, setIsSceneFinished] = useState(false);
+
   const recognitionRef = useRef<any>(null);
   const silenceTimerRef = useRef<number | null>(null);
   const aiTimerRef = useRef<number | null>(null);
@@ -195,15 +215,18 @@ export default function AiRehearsalStudio() {
   const activeTurnRef = useRef<any | null>(null);
   const micBlockedRef = useRef(false);
 
-  // Scroll to top whenever view or script changes
+  // Scroll to top on route / scene changes
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "instant" });
-  }, [scriptId, session ? 1 : 0]);
+  }, [scriptId, session ? 1 : 0, isSceneFinished]);
 
   const applySessionState = (nextSession: any) => {
     sessionRef.current = nextSession;
     activeTurnRef.current = nextSession?.currentTurn || null;
     setSession(nextSession);
+    if (nextSession?.scene_status === "complete") {
+      setIsSceneFinished(true);
+    }
   };
 
   const clearRehearsalState = () => {
@@ -236,6 +259,8 @@ export default function AiRehearsalStudio() {
     setAiWordIndex(-1);
     setError("");
     setAudioStatus("Stage Idle");
+    setTurnReports({});
+    setIsSceneFinished(false);
   };
 
   const returnToStudio = () => {
@@ -349,9 +374,11 @@ export default function AiRehearsalStudio() {
     setSessionStartedAt(Date.now());
     setAudioStatus("Starting Scene...");
     currentProcessingTurnRef.current = null;
+    setTurnReports({});
+    setIsSceneFinished(false);
     window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
 
-    // Initialize audio player on user interaction to avoid autoplay restrictions
+    // Initialize audio player on user interaction to avoid browser autoplay restrictions
     if (!audioPlayerRef.current) {
       audioPlayerRef.current = new Audio();
     }
@@ -413,9 +440,7 @@ export default function AiRehearsalStudio() {
   useEffect(() => {
     if (!session || session.scene_status === "stopped") {
       stopListening();
-      if (audioPlayerRef.current) {
-        audioPlayerRef.current.pause();
-      }
+      if (audioPlayerRef.current) audioPlayerRef.current.pause();
       window.speechSynthesis?.cancel();
       currentProcessingTurnRef.current = null;
       return;
@@ -423,11 +448,10 @@ export default function AiRehearsalStudio() {
 
     if (session.scene_status === "complete") {
       stopListening();
-      if (audioPlayerRef.current) {
-        audioPlayerRef.current.pause();
-      }
+      if (audioPlayerRef.current) audioPlayerRef.current.pause();
       window.speechSynthesis?.cancel();
       setAudioStatus("Scene Complete");
+      setIsSceneFinished(true);
       currentProcessingTurnRef.current = null;
       return;
     }
@@ -438,9 +462,7 @@ export default function AiRehearsalStudio() {
 
     if (isHuman) {
       currentProcessingTurnRef.current = null;
-      if (audioPlayerRef.current) {
-        audioPlayerRef.current.pause();
-      }
+      if (audioPlayerRef.current) audioPlayerRef.current.pause();
       window.speechSynthesis?.cancel();
       setAudioStatus("Awaiting Actor Speech");
       startListening();
@@ -485,8 +507,29 @@ export default function AiRehearsalStudio() {
       const progressTurnId = data.session.last_human_turn_id || activeTurn?.id;
       const progress = data.session.human_progress?.[progressTurnId];
       if (progress) {
-        setSpokenIndices(progress.matched_indices || []);
+        const matches = progress.matched_indices || [];
+        setSpokenIndices(matches);
         setHumanWordIndex(progress.current_word_index ?? -1);
+
+        // Record live turn report
+        if (activeTurn) {
+          const totalWords = (activeTurn.words || []).length || 1;
+          const accuracy = Math.round((matches.length / totalWords) * 100);
+          setTurnReports((prev) => ({
+            ...prev,
+            [activeSession.current_turn]: {
+              turnIndex: activeSession.current_turn,
+              character: activeTurn.character,
+              speakerType: "human",
+              scriptText: activeTurn.text,
+              words: activeTurn.words || [],
+              spokenTranscript: text,
+              matchedIndices: matches,
+              skipped: false,
+              accuracy: Math.min(100, accuracy),
+            },
+          }));
+        }
       }
       applySessionState(data.session);
     } catch (e) {
@@ -494,19 +537,50 @@ export default function AiRehearsalStudio() {
     }
   };
 
-  const handleManualAdvanceCue = async () => {
-    if (!session?.session_id) return;
+  // Skip Line / Next Cue Function
+  const handleSkipOrAdvanceCue = async (wasSkipped = false) => {
+    const activeSession = sessionRef.current;
+    if (!activeSession?.session_id) return;
+    const activeTurn = activeTurnRef.current;
     stopListening();
-    if (audioPlayerRef.current) {
-      audioPlayerRef.current.pause();
-    }
+    if (audioPlayerRef.current) audioPlayerRef.current.pause();
     window.speechSynthesis?.cancel();
+
+    // Record turn report before advancing
+    if (activeTurn) {
+      const currentReport = turnReports[activeSession.current_turn];
+      const isHuman = activeSession.speaker_type === "human";
+      const totalWords = (activeTurn.words || []).length || 1;
+      const matches = spokenIndices || [];
+      const accuracy = isHuman
+        ? (wasSkipped && matches.length === 0 ? 0 : Math.round((matches.length / totalWords) * 100))
+        : 100;
+
+      setTurnReports((prev) => ({
+        ...prev,
+        [activeSession.current_turn]: {
+          turnIndex: activeSession.current_turn,
+          character: activeTurn.character,
+          speakerType: isHuman ? "human" : "ai",
+          scriptText: activeTurn.text,
+          words: activeTurn.words || [],
+          spokenTranscript: isHuman ? (transcript || (wasSkipped ? "[Skipped Line]" : "")) : "[AI Delivery]",
+          matchedIndices: matches,
+          skipped: wasSkipped,
+          accuracy: Math.min(100, accuracy),
+        },
+      }));
+    }
+
     try {
-      const res = await fetch(`${baseUrl}/api/rehearsal/roleplay/${session.session_id}/advance`, {
+      const res = await fetch(`${baseUrl}/api/rehearsal/roleplay/${activeSession.session_id}/advance`, {
         method: "POST",
       });
       const data = await res.json();
       if (res.ok && data.session) {
+        setTranscript("");
+        setSpokenIndices([]);
+        setHumanWordIndex(-1);
         applySessionState(data.session);
       }
     } catch (e) {
@@ -690,9 +764,7 @@ export default function AiRehearsalStudio() {
       return;
     }
 
-    if (audioPlayerRef.current) {
-      audioPlayerRef.current.pause();
-    }
+    if (audioPlayerRef.current) audioPlayerRef.current.pause();
     window.speechSynthesis?.cancel();
     setAiWordIndex(-1);
     setAudioStatus("AI Partner Speaking...");
@@ -712,7 +784,6 @@ export default function AiRehearsalStudio() {
 
         const voiceLabel = payload.voice || (payload.voice_preference === "female" ? "Aria Neural" : "Guy Neural");
         setActiveVoiceName(voiceLabel);
-        console.log(`[AI Roleplay] Streaming Studio Neural Voice: ${voiceLabel}`);
 
         const startedAt = performance.now();
         if (aiTimerRef.current) window.clearInterval(aiTimerRef.current);
@@ -781,8 +852,257 @@ export default function AiRehearsalStudio() {
     ? Math.round(((session.current_turn + 1) / session.scene.turns.length) * 100)
     : 0;
 
+  // Compute Overall Performance Report Metrics
+  const reportMetrics = useMemo(() => {
+    const reportsList = Object.values(turnReports);
+    const humanReports = reportsList.filter((r) => r.speakerType === "human");
+    const totalLines = humanReports.length || 1;
+    const accuratelyDelivered = humanReports.filter((r) => !r.skipped && r.accuracy >= 70).length;
+    const skippedLines = humanReports.filter((r) => r.skipped || r.accuracy === 0).length;
+    
+    let totalExpectedWords = 0;
+    let totalSpokenMatchedWords = 0;
+    humanReports.forEach((r) => {
+      totalExpectedWords += (r.words || []).length;
+      totalSpokenMatchedWords += (r.matchedIndices || []).length;
+    });
+
+    const wordAccuracy = totalExpectedWords > 0
+      ? Math.round((totalSpokenMatchedWords / totalExpectedWords) * 100)
+      : accuratelyDelivered > 0 ? 85 : 0;
+
+    let tierLabel = "First Read-Through";
+    let tierColor = "amber";
+    if (wordAccuracy >= 88) {
+      tierLabel = "Mastery — Opening Night Ready";
+      tierColor = "emerald";
+    } else if (wordAccuracy >= 70) {
+      tierLabel = "Proficient — Strong Delivery";
+      tierColor = "emerald";
+    } else if (wordAccuracy >= 45) {
+      tierLabel = "In Progress — Needs Polish";
+      tierColor = "amber";
+    }
+
+    return {
+      totalLines,
+      accuratelyDelivered,
+      skippedLines,
+      wordAccuracy,
+      totalExpectedWords,
+      totalSpokenMatchedWords,
+      tierLabel,
+      tierColor,
+      humanReports,
+    };
+  }, [turnReports]);
+
   // =========================================================================
-  // VIEW 1: MINIMALIST POETIC THEATRE REHEARSAL STAGE
+  // VIEW 1: REHEARSAL PERFORMANCE REPORT & TELEMETRY (POST-SCENE)
+  // =========================================================================
+  if (isSceneFinished && displayScene) {
+    return (
+      <div className="space-y-6 w-full max-w-4xl mx-auto pb-24 font-sans text-[#5C3B37] transition-all">
+        
+        {/* TOP BAR */}
+        <header className="flex items-center justify-between gap-4 px-2 pt-2">
+          <button
+            onClick={returnToStudio}
+            className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider text-[#8C5A54] hover:text-[#8C241E] transition-colors cursor-pointer"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Repertoire</span>
+          </button>
+          <span className="text-[11px] font-mono font-bold uppercase tracking-widest text-[#8C5A54]">
+            Rehearsal Debrief
+          </span>
+        </header>
+
+        {/* PERFORMANCE SUMMARY CARD */}
+        <section className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-[3rem] p-8 sm:p-12 shadow-sm relative text-center space-y-8">
+          
+          <div className="space-y-3">
+            <div className="w-16 h-16 rounded-full bg-emerald-700/15 border border-emerald-700/30 flex items-center justify-center mx-auto text-emerald-900 shadow-2xs">
+              <Award className="w-8 h-8" />
+            </div>
+            
+            <div className="space-y-1">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#8C5A54]">
+                Scene Rehearsal Concluded
+              </span>
+              <h1 className="font-serif text-3xl sm:text-4xl text-[#2A1816] font-normal tracking-tight">
+                {currentTitle}
+              </h1>
+            </div>
+
+            {/* THEATRICAL VERDICT BADGE */}
+            <div className="pt-1">
+              <span className={`inline-flex items-center gap-2 px-5 py-2 rounded-full font-mono text-xs font-bold uppercase tracking-widest border ${
+                reportMetrics.tierColor === "emerald"
+                  ? "bg-emerald-700/15 text-emerald-900 border-emerald-700/30"
+                  : "bg-amber-700/15 text-amber-950 border-amber-700/30"
+              }`}>
+                <Trophy className="w-4 h-4" />
+                <span>{reportMetrics.tierLabel}</span>
+              </span>
+            </div>
+          </div>
+
+          {/* 4 SUMMARY METRIC CARDS */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5 text-left">
+            <div className="bg-gradient-to-b from-[#F5EAE6] to-[#EEDBD5] border border-[#DEBEB7] rounded-2xl p-4 space-y-1 shadow-2xs">
+              <span className="text-[10px] font-mono uppercase text-[#8C5A54] block">
+                Word Accuracy
+              </span>
+              <div className="font-serif text-3xl text-[#2A1816] font-normal">
+                {reportMetrics.wordAccuracy}%
+              </div>
+              <span className="text-[9px] font-mono text-[#8C5A54] block">
+                {reportMetrics.totalSpokenMatchedWords} / {reportMetrics.totalExpectedWords || 1} words
+              </span>
+            </div>
+
+            <div className="bg-gradient-to-b from-[#F5EAE6] to-[#EEDBD5] border border-[#DEBEB7] rounded-2xl p-4 space-y-1 shadow-2xs">
+              <span className="text-[10px] font-mono uppercase text-[#8C5A54] block">
+                Accurate Cues
+              </span>
+              <div className="font-serif text-3xl text-[#2A1816] font-normal">
+                {reportMetrics.accuratelyDelivered}
+              </div>
+              <span className="text-[9px] font-mono text-[#8C5A54] block">
+                of {reportMetrics.totalLines} actor cues
+              </span>
+            </div>
+
+            <div className="bg-gradient-to-b from-[#F5EAE6] to-[#EEDBD5] border border-[#DEBEB7] rounded-2xl p-4 space-y-1 shadow-2xs">
+              <span className="text-[10px] font-mono uppercase text-[#8C5A54] block">
+                Skipped Lines
+              </span>
+              <div className="font-serif text-3xl text-[#2A1816] font-normal">
+                {reportMetrics.skippedLines}
+              </div>
+              <span className="text-[9px] font-mono text-[#8C5A54] block">
+                forwarded without speech
+              </span>
+            </div>
+
+            <div className="bg-gradient-to-b from-[#F5EAE6] to-[#EEDBD5] border border-[#DEBEB7] rounded-2xl p-4 space-y-1 shadow-2xs">
+              <span className="text-[10px] font-mono uppercase text-[#8C5A54] block">
+                Dialogue Cues
+              </span>
+              <div className="font-serif text-3xl text-[#2A1816] font-normal">
+                {displayScene.turns?.length || 0}
+              </div>
+              <span className="text-[9px] font-mono text-[#8C5A54] block">
+                full scene parsed
+              </span>
+            </div>
+          </div>
+
+          {/* PER-LINE PERFORMANCE LOG */}
+          <div className="text-left space-y-3 pt-2">
+            <div className="flex items-center justify-between border-b border-[#DCBAB2]/70 pb-2">
+              <h3 className="font-serif text-base text-[#2A1816] font-normal flex items-center gap-2">
+                <BarChart3 className="w-4 h-4 text-[#8C241E]" />
+                <span>Actor Line Delivery Breakdown</span>
+              </h3>
+              <span className="text-[10px] font-mono text-[#8C5A54]">
+                Word Timing & Accuracy
+              </span>
+            </div>
+
+            <div className="space-y-2.5 max-h-[320px] overflow-y-auto custom-scrollbar pr-1">
+              {(displayScene.turns || [])
+                .filter((turn: any) => assignments[turn.character] === "human")
+                .map((turn: any, idx: number) => {
+                  const turnReport = Object.values(turnReports).find((r) => r.scriptText === turn.text);
+                  const isSkipped = turnReport?.skipped;
+                  const accuracy = turnReport?.accuracy ?? 0;
+                  const matchedIndices = turnReport?.matchedIndices || [];
+
+                  return (
+                    <div
+                      key={turn.id || idx}
+                      className="bg-[#F5EAE6] border border-[#DCBAB2] rounded-2xl p-4 space-y-2 text-left shadow-2xs"
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          <span className="font-serif font-bold text-xs text-[#2A1816]">
+                            {turn.character}
+                          </span>
+                          <span className="text-[9px] font-mono text-[#8C5A54]">
+                            Cue #{idx + 1}
+                          </span>
+                        </div>
+
+                        <span className={`text-[10px] font-mono font-bold uppercase px-2.5 py-0.5 rounded-full border ${
+                          isSkipped
+                            ? "bg-rose-100 text-rose-900 border-rose-300"
+                            : accuracy >= 70
+                              ? "bg-emerald-700/15 text-emerald-900 border-emerald-700/30"
+                              : "bg-amber-700/15 text-amber-950 border-amber-700/30"
+                        }`}>
+                          {isSkipped ? "Skipped Line" : `${accuracy}% Spoken Accuracy`}
+                        </span>
+                      </div>
+
+                      {/* Line with word matching highlight */}
+                      <p className="font-serif text-sm leading-relaxed text-[#2A1816]">
+                        {(turn.words || turn.text.split(/\s+/)).map((w: string, wIdx: number) => {
+                          const isMatched = matchedIndices.includes(wIdx);
+                          return (
+                            <span
+                              key={`${w}-${wIdx}`}
+                              className={`inline-block mr-1 ${
+                                isMatched
+                                  ? "text-emerald-900 font-medium underline decoration-emerald-600/40"
+                                  : "text-[#5C3B37]"
+                              }`}
+                            >
+                              {w}
+                            </span>
+                          );
+                        })}
+                      </p>
+
+                      {turnReport?.spokenTranscript && turnReport.spokenTranscript !== "[Skipped Line]" && (
+                        <p className="font-mono text-[10px] text-[#8C5A54] italic pt-1 border-t border-[#DCBAB2]/50">
+                          Captured Speech: "{turnReport.spokenTranscript}"
+                        </p>
+                      )}
+                    </div>
+                  );
+                })}
+            </div>
+          </div>
+
+          {/* ACTION BUTTONS */}
+          <div className="flex flex-wrap items-center justify-center gap-3 pt-4 border-t border-[#DCBAB2]/70">
+            <button
+              onClick={startSession}
+              className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-8 py-3.5 rounded-full font-mono text-xs font-bold uppercase tracking-widest border border-[#A6352F] shadow-md shadow-[#8C241E]/20 flex items-center gap-2 cursor-pointer transition-transform hover:scale-102"
+            >
+              <RotateCcw className="w-4 h-4 text-[#FFD0CC]" />
+              <span>Rehearse Scene Again</span>
+            </button>
+
+            <button
+              onClick={returnToStudio}
+              className="px-6 py-3.5 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-2 transition-colors cursor-pointer"
+            >
+              <BookOpen className="w-4 h-4 text-[#8C241E]" />
+              <span>Return to Repertoire</span>
+            </button>
+          </div>
+
+        </section>
+
+      </div>
+    );
+  }
+
+  // =========================================================================
+  // VIEW 2: MINIMALIST POETIC THEATRE REHEARSAL STAGE
   // =========================================================================
   if (((scriptId && activeScript) || session) && displayScene) {
     return (
@@ -798,7 +1118,7 @@ export default function AiRehearsalStudio() {
             <span>Repertoire</span>
           </button>
 
-          <div className="text-right">
+          <div className="text-right flex items-center gap-3">
             <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
               {session?.scene?.turns?.length
                 ? `Cue ${session.current_turn + 1} of ${session.scene.turns.length}`
@@ -876,30 +1196,53 @@ export default function AiRehearsalStudio() {
                 {isHumanTurn ? (
                   <div className="space-y-3 max-w-md mx-auto">
                     <p className="font-serif italic text-sm text-[#5C3B37] bg-[#F5EAE6] px-4 py-2.5 rounded-2xl border border-[#DCBAB2]/70 min-h-[42px] flex items-center justify-center">
-                      "{transcript || "Speak line into microphone or click Advance Cue..."}"
+                      "{transcript || "Speak line into microphone or click Advance..."}"
                     </p>
-                    <div className="flex items-center justify-center gap-2">
+                    <div className="flex items-center justify-center gap-2 flex-wrap">
                       <button
                         onClick={startListening}
                         className="px-3.5 py-1.5 rounded-full bg-[#EEDBD5] hover:bg-[#E3CEC6] text-[#8C241E] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors cursor-pointer border border-[#D5AAA2]"
                       >
                         <Mic className="w-3.5 h-3.5" />
-                        <span>Listen Again</span>
+                        <span>Listen</span>
                       </button>
 
                       <button
-                        onClick={handleManualAdvanceCue}
-                        className="px-3.5 py-1.5 rounded-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors cursor-pointer border border-[#A6352F] shadow-xs"
+                        onClick={() => handleSkipOrAdvanceCue(false)}
+                        className="px-4 py-1.5 rounded-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors cursor-pointer border border-[#A6352F] shadow-xs"
                       >
                         <Check className="w-3.5 h-3.5 text-[#FFD0CC]" />
                         <span>Advance Cue</span>
                       </button>
+
+                      {/* FAST FORWARD / SKIP LINE BUTTON */}
+                      <button
+                        onClick={() => handleSkipOrAdvanceCue(true)}
+                        className="px-3.5 py-1.5 rounded-full bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors cursor-pointer border border-[#D5AAA2]"
+                        title="Skip this line"
+                      >
+                        <FastForward className="w-3.5 h-3.5 text-[#8C241E]" />
+                        <span>Skip Line</span>
+                      </button>
                     </div>
                   </div>
                 ) : isAiTurn ? (
-                  <div className="inline-flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider text-[#8C241E] bg-[#EEDBD5]/60 px-4 py-1.5 rounded-full border border-[#D5AAA2]">
-                    <Volume2 className="w-3.5 h-3.5 animate-pulse text-[#8C241E]" />
-                    <span>Neural Voice Delivery Active</span>
+                  <div className="space-y-3">
+                    <div className="inline-flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider text-[#8C241E] bg-[#EEDBD5]/60 px-4 py-1.5 rounded-full border border-[#D5AAA2]">
+                      <Volume2 className="w-3.5 h-3.5 animate-pulse text-[#8C241E]" />
+                      <span>Neural Voice Delivery Active</span>
+                    </div>
+
+                    <div>
+                      <button
+                        onClick={() => handleSkipOrAdvanceCue(true)}
+                        className="px-3.5 py-1.5 rounded-full bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider inline-flex items-center gap-1.5 transition-colors cursor-pointer border border-[#D5AAA2]"
+                        title="Skip AI line and advance"
+                      >
+                        <FastForward className="w-3.5 h-3.5 text-[#8C241E]" />
+                        <span>Skip AI Line</span>
+                      </button>
+                    </div>
                   </div>
                 ) : null}
               </div>
@@ -911,10 +1254,10 @@ export default function AiRehearsalStudio() {
               </div>
               <h2 className="font-serif text-2xl font-normal text-[#2A1816]">Scene Concluded</h2>
               <button
-                onClick={returnToStudio}
+                onClick={() => setIsSceneFinished(true)}
                 className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-6 py-2.5 rounded-full font-mono text-xs font-bold uppercase tracking-wider inline-flex items-center gap-2 border border-[#A6352F] cursor-pointer"
               >
-                <BookOpen className="w-4 h-4 text-[#FFD0CC]" /> Return to Repertoire
+                <Award className="w-4 h-4 text-[#FFD0CC]" /> View Performance Report
               </button>
             </div>
           )}
@@ -938,13 +1281,31 @@ export default function AiRehearsalStudio() {
               <span>Start Live Rehearsal</span>
             </button>
           ) : (
-            <button
-              onClick={stopSession}
-              className="bg-rose-900 hover:bg-rose-950 text-[#FDF8F7] px-8 py-3.5 rounded-full font-mono text-xs font-bold uppercase tracking-widest border border-rose-950 shadow-md flex items-center gap-2 cursor-pointer transition-transform hover:scale-102"
-            >
-              <Square className="w-4 h-4 fill-current" />
-              <span>Pause Rehearsal</span>
-            </button>
+            <>
+              <button
+                onClick={stopSession}
+                className="bg-rose-900 hover:bg-rose-950 text-[#FDF8F7] px-7 py-3.5 rounded-full font-mono text-xs font-bold uppercase tracking-widest border border-rose-950 shadow-md flex items-center gap-2 cursor-pointer transition-transform hover:scale-102"
+              >
+                <Square className="w-4 h-4 fill-current" />
+                <span>Pause</span>
+              </button>
+
+              <button
+                onClick={() => handleSkipOrAdvanceCue(true)}
+                className="px-6 py-3.5 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-2 transition-colors cursor-pointer shadow-2xs"
+              >
+                <FastForward className="w-4 h-4 text-[#8C241E]" />
+                <span>Skip Line</span>
+              </button>
+
+              <button
+                onClick={() => setIsSceneFinished(true)}
+                className="px-5 py-3.5 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
+              >
+                <Award className="w-3.5 h-3.5 text-[#8C241E]" />
+                <span>End & View Report</span>
+              </button>
+            </>
           )}
 
           <button
@@ -984,7 +1345,6 @@ export default function AiRehearsalStudio() {
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
               {(displayScene.characters || []).map((character: any) => {
                 const isHuman = assignments[character.name] === "human";
-                const isAi = assignments[character.name] === "ai";
                 const currentVoice = voicePreferences[character.name] || "female";
 
                 return (
@@ -1108,7 +1468,7 @@ export default function AiRehearsalStudio() {
   }
 
   // =========================================================================
-  // VIEW 2: REHEARSAL STUDIO CATALOG & SETUP
+  // VIEW 3: REHEARSAL STUDIO CATALOG & SETUP
   // =========================================================================
   return (
     <div className="space-y-5 w-full max-w-5xl mx-auto pb-20 font-sans text-[#5C3B37]">

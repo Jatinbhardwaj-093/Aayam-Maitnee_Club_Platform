@@ -25,7 +25,7 @@ API_KEY = os.getenv("GEMINI_API_KEY", "")
 
 
 api_bp = Blueprint('api', __name__)
-rehearsal_service = RehearsalService(performance_provider=GeminiPerformanceProvider())
+rehearsal_service = RehearsalService()
 
 # Redis Config (with graceful fallback)
 REDIS_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
