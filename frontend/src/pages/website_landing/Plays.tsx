@@ -244,38 +244,26 @@ export default function Plays() {
                       <h3 className="text-2xl font-serif text-[#2A1816] tracking-tight font-normal leading-tight">
                         {play.title}
                       </h3>
-                      {play.hindi_title && (
-                        <p className="text-xs font-serif text-[#8C5A54] italic">
-                          ({play.hindi_title})
-                        </p>
-                      )}
                       {play.playwright && (
-                        <p className="text-xs text-[#6E4742] font-serif italic pt-0.5">
-                          Written by <strong className="font-normal text-[#2A1816]">{play.playwright}</strong>
+                        <p className="text-xs text-[#6E4742] font-serif italic">
+                          by <span className="font-normal text-[#2A1816]">{play.playwright}</span>
                         </p>
                       )}
+                    </div>
+
+                    {/* Production Meta Line */}
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-mono text-[#6E4742]">
+                      <span><strong className="text-[#2A1816] font-semibold">Dir:</strong> {play.director}</span>
+                      <span>•</span>
+                      <span><strong className="text-[#2A1816] font-semibold">Venue:</strong> {play.venue || "IIT Madras"}</span>
+                      <span>•</span>
+                      <span><strong className="text-[#2A1816] font-semibold">Dates:</strong> {play.dates || "Autumn 2026"}</span>
                     </div>
 
                     {/* Synopsis */}
                     <p className="text-xs text-[#5C3B37] font-light leading-relaxed">
                       {play.description}
                     </p>
-
-                    {/* Production Details */}
-                    <div className="bg-[#F5EAE6] p-3.5 rounded-xl border border-[#DEBEB7] space-y-2 text-xs font-mono text-[#5C3B37]">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[10px] uppercase text-[#8C5A54]">Director</span>
-                        <span className="font-semibold text-[#2A1816]">{play.director}</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-[10px] uppercase text-[#8C5A54]">Venue</span>
-                        <span className="text-[#2A1816] text-[11px] truncate max-w-[180px]">{play.venue || "IIT Madras Stage"}</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-[10px] uppercase text-[#8C5A54]">Schedule</span>
-                        <span className="text-[#8C241E] font-bold text-[11px]">{play.dates || "Autumn 2026"}</span>
-                      </div>
-                    </div>
                   </div>
 
                   {/* Actions */}

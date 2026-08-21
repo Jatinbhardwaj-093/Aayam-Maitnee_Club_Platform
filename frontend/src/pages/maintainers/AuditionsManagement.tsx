@@ -28,7 +28,9 @@ import {
   Award,
   Layers,
   ChevronRight,
-  HeartHandshake
+  HeartHandshake,
+  SlidersHorizontal,
+  RotateCcw
 } from "lucide-react";
 import {
   Dialog,
@@ -193,9 +195,12 @@ export default function AuditionsManagement() {
 
   // Filters & Search
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedProdFilter, setSelectedProdFilter] = useState("All");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedStatus, setSelectedStatus] = useState("All");
   const [selectedPosFilter, setSelectedPosFilter] = useState("All");
+  const [filterPosModalOpen, setFilterPosModalOpen] = useState(false);
+  const [filterAppModalOpen, setFilterAppModalOpen] = useState(false);
 
   // Toast State
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -474,7 +479,11 @@ export default function AuditionsManagement() {
       selectedCategory === "All" ||
       pos.role_category.toLowerCase() === selectedCategory.toLowerCase();
 
-    return matchesSearch && matchesCategory;
+    const matchesProd =
+      selectedProdFilter === "All" ||
+      (pos.production_name && pos.production_name.toLowerCase().includes(selectedProdFilter.toLowerCase()));
+
+    return matchesSearch && matchesCategory && matchesProd;
   });
 
   // Filtered Applications
@@ -625,36 +634,188 @@ export default function AuditionsManagement() {
       {/* TAB 1: ROLE CALLINGS (POSITIONS) */}
       {activeTab === "positions" && (
         <section className="space-y-6">
-          {/* Action Bar */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="space-y-1">
-              <h2 className="text-2xl font-serif text-[#2A1816] tracking-tight">Active Production Roles</h2>
-              <p className="text-xs text-[#6E4742] font-serif italic">
-                Manage roles open for auditions across the 2026 drama production season.
-              </p>
+          {/* Action & Filter Toolbar */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-[#FAF2EE] border border-[#DCBAB2] rounded-2xl p-2.5 sm:p-3 shadow-xs">
+            <div className="relative flex-1 min-w-[220px]">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8C5A54]" />
+              <input
+                type="text"
+                placeholder="Search role title, production..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-8 py-2 bg-transparent text-xs font-sans text-[#2A1816] placeholder:text-[#8C5A54]/70 focus:outline-none"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8C5A54] hover:text-[#2A1816]"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
             </div>
 
-            <div className="flex items-center gap-3 flex-wrap">
-              <div className="relative">
-                <Search className="absolute left-3.5 top-3 h-3.5 w-3.5 text-[#8C5A54] pointer-events-none" />
-                <input
-                  type="text"
-                  placeholder="Search role title, play..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-full pl-9 pr-4 py-2 text-xs text-[#2A1816] font-medium focus:border-[#B32D25] focus:outline-none placeholder:text-[#8C5A54]/60 w-56 sm:w-64"
-                />
-              </div>
+            <div className="flex items-center gap-2 shrink-0 border-t sm:border-t-0 border-[#DCBAB2]/60 pt-2 sm:pt-0">
+              {(selectedProdFilter !== "All" || selectedCategory !== "All") && (
+                <div className="hidden lg:flex items-center gap-1.5">
+                  {selectedProdFilter !== "All" && (
+                    <span className="inline-flex items-center gap-1 bg-[#EEDBD5] text-[#8C241E] border border-[#D5AAA2] px-2.5 py-0.5 rounded-full text-[10px] font-mono">
+                      <span>{selectedProdFilter}</span>
+                      <button onClick={() => setSelectedProdFilter("All")} className="hover:text-[#2A1816]">
+                        <X className="w-3 h-3" />
+                      </button>
+                    </span>
+                  )}
+                  {selectedCategory !== "All" && (
+                    <span className="inline-flex items-center gap-1 bg-[#EEDBD5] text-[#8C241E] border border-[#D5AAA2] px-2.5 py-0.5 rounded-full text-[10px] font-mono">
+                      <span>{selectedCategory}</span>
+                      <button onClick={() => setSelectedCategory("All")} className="hover:text-[#2A1816]">
+                        <X className="w-3 h-3" />
+                      </button>
+                    </span>
+                  )}
+                  <button
+                    onClick={() => {
+                      setSelectedProdFilter("All");
+                      setSelectedCategory("All");
+                    }}
+                    className="text-[10px] font-mono text-[#8C5A54] hover:text-[#8C241E] underline px-1"
+                  >
+                    Reset
+                  </button>
+                </div>
+              )}
+
+              <button
+                onClick={() => setFilterPosModalOpen(true)}
+                className={`px-3.5 py-2 rounded-xl text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer border ${
+                  selectedProdFilter !== "All" || selectedCategory !== "All"
+                    ? "bg-[#8C241E] text-[#FDF8F7] border-[#A6352F] shadow-xs"
+                    : "bg-[#F5EAE6] text-[#5C3B37] hover:bg-[#EEDBD5] border-[#D5AAA2]"
+                }`}
+              >
+                <SlidersHorizontal className="w-3.5 h-3.5" />
+                <span>Filters</span>
+                {(selectedProdFilter !== "All" || selectedCategory !== "All") && (
+                  <span className="bg-[#FAF2EE] text-[#8C241E] w-4 h-4 rounded-full text-[10px] font-bold flex items-center justify-center">
+                    {(selectedProdFilter !== "All" ? 1 : 0) + (selectedCategory !== "All" ? 1 : 0)}
+                  </span>
+                )}
+              </button>
 
               <button
                 onClick={() => setCreatePosOpen(true)}
-                className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-6 py-2.5 rounded-full text-xs font-mono font-bold uppercase tracking-wider shadow-md shadow-[#8C241E]/20 flex items-center gap-2 transition-all cursor-pointer border border-[#A6352F]"
+                className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-4 py-2 rounded-xl text-xs font-mono font-bold uppercase tracking-wider shadow-xs flex items-center gap-1.5 transition-all cursor-pointer border border-[#A6352F]"
               >
-                <Plus className="w-4 h-4 text-[#FFD0CC]" />
-                <span>New Role Calling</span>
+                <Plus className="w-3.5 h-3.5 text-[#FFD0CC]" />
+                <span>New Calling</span>
               </button>
             </div>
           </div>
+
+          {/* POSITIONS FILTER POPUP MODAL */}
+          {filterPosModalOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs animate-in fade-in duration-200">
+              <div className="bg-[#F5EAE6] border border-[#DEBEB7] text-[#2A1816] rounded-[2rem] p-6 sm:p-8 max-w-md w-full shadow-2xl relative space-y-6">
+                <div className="flex items-center justify-between border-b border-[#DCBAB2]/70 pb-3 pr-8">
+                  <div className="space-y-0.5">
+                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
+                      Management Filter
+                    </span>
+                    <h3 className="font-serif text-2xl text-[#2A1816] font-normal">
+                      Filter Role Callings
+                    </h3>
+                  </div>
+                  <button
+                    onClick={() => setFilterPosModalOpen(false)}
+                    className="w-8 h-8 rounded-full bg-[#EEDBD5] hover:bg-[#E3CEC6] text-[#5C3B37] hover:text-[#2A1816] flex items-center justify-center transition-all cursor-pointer border border-[#D5AAA2]"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <div className="space-y-5 text-xs font-sans">
+                  <div className="space-y-2">
+                    <label className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#8C5A54] block">
+                      Production Premiere
+                    </label>
+                    <div className="grid grid-cols-1 gap-1.5">
+                      {[
+                        { id: "All", label: "All Upcoming Productions" },
+                        { id: "Hayavadana", label: "Hayavadana (Girish Karnad)" },
+                        { id: "Ashadh Ka Ek Din", label: "Ashadh Ka Ek Din (Mohan Rakesh)" },
+                        { id: "Charandas Chor", label: "Charandas Chor (Habib Tanvir)" }
+                      ].map(opt => (
+                        <button
+                          key={opt.id}
+                          type="button"
+                          onClick={() => setSelectedProdFilter(opt.id)}
+                          className={`w-full text-left px-3.5 py-2 rounded-xl text-xs font-medium flex items-center justify-between transition-all cursor-pointer ${
+                            selectedProdFilter === opt.id
+                              ? "bg-[#8C241E] text-[#FDF8F7] font-bold shadow-xs"
+                              : "bg-[#FAF2EE] text-[#5C3B37] hover:bg-[#EEDBD5] border border-[#DCBAB2]"
+                          }`}
+                        >
+                          <span>{opt.label}</span>
+                          {selectedProdFilter === opt.id && <Check className="w-3.5 h-3.5 text-[#FDF8F7]" />}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#8C5A54] block">
+                      Role Category
+                    </label>
+                    <div className="grid grid-cols-2 gap-1.5">
+                      {[
+                        { id: "All", label: "All Categories" },
+                        { id: "Character Role", label: "Character Role" },
+                        { id: "Technical Crew", label: "Technical Crew" },
+                        { id: "Creative Designer", label: "Creative Stylist" },
+                        { id: "Directorial", label: "Directorial Lead" }
+                      ].map(opt => (
+                        <button
+                          key={opt.id}
+                          type="button"
+                          onClick={() => setSelectedCategory(opt.id)}
+                          className={`text-left px-3 py-2 rounded-xl text-xs font-medium flex items-center justify-between transition-all cursor-pointer ${
+                            selectedCategory === opt.id
+                              ? "bg-[#8C241E] text-[#FDF8F7] font-bold shadow-xs"
+                              : "bg-[#FAF2EE] text-[#5C3B37] hover:bg-[#EEDBD5] border border-[#DCBAB2]"
+                          }`}
+                        >
+                          <span>{opt.label}</span>
+                          {selectedCategory === opt.id && <Check className="w-3 h-3 text-[#FDF8F7]" />}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-3 border-t border-[#DCBAB2]/70 flex items-center justify-between">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedProdFilter("All");
+                      setSelectedCategory("All");
+                    }}
+                    className="text-xs font-mono text-[#8C5A54] hover:text-[#8C241E] flex items-center gap-1.5 font-bold uppercase tracking-wider"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" />
+                    <span>Reset</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFilterPosModalOpen(false)}
+                    className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-6 py-2.5 rounded-full text-xs font-mono font-bold uppercase tracking-wider shadow-sm transition-all cursor-pointer border border-[#A6352F]"
+                  >
+                    Apply Filters
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Role Cards Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -663,52 +824,44 @@ export default function AuditionsManagement() {
                 key={pos.id}
                 className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-[2rem] p-7 hover:border-[#B32D25]/50 hover:shadow-md transition-all flex flex-col justify-between space-y-6 shadow-xs group"
               >
-                <div className="space-y-4">
-                  {/* Top Meta Tags */}
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="space-y-1">
-                      <span className="text-[11px] font-mono text-[#8C5A54] uppercase tracking-wider font-semibold">
-                        {pos.production_name}
-                      </span>
-                      <h3 className="text-xl font-serif text-[#2A1816] tracking-tight font-normal group-hover:text-[#8C241E] transition-colors">
-                        {pos.role_name}
-                      </h3>
-                    </div>
+                <div className="space-y-3.5">
+                  {/* Subtle top metadata */}
+                  <div className="flex items-baseline justify-between gap-2 border-b border-[#DCBAB2]/40 pb-2.5">
+                    <span className="text-[11px] font-mono text-[#8C5A54] uppercase tracking-wider font-semibold">
+                      {pos.production_name} • {pos.role_category}
+                    </span>
                     <span
-                      className={`text-[9px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border shrink-0 ${
+                      className={`text-[9px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border shrink-0 ${
                         pos.status === "Open Calling"
-                          ? "bg-emerald-700/15 text-emerald-900 border-emerald-700/30"
-                          : "bg-gray-200 text-gray-700 border-gray-300"
+                          ? "bg-emerald-700/15 text-emerald-950 border-emerald-700/30"
+                          : "bg-[#EEDBD5] text-[#6E4742] border-[#D5AAA2]"
                       }`}
                     >
                       {pos.status}
                     </span>
                   </div>
 
-                  {/* Character Description */}
-                  <p className="text-xs text-[#5C3B37] font-sans leading-relaxed line-clamp-3">
+                  <h3 className="text-2xl font-serif text-[#2A1816] tracking-tight font-normal group-hover:text-[#8C241E] transition-colors leading-snug">
+                    {pos.role_name}
+                  </h3>
+
+                  <p className="text-xs text-[#5C3B37] font-light leading-relaxed">
                     {pos.character_description}
                   </p>
 
-                  {/* Requirements Snippet */}
                   {pos.requirements && (
-                    <div className="p-3 bg-[#F5EAE6] rounded-xl border border-[#DCBAB2]/70 text-[11px] text-[#6E4742] font-serif leading-relaxed">
-                      <span className="font-mono text-[9px] uppercase font-bold text-[#8C5A54] block mb-0.5">
-                        Requirements:
+                    <p className="text-xs text-[#6E4742] pt-1 leading-relaxed">
+                      <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#8C5A54] mr-1.5">
+                        Requires:
                       </span>
                       {pos.requirements}
-                    </div>
+                    </p>
                   )}
 
-                  {/* Spec Row */}
-                  <div className="flex items-center gap-3 text-xs font-mono text-[#6E4742]">
-                    <span className="bg-[#EEDBD5] text-[#8C241E] px-2.5 py-0.5 rounded-full border border-[#D5AAA2] text-[10px] font-bold">
-                      {pos.role_category}
-                    </span>
-                    <span>•</span>
+                  <div className="flex items-center gap-3 text-xs font-mono text-[#6E4742] pt-1">
                     <span>{pos.slots_available} Slots Open</span>
                     <span>•</span>
-                    <span className="font-bold text-[#2A1816]">{pos.applicant_count || 0} Applicants</span>
+                    <span className="font-bold text-[#2A1816]">{pos.applicant_count || 0} Candidates</span>
                   </div>
                 </div>
 
@@ -721,7 +874,7 @@ export default function AuditionsManagement() {
                     }}
                     className="text-xs font-mono font-bold text-[#8C241E] hover:text-[#731B16] flex items-center gap-1 cursor-pointer uppercase tracking-wider"
                   >
-                    <span>View Candidates</span>
+                    <span>View Candidates ({pos.applicant_count || 0})</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </button>
 
@@ -744,7 +897,7 @@ export default function AuditionsManagement() {
                           : "bg-[#8C241E] text-white border-[#A6352F]"
                       }`}
                     >
-                      {pos.status === "Open Calling" ? "Close Calling" : "Re-open"}
+                      {pos.status === "Open Calling" ? "Close" : "Re-open"}
                     </button>
                   </div>
                 </div>
@@ -757,56 +910,181 @@ export default function AuditionsManagement() {
       {/* TAB 2: CANDIDATE APPLICATIONS (REVIEW & CASTING DESK) */}
       {activeTab === "applications" && (
         <section className="space-y-6">
-          {/* Action & Filter Bar */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="space-y-1">
-              <h2 className="text-2xl font-serif text-[#2A1816] tracking-tight">Audition Submissions & Slates</h2>
-              <p className="text-xs text-[#6E4742] font-serif italic">
-                Review candidate tapes, run AI role-fit analyses, and issue official casting decisions.
-              </p>
-            </div>
-
-            <div className="flex items-center gap-3 flex-wrap">
-              {/* Search */}
-              <div className="relative">
-                <Search className="absolute left-3.5 top-3 h-3.5 w-3.5 text-[#8C5A54] pointer-events-none" />
-                <input
-                  type="text"
-                  placeholder="Search applicant name, email..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-full pl-9 pr-4 py-2 text-xs text-[#2A1816] font-medium focus:border-[#B32D25] focus:outline-none placeholder:text-[#8C5A54]/60 w-52 sm:w-60"
-                />
-              </div>
-
-              {/* Status Filter Pills */}
-              <div className="flex items-center gap-1.5 bg-[#FAF2EE] p-1 rounded-full border border-[#DCBAB2]">
-                {["All", "Pending Review", "Shortlisted", "Selected", "Rejected"].map((st) => (
-                  <button
-                    key={st}
-                    onClick={() => setSelectedStatus(st)}
-                    className={`px-3 py-1.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider transition-all cursor-pointer ${
-                      selectedStatus === st
-                        ? "bg-[#8C241E] text-[#FDF8F7] shadow-xs"
-                        : "text-[#5C3B37] hover:text-[#2A1816] hover:bg-[#EEDBD5]"
-                    }`}
-                  >
-                    {st}
-                  </button>
-                ))}
-              </div>
-
-              {/* Reset Filters */}
-              {selectedPosFilter !== "All" && (
+          {/* Action & Filter Toolbar */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-[#FAF2EE] border border-[#DCBAB2] rounded-2xl p-2.5 sm:p-3 shadow-xs">
+            <div className="relative flex-1 min-w-[220px]">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8C5A54]" />
+              <input
+                type="text"
+                placeholder="Search applicant name, email, role..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-8 py-2 bg-transparent text-xs font-sans text-[#2A1816] placeholder:text-[#8C5A54]/70 focus:outline-none"
+              />
+              {searchQuery && (
                 <button
-                  onClick={() => setSelectedPosFilter("All")}
-                  className="text-[10px] font-mono font-bold uppercase text-[#8C241E] hover:underline flex items-center gap-1"
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8C5A54] hover:text-[#2A1816]"
                 >
-                  <X className="w-3 h-3" /> Clear Role Filter
+                  <X className="w-3.5 h-3.5" />
                 </button>
               )}
             </div>
+
+            <div className="flex items-center gap-2 shrink-0 border-t sm:border-t-0 border-[#DCBAB2]/60 pt-2 sm:pt-0">
+              {(selectedStatus !== "All" || selectedPosFilter !== "All") && (
+                <div className="hidden lg:flex items-center gap-1.5">
+                  {selectedStatus !== "All" && (
+                    <span className="inline-flex items-center gap-1 bg-[#EEDBD5] text-[#8C241E] border border-[#D5AAA2] px-2.5 py-0.5 rounded-full text-[10px] font-mono">
+                      <span>{selectedStatus}</span>
+                      <button onClick={() => setSelectedStatus("All")} className="hover:text-[#2A1816]">
+                        <X className="w-3 h-3" />
+                      </button>
+                    </span>
+                  )}
+                  {selectedPosFilter !== "All" && (
+                    <span className="inline-flex items-center gap-1 bg-[#EEDBD5] text-[#8C241E] border border-[#D5AAA2] px-2.5 py-0.5 rounded-full text-[10px] font-mono">
+                      <span>Role: {selectedPosFilter}</span>
+                      <button onClick={() => setSelectedPosFilter("All")} className="hover:text-[#2A1816]">
+                        <X className="w-3 h-3" />
+                      </button>
+                    </span>
+                  )}
+                  <button
+                    onClick={() => {
+                      setSelectedStatus("All");
+                      setSelectedPosFilter("All");
+                    }}
+                    className="text-[10px] font-mono text-[#8C5A54] hover:text-[#8C241E] underline px-1"
+                  >
+                    Reset
+                  </button>
+                </div>
+              )}
+
+              <button
+                onClick={() => setFilterAppModalOpen(true)}
+                className={`px-3.5 py-2 rounded-xl text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer border ${
+                  selectedStatus !== "All" || selectedPosFilter !== "All"
+                    ? "bg-[#8C241E] text-[#FDF8F7] border-[#A6352F] shadow-xs"
+                    : "bg-[#F5EAE6] text-[#5C3B37] hover:bg-[#EEDBD5] border-[#D5AAA2]"
+                }`}
+              >
+                <SlidersHorizontal className="w-3.5 h-3.5" />
+                <span>Filter Candidates</span>
+                {(selectedStatus !== "All" || selectedPosFilter !== "All") && (
+                  <span className="bg-[#FAF2EE] text-[#8C241E] w-4 h-4 rounded-full text-[10px] font-bold flex items-center justify-center">
+                    {(selectedStatus !== "All" ? 1 : 0) + (selectedPosFilter !== "All" ? 1 : 0)}
+                  </span>
+                )}
+              </button>
+            </div>
           </div>
+
+          {/* CANDIDATES FILTER POPUP MODAL */}
+          {filterAppModalOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs animate-in fade-in duration-200">
+              <div className="bg-[#F5EAE6] border border-[#DEBEB7] text-[#2A1816] rounded-[2rem] p-6 sm:p-8 max-w-md w-full shadow-2xl relative space-y-6">
+                <div className="flex items-center justify-between border-b border-[#DCBAB2]/70 pb-3 pr-8">
+                  <div className="space-y-0.5">
+                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
+                      Casting Preferences
+                    </span>
+                    <h3 className="font-serif text-2xl text-[#2A1816] font-normal">
+                      Filter Candidate Submissions
+                    </h3>
+                  </div>
+                  <button
+                    onClick={() => setFilterAppModalOpen(false)}
+                    className="w-8 h-8 rounded-full bg-[#EEDBD5] hover:bg-[#E3CEC6] text-[#5C3B37] hover:text-[#2A1816] flex items-center justify-center transition-all cursor-pointer border border-[#D5AAA2]"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <div className="space-y-5 text-xs font-sans">
+                  <div className="space-y-2">
+                    <label className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#8C5A54] block">
+                      Review Status
+                    </label>
+                    <div className="grid grid-cols-2 gap-1.5">
+                      {["All", "Pending Review", "Shortlisted", "Selected", "Rejected"].map(st => (
+                        <button
+                          key={st}
+                          type="button"
+                          onClick={() => setSelectedStatus(st)}
+                          className={`text-left px-3 py-2 rounded-xl text-xs font-medium flex items-center justify-between transition-all cursor-pointer ${
+                            selectedStatus === st
+                              ? "bg-[#8C241E] text-[#FDF8F7] font-bold shadow-xs"
+                              : "bg-[#FAF2EE] text-[#5C3B37] hover:bg-[#EEDBD5] border border-[#DCBAB2]"
+                          }`}
+                        >
+                          <span>{st}</span>
+                          {selectedStatus === st && <Check className="w-3 h-3 text-[#FDF8F7]" />}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#8C5A54] block">
+                      Role Calling
+                    </label>
+                    <div className="max-h-40 overflow-y-auto space-y-1 custom-scrollbar pr-1">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedPosFilter("All")}
+                        className={`w-full text-left px-3 py-1.5 rounded-xl text-xs font-medium flex items-center justify-between transition-all cursor-pointer ${
+                          selectedPosFilter === "All"
+                            ? "bg-[#8C241E] text-[#FDF8F7] font-bold"
+                            : "bg-[#FAF2EE] text-[#5C3B37] hover:bg-[#EEDBD5] border border-[#DCBAB2]"
+                        }`}
+                      >
+                        <span>All Roles</span>
+                        {selectedPosFilter === "All" && <Check className="w-3 h-3 text-[#FDF8F7]" />}
+                      </button>
+                      {positions.map(pos => (
+                        <button
+                          key={pos.id}
+                          type="button"
+                          onClick={() => setSelectedPosFilter(pos.role_name)}
+                          className={`w-full text-left px-3 py-1.5 rounded-xl text-xs font-medium flex items-center justify-between transition-all cursor-pointer ${
+                            selectedPosFilter === pos.role_name
+                              ? "bg-[#8C241E] text-[#FDF8F7] font-bold"
+                              : "bg-[#FAF2EE] text-[#5C3B37] hover:bg-[#EEDBD5] border border-[#DCBAB2]"
+                          }`}
+                        >
+                          <span className="truncate">{pos.role_name} ({pos.production_name})</span>
+                          {selectedPosFilter === pos.role_name && <Check className="w-3 h-3 text-[#FDF8F7]" />}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-3 border-t border-[#DCBAB2]/70 flex items-center justify-between">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedStatus("All");
+                      setSelectedPosFilter("All");
+                    }}
+                    className="text-xs font-mono text-[#8C5A54] hover:text-[#8C241E] flex items-center gap-1.5 font-bold uppercase tracking-wider"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" />
+                    <span>Reset</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFilterAppModalOpen(false)}
+                    className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-6 py-2.5 rounded-full text-xs font-mono font-bold uppercase tracking-wider shadow-sm transition-all cursor-pointer border border-[#A6352F]"
+                  >
+                    Apply Filters
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Applications Table Container */}
           <div className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-[2.5rem] overflow-hidden shadow-xs">

@@ -16,7 +16,9 @@ import {
   Sparkles,
   Award,
   X,
-  PlayCircle
+  PlayCircle,
+  SlidersHorizontal,
+  RotateCcw
 } from "lucide-react";
 
 interface OpenPosition {
@@ -59,6 +61,7 @@ export default function AuditionsCasting() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedProduction, setSelectedProduction] = useState<string>("All");
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  const [filterModalOpen, setFilterModalOpen] = useState(false);
   
   const [openPositions, setOpenPositions] = useState<OpenPosition[]>([]);
   const [applications, setApplications] = useState<Application[]>([]);
@@ -173,6 +176,15 @@ export default function AuditionsCasting() {
     } finally {
       setSubmittingApp(false);
     }
+  };
+
+  const hasActiveFilters = selectedProduction !== "All" || selectedCategory !== "All";
+  const activeFilterCount = (selectedProduction !== "All" ? 1 : 0) + (selectedCategory !== "All" ? 1 : 0);
+
+  const resetFilters = () => {
+    setSelectedProduction("All");
+    setSelectedCategory("All");
+    setSearchTerm("");
   };
 
   const filteredPositions = openPositions.filter((pos) => {
@@ -302,67 +314,193 @@ export default function AuditionsCasting() {
         </div>
       )}
 
-      {/* Filter & Search Bar */}
-      <div className="space-y-4">
-        {/* Production Filter Tabs */}
-        <div className="flex flex-wrap items-center gap-2 border-b border-[#DCBAB2]/60 pb-3">
-          <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#8C5A54] mr-2">
-            Production:
-          </span>
-          {["All", "Hayavadana", "Ashadh Ka Ek Din", "Charandas Chor"].map((prod) => (
+      {/* TONED-DOWN EDITORIAL FILTER BAR */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-[#FAF2EE] border border-[#DCBAB2] rounded-2xl p-2.5 sm:p-3 shadow-xs">
+        {/* Search input */}
+        <div className="relative flex-1 min-w-[240px]">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8C5A54]" />
+          <input
+            type="text"
+            placeholder="Search roles, characters, departments..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-9 pr-8 py-2 bg-transparent text-xs font-sans text-[#2A1816] placeholder:text-[#8C5A54]/70 focus:outline-none"
+          />
+          {searchTerm && (
             <button
-              key={prod}
-              onClick={() => setSelectedProduction(prod)}
-              className={`px-4 py-1.5 rounded-full text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer ${
-                selectedProduction === prod
-                  ? "bg-[#8C241E] text-[#FDF8F7] shadow-xs border border-[#A6352F]"
-                  : "bg-[#FAF2EE] text-[#6E4742] hover:bg-[#EEDBD5] border border-[#DCBAB2]"
-              }`}
+              onClick={() => setSearchTerm("")}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8C5A54] hover:text-[#2A1816]"
             >
-              {prod === "All" ? "All Productions" : prod}
+              <X className="w-3.5 h-3.5" />
             </button>
-          ))}
+          )}
         </div>
 
-        {/* Search & Department Filters */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="relative w-full sm:w-80">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8C5A54]" />
-            <input
-              type="text"
-              placeholder="Search roles, characters, departments..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 bg-[#FAF2EE] border border-[#DCBAB2] rounded-full text-xs font-sans text-[#2A1816] placeholder:text-[#8C5A54]/70 focus:outline-hidden focus:border-[#8C241E] transition-all"
-            />
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-            {["All", "Performer", "Technical Crew", "Creative Designer", "Director"].map((cat) => (
+        {/* Active filter pills & Filter Options Popup button */}
+        <div className="flex items-center gap-2 shrink-0 border-t sm:border-t-0 border-[#DCBAB2]/60 pt-2 sm:pt-0">
+          {hasActiveFilters && (
+            <div className="hidden md:flex items-center gap-1.5">
+              {selectedProduction !== "All" && (
+                <span className="inline-flex items-center gap-1 bg-[#EEDBD5] text-[#8C241E] border border-[#D5AAA2] px-2.5 py-1 rounded-full text-[10px] font-mono font-medium">
+                  <span>{selectedProduction}</span>
+                  <button onClick={() => setSelectedProduction("All")} className="hover:text-[#2A1816]">
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              )}
+              {selectedCategory !== "All" && (
+                <span className="inline-flex items-center gap-1 bg-[#EEDBD5] text-[#8C241E] border border-[#D5AAA2] px-2.5 py-1 rounded-full text-[10px] font-mono font-medium">
+                  <span>{selectedCategory}</span>
+                  <button onClick={() => setSelectedCategory("All")} className="hover:text-[#2A1816]">
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              )}
               <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={`px-3.5 py-1.5 rounded-full text-[11px] font-mono font-bold uppercase tracking-wider transition-all cursor-pointer ${
-                  selectedCategory === cat
-                    ? "bg-[#2A1816] text-[#FDF8F7] shadow-xs"
-                    : "bg-[#FAF2EE] text-[#6E4742] hover:bg-[#EEDBD5] border border-[#DCBAB2]"
-                }`}
+                onClick={resetFilters}
+                className="text-[10px] font-mono text-[#8C5A54] hover:text-[#8C241E] underline px-1"
               >
-                {cat === "Performer" ? "Actor / Cast" : cat === "Technical Crew" ? "Tech & Lighting" : cat === "Creative Designer" ? "Makeup & Wardrobe" : cat === "Director" ? "Direction & Stage" : "All Departments"}
+                Reset
               </button>
-            ))}
-          </div>
+            </div>
+          )}
+
+          <button
+            onClick={() => setFilterModalOpen(true)}
+            className={`px-4 py-2 rounded-xl text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer border ${
+              hasActiveFilters
+                ? "bg-[#8C241E] text-[#FDF8F7] border-[#A6352F] shadow-xs"
+                : "bg-[#F5EAE6] text-[#5C3B37] hover:bg-[#EEDBD5] border-[#D5AAA2]"
+            }`}
+          >
+            <SlidersHorizontal className="w-3.5 h-3.5" />
+            <span>Filter Options</span>
+            {activeFilterCount > 0 && (
+              <span className="bg-[#FAF2EE] text-[#8C241E] w-4 h-4 rounded-full text-[10px] font-bold flex items-center justify-center">
+                {activeFilterCount}
+              </span>
+            )}
+          </button>
         </div>
       </div>
 
-      {/* Open Positions Grid */}
+      {/* FILTER OPTIONS POPUP WINDOW */}
+      {filterModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-[#F5EAE6] border border-[#DEBEB7] text-[#2A1816] rounded-[2rem] p-6 sm:p-8 max-w-md w-full shadow-2xl relative space-y-6">
+            <div className="flex items-center justify-between border-b border-[#DCBAB2]/70 pb-3 pr-8">
+              <div className="space-y-0.5">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
+                  Callboard Preferences
+                </span>
+                <h3 className="font-serif text-2xl text-[#2A1816] font-normal">
+                  Filter Audition Roles
+                </h3>
+              </div>
+              <button
+                onClick={() => setFilterModalOpen(false)}
+                className="w-8 h-8 rounded-full bg-[#EEDBD5] hover:bg-[#E3CEC6] text-[#5C3B37] hover:text-[#2A1816] flex items-center justify-center transition-all cursor-pointer border border-[#D5AAA2]"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="space-y-5 text-xs font-sans">
+              {/* Option 1: Production Filter */}
+              <div className="space-y-2">
+                <label className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#8C5A54] block">
+                  Production Premiere
+                </label>
+                <div className="grid grid-cols-1 gap-1.5">
+                  {[
+                    { id: "All", label: "All Upcoming Indian Plays" },
+                    { id: "Hayavadana", label: "Hayavadana (Girish Karnad)" },
+                    { id: "Ashadh Ka Ek Din", label: "Ashadh Ka Ek Din (Mohan Rakesh)" },
+                    { id: "Charandas Chor", label: "Charandas Chor (Habib Tanvir)" }
+                  ].map(opt => (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      onClick={() => setSelectedProduction(opt.id)}
+                      className={`w-full text-left px-3.5 py-2 rounded-xl text-xs font-medium flex items-center justify-between transition-all cursor-pointer ${
+                        selectedProduction === opt.id
+                          ? "bg-[#8C241E] text-[#FDF8F7] font-bold shadow-xs"
+                          : "bg-[#FAF2EE] text-[#5C3B37] hover:bg-[#EEDBD5] border border-[#DCBAB2]"
+                      }`}
+                    >
+                      <span>{opt.label}</span>
+                      {selectedProduction === opt.id && <Check className="w-3.5 h-3.5 text-[#FDF8F7]" />}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Option 2: Role Department */}
+              <div className="space-y-2">
+                <label className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#8C5A54] block">
+                  Department & Role Type
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                  {[
+                    { id: "All", label: "All Roles" },
+                    { id: "Performer", label: "Actor / Cast" },
+                    { id: "Technical Crew", label: "Tech & Light Man" },
+                    { id: "Creative Designer", label: "Makeup & SFX" },
+                    { id: "Director", label: "Direction & Stage" }
+                  ].map(opt => (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      onClick={() => setSelectedCategory(opt.id)}
+                      className={`text-left px-3 py-2 rounded-xl text-xs font-medium flex items-center justify-between transition-all cursor-pointer ${
+                        selectedCategory === opt.id
+                          ? "bg-[#8C241E] text-[#FDF8F7] font-bold shadow-xs"
+                          : "bg-[#FAF2EE] text-[#5C3B37] hover:bg-[#EEDBD5] border border-[#DCBAB2]"
+                      }`}
+                    >
+                      <span>{opt.label}</span>
+                      {selectedCategory === opt.id && <Check className="w-3 h-3 text-[#FDF8F7]" />}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-3 border-t border-[#DCBAB2]/70 flex items-center justify-between">
+              <button
+                type="button"
+                onClick={resetFilters}
+                className="text-xs font-mono text-[#8C5A54] hover:text-[#8C241E] flex items-center gap-1.5 font-bold uppercase tracking-wider"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>Reset All</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setFilterModalOpen(false)}
+                className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-6 py-2.5 rounded-full text-xs font-mono font-bold uppercase tracking-wider shadow-sm transition-all cursor-pointer border border-[#A6352F]"
+              >
+                Apply Filters
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* CALM EDITORIAL OPEN POSITIONS GRID */}
       {loading ? (
         <div className="text-center py-20 bg-[#FAF2EE] border border-[#DCBAB2] rounded-[2rem] text-[#8C5A54] font-serif italic text-sm">
           Loading audition callboard...
         </div>
       ) : filteredPositions.length === 0 ? (
-        <div className="text-center py-20 bg-[#FAF2EE] border border-[#DCBAB2] rounded-[2rem] text-[#8C5A54] font-serif italic text-sm">
-          No audition positions match the selected filters.
+        <div className="text-center py-20 bg-[#FAF2EE] border border-[#DCBAB2] rounded-[2rem] text-[#8C5A54] font-serif italic text-sm space-y-3">
+          <p>No audition positions match the selected filters.</p>
+          <button
+            onClick={resetFilters}
+            className="text-xs font-mono text-[#8C241E] font-bold uppercase tracking-wider underline cursor-pointer"
+          >
+            Clear Filters
+          </button>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -372,58 +510,56 @@ export default function AuditionsCasting() {
             return (
               <div
                 key={pos.id}
-                className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-[2rem] p-6 sm:p-7 hover:border-[#B32D25]/50 hover:shadow-md transition-all flex flex-col justify-between space-y-5 shadow-xs group"
+                className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-[2rem] p-7 hover:border-[#B32D25]/50 hover:shadow-md transition-all flex flex-col justify-between space-y-6 shadow-xs group"
               >
                 <div className="space-y-3.5">
-                  <div className="flex items-center justify-between gap-2 border-b border-[#DCBAB2]/50 pb-3">
-                    <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#8C5A54] bg-[#EEDBD5] px-2.5 py-0.5 rounded-full border border-[#D5AAA2]">
-                      {pos.production_name || "Upcoming Play"}
+                  {/* Subtle editorial header string */}
+                  <div className="flex items-baseline justify-between gap-2 border-b border-[#DCBAB2]/40 pb-2.5">
+                    <span className="text-[11px] font-mono text-[#8C5A54] uppercase tracking-wider font-semibold">
+                      {pos.production_name || "Premiere"} • {pos.role_category || pos.category || "Role"}
                     </span>
-                    <span className="font-mono text-[10px] text-[#8C5A54] uppercase tracking-wider">
-                      {pos.slots_available ? `${pos.slots_available} Slot${pos.slots_available > 1 ? "s" : ""}` : "Open Calling"}
+                    <span className="text-[10px] font-mono text-[#8C5A54]">
+                      {pos.slots_available ? `${pos.slots_available} Slot${pos.slots_available > 1 ? "s" : ""}` : "Open"}
                     </span>
                   </div>
 
-                  <div className="space-y-1">
-                    <span className="text-[11px] font-mono uppercase font-bold text-[#8C241E]">
-                      {pos.role_category || pos.category || "Character Role"}
-                    </span>
-                    <h3 className="text-xl sm:text-2xl font-serif text-[#2A1816] tracking-tight font-normal leading-snug">
-                      {pos.role_name || pos.title}
-                    </h3>
-                  </div>
+                  {/* Clean title */}
+                  <h3 className="text-2xl font-serif text-[#2A1816] tracking-tight font-normal leading-snug">
+                    {pos.role_name || pos.title}
+                  </h3>
 
+                  {/* Character synopsis */}
                   <p className="text-xs text-[#5C3B37] font-light leading-relaxed">
                     {pos.character_description || pos.description}
                   </p>
 
+                  {/* Understated requirement line */}
                   {pos.requirements && (
-                    <div className="bg-[#F5EAE6] p-3 rounded-xl border border-[#DEBEB7] space-y-1 text-xs">
-                      <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#8C5A54] flex items-center gap-1">
-                        <AlertCircle className="w-3 h-3 text-[#8C241E]" /> Requirements
+                    <p className="text-xs text-[#6E4742] pt-1 leading-relaxed">
+                      <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#8C5A54] mr-1.5">
+                        Requires:
                       </span>
-                      <p className="text-[11px] text-[#5C3B37] leading-relaxed">
-                        {pos.requirements}
-                      </p>
-                    </div>
+                      {pos.requirements}
+                    </p>
                   )}
                 </div>
 
-                <div className="pt-3 border-t border-[#DCBAB2]/60 flex items-center justify-between gap-3">
-                  <span className="font-mono text-[10px] text-[#8C5A54] uppercase tracking-wider">
+                {/* Card Footer */}
+                <div className="pt-3 border-t border-[#DCBAB2]/50 flex items-center justify-between gap-3">
+                  <span className="text-[10px] font-mono text-[#8C5A54]">
                     Due: {pos.deadline || "Sep 25, 2026"}
                   </span>
 
                   {hasApplied ? (
-                    <span className="px-4 py-2 rounded-full bg-emerald-700/15 text-emerald-950 border border-emerald-700/30 text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5">
+                    <span className="px-3.5 py-1.5 rounded-full bg-emerald-700/15 text-emerald-950 border border-emerald-700/30 text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5">
                       <CheckCircle2 className="w-3.5 h-3.5 text-emerald-800" /> Applied
                     </span>
                   ) : (
                     <button
                       onClick={() => handleApplyClick(pos)}
-                      className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-4 py-2 rounded-full text-xs font-mono font-bold uppercase tracking-wider shadow-sm flex items-center gap-1.5 transition-all cursor-pointer border border-[#A6352F]"
+                      className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-4 py-2 rounded-full text-xs font-mono font-bold uppercase tracking-wider shadow-sm flex items-center gap-1 transition-all cursor-pointer border border-[#A6352F]"
                     >
-                      <span>Apply Calling</span>
+                      <span>Apply</span>
                       <ChevronRight className="w-3.5 h-3.5" />
                     </button>
                   )}
@@ -581,4 +717,5 @@ export default function AuditionsCasting() {
     </div>
   );
 }
+
 

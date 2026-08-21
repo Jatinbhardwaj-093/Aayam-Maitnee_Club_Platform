@@ -224,33 +224,20 @@ export default function MemberPlays() {
                 key={play.id}
                 className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-[2rem] p-7 md:p-8 hover:border-[#B32D25]/50 hover:shadow-md transition-all flex flex-col justify-between space-y-6 shadow-xs group"
               >
-                {/* Header & Badges */}
+                {/* Header & Content */}
                 <div className="space-y-4">
-                  <div className="flex items-start justify-between gap-4 border-b border-[#DCBAB2]/50 pb-4">
+                  {/* Subtle top metadata */}
+                  <div className="flex items-start justify-between gap-4 border-b border-[#DCBAB2]/50 pb-3.5">
                     <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[11px] font-mono text-[#8C5A54] uppercase tracking-wider font-semibold">
-                          {play.genre || "Theatrical Drama"}
-                        </span>
-                        <span className="text-[#8C5A54] text-[10px]">•</span>
-                        <span className="text-[11px] font-mono text-[#8C5A54] uppercase tracking-wider">
-                          {play.language || "Hindi"}
-                        </span>
+                      <div className="text-[11px] font-mono text-[#8C5A54] uppercase tracking-wider font-semibold">
+                        {play.genre || "Theatrical Drama"} • {play.language || "Hindi"} {play.acts ? `• ${play.acts}` : ""}
                       </div>
-
                       <h3 className="text-2xl sm:text-3xl font-serif text-[#2A1816] tracking-tight font-normal">
                         {play.title}
                       </h3>
-
                       {play.playwright && (
                         <p className="text-xs text-[#6E4742] font-serif italic">
-                          Written by <span className="font-medium text-[#2A1816]">{play.playwright}</span>
-                        </p>
-                      )}
-
-                      {play.tagline && (
-                        <p className="text-xs text-[#8C5A54] font-serif italic pt-0.5">
-                          "{play.tagline}"
+                          by <span className="font-normal text-[#2A1816]">{play.playwright}</span>
                         </p>
                       )}
                     </div>
@@ -266,77 +253,40 @@ export default function MemberPlays() {
                     </span>
                   </div>
 
-                  {/* Specifications Matrix */}
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 bg-[#F5EAE6] p-4 rounded-2xl border border-[#DEBEB7] text-xs">
-                    <div className="space-y-0.5">
-                      <span className="text-[10px] font-mono uppercase font-bold text-[#8C5A54] flex items-center gap-1">
-                        <Award className="w-3 h-3 text-[#8C241E]" /> Director
-                      </span>
-                      <span className="font-serif font-medium text-[#2A1816] truncate block">{play.director || "Ensemble Lead"}</span>
-                    </div>
-
-                    <div className="space-y-0.5">
-                      <span className="text-[10px] font-mono uppercase font-bold text-[#8C5A54] flex items-center gap-1">
-                        <MapPin className="w-3 h-3 text-[#8C241E]" /> Venue
-                      </span>
-                      <span className="font-serif font-medium text-[#2A1816] truncate block">{play.venue || "CLT Main Stage"}</span>
-                    </div>
-
-                    <div className="space-y-0.5">
-                      <span className="text-[10px] font-mono uppercase font-bold text-[#8C5A54] flex items-center gap-1">
-                        <Clock className="w-3 h-3 text-[#8C241E]" /> Runtime
-                      </span>
-                      <span className="font-mono text-[11px] font-bold text-[#2A1816] truncate block">{play.runtime || "90 Mins"}</span>
-                    </div>
-
-                    <div className="space-y-0.5">
-                      <span className="text-[10px] font-mono uppercase font-bold text-[#8C5A54] flex items-center gap-1">
-                        <Calendar className="w-3 h-3 text-[#8C241E]" /> Staging Dates
-                      </span>
-                      <span className="font-mono text-[11px] font-medium text-[#2A1816] truncate block">{play.dates || "Season 2026"}</span>
-                    </div>
-
-                    <div className="space-y-0.5">
-                      <span className="text-[10px] font-mono uppercase font-bold text-[#8C5A54] flex items-center gap-1">
-                        <Layers className="w-3 h-3 text-[#8C241E]" /> Structure
-                      </span>
-                      <span className="font-serif font-medium text-[#2A1816] truncate block">{play.acts || "Full Production"}</span>
-                    </div>
-
-                    <div className="space-y-0.5">
-                      <span className="text-[10px] font-mono uppercase font-bold text-[#8C5A54] flex items-center gap-1">
-                        <Tag className="w-3 h-3 text-[#8C241E]" /> Access
-                      </span>
-                      <span className="font-mono text-[11px] font-bold text-[#8C241E] truncate block">{play.price || "Free Entry"}</span>
-                    </div>
+                  {/* Editorial Production Details Row */}
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-mono text-[#6E4742] pt-1">
+                    <span><strong className="text-[#2A1816] font-semibold">Dir:</strong> {play.director || "Ensemble Lead"}</span>
+                    <span>•</span>
+                    <span><strong className="text-[#2A1816] font-semibold">Venue:</strong> {play.venue || "IIT Madras"}</span>
+                    <span>•</span>
+                    <span><strong className="text-[#2A1816] font-semibold">Dates:</strong> {play.dates || "Season 2026"}</span>
+                    {play.runtime && (
+                      <>
+                        <span>•</span>
+                        <span>{play.runtime}</span>
+                      </>
+                    )}
                   </div>
 
                   {/* Synopsis */}
-                  <div className="space-y-1 pt-1">
-                    <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#8C5A54]">
-                      Dramatic Synopsis & Production Notes:
-                    </span>
-                    <p className="text-xs text-[#5C3B37] leading-relaxed font-light">
-                      {play.description}
-                    </p>
-                  </div>
+                  <p className="text-xs text-[#5C3B37] leading-relaxed font-light">
+                    {play.description}
+                  </p>
 
                   {/* Cast Roster */}
                   {play.cast && (
-                    <div className="space-y-1 bg-[#F5EAE6]/70 p-3 rounded-xl border border-[#DEBEB7]/60">
-                      <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#8C5A54] block">
-                        Featured Cast / Roles:
+                    <p className="text-xs text-[#6E4742] pt-1 leading-relaxed">
+                      <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#8C5A54] mr-1.5">
+                        Cast:
                       </span>
-                      <p className="text-xs font-serif text-[#2A1816] italic leading-snug">
-                        {play.cast}
-                      </p>
-                    </div>
+                      <span className="font-serif italic text-[#2A1816]">{play.cast}</span>
+                    </p>
                   )}
                 </div>
 
                 {/* Card Actions */}
                 <div className="pt-4 border-t border-[#DCBAB2]/60 flex flex-wrap items-center justify-between gap-3">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-3">
                     <Link
                       to="/member-scripts"
                       className="text-xs font-mono font-bold text-[#8C241E] hover:text-[#731B16] flex items-center gap-1 uppercase tracking-wider"
@@ -365,7 +315,7 @@ export default function MemberPlays() {
                       <span>Volunteer for Crew</span>
                     </button>
                   ) : (
-                    <span className="font-mono text-[11px] text-[#8C5A54] uppercase tracking-wider font-semibold">
+                    <span className="font-mono text-[11px] text-[#8C5A54] uppercase tracking-wider">
                       Archived in Repertory
                     </span>
                   )}
