@@ -1368,12 +1368,20 @@ def _script_vault_accessible_query(Script, User, email):
     return Script.query.filter(or_(*filters))
 
 
+def _script_rehearsal_accessible_query(Script, User, email):
+    owner_filters = _script_owner_filters(Script, User, email)
+    filters = [Script.status == 'Public']
+    if owner_filters:
+        filters.extend(owner_filters)
+    return Script.query.filter(or_(*filters))
+
+
 def _get_accessible_script_or_response(script_id, email):
     from models import Script, User
     script = Script.query.get(script_id)
     if not script:
         return None, (jsonify({'error': 'Script not found'}), 404)
-    allowed = _script_vault_accessible_query(Script, User, email).filter(Script.id == script_id).first()
+    allowed = _script_rehearsal_accessible_query(Script, User, email).filter(Script.id == script_id).first()
     if not allowed:
         return None, (jsonify({'error': 'Script not found'}), 404)
     return script, None
@@ -1397,7 +1405,7 @@ def _script_rehearsal_summary(script):
 def get_rehearsal_scripts():
     from models import Script, User
     email = request.args.get('email')
-    scripts = _script_vault_accessible_query(Script, User, email).order_by(Script.created_at.desc()).all()
+    scripts = _script_rehearsal_accessible_query(Script, User, email).order_by(Script.id.asc()).all()
     unique = {script.id: script for script in scripts}.values()
     return jsonify({
         'status': 'success',

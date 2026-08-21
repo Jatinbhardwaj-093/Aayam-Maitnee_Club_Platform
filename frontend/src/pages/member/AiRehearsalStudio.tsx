@@ -358,20 +358,31 @@ export default function AiRehearsalStudio() {
       });
   }, [activeUser?.email, scriptId, location.pathname]);
 
+  const [scriptFilterTab, setScriptFilterTab] = useState<"all" | "public" | "drafts">("public");
+
   const pinnedScripts = useMemo(() => {
     return allScripts.filter((s) => pinnedScriptIds.includes(s.id));
   }, [allScripts, pinnedScriptIds]);
 
+  const publicScriptsCount = useMemo(() => allScripts.filter((s) => s.status === "Public").length, [allScripts]);
+  const myDraftsCount = useMemo(() => allScripts.filter((s) => s.status !== "Public").length, [allScripts]);
+
   const filteredScripts = useMemo(() => {
-    if (!searchQuery.trim()) return allScripts;
+    let list = allScripts;
+    if (scriptFilterTab === "public") {
+      list = list.filter((s) => s.status === "Public");
+    } else if (scriptFilterTab === "drafts") {
+      list = list.filter((s) => s.status !== "Public");
+    }
+    if (!searchQuery.trim()) return list;
     const q = searchQuery.toLowerCase();
-    return allScripts.filter(
+    return list.filter(
       (s) =>
         s.title.toLowerCase().includes(q) ||
         s.playwright.toLowerCase().includes(q) ||
         (s.genre && s.genre.toLowerCase().includes(q))
     );
-  }, [allScripts, searchQuery]);
+  }, [allScripts, searchQuery, scriptFilterTab]);
 
   const parseScript = async (targetScript?: ScriptItem, customTitle?: string, customText?: string) => {
     setParsing(true);
@@ -1678,7 +1689,7 @@ export default function AiRehearsalStudio() {
                 <span>Script Repertoire</span>
               </h2>
               <p className="text-[11px] font-mono text-[#8C5A54]">
-                {filteredScripts.length} verified scripts · ready for live rehearsal
+                {publicScriptsCount} official public plays {myDraftsCount > 0 ? `· ${myDraftsCount} personal drafts` : ""}
               </p>
             </div>
 
@@ -1694,10 +1705,50 @@ export default function AiRehearsalStudio() {
             </div>
           </div>
 
+          {/* VAULT FILTER PILLS (PUBLIC VS PERSONAL DRAFTS) */}
+          {myDraftsCount > 0 && (
+            <div className="flex items-center gap-1.5 p-1 bg-[#E8D6CF]/60 rounded-xl border border-[#D5AAA2]/60">
+              <button
+                type="button"
+                onClick={() => setScriptFilterTab("public")}
+                className={`flex-1 py-1.5 px-2.5 rounded-lg text-[10px] font-mono font-bold uppercase transition-all cursor-pointer text-center ${
+                  scriptFilterTab === "public"
+                    ? "bg-[#8C241E] text-[#FDF8F7] shadow-xs"
+                    : "text-[#5C3B37] hover:text-[#2A1816]"
+                }`}
+              >
+                Public Repertoire ({publicScriptsCount})
+              </button>
+              <button
+                type="button"
+                onClick={() => setScriptFilterTab("drafts")}
+                className={`flex-1 py-1.5 px-2.5 rounded-lg text-[10px] font-mono font-bold uppercase transition-all cursor-pointer text-center ${
+                  scriptFilterTab === "drafts"
+                    ? "bg-[#8C241E] text-[#FDF8F7] shadow-xs"
+                    : "text-[#5C3B37] hover:text-[#2A1816]"
+                }`}
+              >
+                My Drafts ({myDraftsCount})
+              </button>
+              <button
+                type="button"
+                onClick={() => setScriptFilterTab("all")}
+                className={`py-1.5 px-2.5 rounded-lg text-[10px] font-mono font-bold uppercase transition-all cursor-pointer text-center ${
+                  scriptFilterTab === "all"
+                    ? "bg-[#8C241E] text-[#FDF8F7] shadow-xs"
+                    : "text-[#5C3B37] hover:text-[#2A1816]"
+                }`}
+              >
+                All ({allScripts.length})
+              </button>
+            </div>
+          )}
+
           {/* SCRIPT LISTING */}
           <div className="space-y-2">
             {filteredScripts.map((script) => {
               const isPinned = pinnedScriptIds.includes(script.id);
+              const isPublic = script.status === "Public";
 
               return (
                 <div
@@ -1715,9 +1766,13 @@ export default function AiRehearsalStudio() {
                     </button>
 
                     <div className="space-y-1 min-w-0">
-                      <div className="flex items-center gap-1.5 min-w-0 leading-none">
-                        <span className="text-[9px] font-mono font-bold uppercase text-[#8C241E] bg-[#EEDBD5] px-2 py-0.5 rounded-full border border-[#D5AAA2] whitespace-nowrap">
-                          {script.genre || "Drama"}
+                      <div className="flex items-center gap-1.5 min-w-0 leading-none flex-wrap">
+                        <span className={`text-[9px] font-mono font-bold uppercase px-2 py-0.5 rounded-full border whitespace-nowrap ${
+                          isPublic
+                            ? "text-[#8C241E] bg-[#EEDBD5] border-[#D5AAA2]"
+                            : "text-amber-950 bg-amber-700/15 border-amber-700/30"
+                        }`}>
+                          {isPublic ? (script.genre || "Drama") : "My Private Draft"}
                         </span>
                         {script.language && (
                           <span className="text-[9px] font-mono text-[#8C5A54] truncate">
@@ -1758,7 +1813,7 @@ export default function AiRehearsalStudio() {
 
             {filteredScripts.length === 0 && (
               <div className="text-center py-12 text-xs font-mono text-[#6E4742] bg-[#F5EAE6] rounded-2xl border border-dashed border-[#DCBAB2]">
-                No scripts found matching your search.
+                No scripts found in this category.
               </div>
             )}
           </div>
