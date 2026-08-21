@@ -149,17 +149,19 @@ export default function ProductionEditModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
-      <div className="bg-[#F5EAE6] border border-[#DEBEB7] text-[#2A1816] rounded-[2.5rem] p-6 sm:p-8 md:p-10 max-w-3xl w-full shadow-2xl relative max-h-[90vh] overflow-y-auto custom-scrollbar space-y-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 md:p-6 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+      <div className="bg-[#F5EAE6] border border-[#DEBEB7] text-[#2A1816] rounded-3xl max-w-4xl w-full shadow-2xl relative max-h-[92vh] flex flex-col overflow-hidden">
         
         {/* Top Close Button */}
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-6 right-6 w-9 h-9 rounded-full bg-[#EEDBD5] hover:bg-[#E3CEC6] text-[#5C3B37] hover:text-[#2A1816] flex items-center justify-center transition-all cursor-pointer border border-[#D5AAA2] shadow-xs group z-20"
+          className="absolute top-5 right-5 w-9 h-9 rounded-full bg-[#EEDBD5] hover:bg-[#E3CEC6] text-[#5C3B37] hover:text-[#2A1816] flex items-center justify-center transition-all cursor-pointer border border-[#D5AAA2] shadow-xs group z-30"
         >
           <X className="w-4 h-4 group-hover:rotate-90 transition-transform duration-200" />
         </button>
+
+        <div className="overflow-y-auto custom-scrollbar p-6 sm:p-8 md:p-10 space-y-6 pr-4 sm:pr-6 md:pr-8">
 
         {/* Modal Header */}
         <div className="space-y-2 pr-8 border-b border-[#DCBAB2]/70 pb-4">
@@ -506,6 +508,7 @@ export default function ProductionEditModal({
           </div>
 
         </form>
+        </div>
       </div>
     </div>
   );
