@@ -1026,46 +1026,33 @@ export default function EventsManagement() {
                       </div>
                     </div>
 
-                    {/* ACTION BUTTONS - ALL IN ONE CLEAN SINGLE LINE WITH NO ICONS */}
-                    <div className="pt-4 border-t border-[#DCBAB2]/60 flex items-center gap-2 w-full flex-nowrap">
-                      <button
-                        onClick={() => setSelectedEventForAuditions(ev)}
-                        className="flex-1 py-2.5 px-2 rounded-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer shadow-xs border border-[#A6352F] truncate"
-                        title="View open auditions & candidate reels"
-                      >
-                        Auditions ({eventApps.length})
-                      </button>
-
-                      <button
-                        onClick={() => setSelectedEventForVolunteers(ev)}
-                        className="flex-1 py-2.5 px-2 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] hover:text-[#2A1816] text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer shadow-xs truncate"
-                        title="View backstage crew applications"
-                      >
-                        Crew ({eventVols.length})
-                      </button>
-
+                    {/* ACTION CONTROLS - 3 CLEAN BUTTONS WITH THEMED ICONS */}
+                    <div className="pt-4 border-t border-[#DCBAB2]/60 flex items-center gap-3 w-full">
                       <button
                         onClick={() => handleOpenScriptPreview(ev)}
-                        className="flex-1 py-2.5 px-2 rounded-full border border-[#D5AAA2] bg-[#F5EAE6] hover:bg-[#EEDBD5] text-[#8C241E] text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer shadow-xs truncate"
+                        className="flex-1 py-2.5 px-3 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] hover:text-[#2A1816] text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs"
                         title="Preview Society Playbook Script"
                       >
-                        Script
+                        <FileText className="w-3.5 h-3.5 text-[#8C241E]" />
+                        <span>Script</span>
                       </button>
 
                       <button
                         onClick={() => handleOpenDetails(ev)}
-                        className="flex-1 py-2.5 px-2 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] hover:text-[#2A1816] text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer shadow-xs truncate"
+                        className="flex-1 py-2.5 px-3 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] hover:text-[#2A1816] text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs"
                         title="View detailed production dossier"
                       >
-                        Full Details
+                        <Info className="w-3.5 h-3.5 text-[#8C241E]" />
+                        <span>Full Details</span>
                       </button>
 
                       <button
                         onClick={() => handleOpenEdit(ev)}
-                        className="flex-1 py-2.5 px-2 rounded-full border border-[#D5AAA2] bg-[#EEDBD5] hover:bg-[#E3CEC6] text-[#2A1816] hover:text-[#8C241E] text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer shadow-xs truncate"
+                        className="flex-1 py-2.5 px-3 rounded-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm border border-[#A6352F]"
                         title="Edit upcoming production metadata & details"
                       >
-                        Edit Event
+                        <Edit3 className="w-3.5 h-3.5 text-[#FFD0CC]" />
+                        <span>Edit Event</span>
                       </button>
                     </div>
                   </div>
