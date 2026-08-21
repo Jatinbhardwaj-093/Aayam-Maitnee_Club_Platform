@@ -361,9 +361,9 @@ export default function JoinClub() {
     sessionStorage.setItem("aayam_active_user", JSON.stringify(userData));
 
     if (assignedTag === "developer" || assignedTag === "maintainer") {
-      navigate("/maintainer");
+      navigate("/schedule-admin");
     } else {
-      navigate("/member");
+      navigate("/schedule");
     }
   };
 

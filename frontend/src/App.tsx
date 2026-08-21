@@ -1,6 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AppLayout from "./components/AppLayout";
-import MemberDashboard from "./pages/member/MemberDashboard";
 import MySchedule from "./pages/member/MySchedule";
 import ProductionWorkspace from "./pages/ProductionWorkspace";
 import AuditionsCasting from "./pages/member/AuditionsCasting";
@@ -16,7 +15,6 @@ import ScriptBuilder from "./pages/member/ScriptBuilder";
 import AiRehearsalStudio from "./pages/member/AiRehearsalStudio";
 
 // Maintainer pages
-import MaintainerDashboard from "./pages/maintainers/MaintainerDashboard";
 import PlatformAnalytics from "./pages/maintainers/PlatformAnalytics";
 import ProductionControlPanel from "./pages/maintainers/ProductionControlPanel";
 import MemberProfileAudit from "./pages/maintainers/MemberProfileAudit";
@@ -57,8 +55,8 @@ export default function App() {
           <Route path="join" element={<JoinClub />} />
           <Route path="login" element={<Login />} />
 
-          {/* Portal / Dashboard paths */}
-          <Route path="member" element={<MemberDashboard />} />
+          {/* Member portal paths */}
+          <Route path="member" element={<MySchedule />} />
           <Route path="schedule" element={<MySchedule />} />
           <Route path="workspace" element={<ProductionWorkspace />} />
           <Route path="auditions" element={<AuditionsCasting />} />
@@ -72,7 +70,9 @@ export default function App() {
           <Route path="member-gallery" element={<ProductionGallery />} />
           <Route path="admin" element={<ProductionOffice />} />
           <Route path="backstage" element={<BackstagePass />} />
-          <Route path="maintainer" element={<MaintainerDashboard />} />
+
+          {/* Maintainer portal paths */}
+          <Route path="maintainer" element={<MaintainerSchedule />} />
           <Route path="schedule-admin" element={<MaintainerSchedule />} />
           <Route path="analytics" element={<PlatformAnalytics />} />
           <Route path="control-panel" element={<ProductionControlPanel />} />

@@ -76,7 +76,7 @@ export default function ViewProfile() {
         {/* Navigation & Controls */}
         <div className="flex justify-between items-center mb-8">
           <button
-            onClick={() => navigate(activeUser?.role?.toLowerCase().includes("maintainer") || activeUser?.isAdmin ? "/maintainer" : "/member")}
+            onClick={() => navigate(activeUser?.role?.toLowerCase().includes("maintainer") || activeUser?.isAdmin ? "/schedule-admin" : "/schedule")}
             className="group flex items-center gap-3 text-xs font-bold uppercase tracking-widest text-[#353535] hover:text-[#E85F57] transition-all"
           >
             <div className="w-8 h-8 rounded-full border border-[#D5C9BE] flex items-center justify-center group-hover:border-[#E85F57] transition-colors">

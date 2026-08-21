@@ -68,7 +68,7 @@ export default function Home() {
         </p>
         <div className="flex flex-wrap gap-[16px] justify-center pt-[16px]">
           <Link 
-            to="/member" 
+            to="/schedule" 
             className={buttonVariants({ size: "lg", className: "bg-[#E85F57] hover:bg-[#E85F57]/90 text-[#2C2A28] font-semibold rounded-[8px] px-[40px] py-[16px] shadow-md transition-all active:scale-95" })}
           >
             Enter Aayam <ArrowRight className="w-4 h-4 ml-2" />

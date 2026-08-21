@@ -154,10 +154,10 @@ export default function EditProfile() {
         {/* Back header */}
         <div className="mb-6 flex justify-between items-center">
           <button
-            onClick={() => navigate(activeUser?.role.toLowerCase().includes("maintainer") ? "/maintainer" : "/member")}
+            onClick={() => navigate(activeUser?.role.toLowerCase().includes("maintainer") ? "/schedule-admin" : "/schedule")}
             className="flex items-center gap-2 text-xs font-semibold text-[#2C2A28] hover:text-[#2C2A28]/80 transition-all"
           >
-            <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+            <ArrowLeft className="w-4 h-4" /> Back to Schedule
           </button>
         </div>
 
@@ -408,7 +408,7 @@ export default function EditProfile() {
             <Button
               type="button"
               variant="outline"
-              onClick={() => navigate(activeUser?.role.toLowerCase().includes("maintainer") ? "/maintainer" : "/member")}
+              onClick={() => navigate(activeUser?.role.toLowerCase().includes("maintainer") ? "/schedule-admin" : "/schedule")}
               className="border-2 border-[#D5C9BE]/70 text-[#666361] hover:bg-[#E7DDD3] rounded-xl flex-1 py-4 font-semibold"
             >
               Cancel

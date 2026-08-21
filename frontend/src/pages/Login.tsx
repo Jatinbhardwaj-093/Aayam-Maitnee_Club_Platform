@@ -64,9 +64,9 @@ export default function Login() {
         sessionStorage.setItem("aayam_active_user", JSON.stringify(userData));
 
         if (userData.role.includes("Maintainer") || userData.role.includes("Secretary") || userData.role.includes("Chief")) {
-          navigate("/maintainer");
+          navigate("/schedule-admin");
         } else {
-          navigate("/member");
+          navigate("/schedule");
         }
       } else {
         throw new Error(data.message || data.error || "Invalid institutional email or password.");

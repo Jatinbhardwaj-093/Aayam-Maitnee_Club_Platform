@@ -3,7 +3,6 @@ import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import {
   Home,
-  LayoutDashboard,
   Users,
   ClipboardList,
   Bell,
@@ -35,8 +34,7 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { label: "Drama Club Home", path: "/", icon: Home, description: "Public landing page" },
-  { label: "Member Dashboard", path: "/member", icon: LayoutDashboard, description: "Your rehearsals & schedules" },
-  { label: "My Schedule", path: "/schedule", icon: Calendar, description: "Your production schedule" },
+  { label: "My Schedule", path: "/schedule", icon: Calendar, description: "Your rehearsals & call attendance" },
   { label: "Auditions & Casting", path: "/auditions", icon: ClipboardList, description: "Apply for play casting" },
   { label: "Plays & Productions", path: "/member-plays", icon: PlayCircle, description: "Production lineup & scripts" },
   { label: "Script Vault", path: "/member-scripts", icon: FileText, description: "Confidential play scripts" },
@@ -44,7 +42,6 @@ const navItems: NavItem[] = [
 ];
 
 const maintainerNavItems: NavItem[] = [
-  { label: "Maintainer Dashboard", path: "/maintainer", icon: LayoutDashboard, description: "Executive overview & live metrics" },
   { label: "Production Callboard", path: "/schedule-admin", icon: Calendar, description: "Rehearsal call sheets & attendance roster" },
   { label: "Events Management", path: "/events-admin", icon: Calendar, description: "Proposal curation & sponsor deals" },
   { label: "Auditions & Casting", path: "/auditions-admin", icon: ClipboardList, description: "Role callings & candidate requests" },
@@ -185,8 +182,8 @@ export default function AppLayout() {
       }
       const isNormalMember = !isMaintainer;
       if (isNormalMember) {
-        // Display Member Dashboard, My Schedule, Auditions, Plays, Scripts, and Rehearsal Studio.
-        return ["/member", "/schedule", "/auditions", "/member-plays", "/member-scripts", "/ai-rehearsal"].includes(item.path);
+        // Display My Schedule, Auditions, Plays, Scripts, and Rehearsal Studio.
+        return ["/schedule", "/auditions", "/member-plays", "/member-scripts", "/ai-rehearsal"].includes(item.path);
       }
       return true;
     });
@@ -224,9 +221,9 @@ export default function AppLayout() {
 
         // Redirect based on role
         if (user.role.toLowerCase().includes("maintainer") || user.isAdmin) {
-          navigate("/maintainer");
+          navigate("/schedule-admin");
         } else {
-          navigate("/member");
+          navigate("/schedule");
         }
       } else {
         setLoginError("Invalid response from login endpoint");
@@ -363,12 +360,12 @@ export default function AppLayout() {
                 {activeUser ? (
                   <div className="flex items-center gap-3">
                     <Link
-                      to={isMaintainer ? "/maintainer" : "/member"}
+                      to={isMaintainer ? "/schedule-admin" : "/schedule"}
                       className="group bg-[#2C2A28] text-white hover:bg-[#E85F57] pl-5 pr-1.5 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all shadow-md flex items-center gap-3 border border-[#353535] hover:border-[#E85F57]"
                     >
-                      <span>{isMaintainer ? "Maintainer Desk" : "Member Portal"}</span>
+                      <span>{isMaintainer ? "Production Callboard" : "My Schedule"}</span>
                       <div className="w-7 h-7 bg-[#F7F5F0]/20 rounded-full flex items-center justify-center group-hover:bg-[#F7F5F0]/30 transition-colors">
-                        <LayoutDashboard className="w-3.5 h-3.5" />
+                        <Calendar className="w-3.5 h-3.5" />
                       </div>
                     </Link>
                   </div>
@@ -749,10 +746,10 @@ export default function AppLayout() {
                   </p>
                 </div>
                 <Link
-                  to="/member"
+                  to="/schedule"
                   className="bg-[#E85F57] hover:bg-[#E85F57]/90 text-[#2C2A28] font-semibold text-xs rounded-[8px] py-2.5 px-6 shadow-sm transition-all active:scale-95 flex items-center gap-2"
                 >
-                  Return to Dashboard
+                  Return to My Schedule
                 </Link>
               </div>
             ) : (
