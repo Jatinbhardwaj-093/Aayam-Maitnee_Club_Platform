@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   X,
   Lock,
@@ -14,7 +14,11 @@ import {
   User,
   Tag,
   FileText,
-  Users
+  Users,
+  Upload,
+  RotateCcw,
+  CheckCircle2,
+  Paperclip
 } from "lucide-react";
 import type { ProductionDetailData } from "@/components/ProductionDetailModal";
 
@@ -50,10 +54,19 @@ export default function ProductionEditModal({
     (production.status || "").toLowerCase() === "concluded"
   );
 
+  const imageFileInputRef = useRef<HTMLInputElement>(null);
+  const scriptFileInputRef = useRef<HTMLInputElement>(null);
+
+  const [imageFileName, setImageFileName] = useState<string>("");
+  const [imageFileSize, setImageFileSize] = useState<string>("");
+  const [isDraggingImage, setIsDraggingImage] = useState<boolean>(false);
+
+  const [scriptUploadFileName, setScriptUploadFileName] = useState<string>("");
+  const [scriptUploadSize, setScriptUploadSize] = useState<string>("");
+
   const [scriptUrl, setScriptUrl] = useState("");
   const [scriptText, setScriptText] = useState("");
   const [scriptAccess, setScriptAccess] = useState("Verified Society Manuscript");
-  const [scriptFileName, setScriptFileName] = useState("");
 
   const [formData, setFormData] = useState({
     title: "",
@@ -105,9 +118,86 @@ export default function ProductionEditModal({
       });
       setScriptUrl(production.script_url || "");
       setScriptText(production.script_text || "");
+      setImageFileName("");
+      setImageFileSize("");
+      setScriptUploadFileName("");
+      setScriptUploadSize("");
       setErrorMsg(null);
     }
   }, [production, isPast]);
+
+  const handleImageFile = (file: File) => {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setErrorMsg("Please provide a valid image file (PNG, JPG, WEBP, AVIF).");
+      return;
+    }
+
+    setImageFileName(file.name);
+    const sizeKb = (file.size / 1024).toFixed(1);
+    const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+    setImageFileSize(file.size > 1024 * 1024 ? `${sizeMb} MB` : `${sizeKb} KB`);
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const result = event.target?.result as string;
+      if (result) {
+        setFormData((prev) => ({ ...prev, image: result }));
+        setErrorMsg(null);
+      }
+    };
+    reader.onerror = () => {
+      setErrorMsg("Failed to read image file from device. Please try again.");
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleImageInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleImageFile(file);
+    }
+  };
+
+  const handleScriptFile = (file: File) => {
+    if (!file) return;
+    setScriptUploadFileName(file.name);
+    const sizeKb = (file.size / 1024).toFixed(1);
+    setScriptUploadSize(`${sizeKb} KB`);
+
+    const reader = new FileReader();
+    if (file.name.endsWith(".txt") || file.name.endsWith(".fountain") || file.name.endsWith(".md")) {
+      reader.onload = (event) => {
+        const text = event.target?.result as string;
+        if (text) {
+          setFormData((prev) => ({
+            ...prev,
+            script_text: text.slice(0, 5000),
+            script_url: `/vault/scripts/${file.name}`
+          }));
+        }
+      };
+      reader.readAsText(file);
+    } else {
+      reader.onload = (event) => {
+        const result = event.target?.result as string;
+        if (result) {
+          setFormData((prev) => ({
+            ...prev,
+            script_url: result
+          }));
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleScriptInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleScriptFile(file);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -163,158 +253,232 @@ export default function ProductionEditModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 md:p-6 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
       <div className="bg-[#F5EAE6] border border-[#DEBEB7] text-[#2A1816] rounded-3xl max-w-4xl w-full shadow-2xl relative max-h-[92vh] flex flex-col overflow-hidden">
         
-        {/* Top Close Button */}
-        <button
-          type="button"
-          onClick={onClose}
-          className="absolute top-5 right-5 w-9 h-9 rounded-full bg-[#EEDBD5] hover:bg-[#E3CEC6] text-[#5C3B37] hover:text-[#2A1816] flex items-center justify-center transition-all cursor-pointer border border-[#D5AAA2] shadow-xs group z-30"
-        >
-          <X className="w-4 h-4 group-hover:rotate-90 transition-transform duration-200" />
-        </button>
+        {/* Fixed Header */}
+        <div className="px-7 sm:px-9 pt-7 pb-5 border-b border-[#DCBAB2]/70 flex items-start justify-between gap-4 shrink-0 bg-[#F5EAE6]">
+          <div className="space-y-1.5 max-w-2xl">
+            <div className="flex items-center gap-2">
+              <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#8C241E] bg-[#EEDBD5] px-3 py-1 rounded-full border border-[#D5AAA2] inline-block shadow-xs">
+                Maintainer Directorial Authority
+              </span>
+              <span className={`text-[10px] font-mono font-bold uppercase tracking-wider px-3 py-1 rounded-full border flex items-center gap-1 shadow-xs ${
+                isPast
+                  ? "bg-amber-700/15 text-amber-950 border-amber-700/30"
+                  : "bg-emerald-700/15 text-emerald-950 border-emerald-700/30"
+              }`}>
+                {isPast ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
+                <span>{isPast ? "Archived Record (Cover Artwork Edit)" : "Upcoming Production (Full Edit)"}</span>
+              </span>
+            </div>
 
-        <div className="overflow-y-auto custom-scrollbar p-6 sm:p-8 md:p-10 space-y-6 pr-4 sm:pr-6 md:pr-8">
+            <h2 className="text-2xl sm:text-3xl font-serif text-[#2A1816] tracking-tight font-normal">
+              {isPast ? `Update Cover Artwork: ${production.title}` : `Edit Production Details: ${production.title}`}
+            </h2>
 
-        {/* Modal Header */}
-        <div className="space-y-2 pr-8 border-b border-[#DCBAB2]/70 pb-4">
-          <div className="flex items-center gap-2">
-            <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#8C241E] bg-[#EEDBD5] px-3 py-1 rounded-full border border-[#D5AAA2] inline-block">
-              Maintainer Directorial Authority
-            </span>
-            <span className={`text-[10px] font-mono font-bold uppercase tracking-wider px-3 py-1 rounded-full border flex items-center gap-1 ${
-              isPast
-                ? "bg-amber-700/15 text-amber-950 border-amber-700/30"
-                : "bg-emerald-700/15 text-emerald-950 border-emerald-700/30"
-            }`}>
-              {isPast ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
-              <span>{isPast ? "Archived Record (Image Only)" : "Upcoming Production (Full Edit)"}</span>
-            </span>
+            {isPast ? (
+              <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl text-xs text-amber-950 font-serif leading-relaxed flex items-start gap-2">
+                <Lock className="w-3.5 h-3.5 text-[#8C241E] shrink-0 mt-0.5" />
+                <div>
+                  <strong>Archival Provenance Lock:</strong> Historical text details cannot be altered to preserve archive integrity. You can upload a new high-resolution cover image file below.
+                </div>
+              </div>
+            ) : (
+              <p className="text-xs sm:text-sm text-[#5C3B37] font-light leading-relaxed">
+                Refine production cover artwork, casting assignments, schedule dates, assigned venue, and stage directions.
+              </p>
+            )}
           </div>
 
-          <h2 className="text-2xl sm:text-3xl font-serif text-[#2A1816] tracking-tight font-normal">
-            {isPast ? `Update Archival Artwork: ${production.title}` : `Edit Production Details: ${production.title}`}
-          </h2>
-
-          {isPast ? (
-            <div className="p-3.5 bg-amber-500/10 border border-amber-500/30 rounded-2xl text-xs text-amber-950 font-serif leading-relaxed flex items-start gap-2.5">
-              <Lock className="w-4 h-4 text-[#8C241E] shrink-0 mt-0.5" />
-              <div>
-                <strong>Archival Provenance Lock:</strong> To preserve society historical records, playbills, and performance provenance, historical text details cannot be altered. You may update the high-resolution archival cover artwork below.
-              </div>
-            </div>
-          ) : (
-            <p className="text-xs text-[#5C3B37] font-serif italic">
-              Maintainers have full liberty to refine production metadata, casting assignments, schedule dates, venues, and stage direction notes for upcoming premieres.
-            </p>
-          )}
+          {/* Close Button */}
+          <button
+            type="button"
+            onClick={onClose}
+            className="w-9 h-9 rounded-full bg-[#EEDBD5] hover:bg-[#E3CEC6] text-[#5C3B37] hover:text-[#2A1816] flex items-center justify-center transition-all cursor-pointer border border-[#D5AAA2] shadow-xs group shrink-0"
+            title="Close"
+          >
+            <X className="w-4 h-4 group-hover:rotate-90 transition-transform duration-200" />
+          </button>
         </div>
 
-        {/* Form Body */}
-        <form onSubmit={handleSubmit} className="space-y-5 text-xs font-mono">
-          
-          {/* IMAGE / POSTER ARTWORK SECTION (Always Editable) */}
-          <div className="p-4 sm:p-5 bg-[#FAF2EE] border border-[#DCBAB2] rounded-2xl space-y-3">
-            <div className="flex items-center justify-between">
-              <label className="font-bold text-[#8C241E] uppercase tracking-wider flex items-center gap-1.5">
-                <ImageIcon className="w-3.5 h-3.5 text-[#8C241E]" />
-                <span>Hero Poster / Artwork URL</span>
-                <span className="text-rose-500">*</span>
-              </label>
-              <span className="text-[10px] text-[#8C5A54]">Live preview updated</span>
-            </div>
+        {/* Scrollable Form Body with Fixed Action Footer */}
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+          <div className="p-7 sm:p-9 overflow-y-auto flex-1 custom-scrollbar space-y-6 text-xs font-mono pr-5 sm:pr-7">
+            {errorMsg && (
+              <div className="p-4 bg-rose-500/10 border border-rose-500/30 rounded-2xl text-xs text-rose-900 flex items-center gap-2.5">
+                <AlertCircle className="w-4 h-4 text-rose-700 shrink-0" />
+                <span>{errorMsg}</span>
+              </div>
+            )}
 
-            <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 items-center">
-              <div className="sm:col-span-1 aspect-[4/5] rounded-xl overflow-hidden border border-[#DCBAB2] bg-[#2A1816] shadow-xs">
-                <img
-                  src={formData.image || "/aayam_assets/tamashbin_user_1.jpg"}
-                  alt="Poster Preview"
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    (e.target as HTMLElement).src = "/aayam_assets/tamashbin_user_1.jpg";
-                  }}
-                />
+            {/* HERO COVER IMAGE / POSTER ARTWORK (FILE UPLOAD) */}
+            <div className="p-5 sm:p-6 bg-[#FAF2EE] border border-[#DCBAB2] rounded-2xl space-y-4 shadow-xs">
+              <div className="flex items-center justify-between">
+                <label className="font-bold text-[#8C241E] uppercase tracking-wider flex items-center gap-1.5 text-xs">
+                  <ImageIcon className="w-4 h-4 text-[#8C241E]" />
+                  <span>Hero Header / Cover Image File</span>
+                  <span className="text-rose-500">*</span>
+                </label>
+                <span className="text-[11px] font-mono text-[#8C5A54]">Image File Upload</span>
               </div>
 
-              <div className="sm:col-span-3 space-y-2.5">
-                <input
-                  type="text"
-                  required
-                  value={formData.image}
-                  onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                  placeholder="/aayam_assets/tamashbin_user_1.jpg"
-                  className="w-full bg-[#F5EAE6] border border-[#DCBAB2] rounded-xl px-3.5 py-2 text-xs text-[#2A1816] focus:outline-hidden focus:border-[#8C241E]"
-                />
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-start">
+                {/* Image Live Preview */}
+                <div className="md:col-span-1 space-y-2">
+                  <div className="aspect-[4/5] rounded-2xl overflow-hidden border-2 border-[#DCBAB2] bg-[#2A1816] shadow-sm relative group">
+                    <img
+                      src={formData.image || "/aayam_assets/tamashbin_user_1.jpg"}
+                      alt="Artwork Preview"
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLElement).src = "/aayam_assets/tamashbin_user_1.jpg";
+                      }}
+                    />
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-3 text-center">
+                      <span className="text-[11px] font-mono text-white font-bold uppercase tracking-wider bg-black/60 px-3 py-1.5 rounded-full backdrop-blur-xs">
+                        Live Preview
+                      </span>
+                    </div>
+                  </div>
+                  {imageFileName && (
+                    <div className="text-[11px] font-mono text-[#8C5A54] truncate text-center">
+                      {imageFileName} ({imageFileSize})
+                    </div>
+                  )}
+                </div>
 
-                <div className="space-y-1">
-                  <span className="text-[10px] uppercase text-[#8C5A54] block">Quick Society Presets:</span>
-                  <div className="flex flex-wrap gap-1.5">
-                    {PRESET_POSTERS.map((preset) => (
-                      <button
-                        key={preset.url}
-                        type="button"
-                        onClick={() => setFormData({ ...formData, image: preset.url })}
-                        className={`px-2 py-0.5 rounded-lg text-[10px] transition-all cursor-pointer border ${
-                          formData.image === preset.url
-                            ? "bg-[#8C241E] text-white border-[#A6352F]"
-                            : "bg-[#FAF2EE] text-[#5C3B37] border-[#DCBAB2] hover:bg-[#EEDBD5]"
-                        }`}
-                      >
-                        {preset.label}
-                      </button>
-                    ))}
+                {/* File Dropzone & Preset Controls */}
+                <div className="md:col-span-2 space-y-4">
+                  {/* Hidden Input */}
+                  <input
+                    type="file"
+                    ref={imageFileInputRef}
+                    onChange={handleImageInputChange}
+                    accept="image/png, image/jpeg, image/webp, image/gif, image/avif"
+                    className="hidden"
+                  />
+
+                  {/* Drag & Drop Upload Zone */}
+                  <div
+                    onClick={() => imageFileInputRef.current?.click()}
+                    onDragOver={(e) => { e.preventDefault(); setIsDraggingImage(true); }}
+                    onDragLeave={(e) => { e.preventDefault(); setIsDraggingImage(false); }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      setIsDraggingImage(false);
+                      const file = e.dataTransfer.files?.[0];
+                      if (file) handleImageFile(file);
+                    }}
+                    className={`border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-2 ${
+                      isDraggingImage
+                        ? "border-[#8C241E] bg-[#EEDBD5] scale-[1.01]"
+                        : "border-[#DCBAB2] hover:border-[#8C241E] bg-[#F5EAE6] hover:bg-[#EEDBD5]/60"
+                    }`}
+                  >
+                    <div className="w-12 h-12 rounded-full bg-[#EEDBD5] border border-[#D5AAA2] flex items-center justify-center text-[#8C241E] shadow-xs">
+                      <Upload className="w-5 h-5" />
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-xs font-mono font-bold text-[#2A1816]">
+                        {imageFileName ? "Replace Image File" : "Choose Image File from Computer"}
+                      </p>
+                      <p className="text-[11px] text-[#8C5A54] font-light">
+                        Drag & drop here or click to browse (PNG, JPG, WEBP, AVIF)
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Quick Society Archive Presets */}
+                  <div className="space-y-2 pt-1">
+                    <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#8C5A54] block">
+                      Or Choose Society Archive Preset:
+                    </span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {PRESET_POSTERS.map((preset) => (
+                        <button
+                          key={preset.url}
+                          type="button"
+                          onClick={() => {
+                            setFormData((prev) => ({ ...prev, image: preset.url }));
+                            setImageFileName(preset.label);
+                            setImageFileSize("Preset");
+                          }}
+                          className={`px-3 py-1.5 rounded-xl text-xs font-mono font-medium transition-all cursor-pointer border ${
+                            formData.image === preset.url
+                              ? "bg-[#8C241E] text-[#FDF8F7] border-[#A6352F] font-bold shadow-xs"
+                              : "bg-[#FAF2EE] text-[#5C3B37] border-[#DCBAB2] hover:bg-[#EEDBD5] hover:text-[#2A1816]"
+                          }`}
+                        >
+                          {preset.label}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* SCRIPT UPLOAD & PLAYBOOK SECTION (Always Editable for Both Past and Upcoming) */}
-          <div className="p-4 sm:p-5 bg-[#FAF2EE] border border-[#DCBAB2] rounded-2xl space-y-3">
-            <div className="flex items-center justify-between">
-              <label className="font-bold text-[#8C241E] uppercase tracking-wider flex items-center gap-1.5">
-                <FileText className="w-3.5 h-3.5 text-[#8C241E]" />
-                <span>Playbook Script & Document Upload</span>
-              </label>
-              <span className="text-[10px] text-[#8C5A54]">Vault PDF / Fountain / Manuscript</span>
-            </div>
+            {/* PLAYBOOK SCRIPT & DOCUMENT UPLOAD */}
+            <div className="p-5 sm:p-6 bg-[#FAF2EE] border border-[#DCBAB2] rounded-2xl space-y-4 shadow-xs">
+              <div className="flex items-center justify-between">
+                <label className="font-bold text-[#8C241E] uppercase tracking-wider flex items-center gap-1.5 text-xs">
+                  <FileText className="w-4 h-4 text-[#8C241E]" />
+                  <span>Playbook Script & Vault Document Upload</span>
+                </label>
+                <span className="text-[11px] font-mono text-[#8C5A54]">Manuscript PDF / Fountain / TXT</span>
+              </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <label className="text-[10px] uppercase font-bold text-[#8C5A54] block">Script Document Link / URL</label>
-                <input
-                  type="text"
-                  value={formData.script_url}
-                  onChange={(e) => setFormData({ ...formData, script_url: e.target.value })}
-                  placeholder="https://vault.aayam.iitm.ac.in/scripts/playbook.pdf"
-                  className="w-full bg-[#F5EAE6] border border-[#DCBAB2] rounded-xl px-3.5 py-2 text-xs text-[#2A1816] focus:outline-hidden focus:border-[#8C241E]"
+              {/* Hidden Script File Input */}
+              <input
+                type="file"
+                ref={scriptFileInputRef}
+                onChange={handleScriptInputChange}
+                accept=".pdf,.fountain,.txt,.md,.docx"
+                className="hidden"
+              />
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
+                <div
+                  onClick={() => scriptFileInputRef.current?.click()}
+                  className="p-4 bg-[#F5EAE6] hover:bg-[#EEDBD5] border border-[#DCBAB2] hover:border-[#8C241E] rounded-xl flex items-center gap-3 cursor-pointer transition-all shadow-xs"
+                >
+                  <div className="w-9 h-9 rounded-full bg-[#EEDBD5] border border-[#D5AAA2] flex items-center justify-center text-[#8C241E] shrink-0">
+                    <Paperclip className="w-4 h-4" />
+                  </div>
+                  <div className="min-w-0">
+                    <span className="font-bold text-xs text-[#2A1816] block truncate">
+                      {scriptUploadFileName || "Select Script File from Device"}
+                    </span>
+                    <span className="text-[10px] text-[#8C5A54]">
+                      {scriptUploadSize ? `${scriptUploadSize} • Uploaded` : "PDF, Fountain, TXT or Markdown"}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[10px] uppercase font-bold text-[#8C5A54] block">Script Access & Verification</label>
+                  <select
+                    value={scriptAccess}
+                    onChange={(e) => setScriptAccess(e.target.value)}
+                    className="w-full bg-[#F5EAE6] border border-[#DCBAB2] rounded-xl px-4 py-2.5 text-xs text-[#2A1816] focus:outline-hidden focus:border-[#8C241E] cursor-pointer shadow-xs"
+                  >
+                    <option value="Verified Society Manuscript">Verified Society Manuscript (Official)</option>
+                    <option value="Public Reading Excerpt">Public Reading Excerpt</option>
+                    <option value="Ensemble Cast Only">Ensemble Cast Confidential</option>
+                    <option value="Draft Revision">Draft Revision in Progress</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="space-y-1 pt-1">
+                <label className="text-[10px] uppercase font-bold text-[#8C5A54] block">Opening Script Excerpt / Staging Directions</label>
+                <textarea
+                  rows={3}
+                  value={formData.script_text}
+                  onChange={(e) => setFormData({ ...formData, script_text: e.target.value })}
+                  placeholder="[Curtain rises on a bare wooden proscenium. Sutradhar enters with chimta and folk rhythm...]"
+                  className="w-full bg-[#F5EAE6] border border-[#DCBAB2] rounded-xl p-3.5 text-xs text-[#2A1816] focus:outline-hidden focus:border-[#8C241E] leading-relaxed font-mono shadow-xs"
                 />
               </div>
-
-              <div className="space-y-1">
-                <label className="text-[10px] uppercase font-bold text-[#8C5A54] block">Script Access & Verification</label>
-                <select
-                  value={scriptAccess}
-                  onChange={(e) => setScriptAccess(e.target.value)}
-                  className="w-full bg-[#F5EAE6] border border-[#DCBAB2] rounded-xl px-3.5 py-2 text-xs text-[#2A1816] focus:outline-hidden focus:border-[#8C241E] cursor-pointer"
-                >
-                  <option value="Verified Society Manuscript">Verified Society Manuscript (Official)</option>
-                  <option value="Public Reading Excerpt">Public Reading Excerpt</option>
-                  <option value="Ensemble Cast Only">Ensemble Cast Confidential</option>
-                  <option value="Draft Revision">Draft Revision in Progress</option>
-                </select>
-              </div>
             </div>
-
-            <div className="space-y-1 pt-1">
-              <label className="text-[10px] uppercase font-bold text-[#8C5A54] block">Script Opening Excerpt / Staging Directions</label>
-              <textarea
-                rows={3}
-                value={formData.script_text}
-                onChange={(e) => setFormData({ ...formData, script_text: e.target.value })}
-                placeholder="[Curtain rises on a bare wooden proscenium. Sutradhar enters with chimta and folk rhythm...]"
-                className="w-full bg-[#F5EAE6] border border-[#DCBAB2] rounded-xl p-3 text-xs text-[#2A1816] focus:outline-hidden focus:border-[#8C241E] leading-relaxed font-mono"
-              />
-            </div>
-          </div>
 
           {/* UPCOMING FULL EDIT FIELDS (Read-only for Past, Fully Editable for Upcoming) */}
           <div className="space-y-4">
@@ -541,35 +705,34 @@ export default function ProductionEditModal({
               />
             </div>
           </div>
-
-          {/* Action Controls */}
-          <div className="pt-4 border-t border-[#DCBAB2]/70 flex items-center justify-between gap-3">
-            <span className="text-[10px] text-[#8C5A54]">
-              {isPast ? "Only image changes will take effect." : "All changes will be published immediately."}
-            </span>
-
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={onClose}
-                className="px-5 py-2.5 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider cursor-pointer"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={submitting}
-                className="px-6 py-2.5 rounded-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer shadow-sm border border-[#A6352F] disabled:opacity-50"
-              >
-                <Check className="w-4 h-4 text-[#FFD0CC]" />
-                <span>{submitting ? "Saving..." : isPast ? "Save Artwork" : "Publish Production Updates"}</span>
-              </button>
-            </div>
-          </div>
-
-        </form>
         </div>
-      </div>
+
+        {/* Fixed Action Footer */}
+        <div className="px-7 sm:px-9 py-5 bg-[#FAF2EE] border-t border-[#DCBAB2]/70 flex flex-wrap items-center justify-between gap-3 shrink-0">
+          <span className="text-[11px] text-[#8C5A54] font-mono">
+            {isPast ? "Only cover artwork changes will take effect." : "All changes will be updated and published immediately."}
+          </span>
+
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-5 py-2.5 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider cursor-pointer shadow-xs"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={submitting}
+              className="px-7 py-2.5 rounded-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] text-xs font-mono font-bold uppercase tracking-widest flex items-center gap-2 cursor-pointer shadow-md shadow-[#8C241E]/20 border border-[#A6352F] disabled:opacity-50 transition-all"
+            >
+              <Check className="w-4 h-4 text-[#FFD0CC]" />
+              <span>{submitting ? "Saving..." : isPast ? "Save Artwork" : "Publish Production Updates"}</span>
+            </button>
+          </div>
+        </div>
+      </form>
     </div>
-  );
+  </div>
+);
 }
