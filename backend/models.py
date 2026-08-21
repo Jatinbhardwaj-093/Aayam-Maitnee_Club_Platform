@@ -518,12 +518,40 @@ class Volunteer(db.Model):
     __tablename__ = "volunteer"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    status = db.Column(db.String(20), default="Pending")
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    event_id = db.Column(db.Integer, db.ForeignKey("event.id"), nullable=False)
+    status = db.Column(db.String(50), default="Pending Review") # Pending Review, Approved & Assigned, Declined
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=True)
+    event_id = db.Column(db.Integer, db.ForeignKey("event.id"), nullable=True)
+    play_id = db.Column(db.Integer, db.ForeignKey("play.id"), nullable=True)
+
+    applicant_name = db.Column(db.String(150), nullable=True)
+    applicant_email = db.Column(db.String(255), nullable=True)
+    applicant_phone = db.Column(db.String(50), nullable=True)
+    department = db.Column(db.String(100), nullable=True) # Stage Management, Lighting & FX, Sound & Foley, Costumes & Makeup, Props & Set Design, Marketing, General Crew
+    availability = db.Column(db.String(100), nullable=True)
+    notes = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     user = db.relationship("User", back_populates="volunteer")
     event = db.relationship("Event", back_populates="volunteers")
+    play = db.relationship("Play", backref=db.backref("volunteers", cascade="all, delete-orphan"))
+
+    def to_dict(self):
+        play_name = self.play.title if self.play else (self.event.title if self.event else "Society Production")
+        return {
+            'id': self.id,
+            'status': self.status or 'Pending Review',
+            'user_id': self.user_id,
+            'play_id': self.play_id,
+            'event_id': self.event_id,
+            'production_title': play_name,
+            'applicant_name': self.applicant_name or (self.user.name if self.user else "Ensemble Member"),
+            'applicant_email': self.applicant_email or (self.user.email if self.user else ""),
+            'applicant_phone': self.applicant_phone or "+91 98110 44321",
+            'department': self.department or "General Backstage Crew",
+            'availability': self.availability or "5-8 Hours / Week",
+            'notes': self.notes or "",
+            'created_at': self.created_at.strftime('%b %d, %Y') if self.created_at else 'Aug 21, 2026'
+        }
 
 class Participation(db.Model):
     __tablename__ = "participation"
@@ -546,8 +574,14 @@ class Play(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.String(150), nullable=False)
-    status = db.Column(db.String(50)) # e.g. "SELLING FAST", "LIMITED TICKETS"
+    playwright = db.Column(db.String(150), nullable=True)
+    genre = db.Column(db.String(100), nullable=True)
+    language = db.Column(db.String(100), nullable=True, default="Hindi / English")
+    status = db.Column(db.String(50)) # e.g. "Upcoming Premiere", "Archived Production"
     status_color = db.Column(db.String(100)) # CSS classes for color tag
+    is_past = db.Column(db.Boolean, default=False)
+    tagline = db.Column(db.String(255), nullable=True)
+    acts = db.Column(db.String(100), nullable=True)
     description = db.Column(db.Text)
     director = db.Column(db.String(150))
     cast = db.Column(db.String(255))
@@ -562,8 +596,14 @@ class Play(db.Model):
         return {
             'id': self.id,
             'title': self.title,
-            'status': self.status,
-            'statusColor': self.status_color,
+            'playwright': self.playwright or "Classical/Ensemble",
+            'genre': self.genre or "Theatrical Drama",
+            'language': self.language or "Hindi & English",
+            'status': self.status or ("Archived Production" if self.is_past else "Upcoming Premiere"),
+            'statusColor': self.status_color or ("bg-[#E4D9D2]/80 text-[#6B5550] border-[#CBB3AC]" if self.is_past else "bg-emerald-700/15 text-emerald-950 border-emerald-700/30"),
+            'is_past': self.is_past or (self.status and "archive" in self.status.lower()),
+            'tagline': self.tagline or "",
+            'acts': self.acts or "Full Length Drama",
             'description': self.description,
             'director': self.director,
             'cast': self.cast,
@@ -572,7 +612,8 @@ class Play(db.Model):
             'venue': self.venue,
             'dates': self.dates,
             'runtime': self.runtime,
-            'price': self.price
+            'price': self.price,
+            'volunteer_count': len(self.volunteers) if hasattr(self, 'volunteers') and self.volunteers else 0
         }
 
 class OpenPosition(db.Model):

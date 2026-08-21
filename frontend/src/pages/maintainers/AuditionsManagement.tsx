@@ -27,7 +27,8 @@ import {
   UserCheck,
   Award,
   Layers,
-  ChevronRight
+  ChevronRight,
+  HeartHandshake
 } from "lucide-react";
 import {
   Dialog,
@@ -66,6 +67,20 @@ interface AuditionApplication {
   audition_date?: string;
   ai_report?: string;
   submitted_at?: string;
+}
+
+interface ProductionVolunteer {
+  id: number;
+  production_title: string;
+  play_id?: number;
+  applicant_name: string;
+  applicant_email: string;
+  applicant_phone: string;
+  department: string;
+  availability: string;
+  notes: string;
+  status: string; // "Pending Review", "Approved & Assigned", "Declined"
+  created_at: string;
 }
 
 const fallbackPositions: AuditionPosition[] = [
@@ -167,12 +182,13 @@ export default function AuditionsManagement() {
   const { activeUser } = useOutletContext<any>() || {};
   const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005";
 
-  // Tab State: "positions" (Role Callings) | "applications" (Candidate Applications)
-  const [activeTab, setActiveTab] = useState<"positions" | "applications">("positions");
+  // Tab State: "positions" | "applications" | "volunteers"
+  const [activeTab, setActiveTab] = useState<"positions" | "applications" | "volunteers">("positions");
 
   // Data States
   const [positions, setPositions] = useState<AuditionPosition[]>(fallbackPositions);
   const [applications, setApplications] = useState<AuditionApplication[]>(fallbackApplications);
+  const [volunteers, setVolunteers] = useState<ProductionVolunteer[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Filters & Search
@@ -194,7 +210,7 @@ export default function AuditionsManagement() {
 
   // Form States for Create Position
   const [newPosForm, setNewPosForm] = useState({
-    production_name: "Karn Ki Yachika",
+    production_name: "Hayavadana",
     role_name: "",
     role_category: "Character Role",
     character_description: "",
@@ -212,7 +228,7 @@ export default function AuditionsManagement() {
     setTimeout(() => setToastMessage(null), 4000);
   };
 
-  // Fetch Positions & Applications
+  // Fetch Positions & Applications & Volunteers
   const fetchPositions = async () => {
     try {
       const res = await fetch(`${baseUrl}/api/audition-positions`);
@@ -241,9 +257,23 @@ export default function AuditionsManagement() {
     }
   };
 
+  const fetchVolunteers = async () => {
+    try {
+      const res = await fetch(`${baseUrl}/api/volunteers`);
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          setVolunteers(data);
+        }
+      }
+    } catch (err) {
+      console.warn("Failed to fetch volunteers:", err);
+    }
+  };
+
   const refreshAll = async () => {
     setLoading(true);
-    await Promise.all([fetchPositions(), fetchApplications()]);
+    await Promise.all([fetchPositions(), fetchApplications(), fetchVolunteers()]);
     setLoading(false);
   };
 
@@ -355,6 +385,28 @@ export default function AuditionsManagement() {
     } catch (err) {
       console.error(err);
       showToast("Network error updating status.");
+    }
+  };
+
+  // Handle Volunteer Status Change
+  const handleUpdateVolunteerStatus = async (volId: number, newStatus: string) => {
+    try {
+      const res = await fetch(`${baseUrl}/api/volunteer/${volId}/status`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus })
+      });
+      if (res.ok) {
+        showToast(`Crew volunteer status updated to "${newStatus}".`);
+        setVolunteers(prev =>
+          prev.map(v => (v.id === volId ? { ...v, status: newStatus } : v))
+        );
+      } else {
+        showToast("Error updating volunteer status.");
+      }
+    } catch (err) {
+      console.error(err);
+      showToast("Network error updating volunteer status.");
     }
   };
 
@@ -483,10 +535,10 @@ export default function AuditionsManagement() {
           </div>
 
           {/* Stepper / Tab Toggle Bar */}
-          <div className="flex items-center gap-2 bg-[#FAF2EE] p-1.5 rounded-full border border-[#DCBAB2] shadow-xs">
+          <div className="flex flex-wrap items-center gap-2 bg-[#FAF2EE] p-1.5 rounded-full border border-[#DCBAB2] shadow-xs">
             <button
               onClick={() => setActiveTab("positions")}
-              className={`px-5 py-2.5 rounded-full text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-2 ${
+              className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-2 ${
                 activeTab === "positions"
                   ? "bg-[#8C241E] text-[#FDF8F7] shadow-sm border border-[#A6352F]"
                   : "text-[#5C3B37] hover:text-[#2A1816] hover:bg-[#EEDBD5]"
@@ -497,14 +549,25 @@ export default function AuditionsManagement() {
             </button>
             <button
               onClick={() => setActiveTab("applications")}
-              className={`px-5 py-2.5 rounded-full text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-2 ${
+              className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-2 ${
                 activeTab === "applications"
                   ? "bg-[#8C241E] text-[#FDF8F7] shadow-sm border border-[#A6352F]"
                   : "text-[#5C3B37] hover:text-[#2A1816] hover:bg-[#EEDBD5]"
               }`}
             >
               <Users className="w-3.5 h-3.5" />
-              <span>Applications ({applications.length})</span>
+              <span>Audition Candidates ({applications.length})</span>
+            </button>
+            <button
+              onClick={() => setActiveTab("volunteers")}
+              className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-2 ${
+                activeTab === "volunteers"
+                  ? "bg-[#8C241E] text-[#FDF8F7] shadow-sm border border-[#A6352F]"
+                  : "text-[#5C3B37] hover:text-[#2A1816] hover:bg-[#EEDBD5]"
+              }`}
+            >
+              <HeartHandshake className="w-3.5 h-3.5" />
+              <span>Crew Volunteers ({volunteers.length})</span>
             </button>
           </div>
         </div>
@@ -525,17 +588,17 @@ export default function AuditionsManagement() {
 
           <div className="bg-gradient-to-br from-[#F5EAE6] to-[#EEDBD5] border border-[#DEBEB7] rounded-[1.8rem] p-5 shadow-xs flex flex-col justify-between">
             <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
-              Total Submissions
+              Audition Candidates
             </span>
             <div className="flex items-baseline justify-between mt-2">
               <span className="font-serif text-3xl text-[#2A1816] font-normal">{totalAppsCount}</span>
-              <span className="text-[10px] font-mono text-[#8C5A54]">Profiles</span>
+              <span className="text-[10px] font-mono text-[#8C5A54]">Slates</span>
             </div>
           </div>
 
           <div className="bg-gradient-to-br from-[#F5EAE6] to-[#EEDBD5] border border-[#DEBEB7] rounded-[1.8rem] p-5 shadow-xs flex flex-col justify-between">
             <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
-              Shortlisted / Cast
+              Shortlisted Cast
             </span>
             <div className="flex items-baseline justify-between mt-2">
               <span className="font-serif text-3xl text-[#8C241E] font-normal">{shortlistedCount}</span>
@@ -547,12 +610,12 @@ export default function AuditionsManagement() {
 
           <div className="bg-gradient-to-br from-[#F5EAE6] to-[#EEDBD5] border border-[#DEBEB7] rounded-[1.8rem] p-5 shadow-xs flex flex-col justify-between">
             <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
-              Pending Decision
+              Crew Volunteers
             </span>
             <div className="flex items-baseline justify-between mt-2">
-              <span className="font-serif text-3xl text-[#2A1816] font-normal">{pendingCount}</span>
+              <span className="font-serif text-3xl text-[#2A1816] font-normal">{volunteers.length}</span>
               <span className="text-[10px] font-mono text-amber-950 bg-amber-700/15 border border-amber-700/30 px-2 py-0.5 rounded-full">
-                Reviewing
+                Assigned
               </span>
             </div>
           </div>
@@ -883,6 +946,144 @@ export default function AuditionsManagement() {
                                 title="Select for Cast"
                               >
                                 Cast Role
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ---------------------------------------------------- */}
+      {/* TAB 3: PRODUCTION CREW VOLUNTEERS */}
+      {/* ---------------------------------------------------- */}
+      {activeTab === "volunteers" && (
+        <section className="space-y-6">
+          <div className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-[2rem] p-6 sm:p-8 space-y-6 shadow-xs">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#DCBAB2]/60 pb-4">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#8C5A54] bg-[#EEDBD5] px-3 py-1 rounded-full border border-[#D5AAA2]">
+                    Backstage & Technical Crew Applications
+                  </span>
+                </div>
+                <h2 className="text-2xl font-serif text-[#2A1816] tracking-tight font-normal">
+                  Production Crew Volunteers Roster
+                </h2>
+                <p className="text-xs text-[#6E4742] font-light">
+                  Review member volunteers for Stage Management, Lighting Consoles, SFX Makeup, Costumes, Props, Sound & Front of House.
+                </p>
+              </div>
+
+              <span className="font-mono text-xs font-bold uppercase tracking-wider bg-[#EEDBD5] text-[#8C241E] px-4 py-2 rounded-full border border-[#D5AAA2] shrink-0 self-start sm:self-auto">
+                {volunteers.length} Active Application{volunteers.length !== 1 ? "s" : ""}
+              </span>
+            </div>
+
+            <div className="overflow-x-auto custom-scrollbar">
+              <table className="w-full text-left border-collapse min-w-[750px]">
+                <thead>
+                  <tr className="border-b border-[#DCBAB2] bg-[#F5EAE6]">
+                    <th className="px-6 py-4 text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
+                      Volunteer Member
+                    </th>
+                    <th className="px-6 py-4 text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
+                      Target Production
+                    </th>
+                    <th className="px-6 py-4 text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
+                      Department & Availability
+                    </th>
+                    <th className="px-6 py-4 text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
+                      Motivation & Notes
+                    </th>
+                    <th className="px-6 py-4 text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
+                      Status
+                    </th>
+                    <th className="px-6 py-4 text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54] text-right">
+                      Directorial Action
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#DCBAB2]/50">
+                  {volunteers.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="py-16 text-center">
+                        <HeartHandshake className="w-8 h-8 text-[#8C5A54] mx-auto mb-2 opacity-50" />
+                        <p className="font-mono text-xs font-bold uppercase text-[#2A1816]">No volunteer applications yet</p>
+                        <p className="text-xs text-[#6E4742] font-serif mt-1">Crew applications submitted from the Plays catalog will appear here.</p>
+                      </td>
+                    </tr>
+                  ) : (
+                    volunteers.map((vol) => (
+                      <tr key={vol.id} className="hover:bg-[#F5EAE6]/60 transition-colors">
+                        <td className="px-6 py-4.5 align-top">
+                          <div className="space-y-0.5">
+                            <span className="font-serif text-base font-medium text-[#2A1816] block">{vol.applicant_name}</span>
+                            <span className="font-mono text-[11px] text-[#8C5A54] block">{vol.applicant_email}</span>
+                            {vol.applicant_phone && (
+                              <span className="font-mono text-[10px] text-[#8C5A54] block">{vol.applicant_phone}</span>
+                            )}
+                          </div>
+                        </td>
+
+                        <td className="px-6 py-4.5 align-top">
+                          <span className="font-serif text-sm font-medium text-[#2A1816] block">{vol.production_title}</span>
+                          <span className="font-mono text-[10px] text-[#8C5A54]">Applied: {vol.created_at}</span>
+                        </td>
+
+                        <td className="px-6 py-4.5 align-top">
+                          <div className="space-y-1">
+                            <span className="inline-block font-mono text-[11px] font-bold uppercase tracking-wider bg-[#EEDBD5] text-[#8C241E] px-2.5 py-0.5 rounded-full border border-[#D5AAA2]">
+                              {vol.department}
+                            </span>
+                            <span className="font-mono text-[10px] text-[#5C3B37] block">
+                              Commitment: {vol.availability}
+                            </span>
+                          </div>
+                        </td>
+
+                        <td className="px-6 py-4.5 align-top max-w-xs">
+                          <p className="text-xs text-[#5C3B37] font-light leading-relaxed italic">
+                            "{vol.notes || "Ready to assist the backstage production team."}"
+                          </p>
+                        </td>
+
+                        <td className="px-6 py-4.5 align-top">
+                          <span
+                            className={`inline-block px-3 py-1 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider border ${
+                              vol.status === "Approved & Assigned"
+                                ? "bg-emerald-700/15 text-emerald-950 border-emerald-700/30"
+                                : vol.status === "Declined"
+                                ? "bg-gray-200 text-gray-700 border-gray-300"
+                                : "bg-amber-700/15 text-amber-950 border-amber-700/30"
+                            }`}
+                          >
+                            {vol.status}
+                          </span>
+                        </td>
+
+                        <td className="px-6 py-4.5 align-top text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            {vol.status !== "Approved & Assigned" && (
+                              <button
+                                onClick={() => handleUpdateVolunteerStatus(vol.id, "Approved & Assigned")}
+                                className="px-3.5 py-1.5 rounded-full bg-emerald-800 hover:bg-emerald-900 text-[#FDF8F7] text-xs font-mono font-bold uppercase tracking-wider border border-emerald-900 transition-all cursor-pointer shadow-xs"
+                              >
+                                Approve & Assign
+                              </button>
+                            )}
+                            {vol.status !== "Declined" && (
+                              <button
+                                onClick={() => handleUpdateVolunteerStatus(vol.id, "Declined")}
+                                className="px-3 py-1.5 rounded-full bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#8C5A54] hover:text-[#2A1816] text-xs font-mono font-bold uppercase tracking-wider border border-[#DCBAB2] transition-all cursor-pointer shadow-2xs"
+                              >
+                                Decline
                               </button>
                             )}
                           </div>

@@ -1,29 +1,55 @@
 // @ts-nocheck
-import { useState, useEffect } from "react";
-import { useOutletContext } from "react-router-dom";
-import { Search, FileText, Video, Upload, ChevronRight, ListChecks, Check, AlertCircle, Trash2, CheckCircle2, Mic } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { useOutletContext, Link } from "react-router-dom";
+import { 
+  Search, 
+  FileText, 
+  Video, 
+  ChevronRight, 
+  Check, 
+  AlertCircle, 
+  Trash2, 
+  CheckCircle2, 
+  Mic,
+  Calendar,
+  Layers,
+  Sparkles,
+  Award,
+  X,
+  PlayCircle
+} from "lucide-react";
 
 interface OpenPosition {
   id: string;
-  play_id: number;
+  play_id?: number;
   title: string;
-  category: "Performer" | "Technical Crew" | "Creative Designer" | "Director";
+  production_name?: string;
+  role_name?: string;
+  role_category?: string;
+  category?: string;
+  character_description?: string;
   description: string;
   requirements: string;
   deadline: string;
   status?: string;
   slots_available?: number;
+  applicant_count?: number;
 }
 
 interface Application {
   id: string;
-  positionId: string;
-  positionTitle: string;
-  category: string;
-  submittedAt: string;
-  status: "Applied" | "Reviewing" | "Interview/Audition" | "Casting Decision";
+  positionId?: string;
+  position_id?: number;
+  positionTitle?: string;
+  role_name?: string;
+  category?: string;
+  submittedAt?: string;
+  submitted_at?: string;
+  status: string;
+  audition_date?: string;
   notes?: string;
-  files: string[];
+  portfolio_link?: string;
+  files?: string[];
 }
 
 export default function AuditionsCasting() {
@@ -31,24 +57,30 @@ export default function AuditionsCasting() {
   const activeUser = contextData.activeUser || JSON.parse(sessionStorage.getItem("aayam_active_user") || "null");
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<"All" | "Performer" | "Technical Crew" | "Creative Designer" | "Director">("All");
+  const [selectedProduction, setSelectedProduction] = useState<string>("All");
+  const [selectedCategory, setSelectedCategory] = useState<string>("All");
   
   const [openPositions, setOpenPositions] = useState<OpenPosition[]>([]);
   const [applications, setApplications] = useState<Application[]>([]);
+  const [loading, setLoading] = useState(true);
   
   const [applyOpen, setApplyOpen] = useState(false);
   const [activePosition, setActivePosition] = useState<OpenPosition | null>(null);
   
   const [applicantName, setApplicantName] = useState(activeUser?.name || "");
   const [applicantEmail, setApplicantEmail] = useState(activeUser?.email || "");
-  const [fileName1, setFileName1] = useState("");
-  const [fileName2, setFileName2] = useState("");
+  const [applicantPhone, setApplicantPhone] = useState(activeUser?.phone || "+91 98110 44321");
+  const [experienceLevel, setExperienceLevel] = useState("Ensemble Senior (3+ Years)");
+  const [portfolioLink, setPortfolioLink] = useState("");
   const [coverNote, setCoverNote] = useState("");
+  const [submittingApp, setSubmittingApp] = useState(false);
+  const [successMsg, setSuccessMsg] = useState("");
 
   useEffect(() => {
     if (activeUser) {
-      setApplicantName(activeUser.name || "");
-      setApplicantEmail(activeUser.email || "");
+      if (!applicantName) setApplicantName(activeUser.name || "");
+      if (!applicantEmail) setApplicantEmail(activeUser.email || "");
+      if (!applicantPhone && activeUser.phone) setApplicantPhone(activeUser.phone);
     }
   }, [activeUser]);
 
@@ -57,61 +89,15 @@ export default function AuditionsCasting() {
       const res = await fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005"}/api/audition-positions`);
       if (res.ok) {
         const positions = await res.json();
-        if (Array.isArray(positions) && positions.length > 0) {
+        if (Array.isArray(positions)) {
           setOpenPositions(positions);
-          return;
         }
       }
     } catch (e) {
       console.error(e);
+    } finally {
+      setLoading(false);
     }
-    setOpenPositions([
-      {
-        id: "1",
-        play_id: 1,
-        title: "Karn Ki Yachika - Lead Performer (Karn)",
-        category: "Performer",
-        description: "Monumental tragic protagonist navigating moral dilemma, honor, and destiny. High-intensity classical Hindi monologue & verse delivery required.",
-        requirements: "Audition monologue video clip (2 mins) & theatrical bio",
-        deadline: "Sep 25, 2026"
-      },
-      {
-        id: "2",
-        play_id: 2,
-        title: "Tamashbin Kathputliya - Dholak & Courtyard Chorus Lead",
-        category: "Performer",
-        description: "High-energy street drama performer skilled in vocal projection, folk rhythm synchronization, and crowd interaction.",
-        requirements: "Live percussion video or street drama reel",
-        deadline: "Sep 22, 2026"
-      },
-      {
-        id: "3",
-        play_id: 3,
-        title: "DDDJ - Proscenium Lighting & DMX Rig Operator",
-        category: "Technical Crew",
-        description: "Technical crew member managing DMX lighting console, spot gels, color transitions, and live proscenium stage cues.",
-        requirements: "Technical crew portfolio or stage experience summary",
-        deadline: "Sep 28, 2026"
-      },
-      {
-        id: "4",
-        play_id: 4,
-        title: "Samatvam - Physical Movement & Body Ensemble",
-        category: "Performer",
-        description: "Experimental physical theatre actor exploring body synchronization, Navarasa facial control, and synchronized spatial movement.",
-        requirements: "Movement audition tape & physical theatre bio",
-        deadline: "Sep 30, 2026"
-      },
-      {
-        id: "5",
-        play_id: 5,
-        title: "Speak Up Tara - Assistant Stage Director & Dramaturge",
-        category: "Director",
-        description: "Collaborate with principal director on scene blocking, actor notes, script adaptation, and rehearsal pacing.",
-        requirements: "Directorial concept note or previous play review",
-        deadline: "Oct 05, 2026"
-      }
-    ]);
   };
 
   const fetchMyAuditions = async () => {
@@ -134,318 +120,311 @@ export default function AuditionsCasting() {
 
   const handleApplyClick = (pos: OpenPosition) => {
     setActivePosition(pos);
-    setFileName1("");
-    setFileName2("");
+    setPortfolioLink("");
     setCoverNote("");
+    setSuccessMsg("");
     setApplyOpen(true);
   };
 
-  const handleWithdrawApplication = (appId: string, positionTitle: string) => {
-    if (!confirm(`Are you sure you want to withdraw your audition application for "${positionTitle}"?`)) return;
-    setApplications(prev => prev.filter(app => app.id !== appId));
+  const handleWithdrawApplication = async (appId: string | number, roleTitle: string) => {
+    if (!confirm(`Are you sure you want to withdraw your casting application for "${roleTitle}"?`)) return;
+    setApplications(prev => prev.filter(app => String(app.id) !== String(appId)));
   };
 
   const handleSubmitApplication = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!activePosition) return;
-    
-    if (activePosition.category === "Performer" && !fileName1) {
-      alert("Please upload your audition monologue video clip.");
-      return;
-    }
-    if (activePosition.category !== "Performer" && !fileName1) {
-      alert("Please upload your portfolio PDF.");
-      return;
-    }
-    
-    const newApp: Application = {
-      id: "app-" + Math.random().toString(36).substr(2, 9),
-      positionId: activePosition.id,
-      positionTitle: activePosition.title,
-      category: activePosition.category,
-      submittedAt: new Date().toISOString(),
-      status: "Applied",
+    setSubmittingApp(true);
+
+    const payload = {
+      position_id: parseInt(activePosition.id) || activePosition.play_id || 1,
+      role_name: activePosition.role_name || activePosition.title,
+      applicant_name: applicantName || activeUser?.name || "Ensemble Performer",
+      applicant_email: applicantEmail || activeUser?.email || "",
+      applicant_phone: applicantPhone || "+91 98110 44321",
+      experience_level: experienceLevel,
+      portfolio_link: portfolioLink || "https://youtube.com/watch?v=sample_slate",
       notes: coverNote,
-      files: [fileName1, fileName2].filter(Boolean)
+      status: "Pending Review"
     };
-    
+
     try {
-      await fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005"}/api/my-auditions`, {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005"}/api/audition/submit`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...newApp, applicantEmail })
+        body: JSON.stringify(payload)
       });
-    } catch (err) {}
-    
-    setApplications(prev => [newApp, ...prev]);
-    setApplyOpen(false);
-    setActivePosition(null);
-    alert("Audition application submitted successfully to maintainer desk!");
+
+      if (res.ok) {
+        setSuccessMsg(`Your application for "${payload.role_name}" has been recorded for directorial review!`);
+        setTimeout(() => {
+          setApplyOpen(false);
+          setSuccessMsg("");
+          setActivePosition(null);
+          fetchMyAuditions();
+          fetchOpenPositions();
+        }, 2000);
+      } else {
+        alert("Submission failed. Please check details and try again.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error contacting server. Please try again.");
+    } finally {
+      setSubmittingApp(false);
+    }
   };
 
   const filteredPositions = openPositions.filter((pos) => {
-    const matchesSearch = pos.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          pos.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCat = selectedCategory === "All" || pos.category === selectedCategory;
-    return matchesSearch && matchesCat;
+    const titleStr = (pos.title || pos.role_name || "").toLowerCase();
+    const prodStr = (pos.production_name || "").toLowerCase();
+    const descStr = (pos.description || pos.character_description || "").toLowerCase();
+    const query = searchTerm.toLowerCase();
+
+    const matchesSearch = titleStr.includes(query) || prodStr.includes(query) || descStr.includes(query);
+    const matchesProd = selectedProduction === "All" || (pos.production_name && pos.production_name.toLowerCase().includes(selectedProduction.toLowerCase()));
+    
+    const cat = pos.category || pos.role_category || "";
+    const matchesCat = selectedCategory === "All" || cat.toLowerCase().includes(selectedCategory.toLowerCase());
+
+    return matchesSearch && matchesProd && matchesCat;
   });
 
-  if (applyOpen && activePosition) {
-    return (
-      <div className="max-w-4xl mx-auto space-y-8 py-6 px-4 md:px-8 font-sans text-[#2C2A28] animate-in fade-in zoom-in duration-300">
-        <button 
-          onClick={() => setApplyOpen(false)}
-          className="text-xs font-mono font-bold uppercase tracking-widest text-[#666361] hover:text-[#E85F57] transition-all flex items-center gap-2"
-        >
-          ← Back to Board
-        </button>
-
-        <div className="bg-white border border-[#D5C9BE]/60 rounded-[2.5rem] p-8 shadow-xl">
-          <div className="space-y-4 pb-8 border-b border-[#D5C9BE]/60">
-            <span className="inline-block px-3 py-1 bg-[#E85F57]/10 text-[#E85F57] border border-[#E85F57]/20 rounded-full text-[10px] font-mono font-bold uppercase tracking-widest">
-              {activePosition.category} Role
-            </span>
-            <h1 className="font-serif text-3xl md:text-5xl text-[#2C2A28] leading-tight">
-              {activePosition.title}
-            </h1>
-            <p className="text-sm text-[#666361] font-light max-w-2xl">
-              {activePosition.description}
-            </p>
-          </div>
-
-          <form onSubmit={handleSubmitApplication} className="space-y-8 pt-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#666361]">Full Name *</label>
-                <input 
-                  type="text"
-                  value={applicantName}
-                  onChange={(e) => setApplicantName(e.target.value)}
-                  className="w-full bg-[#F7F5F0] border border-[#D5C9BE]/60 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#E85F57] transition-colors"
-                  placeholder="e.g. Aarav Varma"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#666361]">Email Address *</label>
-                <input 
-                  type="email"
-                  value={applicantEmail}
-                  onChange={(e) => setApplicantEmail(e.target.value)}
-                  className="w-full bg-[#F7F5F0] border border-[#D5C9BE]/60 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#E85F57] transition-colors"
-                  placeholder="e.g. member@aayam.org"
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="space-y-6 bg-[#F7F5F0] border border-[#D5C9BE]/40 p-6 rounded-[1.5rem]">
-              <h3 className="font-serif text-xl text-[#2C2A28]">Required Attachments</h3>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#666361] flex items-center gap-1.5">
-                    {activePosition.category === "Performer" ? <Video className="w-3.5 h-3.5 text-[#E85F57]" /> : <FileText className="w-3.5 h-3.5 text-[#E85F57]" />}
-                    {activePosition.category === "Performer" ? "Audition Tape (.mp4)" : "Portfolio PDF"}
-                  </label>
-                  <label className="flex items-center justify-between bg-white border border-dashed border-[#D5C9BE] px-4 py-3 rounded-xl cursor-pointer hover:border-[#E85F57] transition-colors">
-                    <span className="text-xs text-[#666361] truncate max-w-[200px]">
-                      {fileName1 || "Select file..."}
-                    </span>
-                    <span className="bg-[#2C2A28] text-white px-3 py-1.5 rounded-lg text-[9px] font-mono font-bold uppercase">Browse</span>
-                    <input type="file" className="hidden" onChange={(e) => e.target.files?.[0] && setFileName1(e.target.files[0].name)} />
-                  </label>
-                </div>
-                
-                <div className="space-y-2">
-                  <label className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#666361] flex items-center gap-1.5">
-                    <FileText className="w-3.5 h-3.5 text-[#E85F57]" /> Headshot / Resume PDF
-                  </label>
-                  <label className="flex items-center justify-between bg-white border border-dashed border-[#D5C9BE] px-4 py-3 rounded-xl cursor-pointer hover:border-[#E85F57] transition-colors">
-                    <span className="text-xs text-[#666361] truncate max-w-[200px]">
-                      {fileName2 || "Select file..."}
-                    </span>
-                    <span className="bg-[#2C2A28] text-white px-3 py-1.5 rounded-lg text-[9px] font-mono font-bold uppercase">Browse</span>
-                    <input type="file" className="hidden" onChange={(e) => e.target.files?.[0] && setFileName2(e.target.files[0].name)} />
-                  </label>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#666361]">Message to Director (Optional)</label>
-              <textarea 
-                value={coverNote}
-                onChange={(e) => setCoverNote(e.target.value)}
-                placeholder="Mention past theatrical productions, classical training, or specific role preparation..."
-                className="w-full bg-[#F7F5F0] border border-[#D5C9BE]/60 rounded-xl px-4 py-3 text-sm h-32 focus:outline-none focus:border-[#E85F57] transition-colors resize-none"
-              />
-            </div>
-
-            <div className="flex items-center justify-end gap-3 pt-6 border-t border-[#D5C9BE]/60">
-              <button 
-                type="button" 
-                onClick={() => setApplyOpen(false)}
-                className="px-6 py-3 rounded-full border border-[#D5C9BE] text-[#666361] hover:bg-[#F7F5F0] text-xs font-mono font-bold uppercase tracking-widest transition-all"
-              >
-                Cancel
-              </button>
-              <button 
-                type="submit"
-                className="px-8 py-3 rounded-full bg-[#E85F57] hover:bg-[#D94538] text-white text-xs font-mono font-bold uppercase tracking-widest transition-all shadow-md flex items-center gap-2"
-              >
-                <Check className="w-4 h-4" /> Submit Application
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="max-w-6xl mx-auto space-y-10 py-6 px-4 md:px-8 font-sans text-[#2C2A28]">
-      
-      {/* Editorial Header */}
-      <section className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-[#D5C9BE]/60">
-        <div className="space-y-3">
-          <div className="inline-flex items-center gap-2 text-[10px] font-mono font-bold uppercase tracking-widest text-[#E85F57]">
-            <Mic className="w-3.5 h-3.5" />
-            <span>TALENT ACQUISITION</span>
+    <div className="space-y-8 font-sans">
+      {/* Header Banner */}
+      <div className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-[2rem] p-6 sm:p-8 md:p-10 shadow-xs flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div className="space-y-2 flex-1">
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#8C5A54] bg-[#EEDBD5] px-3 py-1 rounded-full border border-[#D5AAA2]">
+              Talent Acquisition & Casting Callboard
+            </span>
+            <span className="font-mono text-xs text-[#8C5A54]">• Autumn Season 2026</span>
           </div>
-          <h1 className="font-serif text-4xl sm:text-5xl text-[#2C2A28] font-normal tracking-tight">
+          <h1 className="text-3xl sm:text-4xl font-serif text-[#2A1816] tracking-tight font-normal">
             Auditions & Casting
           </h1>
-          <p className="text-sm text-[#666361] max-w-xl font-light">
-            Review open production roles, submit your audition tape or technical portfolio, and track your active casting applications.
+          <p className="text-xs sm:text-sm text-[#5C3B37] leading-relaxed max-w-3xl font-light">
+            Audition for character roles, assistant directorial appointments, light console leads, SFX makeup stylists, and soundscape artists for Aayam's upcoming Indian productions.
           </p>
         </div>
-      </section>
 
-      {/* Applied Roles Section */}
+        <div className="flex flex-wrap items-center gap-3 shrink-0">
+          <Link
+            to="/member-plays"
+            className="px-5 py-2.5 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-2 transition-all shadow-xs"
+          >
+            <PlayCircle className="w-3.5 h-3.5 text-[#8C241E]" />
+            <span>View Productions</span>
+          </Link>
+          <Link
+            to="/member-scripts"
+            className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-5 py-2.5 rounded-full text-xs font-mono font-bold uppercase tracking-widest shadow-sm flex items-center gap-2 transition-all border border-[#A6352F]"
+          >
+            <FileText className="w-3.5 h-3.5 text-[#FFD0CC]" />
+            <span>Review Scripts</span>
+          </Link>
+        </div>
+      </div>
+
+      {/* Active Casting Applications Section */}
       {applications.length > 0 && (
-        <section className="space-y-6">
-          <div className="flex items-center justify-between pb-3 border-b border-[#D5C9BE]/60">
-            <h2 className="font-serif text-2xl text-[#2C2A28]">My Casting Applications</h2>
-            <span className="px-3 py-1 bg-[#2C2A28] text-white rounded-full text-[10px] font-mono font-bold uppercase tracking-widest">
-              {applications.length} ACTIVE
+        <div className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-[2rem] p-6 sm:p-8 space-y-6 shadow-xs">
+          <div className="flex items-center justify-between border-b border-[#DCBAB2]/60 pb-4">
+            <div className="space-y-0.5">
+              <h2 className="text-xl sm:text-2xl font-serif text-[#2A1816] tracking-tight font-normal">
+                My Audition Applications
+              </h2>
+              <p className="text-xs text-[#6E4742] font-light">
+                Directorial review status, audition slot times, and candidate updates
+              </p>
+            </div>
+            <span className="font-mono text-xs font-bold uppercase tracking-wider bg-[#EEDBD5] text-[#8C241E] px-3.5 py-1 rounded-full border border-[#D5AAA2]">
+              {applications.length} Active Calling{applications.length > 1 ? "s" : ""}
             </span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {applications.map((app) => (
-              <div key={app.id} className="bg-white/60 border border-[#D5C9BE] rounded-[1.5rem] p-6 hover:bg-white transition-all space-y-4 shadow-sm flex flex-col justify-between relative overflow-hidden group">
-                <div className="absolute top-0 right-0 p-4">
-                  <span className={`inline-flex px-2.5 py-1 rounded-md border text-[9px] font-mono font-bold uppercase tracking-widest ${
-                    app.status === 'Applied' ? 'bg-blue-50 text-blue-700 border-blue-200' :
-                    app.status === 'Reviewing' ? 'bg-amber-50 text-amber-700 border-amber-200' :
-                    app.status === 'Interview/Audition' ? 'bg-purple-50 text-purple-700 border-purple-200' :
-                    'bg-emerald-50 text-emerald-700 border-emerald-200'
-                  }`}>
-                    {app.status}
-                  </span>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {applications.map((app) => {
+              const roleTitle = app.role_name || app.positionTitle || "Production Role";
+              const isShortlisted = app.status === "Shortlisted" || app.status === "Selected";
+
+              return (
+                <div
+                  key={app.id}
+                  className="bg-[#F5EAE6] border border-[#DEBEB7] rounded-2xl p-5 hover:border-[#B32D25]/50 transition-all flex flex-col justify-between space-y-4 shadow-xs relative group"
+                >
+                  <div className="space-y-2">
+                    <div className="flex items-start justify-between gap-2">
+                      <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#8C5A54]">
+                        {app.category || "Audition Role"}
+                      </span>
+                      <span
+                        className={`font-mono text-[9px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full border ${
+                          isShortlisted
+                            ? "bg-emerald-700/15 text-emerald-950 border-emerald-700/30"
+                            : app.status === "Pending Review"
+                            ? "bg-amber-700/15 text-amber-950 border-amber-700/30"
+                            : "bg-[#EEDBD5] text-[#5C3B37] border-[#D5AAA2]"
+                        }`}
+                      >
+                        {app.status}
+                      </span>
+                    </div>
+
+                    <h3 className="text-lg font-serif text-[#2A1816] tracking-tight font-normal leading-snug">
+                      {roleTitle}
+                    </h3>
+
+                    {app.audition_date && (
+                      <p className="text-xs font-mono text-[#8C241E] font-medium flex items-center gap-1.5 pt-1">
+                        <Calendar className="w-3.5 h-3.5" />
+                        <span>Audition Slot: {app.audition_date}</span>
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="pt-3 border-t border-[#DEBEB7]/60 flex items-center justify-between">
+                    <span className="font-mono text-[10px] text-[#8C5A54]">
+                      {app.submitted_at ? `Date: ${app.submitted_at}` : "Under Review"}
+                    </span>
+                    <button
+                      onClick={() => handleWithdrawApplication(app.id, roleTitle)}
+                      className="font-mono text-[10px] font-bold uppercase tracking-wider text-rose-700 hover:text-rose-900 flex items-center gap-1 opacity-80 hover:opacity-100 transition-all cursor-pointer"
+                    >
+                      <Trash2 className="w-3 h-3" /> Withdraw
+                    </button>
+                  </div>
                 </div>
-                
-                <div>
-                  <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#666361] mb-1 block">
-                    {app.category} Role
-                  </span>
-                  <h3 className="font-serif text-xl text-[#2C2A28] pr-16 leading-tight">
-                    {app.positionTitle}
-                  </h3>
-                  <p className="text-[10px] font-mono text-[#666361] mt-2">
-                    SUBMITTED: {new Date(app.submittedAt).toLocaleDateString()}
-                  </p>
-                </div>
-                
-                <div className="pt-4 border-t border-[#D5C9BE]/60 flex items-center justify-between">
-                  <span className="text-xs font-light text-[#666361]">
-                    {app.files.length} attachment(s)
-                  </span>
-                  <button 
-                    onClick={() => handleWithdrawApplication(app.id, app.positionTitle)}
-                    className="text-[9px] font-mono font-bold uppercase tracking-widest text-red-500 hover:text-red-700 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
-                    <Trash2 className="w-3 h-3" /> Withdraw
-                  </button>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
-        </section>
+        </div>
       )}
 
-      {/* Open Casting Call Board */}
-      <section className="space-y-6 pt-4">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 sticky top-20 z-10 bg-[#E7DDD3]/90 backdrop-blur-md py-4 border-y border-[#D5C9BE]/60">
+      {/* Filter & Search Bar */}
+      <div className="space-y-4">
+        {/* Production Filter Tabs */}
+        <div className="flex flex-wrap items-center gap-2 border-b border-[#DCBAB2]/60 pb-3">
+          <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#8C5A54] mr-2">
+            Production:
+          </span>
+          {["All", "Hayavadana", "Ashadh Ka Ek Din", "Charandas Chor"].map((prod) => (
+            <button
+              key={prod}
+              onClick={() => setSelectedProduction(prod)}
+              className={`px-4 py-1.5 rounded-full text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                selectedProduction === prod
+                  ? "bg-[#8C241E] text-[#FDF8F7] shadow-xs border border-[#A6352F]"
+                  : "bg-[#FAF2EE] text-[#6E4742] hover:bg-[#EEDBD5] border border-[#DCBAB2]"
+              }`}
+            >
+              {prod === "All" ? "All Productions" : prod}
+            </button>
+          ))}
+        </div>
+
+        {/* Search & Department Filters */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="relative w-full sm:w-80">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#666361]" />
-            <input 
-              type="text" 
-              placeholder="Search roles or productions..."
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8C5A54]" />
+            <input
+              type="text"
+              placeholder="Search roles, characters, departments..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-white/60 border border-[#D5C9BE] rounded-full text-sm focus:outline-none focus:border-[#E85F57] focus:bg-white transition-all font-mono"
+              className="w-full pl-9 pr-4 py-2 bg-[#FAF2EE] border border-[#DCBAB2] rounded-full text-xs font-sans text-[#2A1816] placeholder:text-[#8C5A54]/70 focus:outline-hidden focus:border-[#8C241E] transition-all"
             />
           </div>
-          
-          <div className="flex flex-wrap gap-2 w-full sm:w-auto">
-            {(["All", "Performer", "Technical Crew", "Creative Designer", "Director"] as const).map(cat => (
-              <button 
+
+          <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+            {["All", "Performer", "Technical Crew", "Creative Designer", "Director"].map((cat) => (
+              <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-4 py-2 rounded-full text-[10px] font-mono font-bold uppercase tracking-widest transition-all ${
-                  selectedCategory === cat 
-                    ? "bg-[#2C2A28] text-white shadow-md" 
-                    : "bg-white/60 text-[#666361] hover:bg-white border border-[#D5C9BE]"
+                className={`px-3.5 py-1.5 rounded-full text-[11px] font-mono font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                  selectedCategory === cat
+                    ? "bg-[#2A1816] text-[#FDF8F7] shadow-xs"
+                    : "bg-[#FAF2EE] text-[#6E4742] hover:bg-[#EEDBD5] border border-[#DCBAB2]"
                 }`}
               >
-                {cat}
+                {cat === "Performer" ? "Actor / Cast" : cat === "Technical Crew" ? "Tech & Lighting" : cat === "Creative Designer" ? "Makeup & Wardrobe" : cat === "Director" ? "Direction & Stage" : "All Departments"}
               </button>
             ))}
           </div>
         </div>
+      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* Open Positions Grid */}
+      {loading ? (
+        <div className="text-center py-20 bg-[#FAF2EE] border border-[#DCBAB2] rounded-[2rem] text-[#8C5A54] font-serif italic text-sm">
+          Loading audition callboard...
+        </div>
+      ) : filteredPositions.length === 0 ? (
+        <div className="text-center py-20 bg-[#FAF2EE] border border-[#DCBAB2] rounded-[2rem] text-[#8C5A54] font-serif italic text-sm">
+          No audition positions match the selected filters.
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredPositions.map((pos) => {
-            const hasApplied = applications.some(a => a.positionId === pos.id);
-            
+            const hasApplied = applications.some(a => String(a.position_id) === String(pos.id) || a.role_name === (pos.role_name || pos.title));
+
             return (
-              <div key={pos.id} className="bg-white/60 border border-[#D5C9BE] rounded-[2rem] p-8 hover:border-[#E85F57]/40 hover:shadow-xl transition-all space-y-6 flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="inline-block px-3 py-1 bg-[#2C2A28] text-white border border-[#353535] rounded-full text-[9px] font-mono font-bold uppercase tracking-widest">
-                      {pos.category}
+              <div
+                key={pos.id}
+                className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-[2rem] p-6 sm:p-7 hover:border-[#B32D25]/50 hover:shadow-md transition-all flex flex-col justify-between space-y-5 shadow-xs group"
+              >
+                <div className="space-y-3.5">
+                  <div className="flex items-center justify-between gap-2 border-b border-[#DCBAB2]/50 pb-3">
+                    <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#8C5A54] bg-[#EEDBD5] px-2.5 py-0.5 rounded-full border border-[#D5AAA2]">
+                      {pos.production_name || "Upcoming Play"}
                     </span>
-                    <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#E85F57] bg-[#E85F57]/10 px-3 py-1 rounded-full">
-                      DUE: {pos.deadline}
+                    <span className="font-mono text-[10px] text-[#8C5A54] uppercase tracking-wider">
+                      {pos.slots_available ? `${pos.slots_available} Slot${pos.slots_available > 1 ? "s" : ""}` : "Open Calling"}
                     </span>
                   </div>
-                  
-                  <h3 className="font-serif text-2xl text-[#2C2A28] leading-tight mb-3">
-                    {pos.title}
-                  </h3>
-                  <p className="text-sm text-[#666361] font-light leading-relaxed">
-                    {pos.description}
+
+                  <div className="space-y-1">
+                    <span className="text-[11px] font-mono uppercase font-bold text-[#8C241E]">
+                      {pos.role_category || pos.category || "Character Role"}
+                    </span>
+                    <h3 className="text-xl sm:text-2xl font-serif text-[#2A1816] tracking-tight font-normal leading-snug">
+                      {pos.role_name || pos.title}
+                    </h3>
+                  </div>
+
+                  <p className="text-xs text-[#5C3B37] font-light leading-relaxed">
+                    {pos.character_description || pos.description}
                   </p>
+
+                  {pos.requirements && (
+                    <div className="bg-[#F5EAE6] p-3 rounded-xl border border-[#DEBEB7] space-y-1 text-xs">
+                      <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#8C5A54] flex items-center gap-1">
+                        <AlertCircle className="w-3 h-3 text-[#8C241E]" /> Requirements
+                      </span>
+                      <p className="text-[11px] text-[#5C3B37] leading-relaxed">
+                        {pos.requirements}
+                      </p>
+                    </div>
+                  )}
                 </div>
-                
-                <div className="pt-4 border-t border-[#D5C9BE]/60 flex flex-col gap-4">
-                  <div className="flex items-center gap-2 text-xs text-[#666361]">
-                    <AlertCircle className="w-4 h-4 text-[#E85F57] shrink-0" />
-                    <span><strong className="text-[#2C2A28]">Requires:</strong> {pos.requirements}</span>
-                  </div>
-                  
+
+                <div className="pt-3 border-t border-[#DCBAB2]/60 flex items-center justify-between gap-3">
+                  <span className="font-mono text-[10px] text-[#8C5A54] uppercase tracking-wider">
+                    Due: {pos.deadline || "Sep 25, 2026"}
+                  </span>
+
                   {hasApplied ? (
-                    <button disabled className="w-full py-3.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-mono font-bold uppercase tracking-widest flex items-center justify-center gap-2">
-                      <CheckCircle2 className="w-4 h-4" /> Application Submitted
-                    </button>
+                    <span className="px-4 py-2 rounded-full bg-emerald-700/15 text-emerald-950 border border-emerald-700/30 text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-800" /> Applied
+                    </span>
                   ) : (
-                    <button 
+                    <button
                       onClick={() => handleApplyClick(pos)}
-                      className="w-full py-3.5 rounded-full bg-[#E85F57] hover:bg-[#D94538] text-white text-xs font-mono font-bold uppercase tracking-widest shadow-md flex items-center justify-center gap-2 transition-all"
+                      className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-4 py-2 rounded-full text-xs font-mono font-bold uppercase tracking-wider shadow-sm flex items-center gap-1.5 transition-all cursor-pointer border border-[#A6352F]"
                     >
-                      Apply Now <ChevronRight className="w-4 h-4" />
+                      <span>Apply Calling</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
                     </button>
                   )}
                 </div>
@@ -453,13 +432,153 @@ export default function AuditionsCasting() {
             );
           })}
         </div>
-        
-        {filteredPositions.length === 0 && (
-          <div className="text-center py-16 bg-white/40 border border-[#D5C9BE]/40 rounded-[2rem]">
-            <p className="text-sm font-light text-[#666361]">No open casting calls match your search.</p>
+      )}
+
+      {/* AUDITION APPLICATION MODAL */}
+      {applyOpen && activePosition && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
+          <div className="bg-[#F5EAE6] border border-[#DEBEB7] text-[#2A1816] rounded-[2.5rem] p-6 sm:p-8 max-w-xl w-full shadow-2xl relative max-h-[90vh] overflow-y-auto custom-scrollbar">
+            {/* Close Button */}
+            <button
+              type="button"
+              onClick={() => setApplyOpen(false)}
+              className="absolute top-6 right-6 w-9 h-9 rounded-full bg-[#EEDBD5] hover:bg-[#E3CEC6] text-[#5C3B37] hover:text-[#2A1816] flex items-center justify-center transition-all cursor-pointer border border-[#D5AAA2] shadow-xs group z-20"
+            >
+              <X className="w-4 h-4 group-hover:rotate-90 transition-transform duration-200" />
+            </button>
+
+            <div className="space-y-6">
+              <div className="space-y-1.5 pr-8">
+                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#8C5A54] bg-[#EEDBD5] px-3 py-1 rounded-full border border-[#D5AAA2] inline-block">
+                  {activePosition.production_name || "Upcoming Indian Premiere"}
+                </span>
+                <h2 className="text-2xl sm:text-3xl font-serif text-[#2A1816] tracking-tight font-normal">
+                  Apply: {activePosition.role_name || activePosition.title}
+                </h2>
+                <p className="text-xs text-[#5C3B37] font-light leading-relaxed">
+                  Submit your candidate audition slate, portfolio link, or technical experience summary.
+                </p>
+              </div>
+
+              {successMsg ? (
+                <div className="p-5 rounded-2xl bg-emerald-700/15 border border-emerald-700/30 text-emerald-950 flex items-start gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-800 shrink-0 mt-0.5" />
+                  <div className="text-xs space-y-1">
+                    <p className="font-bold font-mono uppercase tracking-wider">Application Submitted</p>
+                    <p>{successMsg}</p>
+                  </div>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmitApplication} className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <label className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#8C5A54] block">
+                        Full Name *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={applicantName}
+                        onChange={e => setApplicantName(e.target.value)}
+                        className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl px-3.5 py-2.5 text-xs text-[#2A1816] focus:outline-hidden focus:border-[#8C241E]"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#8C5A54] block">
+                        Email Address *
+                      </label>
+                      <input
+                        type="email"
+                        required
+                        value={applicantEmail}
+                        onChange={e => setApplicantEmail(e.target.value)}
+                        className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl px-3.5 py-2.5 text-xs text-[#2A1816] focus:outline-hidden focus:border-[#8C241E]"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <label className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#8C5A54] block">
+                        Contact Phone
+                      </label>
+                      <input
+                        type="tel"
+                        value={applicantPhone}
+                        onChange={e => setApplicantPhone(e.target.value)}
+                        className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl px-3.5 py-2.5 text-xs text-[#2A1816] focus:outline-hidden focus:border-[#8C241E]"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#8C5A54] block">
+                        Experience Level
+                      </label>
+                      <select
+                        value={experienceLevel}
+                        onChange={e => setExperienceLevel(e.target.value)}
+                        className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl px-3.5 py-2.5 text-xs text-[#2A1816] focus:outline-hidden focus:border-[#8C241E]"
+                      >
+                        <option value="Ensemble Member (1-2 Years)">Ensemble Member (1-2 Years)</option>
+                        <option value="Ensemble Senior (3-5 Years)">Ensemble Senior (3-5 Years)</option>
+                        <option value="Lead Theatrical Artist (5+ Years)">Lead Theatrical Artist (5+ Years)</option>
+                        <option value="Technical Crew Specialist">Technical Crew Specialist</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#8C5A54] block">
+                      Audition Video / Portfolio Reel Link
+                    </label>
+                    <input
+                      type="url"
+                      value={portfolioLink}
+                      onChange={e => setPortfolioLink(e.target.value)}
+                      placeholder="https://youtube.com/watch?v=... or https://drive.google.com/..."
+                      className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl px-3.5 py-2.5 text-xs text-[#2A1816] focus:outline-hidden focus:border-[#8C241E]"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#8C5A54] block">
+                      Candidate Statement / Role Notes
+                    </label>
+                    <textarea
+                      rows={3}
+                      required
+                      value={coverNote}
+                      onChange={e => setCoverNote(e.target.value)}
+                      placeholder="Mention your classical dialogue preparation, voice modulation training, or lighting console familiarity..."
+                      className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl p-3 text-xs text-[#2A1816] focus:outline-hidden focus:border-[#8C241E] leading-relaxed"
+                    />
+                  </div>
+
+                  <div className="pt-2 flex items-center justify-end gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setApplyOpen(false)}
+                      className="px-5 py-2.5 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={submittingApp}
+                      className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-6 py-2.5 rounded-full text-xs font-mono font-bold uppercase tracking-widest shadow-sm flex items-center gap-2 transition-all cursor-pointer border border-[#A6352F] disabled:opacity-50"
+                    >
+                      <Check className="w-4 h-4" />
+                      <span>{submittingApp ? "Submitting..." : "Submit Audition"}</span>
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
           </div>
-        )}
-      </section>
+        </div>
+      )}
     </div>
   );
 }
+

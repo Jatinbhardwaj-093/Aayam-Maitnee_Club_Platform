@@ -1260,7 +1260,93 @@ def run_portfolio_ai_scan():
         except Exception:
             pass
             
-    return jsonify(result)
+# --- VOLUNTEER & PRODUCTION CREW ENDPOINTS ---
+
+@api_bp.route('/volunteer', methods=['POST'])
+def submit_volunteer_application():
+    from models import Volunteer, Play, User, Notification, db
+    data = request.json or {}
+    
+    play_id = data.get('play_id')
+    event_id = data.get('event_id')
+    applicant_name = (data.get('applicant_name') or '').strip()
+    applicant_email = (data.get('applicant_email') or '').strip()
+    applicant_phone = (data.get('applicant_phone') or '').strip()
+    department = data.get('department', 'General Backstage Crew')
+    availability = data.get('availability', '5-8 Hours / Week')
+    notes = data.get('notes', '')
+    
+    user = User.query.filter_by(email=applicant_email).first() if applicant_email else None
+    
+    vol = Volunteer(
+        user_id=user.id if user else None,
+        play_id=int(play_id) if play_id else None,
+        event_id=int(event_id) if event_id else None,
+        applicant_name=applicant_name or (user.name if user else "Ensemble Volunteer"),
+        applicant_email=applicant_email or (user.email if user else ""),
+        applicant_phone=applicant_phone or "+91 98110 44321",
+        department=department,
+        availability=availability,
+        notes=notes,
+        status="Pending Review"
+    )
+    db.session.add(vol)
+    db.session.commit()
+    
+    # Notify maintainers if available
+    try:
+        play_title = vol.play.title if vol.play else "Upcoming Production"
+        admins = User.query.filter(User.roles.any(name='Maintainer')).all()
+        for admin in admins:
+            notif = Notification(
+                recipient_id=admin.id,
+                type="new_volunteer",
+                title=f"New Volunteer for {play_title}",
+                message=f"{vol.applicant_name} volunteered for '{department}' on {play_title}."
+            )
+            db.session.add(notif)
+        db.session.commit()
+    except Exception:
+        pass
+    
+    return jsonify({'status': 'success', 'volunteer': vol.to_dict()})
+
+@api_bp.route('/volunteers', methods=['GET'])
+def get_volunteers():
+    from models import Volunteer
+    play_id = request.args.get('play_id')
+    query = Volunteer.query
+    if play_id:
+        query = query.filter_by(play_id=int(play_id))
+    vols = query.order_by(Volunteer.created_at.desc()).all()
+    return jsonify([v.to_dict() for v in vols])
+
+@api_bp.route('/volunteer/<int:vol_id>/status', methods=['POST'])
+def update_volunteer_status(vol_id):
+    from models import Volunteer, db
+    data = request.json or {}
+    vol = Volunteer.query.get(vol_id)
+    if not vol:
+        return jsonify({'error': 'Volunteer record not found'}), 404
+        
+    if 'status' in data:
+        vol.status = data['status']
+    if 'department' in data:
+        vol.department = data['department']
+    db.session.commit()
+    return jsonify({'status': 'success', 'volunteer': vol.to_dict()})
+
+@api_bp.route('/my-volunteers', methods=['GET'])
+def get_my_volunteers():
+    from models import Volunteer, User
+    email = request.args.get('email') or request.args.get('user_email')
+    if not email:
+        return jsonify([])
+    vols = Volunteer.query.filter(
+        (Volunteer.applicant_email == email) | 
+        (Volunteer.user.has(email=email))
+    ).order_by(Volunteer.created_at.desc()).all()
+    return jsonify([v.to_dict() for v in vols])
 
 # --- FINANCIAL LEDGER & MAINTAINER STATS ENDPOINTS ---
 
