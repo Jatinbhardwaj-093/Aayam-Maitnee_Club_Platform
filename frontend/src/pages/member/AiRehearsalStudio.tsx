@@ -5,7 +5,10 @@ import {
   AlertCircle,
   ArrowLeft,
   BookOpen,
+  Check,
   CheckCircle2,
+  ChevronDown,
+  ChevronUp,
   Headphones,
   Layers,
   Loader2,
@@ -15,6 +18,7 @@ import {
   Radio,
   RotateCcw,
   Search,
+  Settings2,
   Sparkles,
   Square,
   Users,
@@ -23,9 +27,6 @@ import {
   FileText,
   Edit3
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
 
 interface ScriptItem {
   id: number;
@@ -53,11 +54,11 @@ type VoicePreference = "female" | "male";
 
 const demoScript = `John: Hello Mary, how are you?
 
-Mary: I'm doing well, John.
+Mary: I'm doing well, John. Ready for our opening scene?
 
-John: Are you ready for the performance?
+John: The stage is set. Let's deliver our best performance tonight.
 
-Mary: Yes, I'm completely ready.`;
+Mary: Every line is memorized. Let the drama begin.`;
 
 const normalize = (word: string) => word.toLowerCase().replace(/[^a-z0-9']/g, "");
 
@@ -85,50 +86,96 @@ const localMatchSpokenWords = (expectedWords: string[], transcriptText: string) 
   };
 };
 
-const voiceHints: Record<VoicePreference, string[]> = {
-  female: ["female", "woman", "zira", "samantha", "susan", "victoria", "karen", "moira", "tessa"],
-  male: ["male", "man", "david", "mark", "alex", "daniel", "fred", "rishi", "george"],
+// Premium voice scorer to select natural human voices across browsers
+const rankVoice = (voice: SpeechSynthesisVoice, preference: VoicePreference): number => {
+  const name = voice.name.toLowerCase();
+  const lang = (voice.lang || "").toLowerCase();
+  let score = 0;
+
+  // Prefer English
+  if (lang.startsWith("en")) score += 40;
+  if (lang.includes("en-us") || lang.includes("en-gb") || lang.includes("en-in") || lang.includes("en-au")) score += 20;
+
+  // Premium / Natural AI markers
+  if (name.includes("natural") || name.includes("online (natural)")) score += 150;
+  if (name.includes("premium") || name.includes("enhanced")) score += 120;
+  if (name.includes("neural") || name.includes("google")) score += 90;
+
+  // Heavy penalty for mechanical / legacy system synths
+  if (
+    name.includes("compact") ||
+    name.includes("espeak") ||
+    name.includes("whisper") ||
+    name.includes("zarvox") ||
+    name.includes("trinoids") ||
+    name.includes("cellos") ||
+    name.includes("bad news") ||
+    name.includes("good news") ||
+    name.includes("bells") ||
+    name.includes("boing")
+  ) {
+    score -= 200;
+  }
+
+  // Female voice candidates
+  if (preference === "female") {
+    if (
+      name.includes("female") ||
+      name.includes("woman") ||
+      name.includes("aria") ||
+      name.includes("jenny") ||
+      name.includes("samantha") ||
+      name.includes("serena") ||
+      name.includes("karen") ||
+      name.includes("moira") ||
+      name.includes("tessa") ||
+      name.includes("victoria") ||
+      name.includes("ava") ||
+      name.includes("allison") ||
+      name.includes("susan") ||
+      name.includes("zira")
+    ) {
+      score += 70;
+    }
+    if (name.includes("male") && !name.includes("female")) {
+      score -= 100;
+    }
+  }
+
+  // Male voice candidates
+  if (preference === "male") {
+    if (
+      (name.includes("male") && !name.includes("female")) ||
+      name.includes("man") ||
+      name.includes("guy") ||
+      name.includes("ryan") ||
+      name.includes("daniel") ||
+      name.includes("oliver") ||
+      name.includes("alex") ||
+      name.includes("david") ||
+      name.includes("mark") ||
+      name.includes("rishi") ||
+      name.includes("george") ||
+      name.includes("tom") ||
+      name.includes("arthur")
+    ) {
+      score += 70;
+    }
+    if (name.includes("female") || name.includes("woman")) {
+      score -= 100;
+    }
+  }
+
+  return score;
 };
 
-const selectBrowserVoice = (voices: SpeechSynthesisVoice[], preference?: VoicePreference) => {
-  const englishVoices = voices.filter((voice) => voice.lang?.toLowerCase().startsWith("en"));
-  const candidates = englishVoices.length ? englishVoices : voices;
-  if (!preference) return candidates[0] || null;
-  const hints = voiceHints[preference];
-  return candidates.find((voice) => hints.some((hint) => voice.name.toLowerCase().includes(hint))) || candidates[0] || null;
+const selectBrowserVoice = (voices: SpeechSynthesisVoice[], preference: VoicePreference = "female") => {
+  if (!voices || voices.length === 0) return null;
+  const sorted = [...voices].sort((a, b) => rankVoice(b, preference) - rankVoice(a, preference));
+  return sorted[0] || voices[0] || null;
 };
 
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
-
-const ttsControlsFromPerformance = (performance?: any) => {
-  const pace = performance?.pace || "moderate";
-  const tone = `${performance?.tone || ""} ${performance?.emotion || ""}`.toLowerCase();
-  const intensity = typeof performance?.intensity === "number" ? performance.intensity : 0.5;
-
-  let rate = pace === "slow" ? 0.82 : pace === "brisk" ? 1.12 : 0.95;
-  let pitch = 1;
-  let volume = 0.9;
-
-  if (tone.includes("warm") || tone.includes("gentle") || tone.includes("calm")) pitch -= 0.04;
-  if (tone.includes("angry") || tone.includes("frustrated") || tone.includes("confront")) pitch += 0.06;
-  if (tone.includes("sad") || tone.includes("somber")) {
-    pitch -= 0.08;
-    rate -= 0.05;
-  }
-  if (tone.includes("excited") || tone.includes("urgent")) {
-    pitch += 0.08;
-    rate += 0.06;
-  }
-
-  volume += (intensity - 0.5) * 0.28;
-  rate += (intensity - 0.5) * 0.08;
-
-  return {
-    rate: clamp(rate, 0.65, 1.35),
-    pitch: clamp(pitch, 0.7, 1.35),
-    volume: clamp(volume, 0.55, 1),
-  };
-};
 
 export default function AiRehearsalStudio() {
   const { activeUser } = useOutletContext<any>() || {};
@@ -161,6 +208,7 @@ export default function AiRehearsalStudio() {
   const [sessionStartedAt, setSessionStartedAt] = useState<number | null>(null);
   const [audioStatus, setAudioStatus] = useState("Stage Idle");
   const [parsing, setParsing] = useState(false);
+  const [showCastConfig, setShowCastConfig] = useState(false);
 
   const recognitionRef = useRef<any>(null);
   const silenceTimerRef = useRef<number | null>(null);
@@ -327,9 +375,9 @@ export default function AiRehearsalStudio() {
   };
 
   const parseDemoScript = () => {
-    setInlineTitle("John and Mary Rehearsal");
+    setInlineTitle("John & Mary Rehearsal Scene");
     setInlineScript(demoScript);
-    parseScript(undefined, "John and Mary Rehearsal", demoScript);
+    parseScript(undefined, "John & Mary Rehearsal Scene", demoScript);
   };
 
   const startSession = async () => {
@@ -456,7 +504,7 @@ export default function AiRehearsalStudio() {
     if (!SpeechRecognition) {
       setSpeechSupported(false);
       micBlockedRef.current = true;
-      setError("This browser does not support live speech recognition. Use Chrome or Edge for voice recognition.");
+      setError("Browser speech recognition unavailable. Use Chrome, Edge, or click 'Advance Cue'.");
       setAudioStatus("Microphone unavailable");
       return;
     }
@@ -562,6 +610,7 @@ export default function AiRehearsalStudio() {
     }
   };
 
+  // High-fidelity natural voice synthesizer
   const speakAiTurn = (nextSession: any) => {
     const payload = nextSession.ai_payload;
     if (!payload?.text) {
@@ -569,7 +618,7 @@ export default function AiRehearsalStudio() {
       return;
     }
     if (!("speechSynthesis" in window)) {
-      setError("Browser audio synthesis unavailable. Advancing line automatically.");
+      setError("Browser audio synthesis unavailable. Advancing cue automatically.");
       window.setTimeout(() => completeAiTurn(nextSession.session_id), 1400);
       return;
     }
@@ -577,16 +626,29 @@ export default function AiRehearsalStudio() {
     window.speechSynthesis.cancel();
     setAiWordIndex(-1);
     setAudioStatus("AI Partner Speaking");
+
     const utterance = new SpeechSynthesisUtterance(payload.text);
-    const ttsControls = ttsControlsFromPerformance(payload.performance);
-    utterance.rate = ttsControls.rate;
-    utterance.pitch = ttsControls.pitch;
-    utterance.volume = ttsControls.volume;
+    const pref: VoicePreference =
+      (payload.voice as VoicePreference) ||
+      voicePreferences[nextSession.current_speaker] ||
+      voicePreferences[payload.character] ||
+      "female";
+
+    // Natural theatrical pacing & pitch
+    if (pref === "female") {
+      utterance.rate = 0.94;
+      utterance.pitch = 1.0;
+    } else {
+      utterance.rate = 0.92;
+      utterance.pitch = 0.96;
+    }
+    utterance.volume = 1.0;
 
     const voices = window.speechSynthesis.getVoices();
-    const voicePreference = (payload.voice as VoicePreference) || voicePreferences[nextSession.current_speaker] || voicePreferences[payload.character];
-    const voice = selectBrowserVoice(voices, voicePreference);
-    if (voice) utterance.voice = voice;
+    const voice = selectBrowserVoice(voices, pref);
+    if (voice) {
+      utterance.voice = voice;
+    }
 
     const words = payload.words || [];
     const startedAt = performance.now();
@@ -636,399 +698,335 @@ export default function AiRehearsalStudio() {
   const displayScene = session?.scene || scene;
   const activeTurn = session?.currentTurn || displayScene?.turns?.[0] || null;
   const currentTitle = activeScript?.title || displayScene?.title || inlineTitle;
+  const isHumanTurn = session?.speaker_type === "human";
+  const isAiTurn = session?.speaker_type === "ai";
   const progressPercent = session?.scene?.turns?.length
     ? Math.round(((session.current_turn + 1) / session.scene.turns.length) * 100)
     : 0;
-  const elapsedMins = sessionStartedAt ? Math.max(1, Math.round((Date.now() - sessionStartedAt) / 60000)) : 0;
 
-  // ==========================================
-  // VIEW 1: ACTIVE REHEARSAL PROSCENIUM ROOM
-  // ==========================================
+  // =========================================================================
+  // VIEW 1: MINIMALIST POETIC THEATRE REHEARSAL STAGE
+  // =========================================================================
   if (((scriptId && activeScript) || session) && displayScene) {
     return (
-      <div className="space-y-6 w-full max-w-5xl mx-auto pb-20 font-sans text-[#5C3B37]">
+      <div className="space-y-6 w-full max-w-4xl mx-auto pb-24 font-sans text-[#5C3B37] transition-all">
         
-        <header className="bg-[#F2E5E0] border border-[#DCBAB2] rounded-2xl px-5 py-4 shadow-xs w-full flex items-center gap-4">
+        {/* MINIMALIST TOP NAV & SCENE HEADER */}
+        <header className="flex items-center justify-between gap-4 px-2">
           <button
             onClick={returnToStudio}
-            className="w-9 h-9 rounded-xl border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] hover:text-[#2A1816] flex items-center justify-center transition-colors cursor-pointer shrink-0"
-            title="Return to Rehearsal Library"
+            className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider text-[#8C5A54] hover:text-[#8C241E] transition-colors cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4" />
+            <span>Repertoire</span>
           </button>
-          <div className="min-w-0">
-            <span className="block text-[9px] font-mono uppercase font-bold tracking-widest text-[#8C5A54]">Rehearsal</span>
-            <h1 className="font-serif text-xl md:text-2xl font-normal text-[#2A1816] tracking-tight truncate">
-              {currentTitle}
-            </h1>
+
+          <div className="text-right">
+            <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
+              {session?.scene?.turns?.length
+                ? `Cue ${session.current_turn + 1} of ${session.scene.turns.length}`
+                : `${displayScene?.turns?.length || 0} Dialogue Cues`}
+            </span>
           </div>
         </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-[280px_minmax(0,1fr)] gap-5 w-full items-start">
+        {/* PROGRESS HAIRLINE */}
+        <div className="h-1 w-full rounded-full bg-[#DCBAB2]/40 overflow-hidden">
+          <div
+            className="h-full bg-[#8C241E] transition-all duration-300 rounded-full"
+            style={{ width: `${progressPercent}%` }}
+          />
+        </div>
+
+        {/* MAIN PROSCENIUM STAGE CARD */}
+        <section className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-[3rem] p-8 sm:p-12 md:p-14 shadow-xs relative text-center space-y-8">
           
-          {/* LEFT COLUMN: DIRECTOR'S CONSOLE & ROSTER */}
-          <aside className="space-y-4">
+          {/* SCENE & SPEAKER BANNER */}
+          <div className="space-y-2">
+            <h1 className="font-serif text-xl sm:text-2xl text-[#2A1816] font-normal tracking-tight">
+              {currentTitle}
+            </h1>
             
-            {/* Character Cast & Role Toggle */}
-            <section className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-2xl p-4 space-y-3 shadow-xs">
-              <div className="flex items-center justify-between border-b border-[#DCBAB2]/70 pb-3">
-                <h2 className="font-serif text-lg font-normal text-[#2A1816]">Cast</h2>
-                <span className="text-[10px] font-mono font-bold uppercase text-[#8C5A54] tracking-wider">
-                  {displayScene.characters?.length || 0} Roles
+            {activeTurn && (
+              <div className="pt-2">
+                <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#EEDBD5] border border-[#D5AAA2] text-xs font-mono font-bold uppercase tracking-widest text-[#8C241E] shadow-2xs">
+                  <span>{activeTurn.character}</span>
+                  <span className="text-[#8C5A54]/60">•</span>
+                  <span className="text-[#8C5A54]">
+                    {assignments[activeTurn.character] === "human" ? "Your Cue (Actor)" : "AI Partner"}
+                  </span>
                 </span>
-              </div>
-
-              <div className="space-y-2">
-                {(displayScene.characters || []).map((character: any) => {
-                  const isHuman = assignments[character.name] === "human";
-                  const isAi = assignments[character.name] === "ai";
-                  const currentVoice = voicePreferences[character.name] || "female";
-                  const isTurnActive = activeTurn?.character === character.name;
-
-                  return (
-                    <div
-                      key={character.name}
-                      className={`p-3 rounded-xl border transition-colors space-y-2 ${
-                        isTurnActive
-                          ? "bg-[#F5EAE6] border-[#8C241E]"
-                          : "bg-[#FAF2EE] border-[#DCBAB2]/80"
-                      }`}
-                    >
-                      <div className="flex items-center justify-between gap-2">
-                        <p className="text-xs font-serif font-bold text-[#2A1816] truncate">
-                          {character.name}
-                        </p>
-                        {isTurnActive && (
-                          <span className="text-[9px] font-mono uppercase font-bold text-[#8C241E] bg-[#EEDBD5] px-1.5 py-0.5 rounded border border-[#D5AAA2]">
-                            Speaking
-                          </span>
-                        )}
-                      </div>
-
-                      {/* Segmented control */}
-                      <div className="grid grid-cols-2 gap-1 p-0.5 bg-[#E8D6CF]/70 rounded-lg border border-[#D5AAA2]/60">
-                        <button
-                          type="button"
-                          disabled={!!session && session.scene_status === "active"}
-                          onClick={() => setAssignments({ ...assignments, [character.name]: "human" })}
-                          className={`py-1 px-1.5 rounded-md text-[10px] font-mono font-bold uppercase tracking-wider transition-colors cursor-pointer ${
-                            isHuman
-                              ? "bg-[#8C241E] text-[#FDF8F7] shadow-xs"
-                              : "text-[#5C3B37] hover:text-[#2A1816]"
-                          }`}
-                        >
-                          Actor
-                        </button>
-                        <button
-                          type="button"
-                          disabled={!!session && session.scene_status === "active"}
-                          onClick={() => setAssignments({ ...assignments, [character.name]: "ai" })}
-                          className={`py-1 px-1.5 rounded-md text-[10px] font-mono font-bold uppercase tracking-wider transition-colors cursor-pointer ${
-                            isAi
-                              ? "bg-[#8C241E] text-[#FDF8F7] shadow-xs"
-                              : "text-[#5C3B37] hover:text-[#2A1816]"
-                          }`}
-                        >
-                          AI
-                        </button>
-                      </div>
-
-                      {/* Voice Voice Toggle if AI */}
-                      {isAi && (
-                        <div className="grid grid-cols-2 gap-1 p-0.5 bg-[#FAF2EE] rounded-lg border border-[#DCBAB2]/80">
-                          <button
-                            type="button"
-                            disabled={!!session && session.scene_status === "active"}
-                            onClick={() => setVoicePreferences({ ...voicePreferences, [character.name]: "female" })}
-                            className={`py-0.5 px-1.5 rounded text-[9px] font-mono font-bold uppercase tracking-wider transition-colors cursor-pointer ${
-                              currentVoice === "female"
-                                ? "bg-[#5C3B37] text-[#FAF2EE]"
-                                : "text-[#8C5A54] hover:text-[#2A1816]"
-                            }`}
-                          >
-                            Female
-                          </button>
-                          <button
-                            type="button"
-                            disabled={!!session && session.scene_status === "active"}
-                            onClick={() => setVoicePreferences({ ...voicePreferences, [character.name]: "male" })}
-                            className={`py-0.5 px-1.5 rounded text-[9px] font-mono font-bold uppercase tracking-wider transition-colors cursor-pointer ${
-                              currentVoice === "male"
-                                ? "bg-[#5C3B37] text-[#FAF2EE]"
-                                : "text-[#8C5A54] hover:text-[#2A1816]"
-                            }`}
-                          >
-                            Male
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </section>
-
-            {/* Stage Progress & Control Card */}
-            <section className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-2xl p-4 space-y-4 shadow-xs">
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between text-xs font-mono text-[#8C5A54]">
-                  <span className="uppercase tracking-wider font-bold">Progress</span>
-                  <span className="font-bold text-[#2A1816]">{progressPercent}%</span>
-                </div>
-                
-                {/* Progress Bar */}
-                <div className="h-1.5 w-full rounded-full bg-[#EEDBD5] overflow-hidden border border-[#D5AAA2]/60">
-                  <div
-                    className="h-full bg-[#8C241E] transition-all duration-300 rounded-full"
-                    style={{ width: `${progressPercent}%` }}
-                  />
-                </div>
-
-                <div className="flex items-center justify-between text-[10px] font-mono text-[#6E4742] pt-1">
-                  <span>
-                    {session?.scene?.turns?.length ? `Line ${session.current_turn + 1} of ${session.scene.turns.length}` : `${displayScene?.turns?.length || 0} dialogue lines`}
-                  </span>
-                  <span>{elapsedMins}m elapsed</span>
-                </div>
-              </div>
-
-              {/* Primary Session Controls */}
-              <div className="space-y-2 pt-1 border-t border-[#DCBAB2]/70">
-                {!session || session.scene_status !== "active" ? (
-                  <button
-                    onClick={startSession}
-                    className="w-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] py-2.5 px-4 rounded-xl font-mono text-xs font-bold uppercase tracking-widest border border-[#A6352F] shadow-sm flex items-center justify-center gap-2 transition-colors cursor-pointer"
-                  >
-                    <Play className="w-3.5 h-3.5 fill-current text-[#FFD0CC]" />
-                    <span>Start Rehearsal</span>
-                  </button>
-                ) : (
-                  <button
-                    onClick={stopSession}
-                    className="w-full bg-rose-900 hover:bg-rose-950 text-[#FDF8F7] py-2.5 px-4 rounded-xl font-mono text-xs font-bold uppercase tracking-widest border border-rose-950 shadow-sm flex items-center justify-center gap-2 transition-colors cursor-pointer"
-                  >
-                    <Square className="w-3.5 h-3.5 fill-current" />
-                    <span>Pause Rehearsal</span>
-                  </button>
-                )}
-
-                <button
-                  onClick={() => {
-                    setSession(null);
-                    if (activeScript) parseScript(activeScript);
-                    else parseScript();
-                  }}
-                  className="w-full bg-[#FAF2EE] hover:bg-[#EEDBD5] border border-[#D5AAA2] text-[#5C3B37] hover:text-[#2A1816] py-2 px-3 rounded-xl font-mono text-[10px] font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
-                >
-                  <RotateCcw className="w-3 h-3 text-[#8C241E]" />
-                  <span>Reset Setup</span>
-                </button>
-              </div>
-
-              {/* Telemetry Status Bar */}
-              <div className="p-2.5 rounded-xl bg-[#F5EAE6] border border-[#DCBAB2] flex items-center justify-between text-[11px] font-mono">
-                <span className="text-[#8C5A54] uppercase tracking-wider">Audio:</span>
-                <span className="text-[#2A1816] font-bold flex items-center gap-1.5 truncate">
-                  <Radio className="w-3 h-3 text-[#8C241E] animate-pulse shrink-0" />
-                  <span className="truncate">{audioStatus}</span>
-                </span>
-              </div>
-
-              {error && (
-                <div className="bg-rose-100 border border-rose-300 text-rose-900 rounded-xl p-3 text-[11px] font-mono flex items-start gap-2">
-                  <AlertCircle className="w-3.5 h-3.5 text-rose-700 shrink-0 mt-0.5" />
-                  <span>{error}</span>
-                </div>
-              )}
-            </section>
-          </aside>
-
-          {/* RIGHT COLUMN: PROSCENIUM STAGE & TELEPROMPTER */}
-          <main className="space-y-4">
-            
-            {/* MAIN TELEPROMPTER SCREEN */}
-            <div className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-2xl p-6 md:p-7 shadow-sm space-y-5 relative">
-              
-              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#DCBAB2]/70 pb-3">
-                <div className="space-y-0.5">
-                  <span className="text-[10px] font-mono text-[#8C5A54] uppercase tracking-wider font-bold">
-                    Current Speaker
-                  </span>
-                  <h2 className="text-xl md:text-2xl font-serif text-[#2A1816] font-normal">
-                    {activeTurn?.character || "Awaiting Start"}
-                  </h2>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  {session?.status === "HUMAN_TURN" && (
-                    <span className="inline-flex items-center gap-1.5 text-amber-950 bg-amber-100 border border-amber-300 rounded-full px-3 py-1 text-[11px] font-mono font-bold uppercase tracking-wider">
-                      <Mic className="w-3 h-3 text-amber-900 animate-bounce" />
-                      <span>{listening ? "Speaking" : "Listening"}</span>
-                    </span>
-                  )}
-
-                  {session?.status === "PLAYING_AI_AUDIO" && (
-                    <span className="inline-flex items-center gap-1.5 text-[#FDF8F7] bg-[#8C241E] border border-[#A6352F] rounded-full px-3 py-1 text-[11px] font-mono font-bold uppercase tracking-wider">
-                      <Volume2 className="w-3 h-3 text-[#FFD0CC] animate-pulse" />
-                      <span>AI Speaking</span>
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {/* SPOKEN SCRIPT TELEPROMPTER DISPLAY */}
-              {activeTurn ? (
-                <div className="space-y-5">
-                  
-                  <div className="py-6 md:py-8 min-h-[150px] flex items-center justify-center text-center">
-                    <div className="font-serif text-2xl sm:text-3xl leading-relaxed text-[#2A1816] max-w-3xl mx-auto">
-                      {(activeTurn.words || activeTurn.text?.split(/\s+/) || []).map((word: string, index: number) => {
-                        const isHuman = session?.speaker_type === "human";
-                        const activeIndex = isHuman ? humanWordIndex : aiWordIndex;
-                        const spoken = isHuman ? spokenIndices.includes(index) : index < aiWordIndex;
-                        const active = session && index === activeIndex;
-
-                        return (
-                          <span
-                            key={`${word}-${index}`}
-                            className={`inline-block mx-0.5 transition-colors duration-150 ${
-                              active
-                                ? "text-[#8C241E] font-bold underline decoration-2 underline-offset-4"
-                                : spoken
-                                  ? "text-[#8C241E] font-semibold underline decoration-[#8C241E]/40"
-                                  : "text-[#2A1816]/80 font-normal"
-                            }`}
-                          >
-                            {word}
-                          </span>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {session?.speaker_type === "human" && (
-                    <div className="border-t border-[#DCBAB2]/70 pt-4 space-y-3">
-                      <div className="flex items-center justify-between gap-3">
-                        <p className="text-xs font-mono font-bold uppercase tracking-wider text-amber-950 flex items-center gap-1.5">
-                          <Radio className="w-3.5 h-3.5 text-amber-900" />
-                          <span>Microphone</span>
-                        </p>
-                        {!speechSupported && (
-                          <span className="text-[10px] font-mono font-bold uppercase text-rose-800 bg-rose-100 px-2.5 py-0.5 rounded-full border border-rose-300">
-                            Voice API Unavailable
-                          </span>
-                        )}
-                      </div>
-
-                      <p className="text-sm font-serif italic text-[#5C3B37] bg-[#F5EAE6] px-3.5 py-3 rounded-xl min-h-[44px] flex items-center">
-                        "{transcript || "Speak your line clearly into the microphone..."}"
-                      </p>
-
-                      <div className="flex flex-wrap items-center gap-2.5 pt-1">
-                        <button
-                          onClick={startListening}
-                          className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-4 py-2 rounded-full text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer shadow-xs border border-[#A6352F]"
-                        >
-                          <Mic className="w-3.5 h-3.5 text-[#FFD0CC]" />
-                          <span>Listen again</span>
-                        </button>
-
-                        <button
-                          onClick={() => sendTranscript(activeTurn.text, true, 1200)}
-                          className="px-4 py-2 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] hover:text-[#2A1816] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
-                          title="Confirm line read manually if speech recognition struggles"
-                        >
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-800" />
-                          <span>Advance cue</span>
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="text-center py-16 space-y-4">
-                  <div className="w-16 h-16 rounded-full bg-emerald-100 border border-emerald-300 flex items-center justify-center mx-auto text-emerald-800 shadow-sm">
-                    <CheckCircle2 className="w-8 h-8" />
-                  </div>
-                  <div className="space-y-1">
-                    <h2 className="font-serif text-3xl font-normal text-[#2A1816]">Scene Successfully Concluded</h2>
-                    <p className="text-xs sm:text-sm font-mono text-[#6E4742]">
-                      Rehearsal session duration: ~{elapsedMins} minute(s). All cues completed!
-                    </p>
-                  </div>
-                  <button
-                    onClick={returnToStudio}
-                    className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-6 py-3 rounded-full font-mono text-xs font-bold uppercase tracking-wider inline-flex items-center gap-2 border border-[#A6352F] cursor-pointer shadow-md shadow-[#8C241E]/20"
-                  >
-                    <BookOpen className="w-4 h-4 text-[#FFD0CC]" /> Return to Rehearsal Library
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* SCENE TIMELINE & CUE QUEUE */}
-            {displayScene?.turns && displayScene.turns.length > 0 && (
-              <div className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-2xl p-5 space-y-3 shadow-xs">
-                <div className="flex items-center justify-between border-b border-[#DCBAB2]/70 pb-2.5">
-                  <h3 className="font-serif text-base font-normal text-[#2A1816]">Scene Dialogue Sequence</h3>
-                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
-                    {displayScene.turns.length} Total Cues
-                  </span>
-                </div>
-
-                <div className="space-y-2 max-h-[300px] overflow-y-auto custom-scrollbar pr-1.5">
-                  {displayScene.turns.map((turn: any, index: number) => {
-                    const current = session ? session.current_turn === index : index === 0;
-                    const past = session ? session.current_turn > index : false;
-                    const isHuman = assignments[turn.character] === "human";
-
-                    return (
-                      <div
-                        key={turn.id || index}
-                        className={`w-full text-left rounded-xl border p-3 transition-colors ${
-                          current
-                            ? "border-[#8C241E] bg-[#F5EAE6] shadow-xs"
-                            : past
-                              ? "border-[#DCBAB2]/40 bg-[#FAF2EE]/60 opacity-60"
-                              : "border-[#DCBAB2]/70 bg-[#FAF2EE]"
-                        }`}
-                      >
-                        <div className="flex items-center justify-between gap-2 mb-1">
-                          <div className="flex items-center gap-1.5">
-                            <span className="font-serif font-bold text-xs text-[#2A1816]">
-                              {turn.character}
-                            </span>
-                            <span className={`text-[9px] font-mono font-bold uppercase px-1.5 py-0.2 rounded border ${
-                              isHuman
-                                ? "bg-amber-100 text-amber-950 border-amber-300"
-                                : "bg-[#EEDBD5] text-[#8C241E] border-[#D5AAA2]"
-                            }`}>
-                              {isHuman ? "Actor" : "AI"}
-                            </span>
-                          </div>
-                          <span className="text-[9px] font-mono text-[#8C5A54]">
-                            #{index + 1}
-                          </span>
-                        </div>
-                        <p className="font-serif text-xs text-[#5C3B37] leading-relaxed">
-                          "{turn.text}"
-                        </p>
-                      </div>
-                    );
-                  })}
-                </div>
               </div>
             )}
+          </div>
 
-          </main>
+          {/* SPOKEN SCRIPT TELEPROMPTER */}
+          {activeTurn ? (
+            <div className="space-y-6">
+              <div className="py-4 md:py-6 min-h-[140px] flex items-center justify-center">
+                <p className="font-serif text-2xl sm:text-3xl md:text-4xl text-[#2A1816] leading-relaxed md:leading-[1.7] max-w-2xl mx-auto font-normal">
+                  {(activeTurn.words || activeTurn.text?.split(/\s+/) || []).map((word: string, index: number) => {
+                    const activeIndex = isHumanTurn ? humanWordIndex : aiWordIndex;
+                    const spoken = isHumanTurn ? spokenIndices.includes(index) : index < aiWordIndex;
+                    const active = session && index === activeIndex;
+
+                    return (
+                      <span
+                        key={`${word}-${index}`}
+                        className={`inline-block mx-1 transition-all duration-150 ${
+                          active
+                            ? "text-[#8C241E] font-medium underline decoration-2 underline-offset-6 decoration-[#8C241E]"
+                            : spoken
+                              ? "text-[#8C241E] underline decoration-1 underline-offset-4 decoration-[#8C241E]/40"
+                              : "text-[#2A1816]/90"
+                        }`}
+                      >
+                        {word}
+                      </span>
+                    );
+                  })}
+                </p>
+              </div>
+
+              {/* VOICE FEEDBACK PILL (HUMAN / AI) */}
+              <div className="pt-2">
+                {isHumanTurn ? (
+                  <div className="space-y-3 max-w-md mx-auto">
+                    <p className="font-serif italic text-sm text-[#5C3B37] bg-[#F5EAE6] px-4 py-2.5 rounded-2xl border border-[#DCBAB2]/70 min-h-[42px] flex items-center justify-center">
+                      "{transcript || "Speak line into microphone..."}"
+                    </p>
+                    <div className="flex items-center justify-center gap-2">
+                      <button
+                        onClick={startListening}
+                        className="px-3.5 py-1.5 rounded-full bg-[#EEDBD5] hover:bg-[#E3CEC6] text-[#8C241E] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors cursor-pointer border border-[#D5AAA2]"
+                      >
+                        <Mic className="w-3.5 h-3.5" />
+                        <span>Listen Again</span>
+                      </button>
+
+                      <button
+                        onClick={() => sendTranscript(activeTurn.text, true, 1200)}
+                        className="px-3.5 py-1.5 rounded-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors cursor-pointer border border-[#A6352F] shadow-xs"
+                      >
+                        <Check className="w-3.5 h-3.5 text-[#FFD0CC]" />
+                        <span>Advance Cue</span>
+                      </button>
+                    </div>
+                  </div>
+                ) : isAiTurn ? (
+                  <div className="inline-flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider text-[#8C241E] bg-[#EEDBD5]/60 px-4 py-1.5 rounded-full border border-[#D5AAA2]">
+                    <Volume2 className="w-3.5 h-3.5 animate-pulse text-[#8C241E]" />
+                    <span>AI Partner Speaking...</span>
+                  </div>
+                ) : null}
+              </div>
+            </div>
+          ) : (
+            <div className="py-12 space-y-4">
+              <div className="w-14 h-14 rounded-full bg-emerald-100 border border-emerald-300 flex items-center justify-center mx-auto text-emerald-800">
+                <CheckCircle2 className="w-7 h-7" />
+              </div>
+              <h2 className="font-serif text-2xl font-normal text-[#2A1816]">Scene Concluded</h2>
+              <button
+                onClick={returnToStudio}
+                className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-6 py-2.5 rounded-full font-mono text-xs font-bold uppercase tracking-wider inline-flex items-center gap-2 border border-[#A6352F] cursor-pointer"
+              >
+                <BookOpen className="w-4 h-4 text-[#FFD0CC]" /> Return to Repertoire
+              </button>
+            </div>
+          )}
+
+          {error && (
+            <div className="bg-rose-100 border border-rose-300 text-rose-900 rounded-2xl p-3 text-xs font-mono max-w-md mx-auto flex items-center justify-center gap-2">
+              <AlertCircle className="w-4 h-4 text-rose-700 shrink-0" />
+              <span>{error}</span>
+            </div>
+          )}
+        </section>
+
+        {/* FLOATING THEATRE CONTROLS DOCK */}
+        <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+          {!session || session.scene_status !== "active" ? (
+            <button
+              onClick={startSession}
+              className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-8 py-3.5 rounded-full font-mono text-xs font-bold uppercase tracking-widest border border-[#A6352F] shadow-md shadow-[#8C241E]/20 flex items-center gap-2 cursor-pointer transition-transform hover:scale-102"
+            >
+              <Play className="w-4 h-4 fill-current text-[#FFD0CC]" />
+              <span>Start Live Rehearsal</span>
+            </button>
+          ) : (
+            <button
+              onClick={stopSession}
+              className="bg-rose-900 hover:bg-rose-950 text-[#FDF8F7] px-8 py-3.5 rounded-full font-mono text-xs font-bold uppercase tracking-widest border border-rose-950 shadow-md flex items-center gap-2 cursor-pointer transition-transform hover:scale-102"
+            >
+              <Square className="w-4 h-4 fill-current" />
+              <span>Pause Rehearsal</span>
+            </button>
+          )}
+
+          <button
+            onClick={() => setShowCastConfig(!showCastConfig)}
+            className="px-5 py-3.5 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
+          >
+            <Users className="w-3.5 h-3.5 text-[#8C241E]" />
+            <span>Cast Roles</span>
+            {showCastConfig ? <ChevronUp className="w-3 h-3 ml-0.5" /> : <ChevronDown className="w-3 h-3 ml-0.5" />}
+          </button>
+
+          <button
+            onClick={() => {
+              setSession(null);
+              if (activeScript) parseScript(activeScript);
+              else parseScript();
+            }}
+            className="w-10 h-10 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] flex items-center justify-center transition-colors cursor-pointer shadow-2xs"
+            title="Reset scene to beginning"
+          >
+            <RotateCcw className="w-4 h-4 text-[#8C241E]" />
+          </button>
         </div>
+
+        {/* COLLAPSIBLE MINIMAL CAST & VOICE SETTINGS */}
+        {showCastConfig && (
+          <section className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-3xl p-5 space-y-4 shadow-xs">
+            <div className="flex items-center justify-between border-b border-[#DCBAB2]/70 pb-3">
+              <span className="text-[10px] font-mono uppercase font-bold tracking-wider text-[#8C5A54]">
+                Character Role Assignments & Voice Preference
+              </span>
+              <span className="text-[10px] font-mono text-[#8C5A54]">
+                {displayScene.characters?.length || 0} Roles
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+              {(displayScene.characters || []).map((character: any) => {
+                const isHuman = assignments[character.name] === "human";
+                const isAi = assignments[character.name] === "ai";
+                const currentVoice = voicePreferences[character.name] || "female";
+
+                return (
+                  <div
+                    key={character.name}
+                    className="p-3 rounded-2xl bg-[#F5EAE6] border border-[#DCBAB2] space-y-2.5"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-serif font-bold text-sm text-[#2A1816] truncate">
+                        {character.name}
+                      </span>
+                      <span className="text-[9px] font-mono uppercase text-[#8C5A54]">
+                        {isHuman ? "Actor" : `AI (${currentVoice})`}
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-1 p-0.5 bg-[#E8D6CF]/70 rounded-xl border border-[#D5AAA2]/60">
+                      <button
+                        type="button"
+                        onClick={() => setAssignments({ ...assignments, [character.name]: "human" })}
+                        className={`py-1 px-1.5 rounded-lg text-[10px] font-mono font-bold uppercase transition-colors cursor-pointer ${
+                          isHuman ? "bg-[#8C241E] text-[#FDF8F7] shadow-xs" : "text-[#5C3B37] hover:text-[#2A1816]"
+                        }`}
+                      >
+                        Actor (You)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setAssignments({ ...assignments, [character.name]: "ai" })}
+                        className={`py-1 px-1.5 rounded-lg text-[10px] font-mono font-bold uppercase transition-colors cursor-pointer ${
+                          isAi ? "bg-[#8C241E] text-[#FDF8F7] shadow-xs" : "text-[#5C3B37] hover:text-[#2A1816]"
+                        }`}
+                      >
+                        AI Voice
+                      </button>
+                    </div>
+
+                    {isAi && (
+                      <div className="grid grid-cols-2 gap-1 p-0.5 bg-[#FAF2EE] rounded-lg border border-[#DCBAB2]/70">
+                        <button
+                          type="button"
+                          onClick={() => setVoicePreferences({ ...voicePreferences, [character.name]: "female" })}
+                          className={`py-0.5 px-1.5 rounded text-[9px] font-mono font-bold uppercase transition-colors cursor-pointer ${
+                            currentVoice === "female" ? "bg-[#5C3B37] text-[#FAF2EE]" : "text-[#8C5A54] hover:text-[#2A1816]"
+                          }`}
+                        >
+                          Female
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setVoicePreferences({ ...voicePreferences, [character.name]: "male" })}
+                          className={`py-0.5 px-1.5 rounded text-[9px] font-mono font-bold uppercase transition-colors cursor-pointer ${
+                            currentVoice === "male" ? "bg-[#5C3B37] text-[#FAF2EE]" : "text-[#8C5A54] hover:text-[#2A1816]"
+                          }`}
+                        >
+                          Male
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        )}
+
+        {/* CLEAN DIALOGUE TIMELINE QUEUE */}
+        {displayScene?.turns && displayScene.turns.length > 0 && (
+          <section className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-3xl p-6 space-y-4 shadow-xs">
+            <div className="flex items-center justify-between border-b border-[#DCBAB2]/70 pb-3">
+              <h3 className="font-serif text-base font-normal text-[#2A1816]">Script Dialogue Flow</h3>
+              <span className="text-[10px] font-mono uppercase text-[#8C5A54]">
+                {displayScene.turns.length} Lines
+              </span>
+            </div>
+
+            <div className="space-y-2 max-h-[280px] overflow-y-auto custom-scrollbar pr-1">
+              {displayScene.turns.map((turn: any, index: number) => {
+                const isCurrent = session ? session.current_turn === index : index === 0;
+                const isPast = session ? session.current_turn > index : false;
+                const isHuman = assignments[turn.character] === "human";
+
+                return (
+                  <div
+                    key={turn.id || index}
+                    className={`p-3.5 rounded-2xl border transition-all ${
+                      isCurrent
+                        ? "bg-[#F5EAE6] border-[#8C241E] shadow-2xs"
+                        : isPast
+                          ? "bg-[#FAF2EE]/50 border-[#DCBAB2]/40 opacity-50"
+                          : "bg-[#FAF2EE] border-[#DCBAB2]/70"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-serif font-bold text-xs text-[#2A1816]">
+                          {turn.character}
+                        </span>
+                        <span className={`text-[9px] font-mono font-bold uppercase px-2 py-0.2 rounded-full border ${
+                          isHuman ? "bg-amber-100 text-amber-950 border-amber-300" : "bg-[#EEDBD5] text-[#8C241E] border-[#D5AAA2]"
+                        }`}>
+                          {isHuman ? "Actor" : "AI"}
+                        </span>
+                      </div>
+                      <span className="text-[9px] font-mono text-[#8C5A54]">
+                        #{index + 1}
+                      </span>
+                    </div>
+                    <p className="font-serif text-xs text-[#5C3B37] leading-relaxed">
+                      "{turn.text}"
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        )}
+
       </div>
     );
   }
 
-  // ==========================================
+  // =========================================================================
   // VIEW 2: REHEARSAL STUDIO CATALOG & SETUP
-  // ==========================================
+  // =========================================================================
   return (
     <div className="space-y-5 w-full max-w-5xl mx-auto pb-20 font-sans text-[#5C3B37]">
       
@@ -1042,7 +1040,7 @@ export default function AiRehearsalStudio() {
             Rehearsal Studio
           </h1>
           <p className="font-sans text-xs text-[#5C3B37] leading-relaxed">
-            Select a play from the repertoire or import a custom scene to rehearse with live AI roleplay.
+            Select a play from the repertoire or import a custom scene to rehearse with natural AI roleplay.
           </p>
         </div>
 
