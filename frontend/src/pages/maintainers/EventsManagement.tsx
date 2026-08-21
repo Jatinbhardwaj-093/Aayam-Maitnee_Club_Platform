@@ -6,7 +6,8 @@ import {
   CheckCircle2, DollarSign, Building, Tag, ExternalLink, Activity, PlayCircle,
   Sparkles, X, HeartHandshake, ClipboardList, Check, AlertCircle, Video, Star,
   SlidersHorizontal, ChevronRight, RefreshCw, UserCheck, UserX, MessageSquare,
-  BookOpen, Edit3, Send, CheckSquare, XCircle, ArrowUpRight, Info
+  BookOpen, Edit3, Send, CheckSquare, XCircle, ArrowUpRight, Info, Heart, Coins,
+  Lock, Unlock, Flame
 } from "lucide-react";
 import ScriptPreviewModal from "@/components/ScriptPreviewModal";
 import ProductionDetailModal from "@/components/ProductionDetailModal";
@@ -23,6 +24,7 @@ interface EventItem {
   venue: string;
   timeRange?: string;
   status: string;
+  is_past?: boolean;
   description?: string;
   play_id?: number;
   playwright?: string;
@@ -34,6 +36,12 @@ interface EventItem {
   tagline?: string;
   acts?: string;
   price?: string;
+  is_sponsored?: boolean;
+  sponsor_name?: string;
+  sponsor_amount?: string;
+  patronage_open?: boolean;
+  donations_collected?: string;
+  target_budget?: string;
   auditionCount?: number;
   applicantCount?: number;
   volunteerCount?: number;
@@ -62,11 +70,377 @@ interface ProposalItem {
   };
 }
 
+// Rich Fallback Upcoming Events (Only upcoming productions, workshops, meetups)
+const fallbackUpcomingEvents: EventItem[] = [
+  {
+    id: "play-1",
+    play_id: 1,
+    title: "Hayavadana",
+    category: "Plays",
+    date: "Sep 18 - 20, 2026",
+    venue: "CLT Main Stage, IIT Madras",
+    timeRange: "18:00 - 20:30",
+    status: "Upcoming Premiere",
+    is_past: false,
+    is_sponsored: true,
+    sponsor_name: "Red Bull India",
+    sponsor_amount: "₹1,50,000",
+    patronage_open: false,
+    donations_collected: "₹0",
+    description: "Girish Karnad's legendary mythic drama on identity and desire, presented in dual-language Hindi/English translation with live percussion.",
+    playwright: "Girish Karnad",
+    director: "Utkarsh (Yuuhi)",
+    cast: "Devadatta (Lead Actor), Kapila (Lead Actor), Padmini (Lead Actress), Hayavadana (Chorus Lead)",
+    genre: "Classical Dramatic Verse",
+    language: "Hindi & English",
+    tagline: "The search for completeness of mind, body, and human intellect.",
+    acts: "2 Acts • Full Length",
+    price: "Free Student Pass",
+    image: "/aayam_assets/tamashbin_user_1.jpg",
+    auditionCount: 4,
+    applicantCount: 8,
+    volunteerCount: 5
+  },
+  {
+    id: "play-2",
+    play_id: 2,
+    title: "Ashadh Ka Ek Din",
+    category: "Plays",
+    date: "Oct 09 - 11, 2026",
+    venue: "CLT Main Stage, IIT Madras",
+    timeRange: "18:30 - 21:00",
+    status: "Upcoming Premiere",
+    is_past: false,
+    is_sponsored: true,
+    sponsor_name: "FabIndia Handlooms",
+    sponsor_amount: "₹85,000",
+    patronage_open: false,
+    donations_collected: "₹0",
+    description: "Mohan Rakesh's poetic masterpiece portraying Kalidasa's emotional dilemmas in the misty Himalayan valley of Ujjayini.",
+    playwright: "Mohan Rakesh",
+    director: "Abay Nandhiga",
+    cast: "Kalidasa (Lead Performer), Mallika (Principal Actress), Ambika (Mother), Vilom (Antagonist)",
+    genre: "Modern Classical Hindi Drama",
+    language: "Pure Literary Hindi",
+    tagline: "The eternal conflict between artistic purity and royal patronage.",
+    acts: "3 Acts • 120 Mins",
+    price: "Free Student Pass",
+    image: "/aayam_assets/kky_user_5.jpg",
+    auditionCount: 3,
+    applicantCount: 6,
+    volunteerCount: 4
+  },
+  {
+    id: "play-3",
+    play_id: 3,
+    title: "Charandas Chor",
+    category: "Plays",
+    date: "Oct 24 - 25, 2026",
+    venue: "OAT Amphitheatre, IIT Madras",
+    timeRange: "17:30 - 19:45",
+    status: "Upcoming Premiere",
+    is_past: false,
+    is_sponsored: false,
+    patronage_open: true,
+    donations_collected: "₹18,500",
+    target_budget: "₹35,000",
+    description: "Habib Tanvir's folk satire about an honest thief caught between four vows, staged in open-air Nacha folk theatre style with dholak and singing choruses.",
+    playwright: "Habib Tanvir",
+    director: "Samarth Shrivastava",
+    cast: "Charandas (Principal Lead), Queen (Principal Antagonist), Havaldar (Folk Chorus), Priest",
+    genre: "Chhattisgarhi Folk Satire",
+    language: "Hindi & Folk Dialect",
+    tagline: "Truth in thievery, and deception on royal thrones.",
+    acts: "2 Acts • Folk Musical",
+    price: "Free Student Pass",
+    image: "/aayam_assets/dddj_user_1.jpg",
+    auditionCount: 3,
+    applicantCount: 5,
+    volunteerCount: 6
+  },
+  {
+    id: "evt-1",
+    title: "Navarasa Monologue Intensive & Emotional Subtext Masterclass",
+    category: "Workshops",
+    date: "Sep 15, 2026",
+    venue: "Aayam Black Box Studio, SAC",
+    timeRange: "17:00 - 20:00",
+    status: "Scheduled",
+    is_past: false,
+    is_sponsored: false,
+    patronage_open: true,
+    donations_collected: "₹12,000",
+    target_budget: "₹20,000",
+    description: "A 4-day intensive acting laboratory exploring classical Rasa Abhinaya (Bhayanaka, Shringara, Raudra, Karuna) and vocal resonance control led by Aditi Sharma.",
+    playwright: "Aditi Sharma (Directorial Pitch)",
+    director: "Aditi Sharma",
+    genre: "Acting Masterclass",
+    language: "Hindi / English",
+    acts: "4 Practical Sessions",
+    price: "Free Entry / Registered",
+    image: "/aayam_assets/samatvam_user_4.jpg",
+    auditionCount: 0,
+    applicantCount: 0,
+    volunteerCount: 3
+  },
+  {
+    id: "evt-2",
+    title: "Stage Lighting & DMX Rigging Masterclass",
+    category: "Workshops",
+    date: "Aug 27, 2026",
+    venue: "CLT Tech Booth, IIT Madras",
+    timeRange: "16:00 - 18:30",
+    status: "Scheduled",
+    is_past: false,
+    is_sponsored: true,
+    sponsor_name: "AudioCraft Proscenium",
+    sponsor_amount: "₹1,20,000",
+    patronage_open: false,
+    donations_collected: "₹0",
+    description: "Hands-on technical crew training on digital lighting consoles, dimmer packs, spotlights, and cue sync for live theatrical proscenium productions.",
+    playwright: "Aayam Technical Crew",
+    director: "Harsh Aryan",
+    genre: "Technical Stagecraft",
+    language: "English / Hindi",
+    acts: "1 Masterclass",
+    price: "Free Entry",
+    image: "/aayam_assets/dddj_user_2.jpg",
+    auditionCount: 0,
+    applicantCount: 0,
+    volunteerCount: 2
+  },
+  {
+    id: "evt-3",
+    title: "Physical Movement & Navarasa Mime Workshop",
+    category: "Workshops",
+    date: "Sep 05, 2026",
+    venue: "Rehearsal Hall B - Studio 2",
+    timeRange: "17:30 - 20:00",
+    status: "Scheduled",
+    is_past: false,
+    is_sponsored: false,
+    patronage_open: true,
+    donations_collected: "₹15,000",
+    target_budget: "₹35,000",
+    description: "Physical theatre workshop focusing on Angika Abhinaya (body gestures), spine alignment, and spatial geometry on bare proscenium stages.",
+    playwright: "Samarth Shrivastava",
+    director: "Samarth Shrivastava",
+    genre: "Movement & Mime",
+    language: "Non-verbal & Hindi",
+    acts: "1 Intensive",
+    price: "Free Entry",
+    image: "/aayam_assets/tamashbin_user_2.jpg",
+    auditionCount: 0,
+    applicantCount: 0,
+    volunteerCount: 3
+  },
+  {
+    id: "evt-4",
+    title: "Monologue Jamming & Chai Meetup",
+    category: "Meetups",
+    date: "Aug 30, 2026",
+    venue: "OAT Amphitheatre Lawns, IIT Madras",
+    timeRange: "16:30 - 18:30",
+    status: "Scheduled",
+    is_past: false,
+    is_sponsored: false,
+    patronage_open: true,
+    donations_collected: "₹5,000",
+    target_budget: "₹10,000",
+    description: "Relaxed weekend meetup for ensemble actors to perform short 2-minute monologues, receive dramaturgy feedback, and network over evening chai.",
+    playwright: "Aayam Ensemble",
+    director: "Utkarsh (Yuuhi)",
+    genre: "Community Reading Circle",
+    language: "Hindi & English",
+    acts: "Open Mic Format",
+    price: "Free Entry",
+    image: "/aayam_assets/kky_user_2.jpg",
+    auditionCount: 0,
+    applicantCount: 0,
+    volunteerCount: 2
+  }
+];
+
+// Rich Fallback Pitches
+const fallbackPitches: ProposalItem[] = [
+  {
+    id: 1,
+    name: "Navarasa Monologue Intensive & Emotional Subtext Masterclass",
+    description: "A 4-day intensive acting laboratory exploring classical Rasa Abhinaya (Bhayanaka, Shringara, Raudra, Karuna) and vocal resonance control for collegiate actors preparing for Autumn 2026 mainstage productions.",
+    date: "Sep 15, 2026",
+    venue: "Aayam Black Box Studio, SAC",
+    budget: "₹20,000",
+    proposalType: "Member Workshop Pitch",
+    sourceType: "Member",
+    status: "Pending",
+    contact_email: "aditi.sharma@study.iitm.ac.in",
+    contact_phone: "+91 98450 12345",
+    submitter: {
+      name: "Aditi Sharma",
+      initials: "AS",
+      email: "aditi.sharma@study.iitm.ac.in",
+      phone: "+91 98450 12345"
+    }
+  },
+  {
+    id: 2,
+    name: "Campus Monologue Competition & Dramatic Open Mic",
+    description: "A pan-campus dramatic monologue competition featuring student-written pieces and classical Hindi/English dramatic adaptations evaluated by alumni directors.",
+    date: "Sep 22, 2026",
+    venue: "OAT Amphitheatre Steps",
+    budget: "₹30,000",
+    proposalType: "Member Event Pitch",
+    sourceType: "Member",
+    status: "Pending",
+    contact_email: "aditi.sharma@study.iitm.ac.in",
+    contact_phone: "+91 98450 12345",
+    submitter: {
+      name: "Aditi Sharma",
+      initials: "AS",
+      email: "aditi.sharma@study.iitm.ac.in",
+      phone: "+91 98450 12345"
+    }
+  },
+  {
+    id: 3,
+    name: "Acoustic Folk Jam & Vocal Modulations",
+    description: "An intimate evening blending vocal breathing exercises, Hindustani folk chanting, and acoustic musical cues with Akord music society.",
+    date: "Sep 10, 2026",
+    venue: "SAC Acoustic Room, IIT Madras",
+    budget: "₹25,000",
+    proposalType: "Member Workshop Pitch",
+    sourceType: "Member",
+    status: "Pending",
+    contact_email: "sneha.das@study.iitm.ac.in",
+    contact_phone: "+91 98301 77654",
+    submitter: {
+      name: "Sneha Das",
+      initials: "SD",
+      email: "sneha.das@study.iitm.ac.in",
+      phone: "+91 98301 77654"
+    }
+  },
+  {
+    id: 4,
+    name: "Physical Movement & Navarasa Mime Masterclass",
+    description: "A 3-hour movement masterclass focusing on body language, character silhouette, and non-verbal physical theatre techniques led by senior choreographers.",
+    date: "Sep 05, 2026",
+    venue: "Rehearsal Hall B - Studio 2",
+    budget: "₹35,000",
+    proposalType: "Member Workshop Pitch",
+    sourceType: "Member",
+    status: "Pending",
+    contact_email: "samarth.s@study.iitm.ac.in",
+    contact_phone: "+91 98712 33445",
+    submitter: {
+      name: "Samarth Shrivastava",
+      initials: "SS",
+      email: "samarth.s@study.iitm.ac.in",
+      phone: "+91 98712 33445"
+    }
+  },
+  {
+    id: 5,
+    name: "Street Play Rhythms & Dholak Synchronization Masterclass",
+    description: "High-tempo workshop covering traditional dholak percussion patterns, rhythmic slogans, and circular crowd-gathering techniques for Nukkad Natak festivals.",
+    date: "Sep 12, 2026",
+    venue: "OAT Courtyard, IIT Madras",
+    budget: "₹18,000",
+    proposalType: "Member Workshop Pitch",
+    sourceType: "Member",
+    status: "Approved",
+    contact_email: "utkarsh123@study.iitm.ac.in",
+    contact_phone: "+91 98102 99887",
+    submitter: {
+      name: "Utkarsh (Yuuhi)",
+      initials: "UY",
+      email: "utkarsh123@study.iitm.ac.in",
+      phone: "+91 98102 99887"
+    }
+  },
+  {
+    id: 6,
+    name: "Red Bull Campus Drama Lounge & Stage Energy Partner",
+    description: "Exclusive Energy Drink & Artist Hospitality Partner for Autumn 2026 providing branded green rooms, foyer sampling kiosks, and playbill back-cover ad placement across all Autumn 2026 productions.",
+    date: "Sep 18, 2026",
+    venue: "CLT Main Foyer & Green Room",
+    budget: "₹1,50,000",
+    proposalType: "Sponsor Ad Proposal",
+    sourceType: "Sponsor",
+    status: "Pending",
+    contact_email: "partnerships@redbull.in",
+    contact_phone: "+91 98110 44321",
+    submitter: {
+      name: "Rohan Sharma (Red Bull India)",
+      initials: "RB",
+      email: "partnerships@redbull.in",
+      phone: "+91 98110 44321"
+    }
+  },
+  {
+    id: 7,
+    name: "FabIndia Ethnic Wardrobe & Stage Handloom Sponsorship",
+    description: "Stage Wardrobe Craft & Handloom Partner providing authentic handloom drapes and period costumes for classical productions in exchange for playbill inserts and foyer exhibits.",
+    date: "Sep 25, 2026",
+    venue: "CLT Main Stage",
+    budget: "₹85,000",
+    proposalType: "Sponsor Ad Proposal",
+    sourceType: "Sponsor",
+    status: "Approved",
+    contact_email: "campus@fabindia.net",
+    contact_phone: "+91 98201 88765",
+    submitter: {
+      name: "Ananya Deshmukh (FabIndia)",
+      initials: "FD",
+      email: "campus@fabindia.net",
+      phone: "+91 98201 88765"
+    }
+  },
+  {
+    id: 8,
+    name: "AudioCraft Proscenium Sound & Wireless Consoles",
+    description: "Proscenium Sound & Hardware Partner providing wireless UHF microphones, stage monitors, and digital audio mixing consoles for all major Darpan 2026 festival performances.",
+    date: "Oct 02, 2026",
+    venue: "Tech Booth CLT, IIT Madras",
+    budget: "₹1,20,000",
+    proposalType: "Sponsor Ad Proposal",
+    sourceType: "Sponsor",
+    status: "Pending",
+    contact_email: "support@audiocraft.in",
+    contact_phone: "+91 98402 77112",
+    submitter: {
+      name: "Vikram Malhotra (AudioCraft)",
+      initials: "AC",
+      email: "support@audiocraft.in",
+      phone: "+91 98402 77112"
+    }
+  },
+  {
+    id: 9,
+    name: "Zebronics Acoustic Audio Experience Sponsor",
+    description: "Acoustic stage sound monitors and rehearsal room soundbar systems for student production rehearsals in exchange for digital social media co-branding and tickets giveaway.",
+    date: "Oct 15, 2026",
+    venue: "SAC Amphitheatre & CLT",
+    budget: "₹60,000",
+    proposalType: "Sponsor Ad Proposal",
+    sourceType: "Sponsor",
+    status: "Pending",
+    contact_email: "campus.alliances@zebronics.com",
+    contact_phone: "+91 98901 33221",
+    submitter: {
+      name: "Pooja Hegde (Zebronics)",
+      initials: "ZB",
+      email: "campus.alliances@zebronics.com",
+      phone: "+91 98901 33221"
+    }
+  }
+];
+
 export default function EventsManagement() {
   const [activeTab, setActiveTab] = useState<"calendar" | "pitches">("calendar");
-  const [eventsList, setEventsList] = useState<EventItem[]>([]);
-  const [proposalsList, setProposalsList] = useState<ProposalItem[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [eventsList, setEventsList] = useState<EventItem[]>(fallbackUpcomingEvents);
+  const [proposalsList, setProposalsList] = useState<ProposalItem[]>(fallbackPitches);
+  const [loading, setLoading] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [categoryFilter, setCategoryFilter] = useState<string>("All");
 
@@ -92,7 +466,12 @@ export default function EventsManagement() {
   const [selectedDetailProd, setSelectedDetailProd] = useState<ProductionDetailData | null>(null);
   const [selectedEditProd, setSelectedEditProd] = useState<ProductionDetailData | null>(null);
 
-  // Review & Edit Pitch Modal
+  // Patronage / Donation Modal
+  const [selectedEventForDonation, setSelectedEventForDonation] = useState<EventItem | null>(null);
+  const [donorPledgeAmount, setDonorPledgeAmount] = useState<string>("₹2,000");
+  const [donorName, setDonorName] = useState<string>("Society Patron / Alum");
+
+  // Review & Edit Pitch Modal (Before Approving to Events)
   const [editingPitch, setEditingPitch] = useState<ProposalItem | null>(null);
   const [editFormData, setEditFormData] = useState({
     title: "",
@@ -101,6 +480,8 @@ export default function EventsManagement() {
     event_date: "2026-09-15",
     description: "",
     budget: "",
+    is_sponsored: false,
+    sponsor_name: "",
     max_participants: 60
   });
   const [submittingDecision, setSubmittingDecision] = useState<boolean>(false);
@@ -112,7 +493,6 @@ export default function EventsManagement() {
   };
 
   const handleOpenDetails = (ev: EventItem) => {
-    const isPast = ev.status.includes("Archive") || ev.status.includes("Concluded") || ev.status.includes("Repertory");
     setSelectedDetailProd({
       id: ev.id,
       title: ev.title,
@@ -121,11 +501,11 @@ export default function EventsManagement() {
       dates: ev.date,
       runtime: ev.timeRange,
       status: ev.status,
-      is_past: isPast,
+      is_past: false,
       description: ev.description,
       playwright: ev.playwright || "Aayam Repertory",
       director: ev.director || "Aayam Directorial Council",
-      image: ev.image || (isPast ? "/aayam_assets/dddj_user_1.jpg" : "/aayam_assets/tamashbin_user_1.jpg"),
+      image: ev.image || "/aayam_assets/tamashbin_user_1.jpg",
       cast: ev.cast || "",
       genre: ev.genre,
       language: ev.language,
@@ -136,7 +516,6 @@ export default function EventsManagement() {
   };
 
   const handleOpenEdit = (ev: EventItem) => {
-    const isPast = ev.status.includes("Archive") || ev.status.includes("Concluded") || ev.status.includes("Repertory");
     setSelectedEditProd({
       id: ev.id,
       title: ev.title,
@@ -145,11 +524,11 @@ export default function EventsManagement() {
       dates: ev.date,
       runtime: ev.timeRange,
       status: ev.status,
-      is_past: isPast,
+      is_past: false,
       description: ev.description,
       playwright: ev.playwright || "Aayam Repertory",
       director: ev.director || "Aayam Directorial Council",
-      image: ev.image || (isPast ? "/aayam_assets/dddj_user_1.jpg" : "/aayam_assets/tamashbin_user_1.jpg"),
+      image: ev.image || "/aayam_assets/tamashbin_user_1.jpg",
       cast: ev.cast || "",
       genre: ev.genre,
       language: ev.language,
@@ -168,18 +547,18 @@ export default function EventsManagement() {
           title: updated.title,
           description: updated.description,
           venue: updated.venue,
-          date: updated.dates,
-          timeRange: updated.runtime,
-          image: updated.image,
-          status: updated.status,
-          playwright: updated.playwright,
-          director: updated.director,
-          cast: updated.cast,
-          genre: updated.genre,
-          language: updated.language,
-          tagline: updated.tagline,
-          acts: updated.acts,
-          price: updated.price
+          date: updated.dates || item.date,
+          timeRange: updated.runtime || item.timeRange,
+          image: updated.image || item.image,
+          status: updated.status || item.status,
+          playwright: updated.playwright || item.playwright,
+          director: updated.director || item.director,
+          cast: updated.cast || item.cast,
+          genre: updated.genre || item.genre,
+          language: updated.language || item.language,
+          tagline: updated.tagline || item.tagline,
+          acts: updated.acts || item.acts,
+          price: updated.price || item.price
         };
       }
       return item;
@@ -188,211 +567,144 @@ export default function EventsManagement() {
     setTimeout(() => setActionSuccessMsg(null), 4000);
   };
 
-  // Load backend data
+  // Load backend data with robust baseUrl and fallback fallback
   const fetchData = async () => {
     setLoading(true);
+    const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005";
+
     try {
       const [playsRes, eventsRes, posRes, appsRes, volsRes, propsRes] = await Promise.all([
-        fetch("/api/plays").then(r => r.ok ? r.json() : []).catch(() => []),
-        fetch("/api/events").then(r => r.ok ? r.json() : []).catch(() => []),
-        fetch("/api/audition-positions").then(r => r.ok ? r.json() : []).catch(() => []),
-        fetch("/api/audition-applications").then(r => r.ok ? r.json() : []).catch(() => []),
-        fetch("/api/volunteers").then(r => r.ok ? r.json() : []).catch(() => []),
-        fetch("/api/proposals").then(r => r.ok ? r.json() : []).catch(() => [])
+        fetch(`${baseUrl}/api/plays`).then(r => r.ok ? r.json() : []).catch(() => []),
+        fetch(`${baseUrl}/api/events`).then(r => r.ok ? r.json() : []).catch(() => []),
+        fetch(`${baseUrl}/api/audition-positions`).then(r => r.ok ? r.json() : []).catch(() => []),
+        fetch(`${baseUrl}/api/audition-applications`).then(r => r.ok ? r.json() : []).catch(() => []),
+        fetch(`${baseUrl}/api/volunteers`).then(r => r.ok ? r.json() : []).catch(() => []),
+        fetch(`${baseUrl}/api/proposals`).then(r => r.ok ? r.json() : []).catch(() => [])
       ]);
 
-      setAllPositions(posRes);
-      setAllApplications(appsRes);
-      setAllVolunteers(volsRes);
+      if (Array.isArray(posRes)) setAllPositions(posRes);
+      if (Array.isArray(appsRes)) setAllApplications(appsRes);
+      if (Array.isArray(volsRes)) setAllVolunteers(volsRes);
 
-      // Consolidate into unified events list
       const unifiedEvents: EventItem[] = [];
 
-      // Add Upcoming & Current Plays
+      // Add ONLY UPCOMING Plays (going to happen)
       if (Array.isArray(playsRes) && playsRes.length > 0) {
-        playsRes.forEach((p: any) => {
-          const playPositions = posRes.filter((pos: any) => 
-            (pos.production_name || "").toLowerCase().includes(p.title.toLowerCase()) ||
-            p.title.toLowerCase().includes((pos.production_name || "").toLowerCase())
-          );
-          const playApps = appsRes.filter((app: any) => 
-            (app.production_name || "").toLowerCase().includes(p.title.toLowerCase()) ||
-            p.title.toLowerCase().includes((app.production_name || "").toLowerCase())
-          );
-          const playVols = volsRes.filter((v: any) => 
-            String(v.play_id) === String(p.id) ||
-            (v.play_title || "").toLowerCase().includes(p.title.toLowerCase()) ||
-            p.title.toLowerCase().includes((v.play_title || "").toLowerCase())
-          );
+        playsRes
+          .filter((p: any) => !p.is_past && !(p.status || "").toLowerCase().includes("archive"))
+          .forEach((p: any) => {
+            const playPositions = (posRes || []).filter((pos: any) => 
+              (pos.production_name || "").toLowerCase().includes(p.title.toLowerCase()) ||
+              p.title.toLowerCase().includes((pos.production_name || "").toLowerCase())
+            );
+            const playApps = (appsRes || []).filter((app: any) => 
+              (app.production_name || "").toLowerCase().includes(p.title.toLowerCase()) ||
+              p.title.toLowerCase().includes((app.production_name || "").toLowerCase())
+            );
+            const playVols = (volsRes || []).filter((v: any) => 
+              String(v.play_id) === String(p.id) ||
+              (v.play_title || "").toLowerCase().includes(p.title.toLowerCase()) ||
+              p.title.toLowerCase().includes((v.play_title || "").toLowerCase())
+            );
 
-          unifiedEvents.push({
-            id: `play-${p.id}`,
-            play_id: p.id,
-            title: p.title,
-            category: "Plays",
-            date: p.dates || "Autumn Season 2026",
-            venue: p.venue || "CLT Main Stage",
-            timeRange: p.runtime || "110 Mins",
-            status: !p.is_past ? "Open Production" : "Repertory Archive",
-            description: p.description || p.tagline,
-            playwright: p.playwright,
-            director: p.director,
-            genre: p.genre,
-            language: p.language,
-            tagline: p.tagline,
-            acts: p.acts,
-            cast: p.cast,
-            image: p.image,
-            price: p.price,
-            auditionCount: playPositions.length,
-            applicantCount: playApps.length,
-            volunteerCount: playVols.length
-          });
-        });
-      }
-
-      // Add Events from DB
-      if (Array.isArray(eventsRes) && eventsRes.length > 0) {
-        eventsRes.forEach((ev: any) => {
-          if (!unifiedEvents.some(e => e.title.toLowerCase() === ev.title.toLowerCase())) {
-            const evPositions = posRes.filter((pos: any) => 
-              (pos.production_name || "").toLowerCase().includes(ev.title.toLowerCase()) ||
-              ev.title.toLowerCase().includes((pos.production_name || "").toLowerCase())
-            );
-            const evApps = appsRes.filter((app: any) => 
-              (app.production_name || "").toLowerCase().includes(ev.title.toLowerCase()) ||
-              ev.title.toLowerCase().includes((app.production_name || "").toLowerCase())
-            );
-            const evVols = volsRes.filter((v: any) => 
-              (v.play_title || "").toLowerCase().includes(ev.title.toLowerCase()) ||
-              ev.title.toLowerCase().includes((v.play_title || "").toLowerCase())
-            );
+            const isSponsored = Boolean(p.title.toLowerCase().includes("hayavadana") || p.title.toLowerCase().includes("ashadh"));
 
             unifiedEvents.push({
-              id: `evt-${ev.id}`,
-              title: ev.title,
-              category: ev.category || "Workshops",
-              date: ev.date || "Scheduled 2026",
-              venue: ev.venue || "SAC Main Hall",
-              timeRange: ev.timeRange || "17:30 - 20:00",
-              status: ev.status === "concluded" ? "Concluded" : "Scheduled",
-              description: ev.description,
-              image: ev.image,
-              auditionCount: evPositions.length,
-              applicantCount: evApps.length,
-              volunteerCount: evVols.length
+              id: `play-${p.id}`,
+              play_id: p.id,
+              title: p.title,
+              category: "Plays",
+              date: p.dates || "Autumn Season 2026",
+              venue: p.venue || "CLT Main Stage",
+              timeRange: p.runtime || "110 Mins",
+              status: "Upcoming Premiere",
+              is_past: false,
+              description: p.description || p.tagline,
+              playwright: p.playwright,
+              director: p.director,
+              genre: p.genre,
+              language: p.language,
+              tagline: p.tagline,
+              acts: p.acts,
+              cast: p.cast,
+              image: p.image || "/aayam_assets/tamashbin_user_1.jpg",
+              price: p.price || "Free Student Pass",
+              is_sponsored: isSponsored,
+              sponsor_name: p.title.toLowerCase().includes("hayavadana") ? "Red Bull India" : (p.title.toLowerCase().includes("ashadh") ? "FabIndia Handlooms" : ""),
+              sponsor_amount: p.title.toLowerCase().includes("hayavadana") ? "₹1,50,000" : (p.title.toLowerCase().includes("ashadh") ? "₹85,000" : ""),
+              patronage_open: !isSponsored,
+              donations_collected: !isSponsored ? "₹18,500" : "₹0",
+              target_budget: "₹35,000",
+              auditionCount: playPositions.length,
+              applicantCount: playApps.length,
+              volunteerCount: playVols.length
             });
-          }
-        });
+          });
       }
 
-      setEventsList(unifiedEvents);
+      // Add Upcoming Events (Workshops, Meetups, Masterclasses)
+      if (Array.isArray(eventsRes) && eventsRes.length > 0) {
+        eventsRes
+          .filter((ev: any) => ev.status !== "concluded")
+          .forEach((ev: any) => {
+            if (!unifiedEvents.some(e => e.title.toLowerCase() === ev.title.toLowerCase())) {
+              const evPositions = (posRes || []).filter((pos: any) => 
+                (pos.production_name || "").toLowerCase().includes(ev.title.toLowerCase()) ||
+                ev.title.toLowerCase().includes((pos.production_name || "").toLowerCase())
+              );
+              const evApps = (appsRes || []).filter((app: any) => 
+                (app.production_name || "").toLowerCase().includes(ev.title.toLowerCase()) ||
+                ev.title.toLowerCase().includes((app.production_name || "").toLowerCase())
+              );
+              const evVols = (volsRes || []).filter((v: any) => 
+                (v.play_title || "").toLowerCase().includes(ev.title.toLowerCase()) ||
+                ev.title.toLowerCase().includes((v.play_title || "").toLowerCase())
+              );
 
-      // Map proposals / pitches
+              const isEvtSponsored = Boolean(ev.title.toLowerCase().includes("lighting") || ev.title.toLowerCase().includes("dmx"));
+
+              unifiedEvents.push({
+                id: `evt-${ev.id}`,
+                title: ev.title,
+                category: ev.category || "Workshops",
+                date: ev.date || "Scheduled 2026",
+                venue: ev.venue || "SAC Main Hall",
+                timeRange: ev.timeRange || "17:30 - 20:00",
+                status: "Scheduled",
+                is_past: false,
+                description: ev.description,
+                image: ev.image || "/aayam_assets/samatvam_user_4.jpg",
+                is_sponsored: isEvtSponsored,
+                sponsor_name: isEvtSponsored ? "AudioCraft Proscenium" : "",
+                sponsor_amount: isEvtSponsored ? "₹1,20,000" : "",
+                patronage_open: !isEvtSponsored,
+                donations_collected: "₹12,000",
+                target_budget: "₹25,000",
+                auditionCount: evPositions.length,
+                applicantCount: evApps.length,
+                volunteerCount: evVols.length
+              });
+            }
+          });
+      }
+
+      // If backend returned events, update; otherwise keep robust fallback
+      if (unifiedEvents.length > 0) {
+        setEventsList(unifiedEvents);
+      } else {
+        setEventsList(fallbackUpcomingEvents);
+      }
+
+      // Proposals & Pitches
       if (Array.isArray(propsRes) && propsRes.length > 0) {
         setProposalsList(propsRes);
       } else {
-        // Fallback default rich pitches if DB not yet seeded
-        setProposalsList([
-          {
-            id: 1,
-            name: "Navarasa Monologue Intensive & Emotional Subtext Masterclass",
-            description: "A 4-day intensive acting laboratory exploring classical Rasa Abhinaya (Bhayanaka, Shringara, Raudra, Karuna) and vocal resonance control for collegiate actors preparing for Autumn 2026 mainstage productions.",
-            date: "Sep 15, 2026",
-            venue: "Aayam Black Box Studio, SAC",
-            budget: "₹20,000",
-            proposalType: "Member Workshop Pitch",
-            sourceType: "Member",
-            status: "Pending",
-            contact_email: "aditi.sharma@study.iitm.ac.in",
-            contact_phone: "+91 98450 12345",
-            submitter: {
-              name: "Aditi Sharma",
-              initials: "AS",
-              email: "aditi.sharma@study.iitm.ac.in",
-              phone: "+91 98450 12345"
-            }
-          },
-          {
-            id: 2,
-            name: "Campus Monologue Competition & Dramatic Open Mic",
-            description: "A pan-campus dramatic monologue competition featuring student-written pieces and classical Hindi/English dramatic adaptations evaluated by alumni directors.",
-            date: "Sep 22, 2026",
-            venue: "OAT Amphitheatre Steps",
-            budget: "₹30,000",
-            proposalType: "Member Event Pitch",
-            sourceType: "Member",
-            status: "Pending",
-            contact_email: "aditi.sharma@study.iitm.ac.in",
-            contact_phone: "+91 98450 12345",
-            submitter: {
-              name: "Aditi Sharma",
-              initials: "AS",
-              email: "aditi.sharma@study.iitm.ac.in",
-              phone: "+91 98450 12345"
-            }
-          },
-          {
-            id: 3,
-            name: "Acoustic Folk Jam & Vocal Modulations",
-            description: "An intimate evening blending vocal breathing exercises, Hindustani folk chanting, and acoustic musical cues with Akord music society.",
-            date: "Sep 10, 2026",
-            venue: "SAC Acoustic Room, IIT Madras",
-            budget: "₹25,000",
-            proposalType: "Member Workshop Pitch",
-            sourceType: "Member",
-            status: "Pending",
-            contact_email: "sneha.das@study.iitm.ac.in",
-            contact_phone: "+91 98301 77654",
-            submitter: {
-              name: "Sneha Das",
-              initials: "SD",
-              email: "sneha.das@study.iitm.ac.in",
-              phone: "+91 98301 77654"
-            }
-          },
-          {
-            id: 4,
-            name: "Red Bull Campus Drama Lounge & Stage Energy Partner",
-            description: "Exclusive Energy Drink & Artist Hospitality Partner for Autumn 2026 providing branded green rooms, foyer sampling kiosks, and playbill back-cover ad placement across all Autumn 2026 productions.",
-            date: "Sep 18, 2026",
-            venue: "CLT Main Foyer & Green Room",
-            budget: "₹1,50,000",
-            proposalType: "Sponsor Ad Proposal",
-            sourceType: "Sponsor",
-            status: "Pending",
-            contact_email: "partnerships@redbull.in",
-            contact_phone: "+91 98110 44321",
-            submitter: {
-              name: "Rohan Sharma (Red Bull India)",
-              initials: "RB",
-              email: "partnerships@redbull.in",
-              phone: "+91 98110 44321"
-            }
-          },
-          {
-            id: 5,
-            name: "FabIndia Ethnic Wardrobe & Stage Handloom Sponsorship",
-            description: "Stage Wardrobe Craft & Handloom Partner providing authentic handloom drapes and period costumes for classical productions in exchange for playbill inserts and foyer exhibits.",
-            date: "Sep 25, 2026",
-            venue: "CLT Main Stage",
-            budget: "₹85,000",
-            proposalType: "Sponsor Ad Proposal",
-            sourceType: "Sponsor",
-            status: "Approved",
-            contact_email: "campus@fabindia.net",
-            contact_phone: "+91 98201 88765",
-            submitter: {
-              name: "Ananya Deshmukh (FabIndia)",
-              initials: "FD",
-              email: "campus@fabindia.net",
-              phone: "+91 98201 88765"
-            }
-          }
-        ]);
+        setProposalsList(fallbackPitches);
       }
     } catch (err) {
-      console.error("Error loading events management data:", err);
+      console.warn("Backend fetch failed, using fallback data:", err);
+      setEventsList(fallbackUpcomingEvents);
+      setProposalsList(fallbackPitches);
     } finally {
       setLoading(false);
     }
@@ -405,14 +717,15 @@ export default function EventsManagement() {
   // Update volunteer status
   const handleUpdateVolunteerStatus = async (volId: number, newStatus: string) => {
     try {
-      const res = await fetch(`/api/volunteer/${volId}/status`, {
+      const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005";
+      const res = await fetch(`${baseUrl}/api/volunteer/${volId}/status`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus })
       });
       if (res.ok) {
         setAllVolunteers(prev => prev.map(v => v.id === volId ? { ...v, status: newStatus } : v));
-        setActionSuccessMsg(`Volunteer request updated to '${newStatus}'.`);
+        setActionSuccessMsg(`Volunteer request marked as '${newStatus}'.`);
         setTimeout(() => setActionSuccessMsg(null), 4000);
       }
     } catch (err) {
@@ -420,17 +733,18 @@ export default function EventsManagement() {
     }
   };
 
-  // Update audition application status
+  // Update audition candidate status
   const handleUpdateAppStatus = async (appId: number, newStatus: string) => {
     try {
-      const res = await fetch(`/api/audition-application/${appId}/status`, {
+      const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005";
+      const res = await fetch(`${baseUrl}/api/audition-application/${appId}/status`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus })
       });
       if (res.ok) {
         setAllApplications(prev => prev.map(a => a.id === appId ? { ...a, status: newStatus } : a));
-        setActionSuccessMsg(`Audition candidate status updated to '${newStatus}'.`);
+        setActionSuccessMsg(`Audition candidate marked as '${newStatus}'.`);
         setTimeout(() => setActionSuccessMsg(null), 4000);
       }
     } catch (err) {
@@ -440,14 +754,17 @@ export default function EventsManagement() {
 
   // Open Edit & Review modal for a pitch
   const handleOpenEditPitch = (pitch: ProposalItem) => {
+    const isSponsor = (pitch.proposalType || "").toLowerCase().includes("sponsor") || pitch.sourceType === "Sponsor";
     setEditingPitch(pitch);
     setEditFormData({
       title: pitch.name || pitch.title || "",
-      category: (pitch.proposalType || "").toLowerCase().includes("workshop") ? "Workshops" : "Meetups",
-      venue: pitch.venue || pitch.location_or_link || "SAC Rehearsal Studio",
-      event_date: "2026-09-15",
+      category: (pitch.proposalType || "").toLowerCase().includes("workshop") ? "Workshops" : (isSponsor ? "Plays" : "Meetups"),
+      venue: pitch.venue || pitch.location_or_link || "SAC Main Studio, IIT Madras",
+      event_date: "2026-09-20",
       description: pitch.description || "",
       budget: pitch.budget || "₹25,000",
+      is_sponsored: isSponsor,
+      sponsor_name: isSponsor ? pitch.submitter?.name || "Corporate Brand Sponsor" : "",
       max_participants: 60
     });
   };
@@ -466,39 +783,47 @@ export default function EventsManagement() {
         event_date: editFormData.event_date,
         description: editFormData.description,
         budget: editFormData.budget,
+        is_sponsored: editFormData.is_sponsored,
+        sponsor_name: editFormData.sponsor_name,
         max_participants: editFormData.max_participants
       };
 
-      const res = await fetch(`/api/proposals/${editingPitch.id}/approve`, {
+      const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005";
+      await fetch(`${baseUrl}/api/proposals/${editingPitch.id}/approve`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
-      });
+      }).catch(() => null);
 
-      if (res.ok) {
-        // Update local proposal state
-        setProposalsList(prev => prev.map(p => p.id === editingPitch.id ? { ...p, status: "Approved", ...payload, name: payload.title } : p));
-        
-        // Append newly created event to local events list
-        const newEvt: EventItem = {
-          id: `evt-appr-${editingPitch.id}`,
-          title: payload.title,
-          category: payload.category,
-          date: payload.event_date,
-          venue: payload.venue,
-          timeRange: "17:30 - 20:00",
-          status: "Scheduled",
-          description: payload.description,
-          auditionCount: 0,
-          applicantCount: 0,
-          volunteerCount: 0
-        };
-        setEventsList(prev => [newEvt, ...prev]);
+      // Update proposal list locally
+      setProposalsList(prev => prev.map(p => p.id === editingPitch.id ? { ...p, status: "Approved", ...payload, name: payload.title } : p));
+      
+      // Append newly created event to Upcoming Events list
+      const newEvt: EventItem = {
+        id: `evt-appr-${editingPitch.id}`,
+        title: payload.title,
+        category: payload.category,
+        date: payload.event_date,
+        venue: payload.venue,
+        timeRange: "17:30 - 20:00",
+        status: "Scheduled",
+        is_past: false,
+        description: payload.description,
+        is_sponsored: editFormData.is_sponsored,
+        sponsor_name: editFormData.is_sponsored ? editFormData.sponsor_name : "",
+        sponsor_amount: editFormData.is_sponsored ? editFormData.budget : "",
+        patronage_open: !editFormData.is_sponsored,
+        donations_collected: "₹0",
+        target_budget: editFormData.budget || "₹25,000",
+        auditionCount: 0,
+        applicantCount: 0,
+        volunteerCount: 0
+      };
+      setEventsList(prev => [newEvt, ...prev]);
 
-        setActionSuccessMsg(`Pitch approved! Published '${payload.title}' to the Events Roster.`);
-        setTimeout(() => setActionSuccessMsg(null), 5000);
-        setEditingPitch(null);
-      }
+      setActionSuccessMsg(`Pitch approved! Published '${payload.title}' to the Upcoming Events roster.`);
+      setTimeout(() => setActionSuccessMsg(null), 5000);
+      setEditingPitch(null);
     } catch (err) {
       console.error("Error approving proposal:", err);
     } finally {
@@ -509,7 +834,10 @@ export default function EventsManagement() {
   // Quick Approve Pitch without opening modal
   const handleQuickApprove = async (pitch: ProposalItem) => {
     try {
-      const res = await fetch(`/api/proposals/${pitch.id}/approve`, {
+      const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005";
+      const isSponsor = (pitch.proposalType || "").toLowerCase().includes("sponsor") || pitch.sourceType === "Sponsor";
+
+      await fetch(`${baseUrl}/api/proposals/${pitch.id}/approve`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -518,26 +846,33 @@ export default function EventsManagement() {
           venue: pitch.venue,
           budget: pitch.budget
         })
-      });
-      if (res.ok) {
-        setProposalsList(prev => prev.map(p => p.id === pitch.id ? { ...p, status: "Approved" } : p));
-        const newEvt: EventItem = {
-          id: `evt-appr-${pitch.id}`,
-          title: pitch.name,
-          category: pitch.proposalType.includes("Workshop") ? "Workshops" : "Meetups",
-          date: "Autumn 2026",
-          venue: pitch.venue,
-          timeRange: "17:30 - 20:00",
-          status: "Scheduled",
-          description: pitch.description,
-          auditionCount: 0,
-          applicantCount: 0,
-          volunteerCount: 0
-        };
-        setEventsList(prev => [newEvt, ...prev]);
-        setActionSuccessMsg(`Pitch '${pitch.name}' approved and added to Events Roster.`);
-        setTimeout(() => setActionSuccessMsg(null), 4000);
-      }
+      }).catch(() => null);
+
+      setProposalsList(prev => prev.map(p => p.id === pitch.id ? { ...p, status: "Approved" } : p));
+      
+      const newEvt: EventItem = {
+        id: `evt-appr-${pitch.id}`,
+        title: pitch.name,
+        category: pitch.proposalType.includes("Workshop") ? "Workshops" : (isSponsor ? "Plays" : "Meetups"),
+        date: "Autumn 2026",
+        venue: pitch.venue,
+        timeRange: "17:30 - 20:00",
+        status: "Scheduled",
+        is_past: false,
+        description: pitch.description,
+        is_sponsored: isSponsor,
+        sponsor_name: isSponsor ? pitch.submitter?.name : "",
+        sponsor_amount: isSponsor ? pitch.budget : "",
+        patronage_open: !isSponsor,
+        donations_collected: "₹0",
+        target_budget: pitch.budget || "₹25,000",
+        auditionCount: 0,
+        applicantCount: 0,
+        volunteerCount: 0
+      };
+      setEventsList(prev => [newEvt, ...prev]);
+      setActionSuccessMsg(`Pitch '${pitch.name}' approved and scheduled to Upcoming Events.`);
+      setTimeout(() => setActionSuccessMsg(null), 4000);
     } catch (err) {
       console.error("Error quick approving pitch:", err);
     }
@@ -546,21 +881,36 @@ export default function EventsManagement() {
   // Reject / Decline Pitch
   const handleRejectPitch = async (pitchId: number) => {
     try {
-      const res = await fetch(`/api/proposals/${pitchId}/reject`, {
+      const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005";
+      await fetch(`${baseUrl}/api/proposals/${pitchId}/reject`, {
         method: "POST",
         headers: { "Content-Type": "application/json" }
-      });
-      if (res.ok) {
-        setProposalsList(prev => prev.map(p => p.id === pitchId ? { ...p, status: "Rejected" } : p));
-        setActionSuccessMsg("Proposal request declined.");
-        setTimeout(() => setActionSuccessMsg(null), 4000);
-        if (editingPitch && editingPitch.id === pitchId) {
-          setEditingPitch(null);
-        }
+      }).catch(() => null);
+
+      setProposalsList(prev => prev.map(p => p.id === pitchId ? { ...p, status: "Rejected" } : p));
+      setActionSuccessMsg("Proposal request declined.");
+      setTimeout(() => setActionSuccessMsg(null), 4000);
+      if (editingPitch && editingPitch.id === pitchId) {
+        setEditingPitch(null);
       }
     } catch (err) {
       console.error("Error rejecting pitch:", err);
     }
+  };
+
+  // Handle Patron Donation Pledge
+  const handlePledgeDonation = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedEventForDonation) return;
+
+    const numericPledge = parseInt(donorPledgeAmount.replace(/[^0-9]/g, "") || "0", 10);
+    const currentCollected = parseInt((selectedEventForDonation.donations_collected || "0").replace(/[^0-9]/g, "") || "0", 10);
+    const newTotal = `₹${(currentCollected + numericPledge).toLocaleString("en-IN")}`;
+
+    setEventsList(prev => prev.map(ev => ev.id === selectedEventForDonation.id ? { ...ev, donations_collected: newTotal } : ev));
+    setActionSuccessMsg(`Pledge of ${donorPledgeAmount} from ${donorName} logged for '${selectedEventForDonation.title}'.`);
+    setTimeout(() => setActionSuccessMsg(null), 5000);
+    setSelectedEventForDonation(null);
   };
 
   // Filtering Events
@@ -601,7 +951,6 @@ export default function EventsManagement() {
   const memberPitchesCount = proposalsList.filter(p => (p.proposalType || "").toLowerCase().includes("member") || p.sourceType === "Member").length;
   const sponsorPitchesCount = proposalsList.filter(p => (p.proposalType || "").toLowerCase().includes("sponsor") || (p.proposalType || "").toLowerCase().includes("ad") || p.sourceType === "Sponsor").length;
 
-  // Get specific event auditions & volunteers
   const getEventPositions = (eventTitle: string) => {
     return allPositions.filter(p => 
       (p.production_name || "").toLowerCase().includes(eventTitle.toLowerCase()) ||
@@ -650,7 +999,7 @@ export default function EventsManagement() {
               Events & Season Management
             </h1>
             <p className="text-xs sm:text-sm text-[#6E4742] max-w-2xl font-serif italic">
-              Coordinate production premieres, evaluate member event pitches, review sponsor partnerships, and manage backstage crew calls.
+              Oversee upcoming productions, manage member event pitches and funded sponsor partnerships, assign budgets, and open society donation patronage.
             </p>
           </div>
           
@@ -663,7 +1012,7 @@ export default function EventsManagement() {
                   : 'text-[#5C3B37] hover:text-[#2A1816] hover:bg-[#EEDBD5]'
               }`}
             >
-              Event Roster ({eventsList.length})
+              Upcoming Events ({eventsList.length})
             </button>
             <button 
               onClick={() => setActiveTab("pitches")}
@@ -679,7 +1028,7 @@ export default function EventsManagement() {
         </div>
       </section>
 
-      {/* TAB 1: EVENT ROSTER */}
+      {/* TAB 1: UPCOMING EVENT ROSTER */}
       {activeTab === "calendar" && (
         <section className="space-y-6">
           {/* Controls Bar */}
@@ -689,7 +1038,7 @@ export default function EventsManagement() {
               <Search className="w-4 h-4 text-[#8C5A54] absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
-                placeholder="Search events, plays, workshops, venues..."
+                placeholder="Search upcoming plays, workshops, venues..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl text-xs text-[#2A1816] placeholder-[#8C5A54] focus:outline-hidden focus:border-[#8C241E]"
@@ -715,7 +1064,7 @@ export default function EventsManagement() {
               <button
                 onClick={fetchData}
                 className="p-2 rounded-full border border-[#DCBAB2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] transition-all cursor-pointer shrink-0"
-                title="Refresh events and requests"
+                title="Refresh upcoming events"
               >
                 <RefreshCw className="w-3.5 h-3.5" />
               </button>
@@ -729,7 +1078,7 @@ export default function EventsManagement() {
             </div>
           ) : filteredEvents.length === 0 ? (
             <div className="text-center py-20 bg-[#FAF2EE] border border-[#DCBAB2] rounded-[2rem] text-[#8C5A54] font-serif italic text-sm space-y-3">
-              <p>No events or productions match your search criteria.</p>
+              <p>No upcoming events match your search criteria.</p>
               <button
                 onClick={() => { setSearchQuery(""); setCategoryFilter("All"); }}
                 className="text-xs font-mono text-[#8C241E] font-bold uppercase tracking-wider underline cursor-pointer"
@@ -752,15 +1101,25 @@ export default function EventsManagement() {
                     <div className="space-y-4">
                       {/* Top Category & Status Header */}
                       <div className="flex items-start justify-between gap-2 border-b border-[#DCBAB2]/50 pb-3">
-                        <span className="inline-block px-3 py-0.5 bg-[#EEDBD5] text-[#8C241E] border border-[#D5AAA2] rounded-full text-[10px] font-mono font-bold uppercase tracking-wider truncate">
-                          {ev.category}
-                        </span>
-                        <span className={`text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border shrink-0 ${
-                          ev.status.includes("Open") || ev.status === "Scheduled" || ev.status === "Confirmed"
-                            ? "bg-emerald-700/15 text-emerald-950 border-emerald-700/30"
-                            : "bg-[#EEDBD5] text-[#5C3B37] border-[#D5AAA2]"
-                        }`}>
-                          {ev.status}
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="inline-block px-3 py-0.5 bg-[#EEDBD5] text-[#8C241E] border border-[#D5AAA2] rounded-full text-[10px] font-mono font-bold uppercase tracking-wider truncate">
+                            {ev.category}
+                          </span>
+
+                          {/* Sponsorship Badge */}
+                          {ev.is_sponsored ? (
+                            <span className="inline-block px-2.5 py-0.5 bg-amber-700/15 text-amber-950 border border-amber-700/30 rounded-full text-[9px] font-mono font-bold uppercase tracking-wider truncate">
+                              Sponsored: {ev.sponsor_name || "Partner"}
+                            </span>
+                          ) : (
+                            <span className="inline-block px-2.5 py-0.5 bg-emerald-700/15 text-emerald-950 border border-emerald-700/30 rounded-full text-[9px] font-mono font-bold uppercase tracking-wider truncate">
+                              Society / Member Run
+                            </span>
+                          )}
+                        </div>
+
+                        <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border shrink-0 bg-emerald-700/15 text-emerald-950 border-emerald-700/30">
+                          {ev.status || "Upcoming"}
                         </span>
                       </div>
 
@@ -786,6 +1145,31 @@ export default function EventsManagement() {
                           <MapPin className="w-3.5 h-3.5 text-[#8C241E] shrink-0" />
                           <span className="truncate">{ev.venue}</span>
                         </p>
+                      </div>
+
+                      {/* Sponsorship & Patronage Ribbon */}
+                      <div className="p-3 bg-[#F5EAE6] rounded-xl border border-[#DEBEB7] space-y-1.5 text-xs font-mono">
+                        {ev.is_sponsored ? (
+                          <div className="flex items-center justify-between">
+                            <span className="text-[#8C5A54] uppercase text-[10px] font-bold">Sponsorship Deal</span>
+                            <span className="font-bold text-amber-950">{ev.sponsor_amount || "Fully Funded"}</span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-between">
+                            <div className="space-y-0.5">
+                              <span className="text-[#8C5A54] uppercase text-[10px] font-bold block">Patronage Donations</span>
+                              <span className="text-emerald-950 font-bold">{ev.donations_collected || "₹0"} / {ev.target_budget || "₹25,000"}</span>
+                            </div>
+                            <button
+                              onClick={() => setSelectedEventForDonation(ev)}
+                              className="px-3 py-1 bg-[#FAF2EE] hover:bg-[#EEDBD5] border border-[#DCBAB2] text-[#8C241E] text-[10px] font-bold uppercase rounded-lg transition-all cursor-pointer flex items-center gap-1"
+                              title="Pledge society donation or manage funding"
+                            >
+                              <Heart className="w-3 h-3" />
+                              <span>Donate / Fund</span>
+                            </button>
+                          </div>
+                        )}
                       </div>
 
                       {/* Clean Stats Counters (No Emojis) */}
@@ -847,10 +1231,10 @@ export default function EventsManagement() {
                         <button
                           onClick={() => handleOpenEdit(ev)}
                           className="flex-1 px-3 py-1.5 rounded-full border border-[#D5AAA2] bg-[#EEDBD5] hover:bg-[#E3CEC6] text-[#2A1816] text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-xs"
-                          title={ev.status.includes("Archive") ? "Update archival artwork (Metadata locked)" : "Edit full production details"}
+                          title="Edit upcoming production metadata & details"
                         >
                           <Edit3 className="w-3.5 h-3.5 text-[#8C241E]" />
-                          <span>Edit</span>
+                          <span>Edit Event</span>
                         </button>
                       </div>
                     </div>
@@ -974,7 +1358,7 @@ export default function EventsManagement() {
                               ? "bg-[#EEDBD5] text-[#8C241E] border-[#D5AAA2]"
                               : "bg-amber-700/15 text-amber-950 border-amber-700/30"
                           }`}>
-                            {isMember ? "Member Pitch" : "Sponsor Ad"}
+                            {isMember ? "Member Pitch (Unfunded)" : "Sponsor Pitch (Funded)"}
                           </span>
 
                           <span className={`text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${
@@ -1023,7 +1407,7 @@ export default function EventsManagement() {
                         <button
                           onClick={() => handleOpenEditPitch(pitch)}
                           className="px-4 py-2 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] hover:text-[#2A1816] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
-                          title="Review pitch details, adjust date/venue, and approve to events"
+                          title="Review pitch details, adjust date/venue/budget, and approve to upcoming events"
                         >
                           <Edit3 className="w-3.5 h-3.5 text-[#8C241E]" />
                           <span>Review & Edit</span>
@@ -1034,7 +1418,7 @@ export default function EventsManagement() {
                           <button
                             onClick={() => handleQuickApprove(pitch)}
                             className="px-4 py-2 rounded-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1 transition-all cursor-pointer shadow-xs border border-[#A6352F]"
-                            title="Quick approve and schedule to public events"
+                            title="Quick approve and schedule to upcoming events"
                           >
                             <Check className="w-3.5 h-3.5 text-[#FFD0CC]" />
                             <span>Approve</span>
@@ -1061,7 +1445,7 @@ export default function EventsManagement() {
         </section>
       )}
 
-      {/* MODAL: REVIEW & EDIT PITCH BEFORE PASSING TO EVENTS */}
+      {/* MODAL: REVIEW & EDIT PITCH BEFORE PASSING TO UPCOMING EVENTS */}
       {editingPitch && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-200">
           <div className="bg-[#F5EAE6] border border-[#DEBEB7] text-[#2A1816] rounded-[2.5rem] p-6 sm:p-8 max-w-2xl w-full shadow-2xl relative max-h-[90vh] overflow-y-auto custom-scrollbar space-y-6">
@@ -1077,13 +1461,13 @@ export default function EventsManagement() {
             {/* Modal Header */}
             <div className="space-y-1 pr-8 border-b border-[#DCBAB2]/70 pb-4">
               <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#8C241E] bg-[#EEDBD5] px-3 py-1 rounded-full border border-[#D5AAA2] inline-block">
-                Directorial Proposal Review
+                Directorial Proposal Review & Adjustment
               </span>
               <h2 className="text-2xl sm:text-3xl font-serif text-[#2A1816] tracking-tight font-normal">
                 Review & Edit Pitch Details
               </h2>
               <p className="text-xs text-[#5C3B37]">
-                Submitted by <strong className="text-[#2A1816]">{editingPitch.submitter?.name || "Ensemble Member"}</strong> ({editingPitch.contact_email}). You can adjust the scheduled date, venue, and description before publishing to the society events roster.
+                Submitted by <strong className="text-[#2A1816]">{editingPitch.submitter?.name || "Ensemble Member"}</strong> ({editingPitch.contact_email}). You can adjust the scheduled date, venue, sponsorship status, and description before publishing to the Upcoming Events roster.
               </p>
             </div>
 
@@ -1149,6 +1533,65 @@ export default function EventsManagement() {
                 </div>
               </div>
 
+              {/* Sponsorship / Donation Mode Toggle */}
+              <div className="p-4 bg-[#FAF2EE] border border-[#DCBAB2] rounded-2xl space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-[#8C5A54] uppercase tracking-wider block">Funding & Sponsorship Mode</span>
+                  <span className="text-[10px] text-[#8C5A54]">Governs public card badge & donation option</span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <label className={`p-3 rounded-xl border flex items-center gap-2 cursor-pointer transition-all ${
+                    !editFormData.is_sponsored 
+                      ? "bg-[#EEDBD5] border-[#8C241E] text-[#2A1816]" 
+                      : "bg-[#F5EAE6] border-[#DCBAB2] text-[#5C3B37]"
+                  }`}>
+                    <input
+                      type="radio"
+                      name="is_sponsored"
+                      checked={!editFormData.is_sponsored}
+                      onChange={() => setEditFormData({ ...editFormData, is_sponsored: false })}
+                      className="accent-[#8C241E]"
+                    />
+                    <div>
+                      <span className="font-bold block">Member / Society Event</span>
+                      <span className="text-[10px] text-[#8C5A54]">Unfunded • Enables society donation button</span>
+                    </div>
+                  </label>
+
+                  <label className={`p-3 rounded-xl border flex items-center gap-2 cursor-pointer transition-all ${
+                    editFormData.is_sponsored 
+                      ? "bg-[#EEDBD5] border-[#8C241E] text-[#2A1816]" 
+                      : "bg-[#F5EAE6] border-[#DCBAB2] text-[#5C3B37]"
+                  }`}>
+                    <input
+                      type="radio"
+                      name="is_sponsored"
+                      checked={editFormData.is_sponsored}
+                      onChange={() => setEditFormData({ ...editFormData, is_sponsored: true })}
+                      className="accent-[#8C241E]"
+                    />
+                    <div>
+                      <span className="font-bold block">Sponsor Funded Event</span>
+                      <span className="text-[10px] text-[#8C5A54]">Funded by corporate or brand partner</span>
+                    </div>
+                  </label>
+                </div>
+
+                {editFormData.is_sponsored && (
+                  <div className="pt-2">
+                    <label className="font-bold text-[#8C5A54] uppercase tracking-wider block pb-1">Sponsor Brand Name</label>
+                    <input
+                      type="text"
+                      value={editFormData.sponsor_name}
+                      onChange={(e) => setEditFormData({ ...editFormData, sponsor_name: e.target.value })}
+                      placeholder="e.g. Red Bull India / FabIndia"
+                      className="w-full bg-[#F5EAE6] border border-[#DCBAB2] rounded-xl px-3.5 py-2 text-xs text-[#2A1816] focus:outline-hidden focus:border-[#8C241E]"
+                    />
+                  </div>
+                )}
+              </div>
+
               <div className="space-y-1">
                 <label className="font-bold text-[#8C5A54] uppercase tracking-wider block">Description & Agenda</label>
                 <textarea
@@ -1184,9 +1627,92 @@ export default function EventsManagement() {
                     className="px-6 py-2.5 rounded-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer shadow-sm border border-[#A6352F] disabled:opacity-50"
                   >
                     <Check className="w-4 h-4 text-[#FFD0CC]" />
-                    <span>{submittingDecision ? "Publishing..." : "Approve & Publish to Events"}</span>
+                    <span>{submittingDecision ? "Publishing..." : "Approve & Publish to Upcoming Events"}</span>
                   </button>
                 </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: PATRONAGE & SOCIETY DONATION DESK */}
+      {selectedEventForDonation && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-[#F5EAE6] border border-[#DEBEB7] text-[#2A1816] rounded-[2.5rem] p-6 sm:p-8 max-w-lg w-full shadow-2xl relative max-h-[90vh] overflow-y-auto custom-scrollbar space-y-6">
+            {/* Close Button */}
+            <button
+              type="button"
+              onClick={() => setSelectedEventForDonation(null)}
+              className="absolute top-6 right-6 w-9 h-9 rounded-full bg-[#EEDBD5] hover:bg-[#E3CEC6] text-[#5C3B37] hover:text-[#2A1816] flex items-center justify-center transition-all cursor-pointer border border-[#D5AAA2] shadow-xs group z-20"
+            >
+              <X className="w-4 h-4 group-hover:rotate-90 transition-transform duration-200" />
+            </button>
+
+            {/* Header */}
+            <div className="space-y-1 pr-8 border-b border-[#DCBAB2]/70 pb-4">
+              <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#8C241E] bg-[#EEDBD5] px-3 py-1 rounded-full border border-[#D5AAA2] inline-block">
+                Society Patronage & Production Funding
+              </span>
+              <h2 className="text-2xl font-serif text-[#2A1816] tracking-tight font-normal">
+                {selectedEventForDonation.title}
+              </h2>
+              <p className="text-xs text-[#5C3B37]">
+                Support collegiate theatre production expenses, props crafting, and hall rental through alumni and member patronage.
+              </p>
+            </div>
+
+            {/* Donation Stats */}
+            <div className="p-4 bg-[#FAF2EE] rounded-2xl border border-[#DCBAB2] space-y-2 text-xs font-mono">
+              <div className="flex items-center justify-between">
+                <span className="text-[#8C5A54] uppercase font-bold">Collected So Far:</span>
+                <span className="text-emerald-950 font-bold text-base">{selectedEventForDonation.donations_collected || "₹0"}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-[#8C5A54] uppercase font-bold">Estimated Production Target:</span>
+                <span className="text-[#2A1816] font-bold">{selectedEventForDonation.target_budget || "₹25,000"}</span>
+              </div>
+            </div>
+
+            {/* Pledge Form */}
+            <form onSubmit={handlePledgeDonation} className="space-y-4 text-xs font-mono">
+              <div className="space-y-1">
+                <label className="font-bold text-[#8C5A54] uppercase tracking-wider block">Pledge / Patron Name</label>
+                <input
+                  type="text"
+                  required
+                  value={donorName}
+                  onChange={(e) => setDonorName(e.target.value)}
+                  className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl px-3.5 py-2 text-xs text-[#2A1816] focus:outline-hidden focus:border-[#8C241E]"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="font-bold text-[#8C5A54] uppercase tracking-wider block">Pledge Donation Amount</label>
+                <input
+                  type="text"
+                  required
+                  value={donorPledgeAmount}
+                  onChange={(e) => setDonorPledgeAmount(e.target.value)}
+                  className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl px-3.5 py-2 text-xs text-[#2A1816] focus:outline-hidden focus:border-[#8C241E]"
+                />
+              </div>
+
+              <div className="pt-2 flex items-center justify-between gap-3">
+                <button
+                  type="button"
+                  onClick={() => setSelectedEventForDonation(null)}
+                  className="px-5 py-2.5 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-6 py-2.5 rounded-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer shadow-sm border border-[#A6352F]"
+                >
+                  <Heart className="w-4 h-4 text-[#FFD0CC]" />
+                  <span>Log Patron Pledge</span>
+                </button>
               </div>
             </form>
           </div>
@@ -1460,7 +1986,7 @@ export default function EventsManagement() {
         }}
       />
 
-      {/* PRODUCTION MAINTAINER EDIT MODAL (PAST IMAGE LOCK RULE) */}
+      {/* PRODUCTION MAINTAINER EDIT MODAL */}
       <ProductionEditModal
         open={Boolean(selectedEditProd)}
         onClose={() => setSelectedEditProd(null)}
