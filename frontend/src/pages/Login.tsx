@@ -63,11 +63,7 @@ export default function Login() {
         setActiveUser(userData);
         sessionStorage.setItem("aayam_active_user", JSON.stringify(userData));
 
-        if (userData.role.includes("Maintainer") || userData.role.includes("Secretary") || userData.role.includes("Chief")) {
-          navigate("/schedule-admin");
-        } else {
-          navigate("/schedule");
-        }
+        navigate("/schedule");
       } else {
         throw new Error(data.message || data.error || "Invalid institutional email or password.");
       }

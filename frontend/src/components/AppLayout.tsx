@@ -42,8 +42,8 @@ const navItems: NavItem[] = [
 ];
 
 const maintainerNavItems: NavItem[] = [
-  { label: "Production Callboard", path: "/schedule-admin", icon: Calendar, description: "Rehearsal call sheets & attendance roster" },
   { label: "My Schedule", path: "/schedule", icon: Calendar, description: "Your rehearsals & call attendance" },
+  { label: "Production Callboard", path: "/schedule-admin", icon: Calendar, description: "Rehearsal call sheets & attendance roster" },
   { label: "Plays & Productions", path: "/member-plays", icon: PlayCircle, description: "Production lineup & scripts" },
   { label: "Events Management", path: "/events-admin", icon: Calendar, description: "Proposal curation & sponsor deals" },
   { label: "Auditions & Casting", path: "/auditions-admin", icon: ClipboardList, description: "Role callings & candidate requests" },
@@ -221,12 +221,8 @@ export default function AppLayout() {
         setActiveUser(user);
         setPortalOpen(false);
 
-        // Redirect based on role
-        if (user.role.toLowerCase().includes("maintainer") || user.isAdmin) {
-          navigate("/schedule-admin");
-        } else {
-          navigate("/schedule");
-        }
+        // Default dashboard landing page is My Schedule for all members & maintainers
+        navigate("/schedule");
       } else {
         setLoginError("Invalid response from login endpoint");
         return;
@@ -362,10 +358,10 @@ export default function AppLayout() {
                 {activeUser ? (
                   <div className="flex items-center gap-3">
                     <Link
-                      to={isMaintainer ? "/schedule-admin" : "/schedule"}
+                      to="/schedule"
                       className="group bg-[#2C2A28] text-white hover:bg-[#E85F57] pl-5 pr-1.5 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all shadow-md flex items-center gap-3 border border-[#353535] hover:border-[#E85F57]"
                     >
-                      <span>{isMaintainer ? "Production Callboard" : "My Schedule"}</span>
+                      <span>{isMaintainer ? "Maintainer Schedule" : "My Schedule"}</span>
                       <div className="w-7 h-7 bg-[#F7F5F0]/20 rounded-full flex items-center justify-center group-hover:bg-[#F7F5F0]/30 transition-colors">
                         <Calendar className="w-3.5 h-3.5" />
                       </div>

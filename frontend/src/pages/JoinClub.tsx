@@ -360,11 +360,7 @@ export default function JoinClub() {
     setActiveUser(userData);
     sessionStorage.setItem("aayam_active_user", JSON.stringify(userData));
 
-    if (assignedTag === "developer" || assignedTag === "maintainer") {
-      navigate("/schedule-admin");
-    } else {
-      navigate("/schedule");
-    }
+    navigate("/schedule");
   };
 
   return (
