@@ -283,7 +283,7 @@ export default function AiRehearsalStudio() {
     );
   }, [allScripts, searchQuery]);
 
-  const parseScript = async (targetScript?: ScriptItem) => {
+  const parseScript = async (targetScript?: ScriptItem, customTitle?: string, customText?: string) => {
     setParsing(true);
     setError("");
     try {
@@ -293,8 +293,8 @@ export default function AiRehearsalStudio() {
             user_email: activeUser?.email || "",
           }
         : {
-            title: inlineTitle,
-            script: inlineScript,
+            title: customTitle ?? inlineTitle,
+            script: customText ?? inlineScript,
             user_email: activeUser?.email || "",
           };
       const res = await fetch(`${baseUrl}/api/rehearsal/parse`, {
@@ -308,15 +308,17 @@ export default function AiRehearsalStudio() {
         setParsing(false);
         return;
       }
-      setScene(data.scene);
-      const defaultAssignments: Record<string, Assignment> = {};
-      const defaultVoices: Record<string, VoicePreference> = {};
-      (data.scene.characters || []).forEach((c: any, index: number) => {
-        defaultAssignments[c.name] = index === 0 ? "human" : "ai";
-        defaultVoices[c.name] = index % 2 === 0 ? "female" : "male";
-      });
-      setAssignments(defaultAssignments);
-      setVoicePreferences(defaultVoices);
+      if (data.scene) {
+        setScene(data.scene);
+        const defaultAssignments: Record<string, Assignment> = {};
+        const defaultVoices: Record<string, VoicePreference> = {};
+        (data.scene.characters || []).forEach((c: any, index: number) => {
+          defaultAssignments[c.name] = index === 0 ? "human" : "ai";
+          defaultVoices[c.name] = index % 2 === 0 ? "female" : "male";
+        });
+        setAssignments(defaultAssignments);
+        setVoicePreferences(defaultVoices);
+      }
     } catch (err: any) {
       setError(err.message || "Network error while parsing script.");
     } finally {
@@ -327,31 +329,45 @@ export default function AiRehearsalStudio() {
   const parseDemoScript = () => {
     setInlineTitle("John and Mary Rehearsal");
     setInlineScript(demoScript);
-    parseScript();
+    parseScript(undefined, "John and Mary Rehearsal", demoScript);
   };
 
   const startSession = async () => {
-    if (!scene) return;
     setError("");
     setSessionStartedAt(Date.now());
     setAudioStatus("Initializing Roleplay");
     try {
-      const res = await fetch(`${baseUrl}/api/rehearsal/start`, {
+      const payload = activeScript
+        ? {
+            script_id: activeScript.id,
+            assignments,
+            voice_preferences: voicePreferences,
+            user_email: activeUser?.email || "anonymous@aayam.iitm",
+          }
+        : {
+            title: inlineTitle,
+            script: inlineScript,
+            assignments,
+            voice_preferences: voicePreferences,
+            user_email: activeUser?.email || "anonymous@aayam.iitm",
+          };
+
+      const res = await fetch(`${baseUrl}/api/rehearsal/roleplay/start`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          scene,
-          assignments,
-          voicePreferences,
-          user_email: activeUser?.email || "anonymous@aayam.iitm",
-        }),
+        body: JSON.stringify(payload),
       });
       const data = await res.json();
       if (!res.ok) {
         setError(data.error || "Could not start rehearsal session.");
         return;
       }
-      applySessionState(data.session);
+      if (data.session) {
+        applySessionState(data.session);
+        if (data.session.scene) {
+          setScene(data.session.scene);
+        }
+      }
     } catch (err: any) {
       setError(err.message || "Failed to connect to rehearsal server.");
     }
@@ -617,8 +633,8 @@ export default function AiRehearsalStudio() {
     setPinnedScriptIds((ids) => (ids.includes(id) ? ids.filter((item) => item !== id) : [...ids, id]));
   };
 
-  const activeTurn = session?.currentTurn;
   const displayScene = session?.scene || scene;
+  const activeTurn = session?.currentTurn || displayScene?.turns?.[0] || null;
   const currentTitle = activeScript?.title || displayScene?.title || inlineTitle;
   const progressPercent = session?.scene?.turns?.length
     ? Math.round(((session.current_turn + 1) / session.scene.turns.length) * 100)
@@ -658,12 +674,12 @@ export default function AiRehearsalStudio() {
               <div className="flex items-center justify-between border-b border-[#DCBAB2]/70 pb-3">
                 <h2 className="font-serif text-lg font-normal text-[#2A1816]">Cast</h2>
                 <span className="text-[10px] font-mono font-bold uppercase text-[#8C5A54] tracking-wider">
-                  {displayScene.characters.length} Roles
+                  {displayScene.characters?.length || 0} Roles
                 </span>
               </div>
 
               <div className="space-y-2">
-                {displayScene.characters.map((character: any) => {
+                {(displayScene.characters || []).map((character: any) => {
                   const isHuman = assignments[character.name] === "human";
                   const isAi = assignments[character.name] === "ai";
                   const currentVoice = voicePreferences[character.name] || "female";
@@ -770,7 +786,7 @@ export default function AiRehearsalStudio() {
 
                 <div className="flex items-center justify-between text-[10px] font-mono text-[#6E4742] pt-1">
                   <span>
-                    {session?.scene?.turns?.length ? `Line ${session.current_turn + 1} of ${session.scene.turns.length}` : "Ready"}
+                    {session?.scene?.turns?.length ? `Line ${session.current_turn + 1} of ${session.scene.turns.length}` : `${displayScene?.turns?.length || 0} dialogue lines`}
                   </span>
                   <span>{elapsedMins}m elapsed</span>
                 </div>
@@ -866,11 +882,11 @@ export default function AiRehearsalStudio() {
                   
                   <div className="py-6 md:py-8 min-h-[150px] flex items-center justify-center text-center">
                     <div className="font-serif text-2xl sm:text-3xl leading-relaxed text-[#2A1816] max-w-3xl mx-auto">
-                      {activeTurn.words.map((word: string, index: number) => {
-                        const isHuman = session.speaker_type === "human";
+                      {(activeTurn.words || activeTurn.text?.split(/\s+/) || []).map((word: string, index: number) => {
+                        const isHuman = session?.speaker_type === "human";
                         const activeIndex = isHuman ? humanWordIndex : aiWordIndex;
                         const spoken = isHuman ? spokenIndices.includes(index) : index < aiWordIndex;
-                        const active = index === activeIndex;
+                        const active = session && index === activeIndex;
 
                         return (
                           <span
@@ -890,7 +906,7 @@ export default function AiRehearsalStudio() {
                     </div>
                   </div>
 
-                  {session.speaker_type === "human" && (
+                  {session?.speaker_type === "human" && (
                     <div className="border-t border-[#DCBAB2]/70 pt-4 space-y-3">
                       <div className="flex items-center justify-between gap-3">
                         <p className="text-xs font-mono font-bold uppercase tracking-wider text-amber-950 flex items-center gap-1.5">
@@ -949,6 +965,60 @@ export default function AiRehearsalStudio() {
                 </div>
               )}
             </div>
+
+            {/* SCENE TIMELINE & CUE QUEUE */}
+            {displayScene?.turns && displayScene.turns.length > 0 && (
+              <div className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-2xl p-5 space-y-3 shadow-xs">
+                <div className="flex items-center justify-between border-b border-[#DCBAB2]/70 pb-2.5">
+                  <h3 className="font-serif text-base font-normal text-[#2A1816]">Scene Dialogue Sequence</h3>
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
+                    {displayScene.turns.length} Total Cues
+                  </span>
+                </div>
+
+                <div className="space-y-2 max-h-[300px] overflow-y-auto custom-scrollbar pr-1.5">
+                  {displayScene.turns.map((turn: any, index: number) => {
+                    const current = session ? session.current_turn === index : index === 0;
+                    const past = session ? session.current_turn > index : false;
+                    const isHuman = assignments[turn.character] === "human";
+
+                    return (
+                      <div
+                        key={turn.id || index}
+                        className={`w-full text-left rounded-xl border p-3 transition-colors ${
+                          current
+                            ? "border-[#8C241E] bg-[#F5EAE6] shadow-xs"
+                            : past
+                              ? "border-[#DCBAB2]/40 bg-[#FAF2EE]/60 opacity-60"
+                              : "border-[#DCBAB2]/70 bg-[#FAF2EE]"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-2 mb-1">
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-serif font-bold text-xs text-[#2A1816]">
+                              {turn.character}
+                            </span>
+                            <span className={`text-[9px] font-mono font-bold uppercase px-1.5 py-0.2 rounded border ${
+                              isHuman
+                                ? "bg-amber-100 text-amber-950 border-amber-300"
+                                : "bg-[#EEDBD5] text-[#8C241E] border-[#D5AAA2]"
+                            }`}>
+                              {isHuman ? "Actor" : "AI"}
+                            </span>
+                          </div>
+                          <span className="text-[9px] font-mono text-[#8C5A54]">
+                            #{index + 1}
+                          </span>
+                        </div>
+                        <p className="font-serif text-xs text-[#5C3B37] leading-relaxed">
+                          "{turn.text}"
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
           </main>
         </div>
@@ -1163,7 +1233,7 @@ export default function AiRehearsalStudio() {
                     {scene.title}
                   </h2>
                   <p className="text-[11px] font-mono text-[#6E4742]">
-                    {scene.characters.length} Roles • {scene.turns.length} Lines
+                    {scene.characters?.length || 0} Roles • {scene.turns?.length || 0} Lines
                   </p>
                 </div>
                 <button
@@ -1177,7 +1247,7 @@ export default function AiRehearsalStudio() {
               </div>
 
               <div className="space-y-2 max-h-[260px] overflow-y-auto custom-scrollbar pr-1">
-                {scene.characters.map((character: any) => {
+                {(scene.characters || []).map((character: any) => {
                   const isHuman = assignments[character.name] === "human";
                   const currentVoice = voicePreferences[character.name] || "female";
 
