@@ -215,35 +215,35 @@ export default function Plays() {
               {displayedPlays.map((play, idx) => (
                 <div
                   key={play.id || idx}
-                  className="bg-[#FAF2EE] text-[#2A1816] rounded-[2rem] border border-[#DCBAB2] overflow-hidden shadow-md hover:border-[#B32D25]/50 hover:shadow-xl transition-all duration-300 flex flex-col justify-between group"
+                  className="bg-[#2C2A28] text-white rounded-[2rem] border border-[#353535] overflow-hidden shadow-xl hover:border-[#E85F57]/50 hover:shadow-2xl transition-all duration-300 flex flex-col justify-between group"
                 >
                   <div>
                     {/* Visual Card Image Header */}
-                    <div className="relative aspect-[16/9] overflow-hidden bg-[#E8D6CF]">
+                    <div className="relative aspect-[16/9] overflow-hidden bg-[#353535]">
                       {play.image ? (
                         <img
                           src={play.image}
                           alt={play.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 filter brightness-95 contrast-105"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 filter brightness-90 contrast-105"
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-[#EEDBD5] text-[#8C5A54] font-serif italic text-sm">
+                        <div className="w-full h-full flex items-center justify-center bg-[#353535] text-white/50 font-serif italic text-sm">
                           Aayam Repertory
                         </div>
                       )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#2A1816]/80 via-transparent to-transparent" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#2C2A28] via-transparent to-transparent" />
                       
                       <div className="absolute top-4 right-4">
-                        <span className={`inline-flex items-center gap-1 px-3 py-1 text-[9px] font-mono font-bold rounded-full uppercase tracking-wider shadow-sm backdrop-blur-md border ${
+                        <span className={`inline-flex items-center gap-1 px-3 py-1 text-[9px] font-mono font-bold rounded-full uppercase tracking-wider shadow-md backdrop-blur-md border ${
                           !play.is_past
-                            ? "bg-[#FAF2EE]/90 text-emerald-950 border-emerald-700/30"
-                            : "bg-[#FAF2EE]/90 text-[#8C5A54] border-[#D5AAA2]"
+                            ? "bg-[#2C2A28]/90 text-emerald-300 border-emerald-500/40"
+                            : "bg-[#2C2A28]/90 text-white/60 border-white/20"
                         }`}>
                           {!play.is_past ? "Upcoming Premiere" : "Repertory"}
                         </span>
                       </div>
 
-                      <div className="absolute bottom-3 left-5 text-xs font-mono font-bold text-[#FAF2EE] drop-shadow-sm">
+                      <div className="absolute bottom-3 left-5 text-xs font-mono font-bold text-white/60 drop-shadow-sm">
                         0{idx + 1} // {play.genre || "Drama"}
                       </div>
                     </div>
@@ -251,64 +251,64 @@ export default function Plays() {
                     {/* Card Body */}
                     <div className="p-6 sm:p-7 space-y-4">
                       <div className="space-y-1">
-                        <h3 className="font-serif text-2xl font-normal text-[#2A1816] group-hover:text-[#8C241E] transition-colors leading-snug">
+                        <h3 className="font-serif text-2xl font-normal text-[#F7F5F0] group-hover:text-[#E85F57] transition-colors leading-snug">
                           {play.title}
                         </h3>
                         {play.playwright && (
-                          <p className="text-xs text-[#6E4742] font-serif italic">
-                            by <span className="font-normal text-[#2A1816]">{play.playwright}</span>
+                          <p className="text-xs text-white/70 font-serif italic">
+                            by <span className="font-normal text-white">{play.playwright}</span>
                           </p>
                         )}
                       </div>
 
-                      <p className="text-xs text-[#5C3B37] leading-relaxed font-light line-clamp-2">
+                      <p className="text-xs text-white/70 leading-relaxed font-light line-clamp-2">
                         {play.description}
                       </p>
 
-                      <div className="grid grid-cols-2 gap-2 pt-3 border-t border-[#DCBAB2]/60 text-xs font-mono text-[#5C3B37]">
+                      <div className="grid grid-cols-2 gap-2 pt-3 border-t border-white/10 text-xs font-mono text-white/70">
                         <div className="flex items-center gap-1.5 truncate">
-                          <MapPin className="w-3.5 h-3.5 text-[#8C241E] shrink-0" />
+                          <MapPin className="w-3.5 h-3.5 text-[#E85F57] shrink-0" />
                           <span className="truncate">{play.venue || "CLT Main Stage"}</span>
                         </div>
                         <div className="flex items-center gap-1.5 truncate">
-                          <Clock className="w-3.5 h-3.5 text-[#8C241E] shrink-0" />
+                          <Clock className="w-3.5 h-3.5 text-[#E85F57] shrink-0" />
                           <span className="truncate">{play.runtime || "90 Mins"}</span>
                         </div>
                       </div>
 
-                      <div className="bg-[#F5EAE6] p-3.5 rounded-xl border border-[#DEBEB7] text-xs text-[#5C3B37] space-y-1">
-                        <div className="truncate"><strong>Director:</strong> {play.director}</div>
-                        {play.cast && <div className="truncate text-[#6E4742]"><strong>Cast:</strong> {play.cast}</div>}
+                      <div className="bg-[#353535]/50 p-3.5 rounded-xl border border-white/5 text-xs text-white/80 space-y-1">
+                        <div className="truncate"><strong className="text-white">Director:</strong> {play.director}</div>
+                        {play.cast && <div className="truncate text-white/60"><strong>Cast:</strong> {play.cast}</div>}
                       </div>
                     </div>
                   </div>
 
                   {/* Card Actions */}
-                  <div className="p-6 sm:p-7 pt-0 flex items-center justify-between border-t border-[#DCBAB2]/60 text-xs font-mono pt-4">
-                    <span className="text-[#8C241E] font-bold">{play.price || "Free Entry"}</span>
+                  <div className="p-6 sm:p-7 pt-0 flex items-center justify-between border-t border-white/10 text-xs font-mono pt-4">
+                    <span className="text-[#E85F57] font-bold">{play.price || "Free Entry"}</span>
 
                     {!play.is_past ? (
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => handleReservePass(play.title)}
-                          className="px-4 py-2 rounded-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer border border-[#A6352F] shadow-sm flex items-center gap-1"
+                          className="px-4 py-2 rounded-full bg-[#E85F57] hover:bg-[#D94538] text-white text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer shadow-md flex items-center gap-1"
                         >
                           <Ticket className="w-3.5 h-3.5" />
                           <span>Reserve</span>
                         </button>
                         <button
                           onClick={() => handleOpenVolunteer(play)}
-                          className="px-3.5 py-2 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1 transition-all cursor-pointer"
+                          className="px-3.5 py-2 rounded-full border border-white/20 hover:bg-white/10 text-white text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1 transition-all cursor-pointer"
                           title="Volunteer for Backstage Crew"
                         >
-                          <HeartHandshake className="w-3.5 h-3.5 text-[#8C241E]" />
+                          <HeartHandshake className="w-3.5 h-3.5 text-[#E85F57]" />
                           <span>Crew</span>
                         </button>
                       </div>
                     ) : (
                       <Link
                         to="/member-scripts"
-                        className="text-[#8C241E] font-bold hover:underline flex items-center gap-1 uppercase tracking-wider text-xs"
+                        className="text-[#E85F57] font-bold hover:underline flex items-center gap-1 uppercase tracking-wider text-xs"
                       >
                         <FileText className="w-3.5 h-3.5" />
                         <span>Script</span>
