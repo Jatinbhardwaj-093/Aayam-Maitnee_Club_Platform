@@ -223,11 +223,11 @@ export default function AuditionsCasting() {
 
         <div className="flex flex-wrap items-center gap-3 shrink-0">
           <Link
-            to="/member-plays"
+            to="/plays"
             className="px-5 py-2.5 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-2 transition-all shadow-xs"
           >
             <PlayCircle className="w-3.5 h-3.5 text-[#8C241E]" />
-            <span>View Productions</span>
+            <span>Public Repertoire</span>
           </Link>
           <Link
             to="/member-scripts"

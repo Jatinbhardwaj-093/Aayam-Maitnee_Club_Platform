@@ -12,7 +12,6 @@ import {
   Calendar,
   Menu,
   ShieldAlert,
-  PlayCircle,
   FileText,
   Eye,
   EyeOff,
@@ -36,7 +35,6 @@ const navItems: NavItem[] = [
   { label: "Drama Club Home", path: "/", icon: Home, description: "Public landing page" },
   { label: "My Schedule", path: "/schedule", icon: Calendar, description: "Your rehearsals & call attendance" },
   { label: "Auditions & Casting", path: "/auditions", icon: ClipboardList, description: "Apply for play casting" },
-  { label: "Plays & Productions", path: "/member-plays", icon: PlayCircle, description: "Production lineup & scripts" },
   { label: "Script Vault", path: "/member-scripts", icon: FileText, description: "Confidential play scripts" },
   { label: "Rehearsal Studio", path: "/ai-rehearsal", icon: Bot, description: "Interactive voice script rehearsal & memory test" },
 ];
@@ -44,7 +42,6 @@ const navItems: NavItem[] = [
 const maintainerNavItems: NavItem[] = [
   { label: "My Schedule", path: "/schedule", icon: Calendar, description: "Your rehearsals & call attendance" },
   { label: "Production Callboard", path: "/schedule-admin", icon: Calendar, description: "Rehearsal call sheets & attendance roster" },
-  { label: "Plays & Productions", path: "/member-plays", icon: PlayCircle, description: "Production lineup & scripts" },
   { label: "Events Management", path: "/events-admin", icon: Calendar, description: "Proposal curation & sponsor deals" },
   { label: "Auditions & Casting", path: "/auditions-admin", icon: ClipboardList, description: "Role callings & candidate requests" },
   { label: "Members Directory", path: "/directory-admin", icon: Users, description: "Ensemble & crew directory" },
