@@ -50,6 +50,11 @@ export default function ProductionEditModal({
     (production.status || "").toLowerCase() === "concluded"
   );
 
+  const [scriptUrl, setScriptUrl] = useState("");
+  const [scriptText, setScriptText] = useState("");
+  const [scriptAccess, setScriptAccess] = useState("Verified Society Manuscript");
+  const [scriptFileName, setScriptFileName] = useState("");
+
   const [formData, setFormData] = useState({
     title: "",
     playwright: "",
@@ -67,7 +72,9 @@ export default function ProductionEditModal({
     dates: "",
     runtime: "",
     price: "",
-    category: ""
+    category: "",
+    script_url: "",
+    script_text: ""
   });
 
   const [submitting, setSubmitting] = useState(false);
@@ -92,8 +99,12 @@ export default function ProductionEditModal({
         dates: production.dates || "Autumn Season 2026",
         runtime: production.runtime || "110 Mins",
         price: production.price || "Free Society Pass",
-        category: production.category || "Plays"
+        category: production.category || "Plays",
+        script_url: production.script_url || "",
+        script_text: production.script_text || ""
       });
+      setScriptUrl(production.script_url || "");
+      setScriptText(production.script_text || "");
       setErrorMsg(null);
     }
   }, [production, isPast]);
@@ -253,6 +264,55 @@ export default function ProductionEditModal({
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+
+          {/* SCRIPT UPLOAD & PLAYBOOK SECTION (Always Editable for Both Past and Upcoming) */}
+          <div className="p-4 sm:p-5 bg-[#FAF2EE] border border-[#DCBAB2] rounded-2xl space-y-3">
+            <div className="flex items-center justify-between">
+              <label className="font-bold text-[#8C241E] uppercase tracking-wider flex items-center gap-1.5">
+                <FileText className="w-3.5 h-3.5 text-[#8C241E]" />
+                <span>Playbook Script & Document Upload</span>
+              </label>
+              <span className="text-[10px] text-[#8C5A54]">Vault PDF / Fountain / Manuscript</span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <label className="text-[10px] uppercase font-bold text-[#8C5A54] block">Script Document Link / URL</label>
+                <input
+                  type="text"
+                  value={formData.script_url}
+                  onChange={(e) => setFormData({ ...formData, script_url: e.target.value })}
+                  placeholder="https://vault.aayam.iitm.ac.in/scripts/playbook.pdf"
+                  className="w-full bg-[#F5EAE6] border border-[#DCBAB2] rounded-xl px-3.5 py-2 text-xs text-[#2A1816] focus:outline-hidden focus:border-[#8C241E]"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[10px] uppercase font-bold text-[#8C5A54] block">Script Access & Verification</label>
+                <select
+                  value={scriptAccess}
+                  onChange={(e) => setScriptAccess(e.target.value)}
+                  className="w-full bg-[#F5EAE6] border border-[#DCBAB2] rounded-xl px-3.5 py-2 text-xs text-[#2A1816] focus:outline-hidden focus:border-[#8C241E] cursor-pointer"
+                >
+                  <option value="Verified Society Manuscript">Verified Society Manuscript (Official)</option>
+                  <option value="Public Reading Excerpt">Public Reading Excerpt</option>
+                  <option value="Ensemble Cast Only">Ensemble Cast Confidential</option>
+                  <option value="Draft Revision">Draft Revision in Progress</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="space-y-1 pt-1">
+              <label className="text-[10px] uppercase font-bold text-[#8C5A54] block">Script Opening Excerpt / Staging Directions</label>
+              <textarea
+                rows={3}
+                value={formData.script_text}
+                onChange={(e) => setFormData({ ...formData, script_text: e.target.value })}
+                placeholder="[Curtain rises on a bare wooden proscenium. Sutradhar enters with chimta and folk rhythm...]"
+                className="w-full bg-[#F5EAE6] border border-[#DCBAB2] rounded-xl p-3 text-xs text-[#2A1816] focus:outline-hidden focus:border-[#8C241E] leading-relaxed font-mono"
+              />
             </div>
           </div>
 

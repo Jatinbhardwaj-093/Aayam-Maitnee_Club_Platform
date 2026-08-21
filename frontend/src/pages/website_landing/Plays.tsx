@@ -363,60 +363,44 @@ export default function Plays() {
                     </div>
                   </div>
 
-                  {/* Card Actions */}
-                  <div className="p-6 sm:p-7 pt-0 flex items-center justify-between border-t border-white/10 text-xs font-mono pt-4 gap-2 flex-wrap">
-                    <span className="text-[#E85F57] font-bold">{play.price || "Free Entry"}</span>
+                  {/* Card Actions - ALL IN ONE SINGLE LINE WITH NO ICONS */}
+                  <div className="p-4 sm:p-5 pt-0 border-t border-white/10 pt-3.5 flex items-center gap-1.5 w-full flex-nowrap">
+                    <button
+                      onClick={() => handleOpenDetails(play)}
+                      className="flex-1 py-2 px-1 rounded-full border border-white/20 hover:bg-white/10 text-white text-[11px] font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer truncate"
+                      title="View full production dossier"
+                    >
+                      Details
+                    </button>
 
-                    <div className="flex items-center gap-2 flex-wrap">
+                    <button
+                      onClick={() => handleOpenScriptPreview(play)}
+                      className="flex-1 py-2 px-1 rounded-full border border-white/20 hover:bg-white/10 text-[#E85F57] text-[11px] font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer truncate"
+                      title="Preview Script & Playbook"
+                    >
+                      Script
+                    </button>
+
+                    <button
+                      onClick={() => handleOpenEdit(play)}
+                      className="flex-1 py-2 px-1 rounded-full bg-[#E85F57]/20 border border-[#E85F57]/40 hover:bg-[#E85F57]/30 text-white text-[11px] font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer truncate"
+                      title={play.is_past ? "Update archival artwork & upload script" : "Edit full production details"}
+                    >
+                      Edit
+                    </button>
+
+                    {!play.is_past ? (
                       <button
-                        onClick={() => handleOpenDetails(play)}
-                        className="px-3 py-1.5 rounded-full border border-white/20 hover:bg-white/10 text-white text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1 transition-all cursor-pointer"
-                        title="View full production dossier"
+                        onClick={() => handleReservePass(play.title)}
+                        className="flex-1 py-2 px-1 rounded-full bg-[#E85F57] hover:bg-[#D94538] text-white text-[11px] font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer shadow-md truncate"
                       >
-                        <Info className="w-3.5 h-3.5 text-[#E85F57]" />
-                        <span>Details</span>
+                        Reserve
                       </button>
-
-                      <button
-                        onClick={() => handleOpenScriptPreview(play)}
-                        className="px-3 py-1.5 rounded-full border border-white/20 hover:bg-white/10 text-white text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1 transition-all cursor-pointer"
-                        title="Preview Script & Playbook"
-                      >
-                        <FileText className="w-3.5 h-3.5 text-[#E85F57]" />
-                        <span>Script</span>
-                      </button>
-
-                      {isMaintainer && (
-                        <button
-                          onClick={() => handleOpenEdit(play)}
-                          className="px-3 py-1.5 rounded-full bg-[#E85F57]/20 border border-[#E85F57]/40 hover:bg-[#E85F57]/30 text-white text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1 transition-all cursor-pointer"
-                          title={play.is_past ? "Update archival artwork (Metadata locked)" : "Edit full production details"}
-                        >
-                          <Edit3 className="w-3.5 h-3.5 text-[#E85F57]" />
-                          <span>Edit</span>
-                        </button>
-                      )}
-
-                      {!play.is_past && (
-                        <>
-                          <button
-                            onClick={() => handleReservePass(play.title)}
-                            className="px-4 py-1.5 rounded-full bg-[#E85F57] hover:bg-[#D94538] text-white text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer shadow-md flex items-center gap-1"
-                          >
-                            <Ticket className="w-3.5 h-3.5" />
-                            <span>Reserve</span>
-                          </button>
-                          <button
-                            onClick={() => handleOpenVolunteer(play)}
-                            className="px-3 py-1.5 rounded-full border border-white/20 hover:bg-white/10 text-white text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1 transition-all cursor-pointer"
-                            title="Volunteer for Backstage Crew"
-                          >
-                            <HeartHandshake className="w-3.5 h-3.5 text-[#E85F57]" />
-                            <span>Crew</span>
-                          </button>
-                        </>
-                      )}
-                    </div>
+                    ) : (
+                      <span className="flex-1 py-2 px-1 rounded-full bg-white/10 border border-white/10 text-white/60 text-[10px] font-mono font-bold uppercase tracking-wider text-center truncate">
+                        Archived
+                      </span>
+                    )}
                   </div>
                 </div>
               ))}

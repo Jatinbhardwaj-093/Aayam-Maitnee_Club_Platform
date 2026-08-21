@@ -1185,58 +1185,47 @@ export default function EventsManagement() {
                       </div>
                     </div>
 
-                    {/* ACTION BUTTONS */}
-                    <div className="pt-4 border-t border-[#DCBAB2]/60 space-y-2">
-                      {/* Row 1: Auditions, Volunteers, Script */}
-                      <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
-                        <button
-                          onClick={() => setSelectedEventForAuditions(ev)}
-                          className="flex-1 min-w-[100px] px-3 py-2 rounded-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer shadow-xs flex items-center justify-center gap-1.5 border border-[#A6352F]"
-                          title="View open auditions & candidate reels"
-                        >
-                          <ClipboardList className="w-3.5 h-3.5 text-[#FFD0CC]" />
-                          <span className="truncate">Auditions ({eventApps.length})</span>
-                        </button>
+                    {/* ACTION BUTTONS - ALL IN ONE CLEAN SINGLE LINE WITH NO ICONS */}
+                    <div className="pt-3.5 border-t border-[#DCBAB2]/60 flex items-center gap-1.5 w-full flex-nowrap">
+                      <button
+                        onClick={() => setSelectedEventForAuditions(ev)}
+                        className="flex-1 py-2 px-1 rounded-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] text-[10px] font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer shadow-xs border border-[#A6352F] truncate"
+                        title="View open auditions & candidate reels"
+                      >
+                        Auditions ({eventApps.length})
+                      </button>
 
-                        <button
-                          onClick={() => setSelectedEventForVolunteers(ev)}
-                          className="flex-1 min-w-[100px] px-3 py-2 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] hover:text-[#2A1816] text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-xs"
-                          title="View backstage crew applications"
-                        >
-                          <HeartHandshake className="w-3.5 h-3.5 text-[#8C241E]" />
-                          <span className="truncate">Volunteers ({eventVols.length})</span>
-                        </button>
+                      <button
+                        onClick={() => setSelectedEventForVolunteers(ev)}
+                        className="flex-1 py-2 px-1 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] hover:text-[#2A1816] text-[10px] font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer shadow-xs truncate"
+                        title="View backstage crew applications"
+                      >
+                        Crew ({eventVols.length})
+                      </button>
 
-                        <button
-                          onClick={() => handleOpenScriptPreview(ev)}
-                          className="px-3.5 py-2 rounded-full border border-[#D5AAA2] bg-[#F5EAE6] hover:bg-[#EEDBD5] text-[#8C241E] text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-1 transition-all cursor-pointer shadow-xs shrink-0"
-                          title="Preview Society Playbook Script"
-                        >
-                          <FileText className="w-3.5 h-3.5 text-[#8C241E]" />
-                          <span>Script</span>
-                        </button>
-                      </div>
+                      <button
+                        onClick={() => handleOpenScriptPreview(ev)}
+                        className="flex-1 py-2 px-1 rounded-full border border-[#D5AAA2] bg-[#F5EAE6] hover:bg-[#EEDBD5] text-[#8C241E] text-[10px] font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer shadow-xs truncate"
+                        title="Preview Society Playbook Script"
+                      >
+                        Script
+                      </button>
 
-                      {/* Row 2: Full Dossier Details & Maintainer Edit */}
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => handleOpenDetails(ev)}
-                          className="flex-1 px-3 py-1.5 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] hover:text-[#2A1816] text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-xs"
-                          title="View detailed production dossier & cast roster"
-                        >
-                          <Info className="w-3.5 h-3.5 text-[#8C241E]" />
-                          <span>Full Details</span>
-                        </button>
+                      <button
+                        onClick={() => handleOpenDetails(ev)}
+                        className="flex-1 py-2 px-1 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] hover:text-[#2A1816] text-[10px] font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer shadow-xs truncate"
+                        title="View detailed production dossier"
+                      >
+                        Details
+                      </button>
 
-                        <button
-                          onClick={() => handleOpenEdit(ev)}
-                          className="flex-1 px-3 py-1.5 rounded-full border border-[#D5AAA2] bg-[#EEDBD5] hover:bg-[#E3CEC6] text-[#2A1816] text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-xs"
-                          title="Edit upcoming production metadata & details"
-                        >
-                          <Edit3 className="w-3.5 h-3.5 text-[#8C241E]" />
-                          <span>Edit Event</span>
-                        </button>
-                      </div>
+                      <button
+                        onClick={() => handleOpenEdit(ev)}
+                        className="flex-1 py-2 px-1 rounded-full border border-[#D5AAA2] bg-[#EEDBD5] hover:bg-[#E3CEC6] text-[#2A1816] hover:text-[#8C241E] text-[10px] font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer shadow-xs truncate"
+                        title="Edit upcoming production metadata & details"
+                      >
+                        Edit
+                      </button>
                     </div>
                   </div>
                 );
