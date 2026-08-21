@@ -508,11 +508,11 @@ export default function AuditionsCasting() {
             const hasApplied = applications.some(a => String(a.position_id) === String(pos.id) || a.role_name === (pos.role_name || pos.title));
             
             const prodImg = (pos.production_name || "").toLowerCase().includes("hayavadana")
-              ? "/aayam_assets/tamashbin_user_1.jpg"
+              ? "/aayam_assets/hayavadana.jpg"
               : (pos.production_name || "").toLowerCase().includes("ashadh")
-              ? "/aayam_assets/kky_user_5.jpg"
+              ? "/aayam_assets/ashadh_ka_ek_din.jpg"
               : (pos.production_name || "").toLowerCase().includes("charandas")
-              ? "/aayam_assets/dddj_user_1.jpg"
+              ? "/aayam_assets/charandas_chor.jpg"
               : "/aayam_assets/samatvam_user_1.jpg";
 
             return (
