@@ -19,10 +19,9 @@ import {
 import ScriptPreviewModal from "@/components/ScriptPreviewModal";
 import ProductionDetailModal from "@/components/ProductionDetailModal";
 import type { ProductionDetailData } from "@/components/ProductionDetailModal";
-import ProductionEditModal from "@/components/ProductionEditModal";
 import { getPlaybookForTitle } from "@/data/playbooksData";
 import type { Playbook } from "@/data/playbooksData";
-import { Info, Edit3 } from "lucide-react";
+import { Info } from "lucide-react";
 
 interface Play {
   id: number;
@@ -61,9 +60,8 @@ export default function MemberPlays() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"upcoming" | "past">("upcoming");
 
-  // Production Detail & Edit Modal States
+  // Production Detail Modal State
   const [selectedDetailPlay, setSelectedDetailPlay] = useState<ProductionDetailData | null>(null);
-  const [selectedEditPlay, setSelectedEditPlay] = useState<ProductionDetailData | null>(null);
 
   // Volunteer Modal State
   const [volunteerOpen, setVolunteerOpen] = useState(false);
@@ -109,34 +107,6 @@ export default function MemberPlays() {
       price: play.price,
       category: "Stage Play"
     });
-  };
-
-  const handleOpenEdit = (play: Play) => {
-    setSelectedEditPlay({
-      id: play.id,
-      title: play.title,
-      playwright: play.playwright,
-      director: play.director,
-      genre: play.genre,
-      language: play.language,
-      status: play.status,
-      is_past: play.is_past,
-      tagline: play.tagline,
-      acts: play.acts,
-      description: play.description,
-      cast: play.cast,
-      season: play.season,
-      image: play.image,
-      venue: play.venue,
-      dates: play.dates,
-      runtime: play.runtime,
-      price: play.price,
-      category: "Stage Play"
-    });
-  };
-
-  const handlePlayEditSuccess = (updated: ProductionDetailData) => {
-    setPlays(prev => prev.map(p => p.id === updated.id ? { ...p, ...updated } : p));
   };
 
   const fetchPlays = () => {
@@ -568,14 +538,6 @@ export default function MemberPlays() {
           setPreviewScript(pb);
           setScriptModalOpen(true);
         }}
-      />
-
-      {/* PRODUCTION MAINTAINER EDIT MODAL (PAST IMAGE LOCK RULE) */}
-      <ProductionEditModal
-        open={Boolean(selectedEditPlay)}
-        onClose={() => setSelectedEditPlay(null)}
-        production={selectedEditPlay}
-        onSuccess={handlePlayEditSuccess}
       />
     </div>
   );
