@@ -630,329 +630,327 @@ export default function AiRehearsalStudio() {
   // ==========================================
   if (((scriptId && activeScript) || session) && displayScene) {
     return (
-      <div className="min-h-screen bg-[#E7DDD3] text-[#5C3B37] pb-16">
-        <div className="max-w-5xl mx-auto px-4 md:px-6 py-6 space-y-5">
+      <div className="space-y-6 w-full max-w-5xl mx-auto pb-20 font-sans text-[#5C3B37]">
+        
+        <header className="bg-[#F2E5E0] border border-[#DCBAB2] rounded-2xl px-5 py-4 shadow-xs w-full flex items-center gap-4">
+          <button
+            onClick={returnToStudio}
+            className="w-9 h-9 rounded-xl border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] hover:text-[#2A1816] flex items-center justify-center transition-colors cursor-pointer shrink-0"
+            title="Return to Rehearsal Library"
+          >
+            <ArrowLeft className="w-4 h-4" />
+          </button>
+          <div className="min-w-0">
+            <span className="block text-[9px] font-mono uppercase font-bold tracking-widest text-[#8C5A54]">Rehearsal</span>
+            <h1 className="font-serif text-xl md:text-2xl font-normal text-[#2A1816] tracking-tight truncate">
+              {currentTitle}
+            </h1>
+          </div>
+        </header>
+
+        <div className="grid grid-cols-1 lg:grid-cols-[280px_minmax(0,1fr)] gap-5 w-full items-start">
           
-          <header className="bg-[#F2E5E0] border border-[#DCBAB2] rounded-2xl px-5 py-4 shadow-xs w-full flex items-center gap-4">
-            <button
-              onClick={returnToStudio}
-              className="w-9 h-9 rounded-xl border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] hover:text-[#2A1816] flex items-center justify-center transition-colors cursor-pointer shrink-0"
-              title="Return to Rehearsal Library"
-            >
-              <ArrowLeft className="w-4 h-4" />
-            </button>
-            <div className="min-w-0">
-              <span className="block text-[9px] font-mono uppercase font-bold tracking-widest text-[#8C5A54]">Rehearsal</span>
-              <h1 className="font-serif text-xl md:text-2xl font-normal text-[#2A1816] tracking-tight truncate">
-                {currentTitle}
-              </h1>
-            </div>
-          </header>
-
-          <div className="grid grid-cols-1 lg:grid-cols-[280px_minmax(0,1fr)] gap-5 w-full items-start">
+          {/* LEFT COLUMN: DIRECTOR'S CONSOLE & ROSTER */}
+          <aside className="space-y-4">
             
-            {/* LEFT COLUMN: DIRECTOR'S CONSOLE & ROSTER */}
-            <aside className="space-y-4">
-              
-              {/* Character Cast & Role Toggle */}
-              <section className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-2xl p-4 space-y-3 shadow-xs">
-                <div className="flex items-center justify-between border-b border-[#DCBAB2]/70 pb-3">
-                  <h2 className="font-serif text-lg font-normal text-[#2A1816]">Cast</h2>
-                  <span className="text-[10px] font-mono font-bold uppercase text-[#8C5A54] tracking-wider">
-                    {displayScene.characters.length} Roles
-                  </span>
-                </div>
-
-                <div className="space-y-2">
-                  {displayScene.characters.map((character: any) => {
-                    const isHuman = assignments[character.name] === "human";
-                    const isAi = assignments[character.name] === "ai";
-                    const currentVoice = voicePreferences[character.name] || "female";
-                    const isTurnActive = activeTurn?.character === character.name;
-
-                    return (
-                      <div
-                        key={character.name}
-                        className={`p-3 rounded-xl border transition-colors space-y-2 ${
-                          isTurnActive
-                            ? "bg-[#F5EAE6] border-[#8C241E]"
-                            : "bg-[#FAF2EE] border-[#DCBAB2]/80"
-                        }`}
-                      >
-                        <div className="flex items-center justify-between gap-2">
-                          <p className="text-xs font-serif font-bold text-[#2A1816] truncate">
-                            {character.name}
-                          </p>
-                          {isTurnActive && (
-                            <span className="text-[9px] font-mono uppercase font-bold text-[#8C241E] bg-[#EEDBD5] px-1.5 py-0.5 rounded border border-[#D5AAA2]">
-                              Speaking
-                            </span>
-                          )}
-                        </div>
-
-                        {/* Segmented control */}
-                        <div className="grid grid-cols-2 gap-1 p-0.5 bg-[#E8D6CF]/70 rounded-lg border border-[#D5AAA2]/60">
-                          <button
-                            type="button"
-                            disabled={!!session && session.scene_status === "active"}
-                            onClick={() => setAssignments({ ...assignments, [character.name]: "human" })}
-                            className={`py-1 px-1.5 rounded-md text-[10px] font-mono font-bold uppercase tracking-wider transition-colors cursor-pointer ${
-                              isHuman
-                                ? "bg-[#8C241E] text-[#FDF8F7] shadow-xs"
-                                : "text-[#5C3B37] hover:text-[#2A1816]"
-                            }`}
-                          >
-                            Actor
-                          </button>
-                          <button
-                            type="button"
-                            disabled={!!session && session.scene_status === "active"}
-                            onClick={() => setAssignments({ ...assignments, [character.name]: "ai" })}
-                            className={`py-1 px-1.5 rounded-md text-[10px] font-mono font-bold uppercase tracking-wider transition-colors cursor-pointer ${
-                              isAi
-                                ? "bg-[#8C241E] text-[#FDF8F7] shadow-xs"
-                                : "text-[#5C3B37] hover:text-[#2A1816]"
-                            }`}
-                          >
-                            AI
-                          </button>
-                        </div>
-
-                        {/* Voice Voice Toggle if AI */}
-                        {isAi && (
-                          <div className="grid grid-cols-2 gap-1 p-0.5 bg-[#FAF2EE] rounded-lg border border-[#DCBAB2]/80">
-                            <button
-                              type="button"
-                              disabled={!!session && session.scene_status === "active"}
-                              onClick={() => setVoicePreferences({ ...voicePreferences, [character.name]: "female" })}
-                              className={`py-0.5 px-1.5 rounded text-[9px] font-mono font-bold uppercase tracking-wider transition-colors cursor-pointer ${
-                                currentVoice === "female"
-                                  ? "bg-[#5C3B37] text-[#FAF2EE]"
-                                  : "text-[#8C5A54] hover:text-[#2A1816]"
-                              }`}
-                            >
-                              Female
-                            </button>
-                            <button
-                              type="button"
-                              disabled={!!session && session.scene_status === "active"}
-                              onClick={() => setVoicePreferences({ ...voicePreferences, [character.name]: "male" })}
-                              className={`py-0.5 px-1.5 rounded text-[9px] font-mono font-bold uppercase tracking-wider transition-colors cursor-pointer ${
-                                currentVoice === "male"
-                                  ? "bg-[#5C3B37] text-[#FAF2EE]"
-                                  : "text-[#8C5A54] hover:text-[#2A1816]"
-                              }`}
-                            >
-                              Male
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </section>
-
-              {/* Stage Progress & Control Card */}
-              <section className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-2xl p-4 space-y-4 shadow-xs">
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between text-xs font-mono text-[#8C5A54]">
-                    <span className="uppercase tracking-wider font-bold">Progress</span>
-                    <span className="font-bold text-[#2A1816]">{progressPercent}%</span>
-                  </div>
-                  
-                  {/* Progress Bar */}
-                  <div className="h-1.5 w-full rounded-full bg-[#EEDBD5] overflow-hidden border border-[#D5AAA2]/60">
-                    <div
-                      className="h-full bg-[#8C241E] transition-all duration-300 rounded-full"
-                      style={{ width: `${progressPercent}%` }}
-                    />
-                  </div>
-
-                  <div className="flex items-center justify-between text-[10px] font-mono text-[#6E4742] pt-1">
-                    <span>
-                      {session?.scene?.turns?.length ? `Line ${session.current_turn + 1} of ${session.scene.turns.length}` : "Ready"}
-                    </span>
-                    <span>{elapsedMins}m elapsed</span>
-                  </div>
-                </div>
-
-                {/* Primary Session Controls */}
-                <div className="space-y-2 pt-1 border-t border-[#DCBAB2]/70">
-                  {!session || session.scene_status !== "active" ? (
-                    <button
-                      onClick={startSession}
-                      className="w-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] py-2.5 px-4 rounded-xl font-mono text-xs font-bold uppercase tracking-widest border border-[#A6352F] shadow-sm flex items-center justify-center gap-2 transition-colors cursor-pointer"
-                    >
-                      <Play className="w-3.5 h-3.5 fill-current text-[#FFD0CC]" />
-                      <span>Start Rehearsal</span>
-                    </button>
-                  ) : (
-                    <button
-                      onClick={stopSession}
-                      className="w-full bg-rose-900 hover:bg-rose-950 text-[#FDF8F7] py-2.5 px-4 rounded-xl font-mono text-xs font-bold uppercase tracking-widest border border-rose-950 shadow-sm flex items-center justify-center gap-2 transition-colors cursor-pointer"
-                    >
-                      <Square className="w-3.5 h-3.5 fill-current" />
-                      <span>Pause Rehearsal</span>
-                    </button>
-                  )}
-
-                  <button
-                    onClick={() => {
-                      setSession(null);
-                      if (activeScript) parseScript(activeScript);
-                      else parseScript();
-                    }}
-                    className="w-full bg-[#FAF2EE] hover:bg-[#EEDBD5] border border-[#D5AAA2] text-[#5C3B37] hover:text-[#2A1816] py-2 px-3 rounded-xl font-mono text-[10px] font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
-                  >
-                    <RotateCcw className="w-3 h-3 text-[#8C241E]" />
-                    <span>Reset Setup</span>
-                  </button>
-                </div>
-
-                {/* Telemetry Status Bar */}
-                <div className="p-2.5 rounded-xl bg-[#F5EAE6] border border-[#DCBAB2] flex items-center justify-between text-[11px] font-mono">
-                  <span className="text-[#8C5A54] uppercase tracking-wider">Audio:</span>
-                  <span className="text-[#2A1816] font-bold flex items-center gap-1.5 truncate">
-                    <Radio className="w-3 h-3 text-[#8C241E] animate-pulse shrink-0" />
-                    <span className="truncate">{audioStatus}</span>
-                  </span>
-                </div>
-
-                {error && (
-                  <div className="bg-rose-100 border border-rose-300 text-rose-900 rounded-xl p-3 text-[11px] font-mono flex items-start gap-2">
-                    <AlertCircle className="w-3.5 h-3.5 text-rose-700 shrink-0 mt-0.5" />
-                    <span>{error}</span>
-                  </div>
-                )}
-              </section>
-            </aside>
-
-            {/* RIGHT COLUMN: PROSCENIUM STAGE & TELEPROMPTER */}
-            <main className="space-y-4">
-              
-              {/* MAIN TELEPROMPTER SCREEN */}
-              <div className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-2xl p-6 md:p-7 shadow-sm space-y-5 relative">
-                
-                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#DCBAB2]/70 pb-3">
-                  <div className="space-y-0.5">
-                    <span className="text-[10px] font-mono text-[#8C5A54] uppercase tracking-wider font-bold">
-                      Current Speaker
-                    </span>
-                    <h2 className="text-xl md:text-2xl font-serif text-[#2A1816] font-normal">
-                      {activeTurn?.character || "Awaiting Start"}
-                    </h2>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    {session?.status === "HUMAN_TURN" && (
-                      <span className="inline-flex items-center gap-1.5 text-amber-950 bg-amber-100 border border-amber-300 rounded-full px-3 py-1 text-[11px] font-mono font-bold uppercase tracking-wider">
-                        <Mic className="w-3 h-3 text-amber-900 animate-bounce" />
-                        <span>{listening ? "Speaking" : "Listening"}</span>
-                      </span>
-                    )}
-
-                    {session?.status === "PLAYING_AI_AUDIO" && (
-                      <span className="inline-flex items-center gap-1.5 text-[#FDF8F7] bg-[#8C241E] border border-[#A6352F] rounded-full px-3 py-1 text-[11px] font-mono font-bold uppercase tracking-wider">
-                        <Volume2 className="w-3 h-3 text-[#FFD0CC] animate-pulse" />
-                        <span>AI Speaking</span>
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                {/* SPOKEN SCRIPT TELEPROMPTER DISPLAY */}
-                {activeTurn ? (
-                  <div className="space-y-5">
-                    
-                    <div className="py-6 md:py-8 min-h-[150px] flex items-center justify-center text-center">
-                      <div className="font-serif text-2xl sm:text-3xl leading-relaxed text-[#2A1816] max-w-3xl mx-auto">
-                        {activeTurn.words.map((word: string, index: number) => {
-                          const isHuman = session.speaker_type === "human";
-                          const activeIndex = isHuman ? humanWordIndex : aiWordIndex;
-                          const spoken = isHuman ? spokenIndices.includes(index) : index < aiWordIndex;
-                          const active = index === activeIndex;
-
-                          return (
-                            <span
-                              key={`${word}-${index}`}
-                              className={`inline-block mx-0.5 transition-colors duration-150 ${
-                                active
-                                  ? "text-[#8C241E] font-bold underline decoration-2 underline-offset-4"
-                                  : spoken
-                                    ? "text-[#8C241E] font-semibold underline decoration-[#8C241E]/40"
-                                    : "text-[#2A1816]/80 font-normal"
-                              }`}
-                            >
-                              {word}
-                            </span>
-                          );
-                        })}
-                      </div>
-                    </div>
-
-                    {session.speaker_type === "human" && (
-                      <div className="border-t border-[#DCBAB2]/70 pt-4 space-y-3">
-                        <div className="flex items-center justify-between gap-3">
-                          <p className="text-xs font-mono font-bold uppercase tracking-wider text-amber-950 flex items-center gap-1.5">
-                            <Radio className="w-3.5 h-3.5 text-amber-900" />
-                            <span>Microphone</span>
-                          </p>
-                          {!speechSupported && (
-                            <span className="text-[10px] font-mono font-bold uppercase text-rose-800 bg-rose-100 px-2.5 py-0.5 rounded-full border border-rose-300">
-                              Voice API Unavailable
-                            </span>
-                          )}
-                        </div>
-
-                        <p className="text-sm font-serif italic text-[#5C3B37] bg-[#F5EAE6] px-3.5 py-3 rounded-xl min-h-[44px] flex items-center">
-                          "{transcript || "Speak your line clearly into the microphone..."}"
-                        </p>
-
-                        <div className="flex flex-wrap items-center gap-2.5 pt-1">
-                          <button
-                            onClick={startListening}
-                            className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-4 py-2 rounded-full text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer shadow-xs border border-[#A6352F]"
-                          >
-                            <Mic className="w-3.5 h-3.5 text-[#FFD0CC]" />
-                            <span>Listen again</span>
-                          </button>
-
-                          <button
-                            onClick={() => sendTranscript(activeTurn.text, true, 1200)}
-                            className="px-4 py-2 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] hover:text-[#2A1816] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
-                            title="Confirm line read manually if speech recognition struggles"
-                          >
-                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-800" />
-                            <span>Advance cue</span>
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div className="text-center py-16 space-y-4">
-                    <div className="w-16 h-16 rounded-full bg-emerald-100 border border-emerald-300 flex items-center justify-center mx-auto text-emerald-800 shadow-sm">
-                      <CheckCircle2 className="w-8 h-8" />
-                    </div>
-                    <div className="space-y-1">
-                      <h2 className="font-serif text-3xl font-normal text-[#2A1816]">Scene Successfully Concluded</h2>
-                      <p className="text-xs sm:text-sm font-mono text-[#6E4742]">
-                        Rehearsal session duration: ~{elapsedMins} minute(s). All cues completed!
-                      </p>
-                    </div>
-                    <button
-                      onClick={returnToStudio}
-                      className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-6 py-3 rounded-full font-mono text-xs font-bold uppercase tracking-wider inline-flex items-center gap-2 border border-[#A6352F] cursor-pointer shadow-md shadow-[#8C241E]/20"
-                    >
-                      <BookOpen className="w-4 h-4 text-[#FFD0CC]" /> Return to Rehearsal Library
-                    </button>
-                  </div>
-                )}
+            {/* Character Cast & Role Toggle */}
+            <section className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-2xl p-4 space-y-3 shadow-xs">
+              <div className="flex items-center justify-between border-b border-[#DCBAB2]/70 pb-3">
+                <h2 className="font-serif text-lg font-normal text-[#2A1816]">Cast</h2>
+                <span className="text-[10px] font-mono font-bold uppercase text-[#8C5A54] tracking-wider">
+                  {displayScene.characters.length} Roles
+                </span>
               </div>
 
-            </main>
-          </div>
+              <div className="space-y-2">
+                {displayScene.characters.map((character: any) => {
+                  const isHuman = assignments[character.name] === "human";
+                  const isAi = assignments[character.name] === "ai";
+                  const currentVoice = voicePreferences[character.name] || "female";
+                  const isTurnActive = activeTurn?.character === character.name;
+
+                  return (
+                    <div
+                      key={character.name}
+                      className={`p-3 rounded-xl border transition-colors space-y-2 ${
+                        isTurnActive
+                          ? "bg-[#F5EAE6] border-[#8C241E]"
+                          : "bg-[#FAF2EE] border-[#DCBAB2]/80"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="text-xs font-serif font-bold text-[#2A1816] truncate">
+                          {character.name}
+                        </p>
+                        {isTurnActive && (
+                          <span className="text-[9px] font-mono uppercase font-bold text-[#8C241E] bg-[#EEDBD5] px-1.5 py-0.5 rounded border border-[#D5AAA2]">
+                            Speaking
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Segmented control */}
+                      <div className="grid grid-cols-2 gap-1 p-0.5 bg-[#E8D6CF]/70 rounded-lg border border-[#D5AAA2]/60">
+                        <button
+                          type="button"
+                          disabled={!!session && session.scene_status === "active"}
+                          onClick={() => setAssignments({ ...assignments, [character.name]: "human" })}
+                          className={`py-1 px-1.5 rounded-md text-[10px] font-mono font-bold uppercase tracking-wider transition-colors cursor-pointer ${
+                            isHuman
+                              ? "bg-[#8C241E] text-[#FDF8F7] shadow-xs"
+                              : "text-[#5C3B37] hover:text-[#2A1816]"
+                          }`}
+                        >
+                          Actor
+                        </button>
+                        <button
+                          type="button"
+                          disabled={!!session && session.scene_status === "active"}
+                          onClick={() => setAssignments({ ...assignments, [character.name]: "ai" })}
+                          className={`py-1 px-1.5 rounded-md text-[10px] font-mono font-bold uppercase tracking-wider transition-colors cursor-pointer ${
+                            isAi
+                              ? "bg-[#8C241E] text-[#FDF8F7] shadow-xs"
+                              : "text-[#5C3B37] hover:text-[#2A1816]"
+                          }`}
+                        >
+                          AI
+                        </button>
+                      </div>
+
+                      {/* Voice Voice Toggle if AI */}
+                      {isAi && (
+                        <div className="grid grid-cols-2 gap-1 p-0.5 bg-[#FAF2EE] rounded-lg border border-[#DCBAB2]/80">
+                          <button
+                            type="button"
+                            disabled={!!session && session.scene_status === "active"}
+                            onClick={() => setVoicePreferences({ ...voicePreferences, [character.name]: "female" })}
+                            className={`py-0.5 px-1.5 rounded text-[9px] font-mono font-bold uppercase tracking-wider transition-colors cursor-pointer ${
+                              currentVoice === "female"
+                                ? "bg-[#5C3B37] text-[#FAF2EE]"
+                                : "text-[#8C5A54] hover:text-[#2A1816]"
+                            }`}
+                          >
+                            Female
+                          </button>
+                          <button
+                            type="button"
+                            disabled={!!session && session.scene_status === "active"}
+                            onClick={() => setVoicePreferences({ ...voicePreferences, [character.name]: "male" })}
+                            className={`py-0.5 px-1.5 rounded text-[9px] font-mono font-bold uppercase tracking-wider transition-colors cursor-pointer ${
+                              currentVoice === "male"
+                                ? "bg-[#5C3B37] text-[#FAF2EE]"
+                                : "text-[#8C5A54] hover:text-[#2A1816]"
+                            }`}
+                          >
+                            Male
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+
+            {/* Stage Progress & Control Card */}
+            <section className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-2xl p-4 space-y-4 shadow-xs">
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between text-xs font-mono text-[#8C5A54]">
+                  <span className="uppercase tracking-wider font-bold">Progress</span>
+                  <span className="font-bold text-[#2A1816]">{progressPercent}%</span>
+                </div>
+                
+                {/* Progress Bar */}
+                <div className="h-1.5 w-full rounded-full bg-[#EEDBD5] overflow-hidden border border-[#D5AAA2]/60">
+                  <div
+                    className="h-full bg-[#8C241E] transition-all duration-300 rounded-full"
+                    style={{ width: `${progressPercent}%` }}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between text-[10px] font-mono text-[#6E4742] pt-1">
+                  <span>
+                    {session?.scene?.turns?.length ? `Line ${session.current_turn + 1} of ${session.scene.turns.length}` : "Ready"}
+                  </span>
+                  <span>{elapsedMins}m elapsed</span>
+                </div>
+              </div>
+
+              {/* Primary Session Controls */}
+              <div className="space-y-2 pt-1 border-t border-[#DCBAB2]/70">
+                {!session || session.scene_status !== "active" ? (
+                  <button
+                    onClick={startSession}
+                    className="w-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] py-2.5 px-4 rounded-xl font-mono text-xs font-bold uppercase tracking-widest border border-[#A6352F] shadow-sm flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                  >
+                    <Play className="w-3.5 h-3.5 fill-current text-[#FFD0CC]" />
+                    <span>Start Rehearsal</span>
+                  </button>
+                ) : (
+                  <button
+                    onClick={stopSession}
+                    className="w-full bg-rose-900 hover:bg-rose-950 text-[#FDF8F7] py-2.5 px-4 rounded-xl font-mono text-xs font-bold uppercase tracking-widest border border-rose-950 shadow-sm flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                  >
+                    <Square className="w-3.5 h-3.5 fill-current" />
+                    <span>Pause Rehearsal</span>
+                  </button>
+                )}
+
+                <button
+                  onClick={() => {
+                    setSession(null);
+                    if (activeScript) parseScript(activeScript);
+                    else parseScript();
+                  }}
+                  className="w-full bg-[#FAF2EE] hover:bg-[#EEDBD5] border border-[#D5AAA2] text-[#5C3B37] hover:text-[#2A1816] py-2 px-3 rounded-xl font-mono text-[10px] font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                >
+                  <RotateCcw className="w-3 h-3 text-[#8C241E]" />
+                  <span>Reset Setup</span>
+                </button>
+              </div>
+
+              {/* Telemetry Status Bar */}
+              <div className="p-2.5 rounded-xl bg-[#F5EAE6] border border-[#DCBAB2] flex items-center justify-between text-[11px] font-mono">
+                <span className="text-[#8C5A54] uppercase tracking-wider">Audio:</span>
+                <span className="text-[#2A1816] font-bold flex items-center gap-1.5 truncate">
+                  <Radio className="w-3 h-3 text-[#8C241E] animate-pulse shrink-0" />
+                  <span className="truncate">{audioStatus}</span>
+                </span>
+              </div>
+
+              {error && (
+                <div className="bg-rose-100 border border-rose-300 text-rose-900 rounded-xl p-3 text-[11px] font-mono flex items-start gap-2">
+                  <AlertCircle className="w-3.5 h-3.5 text-rose-700 shrink-0 mt-0.5" />
+                  <span>{error}</span>
+                </div>
+              )}
+            </section>
+          </aside>
+
+          {/* RIGHT COLUMN: PROSCENIUM STAGE & TELEPROMPTER */}
+          <main className="space-y-4">
+            
+            {/* MAIN TELEPROMPTER SCREEN */}
+            <div className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-2xl p-6 md:p-7 shadow-sm space-y-5 relative">
+              
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#DCBAB2]/70 pb-3">
+                <div className="space-y-0.5">
+                  <span className="text-[10px] font-mono text-[#8C5A54] uppercase tracking-wider font-bold">
+                    Current Speaker
+                  </span>
+                  <h2 className="text-xl md:text-2xl font-serif text-[#2A1816] font-normal">
+                    {activeTurn?.character || "Awaiting Start"}
+                  </h2>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  {session?.status === "HUMAN_TURN" && (
+                    <span className="inline-flex items-center gap-1.5 text-amber-950 bg-amber-100 border border-amber-300 rounded-full px-3 py-1 text-[11px] font-mono font-bold uppercase tracking-wider">
+                      <Mic className="w-3 h-3 text-amber-900 animate-bounce" />
+                      <span>{listening ? "Speaking" : "Listening"}</span>
+                    </span>
+                  )}
+
+                  {session?.status === "PLAYING_AI_AUDIO" && (
+                    <span className="inline-flex items-center gap-1.5 text-[#FDF8F7] bg-[#8C241E] border border-[#A6352F] rounded-full px-3 py-1 text-[11px] font-mono font-bold uppercase tracking-wider">
+                      <Volume2 className="w-3 h-3 text-[#FFD0CC] animate-pulse" />
+                      <span>AI Speaking</span>
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* SPOKEN SCRIPT TELEPROMPTER DISPLAY */}
+              {activeTurn ? (
+                <div className="space-y-5">
+                  
+                  <div className="py-6 md:py-8 min-h-[150px] flex items-center justify-center text-center">
+                    <div className="font-serif text-2xl sm:text-3xl leading-relaxed text-[#2A1816] max-w-3xl mx-auto">
+                      {activeTurn.words.map((word: string, index: number) => {
+                        const isHuman = session.speaker_type === "human";
+                        const activeIndex = isHuman ? humanWordIndex : aiWordIndex;
+                        const spoken = isHuman ? spokenIndices.includes(index) : index < aiWordIndex;
+                        const active = index === activeIndex;
+
+                        return (
+                          <span
+                            key={`${word}-${index}`}
+                            className={`inline-block mx-0.5 transition-colors duration-150 ${
+                              active
+                                ? "text-[#8C241E] font-bold underline decoration-2 underline-offset-4"
+                                : spoken
+                                  ? "text-[#8C241E] font-semibold underline decoration-[#8C241E]/40"
+                                  : "text-[#2A1816]/80 font-normal"
+                            }`}
+                          >
+                            {word}
+                          </span>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {session.speaker_type === "human" && (
+                    <div className="border-t border-[#DCBAB2]/70 pt-4 space-y-3">
+                      <div className="flex items-center justify-between gap-3">
+                        <p className="text-xs font-mono font-bold uppercase tracking-wider text-amber-950 flex items-center gap-1.5">
+                          <Radio className="w-3.5 h-3.5 text-amber-900" />
+                          <span>Microphone</span>
+                        </p>
+                        {!speechSupported && (
+                          <span className="text-[10px] font-mono font-bold uppercase text-rose-800 bg-rose-100 px-2.5 py-0.5 rounded-full border border-rose-300">
+                            Voice API Unavailable
+                          </span>
+                        )}
+                      </div>
+
+                      <p className="text-sm font-serif italic text-[#5C3B37] bg-[#F5EAE6] px-3.5 py-3 rounded-xl min-h-[44px] flex items-center">
+                        "{transcript || "Speak your line clearly into the microphone..."}"
+                      </p>
+
+                      <div className="flex flex-wrap items-center gap-2.5 pt-1">
+                        <button
+                          onClick={startListening}
+                          className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-4 py-2 rounded-full text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer shadow-xs border border-[#A6352F]"
+                        >
+                          <Mic className="w-3.5 h-3.5 text-[#FFD0CC]" />
+                          <span>Listen again</span>
+                        </button>
+
+                        <button
+                          onClick={() => sendTranscript(activeTurn.text, true, 1200)}
+                          className="px-4 py-2 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] hover:text-[#2A1816] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
+                          title="Confirm line read manually if speech recognition struggles"
+                        >
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-800" />
+                          <span>Advance cue</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="text-center py-16 space-y-4">
+                  <div className="w-16 h-16 rounded-full bg-emerald-100 border border-emerald-300 flex items-center justify-center mx-auto text-emerald-800 shadow-sm">
+                    <CheckCircle2 className="w-8 h-8" />
+                  </div>
+                  <div className="space-y-1">
+                    <h2 className="font-serif text-3xl font-normal text-[#2A1816]">Scene Successfully Concluded</h2>
+                    <p className="text-xs sm:text-sm font-mono text-[#6E4742]">
+                      Rehearsal session duration: ~{elapsedMins} minute(s). All cues completed!
+                    </p>
+                  </div>
+                  <button
+                    onClick={returnToStudio}
+                    className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-6 py-3 rounded-full font-mono text-xs font-bold uppercase tracking-wider inline-flex items-center gap-2 border border-[#A6352F] cursor-pointer shadow-md shadow-[#8C241E]/20"
+                  >
+                    <BookOpen className="w-4 h-4 text-[#FFD0CC]" /> Return to Rehearsal Library
+                  </button>
+                </div>
+              )}
+            </div>
+
+          </main>
         </div>
       </div>
     );
@@ -962,369 +960,367 @@ export default function AiRehearsalStudio() {
   // VIEW 2: REHEARSAL STUDIO CATALOG & SETUP
   // ==========================================
   return (
-    <div className="min-h-screen bg-[#E7DDD3] text-[#5C3B37] pb-16">
-      <div className="max-w-5xl mx-auto px-4 md:px-6 py-6 space-y-5">
-        
-        {/* THEATRICAL STUDIO BANNER */}
-        <section className="bg-[#F2E5E0] border border-[#DCBAB2] rounded-2xl p-6 sm:p-7 shadow-xs flex flex-col md:flex-row justify-between items-start md:items-center gap-5 w-full">
-          <div className="space-y-1 max-w-xl">
-            <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#8C5A54]">
-              Studio
+    <div className="space-y-5 w-full max-w-5xl mx-auto pb-20 font-sans text-[#5C3B37]">
+      
+      {/* THEATRICAL STUDIO BANNER */}
+      <section className="bg-[#F2E5E0] border border-[#DCBAB2] rounded-2xl p-6 sm:p-7 shadow-xs flex flex-col md:flex-row justify-between items-start md:items-center gap-5 w-full">
+        <div className="space-y-1 max-w-xl">
+          <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#8C5A54]">
+            Studio
+          </span>
+          <h1 className="font-serif text-2xl sm:text-3xl text-[#2A1816] font-normal tracking-tight">
+            Rehearsal Studio
+          </h1>
+          <p className="font-sans text-xs text-[#5C3B37] leading-relaxed">
+            Select a play from the repertoire or import a custom scene to rehearse with live AI roleplay.
+          </p>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+          <button
+            onClick={parseDemoScript}
+            disabled={parsing}
+            className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-4 py-2 rounded-xl font-mono text-xs font-bold uppercase tracking-wider border border-[#A6352F] shadow-xs flex items-center gap-1.5 cursor-pointer transition-colors"
+          >
+            <Wand2 className="w-3.5 h-3.5 text-[#FFD0CC]" />
+            <span>{parsing ? "Parsing..." : "Quick Demo Scene"}</span>
+          </button>
+
+          <button
+            onClick={() => navigate("/member/scripts")}
+            className="px-4 py-2 rounded-xl border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors cursor-pointer"
+          >
+            <BookOpen className="w-3.5 h-3.5 text-[#8C241E]" />
+            <span>Script Vault</span>
+          </button>
+        </div>
+      </section>
+
+      {/* PINNED REHEARSAL PLAYBOOKS */}
+      {pinnedScripts.length > 0 && (
+        <section className="space-y-2.5 w-full">
+          <div className="flex items-center justify-between px-0.5">
+            <span className="text-[10px] font-mono uppercase font-bold tracking-wider text-[#8C5A54]">
+              Featured Playbooks
             </span>
-            <h1 className="font-serif text-2xl sm:text-3xl text-[#2A1816] font-normal tracking-tight">
-              Rehearsal Studio
-            </h1>
-            <p className="font-sans text-xs text-[#5C3B37] leading-relaxed">
-              Select a play from the repertoire or import a custom scene to rehearse with live AI roleplay.
-            </p>
+            <span className="text-[10px] font-mono uppercase text-[#8C5A54]">
+              {pinnedScripts.length} Pinned
+            </span>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2.5 shrink-0">
-            <button
-              onClick={parseDemoScript}
-              disabled={parsing}
-              className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-4 py-2 rounded-xl font-mono text-xs font-bold uppercase tracking-wider border border-[#A6352F] shadow-xs flex items-center gap-1.5 cursor-pointer transition-colors"
-            >
-              <Wand2 className="w-3.5 h-3.5 text-[#FFD0CC]" />
-              <span>{parsing ? "Parsing..." : "Quick Demo Scene"}</span>
-            </button>
-
-            <button
-              onClick={() => navigate("/member/scripts")}
-              className="px-4 py-2 rounded-xl border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors cursor-pointer"
-            >
-              <BookOpen className="w-3.5 h-3.5 text-[#8C241E]" />
-              <span>Script Vault</span>
-            </button>
-          </div>
-        </section>
-
-        {/* PINNED REHEARSAL PLAYBOOKS */}
-        {pinnedScripts.length > 0 && (
-          <section className="space-y-2.5">
-            <div className="flex items-center justify-between px-0.5">
-              <span className="text-[10px] font-mono uppercase font-bold tracking-wider text-[#8C5A54]">
-                Featured Playbooks
-              </span>
-              <span className="text-[10px] font-mono uppercase text-[#8C5A54]">
-                {pinnedScripts.length} Pinned
-              </span>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              {pinnedScripts.map((script) => (
-                <div
-                  key={script.id}
-                  onClick={() => navigate(`/ai-rehearsal/${script.id}`)}
-                  className="bg-[#FAF2EE] border border-[#DCBAB2] hover:border-[#8C241E]/60 rounded-2xl p-4 hover:shadow-sm transition-all flex flex-col justify-between space-y-3 group cursor-pointer text-left"
-                >
-                  <div className="space-y-1.5">
-                    <div className="flex items-start justify-between gap-2">
-                      <span className="text-[9px] font-mono font-bold uppercase text-[#8C241E] bg-[#EEDBD5] px-2 py-0.5 rounded-full border border-[#D5AAA2]">
-                        {script.genre || "Drama"}
-                      </span>
-                      <button
-                        onClick={(e) => togglePinScript(script.id, e)}
-                        className="text-[#8C241E] p-0.5"
-                        title="Unpin Script"
-                      >
-                        <Pin className="w-3.5 h-3.5 fill-[#8C241E]" />
-                      </button>
-                    </div>
-
-                    <h3 className="font-serif text-[15px] text-[#2A1816] group-hover:text-[#8C241E] transition-colors leading-snug font-normal">
-                      {script.title}
-                    </h3>
-                    <p className="text-[11px] font-serif italic text-[#6E4742]">
-                      by {script.playwright}
-                    </p>
-                  </div>
-
-                  <div className="pt-2 border-t border-[#DCBAB2]/70 flex items-center justify-between text-[10px] font-mono">
-                    <span className="text-[#8C5A54]">
-                      {script.rolesCount || `${script.charactersCount || 6} Roles`}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 w-full">
+            {pinnedScripts.map((script) => (
+              <div
+                key={script.id}
+                onClick={() => navigate(`/ai-rehearsal/${script.id}`)}
+                className="bg-[#FAF2EE] border border-[#DCBAB2] hover:border-[#8C241E]/60 rounded-2xl p-4 hover:shadow-sm transition-all flex flex-col justify-between space-y-3 group cursor-pointer text-left"
+              >
+                <div className="space-y-1.5">
+                  <div className="flex items-start justify-between gap-2">
+                    <span className="text-[9px] font-mono font-bold uppercase text-[#8C241E] bg-[#EEDBD5] px-2 py-0.5 rounded-full border border-[#D5AAA2]">
+                      {script.genre || "Drama"}
                     </span>
-                    <span className="font-bold uppercase text-[#8C241E] flex items-center gap-1">
-                      <span>Rehearse</span>
-                      <Play className="w-2.5 h-2.5 fill-current" />
-                    </span>
+                    <button
+                      onClick={(e) => togglePinScript(script.id, e)}
+                      className="text-[#8C241E] p-0.5"
+                      title="Unpin Script"
+                    >
+                      <Pin className="w-3.5 h-3.5 fill-[#8C241E]" />
+                    </button>
                   </div>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
 
-        {/* MAIN 2-COLUMN STUDIO LAYOUT: VAULT ROSTER (LEFT) & CUSTOM PARSER (RIGHT) */}
-        <section className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-5 w-full items-start">
-          
-          {/* LEFT: SCRIPT VAULT SELECTION ROSTER */}
-          <div className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-2xl p-5 space-y-4 shadow-xs">
-            
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#DCBAB2]/70 pb-3">
-              <div className="space-y-0.5">
-                <h2 className="font-serif text-lg text-[#2A1816] font-normal flex items-center gap-2">
-                  <BookOpen className="w-4 h-4 text-[#8C241E]" />
-                  <span>Script Repertoire</span>
-                </h2>
-                <p className="text-[11px] font-mono text-[#8C5A54]">
-                  {filteredScripts.length} verified scripts · ready for live rehearsal
-                </p>
-              </div>
-
-              {/* Themed Search Bar */}
-              <div className="relative min-w-[200px]">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3 h-3 text-[#8C5A54]" />
-                <input
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Filter scripts..."
-                  className="w-full pl-8 pr-3 py-1.5 rounded-xl bg-[#E8D6CF]/70 border border-[#D5AAA2] text-xs font-mono text-[#2A1816] placeholder:text-[#8C5A54] focus:outline-none focus:border-[#8C241E]"
-                />
-              </div>
-            </div>
-
-            {/* SCRIPT LISTING */}
-            <div className="space-y-2">
-              {filteredScripts.map((script) => {
-                const isPinned = pinnedScriptIds.includes(script.id);
-
-                return (
-                  <div
-                    key={script.id}
-                    className="rounded-xl border border-[#DCBAB2] bg-[#FAF2EE] hover:bg-[#F5EAE6] hover:border-[#8C241E]/50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-3.5 py-2.5 shadow-2xs group"
-                  >
-                    <div className="flex items-center gap-2 min-w-0">
-                      <button
-                        onClick={(e) => togglePinScript(script.id, e)}
-                        className="p-1 rounded-full text-[#8C5A54] hover:text-[#8C241E] transition-colors cursor-pointer shrink-0"
-                        title={isPinned ? "Unpin script" : "Pin script to top"}
-                      >
-                        <Pin className={`w-4 h-4 ${isPinned ? "fill-[#8C241E] text-[#8C241E]" : ""}`} />
-                      </button>
-
-                      <div className="space-y-0.5 min-w-0">
-                        <div className="flex items-center gap-1.5 min-w-0 leading-none">
-                          <span className="text-[9px] font-mono font-bold uppercase text-[#8C241E] bg-[#EEDBD5] px-2 py-0.5 rounded-full border border-[#D5AAA2] whitespace-nowrap">
-                            {script.genre || "Drama"}
-                          </span>
-                          {script.language && (
-                            <span className="text-[9px] font-mono text-[#8C5A54] truncate">
-                              {script.language}
-                            </span>
-                          )}
-                        </div>
-
-                        <div className="flex items-baseline gap-1.5 min-w-0 leading-tight">
-                          <h3 className="font-serif text-[15px] md:text-base text-[#2A1816] group-hover:text-[#8C241E] transition-colors font-normal truncate">
-                            {script.title}
-                          </h3>
-                          <span className="font-serif text-[11px] italic text-[#6E4742] truncate shrink">
-                            · {script.playwright}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
-                      <div className="font-mono text-[9px] text-[#8C5A54] hidden md:flex flex-col items-end gap-0.5 leading-tight whitespace-nowrap border-r border-[#DCBAB2]/80 pr-2.5">
-                        <span className="font-bold text-[#2A1816]">{script.rolesCount || `${script.charactersCount || 6} Roles`}</span>
-                        <span>{script.pages ? `${script.pages} Pages` : "3 Acts"}</span>
-                      </div>
-
-                      <button
-                        onClick={() => navigate(`/ai-rehearsal/${script.id}`)}
-                        className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-3 py-1.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs border border-[#A6352F]"
-                      >
-                        <Play className="w-3.5 h-3.5 fill-current text-[#FFD0CC]" />
-                        <span>Rehearse</span>
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-
-              {filteredScripts.length === 0 && (
-                <div className="text-center py-12 text-xs font-mono text-[#6E4742] bg-[#F5EAE6] rounded-2xl border border-dashed border-[#DCBAB2]">
-                  No scripts found matching your search.
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* RIGHT: CUSTOM MANUSCRIPT PARSER STUDIO (SELF-CONTAINED) */}
-          <div className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-2xl p-5 space-y-4 shadow-xs">
-            {scene && !activeScript ? (
-              /* PARSED SETUP VIEW INSIDE THE SAME CARD */
-              <div className="space-y-4">
-                <div className="flex items-start justify-between gap-3 border-b border-[#DCBAB2]/70 pb-3">
-                  <div className="space-y-0.5 min-w-0">
-                    <span className="text-[9px] font-mono uppercase font-bold tracking-widest text-[#8C5A54]">
-                      Scene Parsed & Ready
-                    </span>
-                    <h2 className="font-serif text-lg text-[#2A1816] tracking-tight truncate font-normal">
-                      {scene.title}
-                    </h2>
-                    <p className="text-[11px] font-mono text-[#6E4742]">
-                      {scene.characters.length} Roles • {scene.turns.length} Lines
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setScene(null)}
-                    className="px-2.5 py-1 rounded-lg border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-[10px] font-mono font-bold uppercase tracking-wider transition-colors cursor-pointer shrink-0"
-                    title="Edit script text"
-                  >
-                    Edit Text
-                  </button>
-                </div>
-
-                <div className="space-y-2 max-h-[260px] overflow-y-auto custom-scrollbar pr-1">
-                  {scene.characters.map((character: any) => {
-                    const isHuman = assignments[character.name] === "human";
-                    const currentVoice = voicePreferences[character.name] || "female";
-
-                    return (
-                      <div
-                        key={character.name}
-                        className="p-3 rounded-xl border border-[#DCBAB2] bg-[#F5EAE6] space-y-2 shadow-2xs"
-                      >
-                        <div className="flex items-center justify-between text-xs">
-                          <span className="font-serif font-bold text-[#2A1816] truncate">
-                            {character.name}
-                          </span>
-                          <span className="text-[9px] font-mono uppercase text-[#8C5A54] font-semibold">
-                            {isHuman ? "Actor (You)" : `AI (${currentVoice})`}
-                          </span>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-1 p-0.5 bg-[#E8D6CF]/70 rounded-lg border border-[#D5AAA2]/70">
-                          <button
-                            type="button"
-                            onClick={() => setAssignments({ ...assignments, [character.name]: "human" })}
-                            className={`py-1 px-1.5 rounded-md text-[10px] font-mono font-bold uppercase transition-all cursor-pointer ${
-                              isHuman ? "bg-[#8C241E] text-[#FDF8F7] shadow-xs" : "text-[#5C3B37] hover:text-[#2A1816]"
-                            }`}
-                          >
-                            Actor (You)
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setAssignments({ ...assignments, [character.name]: "ai" })}
-                            className={`py-1 px-1.5 rounded-md text-[10px] font-mono font-bold uppercase transition-all cursor-pointer ${
-                              !isHuman ? "bg-[#8C241E] text-[#FDF8F7] shadow-xs" : "text-[#5C3B37] hover:text-[#2A1816]"
-                            }`}
-                          >
-                            AI Voice
-                          </button>
-                        </div>
-
-                        {!isHuman && (
-                          <div className="grid grid-cols-2 gap-1 p-0.5 bg-[#FAF2EE] rounded-lg border border-[#DCBAB2]/60">
-                            <button
-                              type="button"
-                              onClick={() => setVoicePreferences({ ...voicePreferences, [character.name]: "female" })}
-                              className={`py-0.5 px-1.5 rounded text-[9px] font-mono font-bold uppercase transition-all cursor-pointer ${
-                                currentVoice === "female" ? "bg-[#5C3B37] text-[#FAF2EE]" : "text-[#8C5A54] hover:text-[#2A1816]"
-                              }`}
-                            >
-                              Female
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => setVoicePreferences({ ...voicePreferences, [character.name]: "male" })}
-                              className={`py-0.5 px-1.5 rounded text-[9px] font-mono font-bold uppercase transition-all cursor-pointer ${
-                                currentVoice === "male" ? "bg-[#5C3B37] text-[#FAF2EE]" : "text-[#8C5A54] hover:text-[#2A1816]"
-                              }`}
-                            >
-                              Male
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-
-                <button
-                  onClick={startSession}
-                  className="w-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] py-2.5 rounded-xl font-mono text-xs font-bold uppercase tracking-widest border border-[#A6352F] shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all"
-                >
-                  <Play className="w-3.5 h-3.5 fill-current text-[#FFD0CC]" />
-                  <span>Start Rehearsal</span>
-                </button>
-              </div>
-            ) : (
-              /* INPUT FORM VIEW INSIDE THE CARD */
-              <div className="space-y-3.5">
-                <div className="space-y-0.5 border-b border-[#DCBAB2]/70 pb-3">
-                  <h2 className="font-serif text-lg font-normal text-[#2A1816] flex items-center gap-2">
-                    <FileText className="w-4 h-4 text-[#8C241E]" />
-                    <span>Custom Scene Importer</span>
-                  </h2>
-                  <p className="text-[11px] font-mono text-[#8C5A54]">
-                    Paste custom dialogue or scene draft
+                  <h3 className="font-serif text-[15px] text-[#2A1816] group-hover:text-[#8C241E] transition-colors leading-snug font-normal">
+                    {script.title}
+                  </h3>
+                  <p className="text-[11px] font-serif italic text-[#6E4742]">
+                    by {script.playwright}
                   </p>
                 </div>
 
-                <div className="space-y-3">
-                  <div>
-                    <label className="text-[10px] font-mono uppercase font-bold text-[#8C5A54] block mb-1">
-                      Scene Title
-                    </label>
-                    <input
-                      value={inlineTitle}
-                      onChange={(e) => setInlineTitle(e.target.value)}
-                      className="w-full px-3 py-1.5 rounded-xl bg-[#E8D6CF]/70 border border-[#D5AAA2] text-xs font-mono text-[#2A1816] focus:outline-none focus:border-[#8C241E]"
-                      placeholder="e.g. Midnight Act II Duel"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-[10px] font-mono uppercase font-bold text-[#8C5A54] block mb-1">
-                      Dialogue Lines (Format: Character: Line)
-                    </label>
-                    <textarea
-                      value={inlineScript}
-                      onChange={(e) => setInlineScript(e.target.value)}
-                      rows={8}
-                      className="w-full rounded-xl border border-[#DCBAB2] bg-[#F5EAE6] p-3 font-mono text-xs text-[#2A1816] leading-relaxed resize-none focus:outline-none focus:border-[#8C241E] custom-scrollbar"
-                      placeholder="John: Hello Mary&#10;Mary: Good day John..."
-                    />
-                  </div>
-
-                  <button
-                    onClick={() => parseScript()}
-                    disabled={parsing}
-                    className="w-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] py-2.5 rounded-xl font-mono text-xs font-bold uppercase tracking-wider border border-[#A6352F] shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all disabled:opacity-50"
-                  >
-                    {parsing ? (
-                      <>
-                        <Loader2 className="w-3.5 h-3.5 animate-spin text-[#FFD0CC]" />
-                        <span>Extracting Characters...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Wand2 className="w-3.5 h-3.5 text-[#FFD0CC]" />
-                        <span>Parse & Setup Rehearsal</span>
-                      </>
-                    )}
-                  </button>
-
-                  {error && (
-                    <div className="bg-rose-100 border border-rose-300 text-rose-900 rounded-xl p-2.5 text-xs font-mono flex items-start gap-2">
-                      <AlertCircle className="w-3.5 h-3.5 text-rose-700 shrink-0 mt-0.5" />
-                      <span>{error}</span>
-                    </div>
-                  )}
+                <div className="pt-2 border-t border-[#DCBAB2]/70 flex items-center justify-between text-[10px] font-mono">
+                  <span className="text-[#8C5A54]">
+                    {script.rolesCount || `${script.charactersCount || 6} Roles`}
+                  </span>
+                  <span className="font-bold uppercase text-[#8C241E] flex items-center gap-1">
+                    <span>Rehearse</span>
+                    <Play className="w-2.5 h-2.5 fill-current" />
+                  </span>
                 </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* MAIN 2-COLUMN STUDIO LAYOUT: VAULT ROSTER (LEFT) & CUSTOM PARSER (RIGHT) */}
+      <section className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-5 w-full items-start">
+        
+        {/* LEFT: SCRIPT VAULT SELECTION ROSTER */}
+        <div className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-2xl p-5 space-y-4 shadow-xs">
+          
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#DCBAB2]/70 pb-3">
+            <div className="space-y-0.5">
+              <h2 className="font-serif text-lg text-[#2A1816] font-normal flex items-center gap-2">
+                <BookOpen className="w-4 h-4 text-[#8C241E]" />
+                <span>Script Repertoire</span>
+              </h2>
+              <p className="text-[11px] font-mono text-[#8C5A54]">
+                {filteredScripts.length} verified scripts · ready for live rehearsal
+              </p>
+            </div>
+
+            {/* Themed Search Bar */}
+            <div className="relative min-w-[200px]">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3 h-3 text-[#8C5A54]" />
+              <input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Filter scripts..."
+                className="w-full pl-8 pr-3 py-1.5 rounded-xl bg-[#E8D6CF]/70 border border-[#D5AAA2] text-xs font-mono text-[#2A1816] placeholder:text-[#8C5A54] focus:outline-none focus:border-[#8C241E]"
+              />
+            </div>
+          </div>
+
+          {/* SCRIPT LISTING */}
+          <div className="space-y-2">
+            {filteredScripts.map((script) => {
+              const isPinned = pinnedScriptIds.includes(script.id);
+
+              return (
+                <div
+                  key={script.id}
+                  className="rounded-xl border border-[#DCBAB2] bg-[#FAF2EE] hover:bg-[#F5EAE6] hover:border-[#8C241E]/50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-3.5 py-2.5 shadow-2xs group"
+                >
+                  <div className="flex items-center gap-2 min-w-0">
+                    <button
+                      onClick={(e) => togglePinScript(script.id, e)}
+                      className="p-1 rounded-full text-[#8C5A54] hover:text-[#8C241E] transition-colors cursor-pointer shrink-0"
+                      title={isPinned ? "Unpin script" : "Pin script to top"}
+                    >
+                      <Pin className={`w-4 h-4 ${isPinned ? "fill-[#8C241E] text-[#8C241E]" : ""}`} />
+                    </button>
+
+                    <div className="space-y-0.5 min-w-0">
+                      <div className="flex items-center gap-1.5 min-w-0 leading-none">
+                        <span className="text-[9px] font-mono font-bold uppercase text-[#8C241E] bg-[#EEDBD5] px-2 py-0.5 rounded-full border border-[#D5AAA2] whitespace-nowrap">
+                          {script.genre || "Drama"}
+                        </span>
+                        {script.language && (
+                          <span className="text-[9px] font-mono text-[#8C5A54] truncate">
+                            {script.language}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex items-baseline gap-1.5 min-w-0 leading-tight">
+                        <h3 className="font-serif text-[15px] md:text-base text-[#2A1816] group-hover:text-[#8C241E] transition-colors font-normal truncate">
+                          {script.title}
+                        </h3>
+                        <span className="font-serif text-[11px] italic text-[#6E4742] truncate shrink">
+                          · {script.playwright}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                    <div className="font-mono text-[9px] text-[#8C5A54] hidden md:flex flex-col items-end gap-0.5 leading-tight whitespace-nowrap border-r border-[#DCBAB2]/80 pr-2.5">
+                      <span className="font-bold text-[#2A1816]">{script.rolesCount || `${script.charactersCount || 6} Roles`}</span>
+                      <span>{script.pages ? `${script.pages} Pages` : "3 Acts"}</span>
+                    </div>
+
+                    <button
+                      onClick={() => navigate(`/ai-rehearsal/${script.id}`)}
+                      className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-3 py-1.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs border border-[#A6352F]"
+                    >
+                      <Play className="w-3.5 h-3.5 fill-current text-[#FFD0CC]" />
+                      <span>Rehearse</span>
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+
+            {filteredScripts.length === 0 && (
+              <div className="text-center py-12 text-xs font-mono text-[#6E4742] bg-[#F5EAE6] rounded-2xl border border-dashed border-[#DCBAB2]">
+                No scripts found matching your search.
               </div>
             )}
           </div>
+        </div>
 
-        </section>
+        {/* RIGHT: CUSTOM MANUSCRIPT PARSER STUDIO (SELF-CONTAINED) */}
+        <div className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-2xl p-5 space-y-4 shadow-xs">
+          {scene && !activeScript ? (
+            /* PARSED SETUP VIEW INSIDE THE SAME CARD */
+            <div className="space-y-4">
+              <div className="flex items-start justify-between gap-3 border-b border-[#DCBAB2]/70 pb-3">
+                <div className="space-y-0.5 min-w-0">
+                  <span className="text-[9px] font-mono uppercase font-bold tracking-widest text-[#8C5A54]">
+                    Scene Parsed & Ready
+                  </span>
+                  <h2 className="font-serif text-lg text-[#2A1816] tracking-tight truncate font-normal">
+                    {scene.title}
+                  </h2>
+                  <p className="text-[11px] font-mono text-[#6E4742]">
+                    {scene.characters.length} Roles • {scene.turns.length} Lines
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setScene(null)}
+                  className="px-2.5 py-1 rounded-lg border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-[10px] font-mono font-bold uppercase tracking-wider transition-colors cursor-pointer shrink-0"
+                  title="Edit script text"
+                >
+                  Edit Text
+                </button>
+              </div>
 
-      </div>
+              <div className="space-y-2 max-h-[260px] overflow-y-auto custom-scrollbar pr-1">
+                {scene.characters.map((character: any) => {
+                  const isHuman = assignments[character.name] === "human";
+                  const currentVoice = voicePreferences[character.name] || "female";
+
+                  return (
+                    <div
+                      key={character.name}
+                      className="p-3 rounded-xl border border-[#DCBAB2] bg-[#F5EAE6] space-y-2 shadow-2xs"
+                    >
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="font-serif font-bold text-[#2A1816] truncate">
+                          {character.name}
+                        </span>
+                        <span className="text-[9px] font-mono uppercase text-[#8C5A54] font-semibold">
+                          {isHuman ? "Actor (You)" : `AI (${currentVoice})`}
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-1 p-0.5 bg-[#E8D6CF]/70 rounded-lg border border-[#D5AAA2]/70">
+                        <button
+                          type="button"
+                          onClick={() => setAssignments({ ...assignments, [character.name]: "human" })}
+                          className={`py-1 px-1.5 rounded-md text-[10px] font-mono font-bold uppercase transition-all cursor-pointer ${
+                            isHuman ? "bg-[#8C241E] text-[#FDF8F7] shadow-xs" : "text-[#5C3B37] hover:text-[#2A1816]"
+                          }`}
+                        >
+                          Actor (You)
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setAssignments({ ...assignments, [character.name]: "ai" })}
+                          className={`py-1 px-1.5 rounded-md text-[10px] font-mono font-bold uppercase transition-all cursor-pointer ${
+                            !isHuman ? "bg-[#8C241E] text-[#FDF8F7] shadow-xs" : "text-[#5C3B37] hover:text-[#2A1816]"
+                          }`}
+                        >
+                          AI Voice
+                        </button>
+                      </div>
+
+                      {!isHuman && (
+                        <div className="grid grid-cols-2 gap-1 p-0.5 bg-[#FAF2EE] rounded-lg border border-[#DCBAB2]/60">
+                          <button
+                            type="button"
+                            onClick={() => setVoicePreferences({ ...voicePreferences, [character.name]: "female" })}
+                            className={`py-0.5 px-1.5 rounded text-[9px] font-mono font-bold uppercase transition-all cursor-pointer ${
+                              currentVoice === "female" ? "bg-[#5C3B37] text-[#FAF2EE]" : "text-[#8C5A54] hover:text-[#2A1816]"
+                            }`}
+                          >
+                            Female
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setVoicePreferences({ ...voicePreferences, [character.name]: "male" })}
+                            className={`py-0.5 px-1.5 rounded text-[9px] font-mono font-bold uppercase transition-all cursor-pointer ${
+                              currentVoice === "male" ? "bg-[#5C3B37] text-[#FAF2EE]" : "text-[#8C5A54] hover:text-[#2A1816]"
+                            }`}
+                          >
+                            Male
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              <button
+                onClick={startSession}
+                className="w-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] py-2.5 rounded-xl font-mono text-xs font-bold uppercase tracking-widest border border-[#A6352F] shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all"
+              >
+                <Play className="w-3.5 h-3.5 fill-current text-[#FFD0CC]" />
+                <span>Start Rehearsal</span>
+              </button>
+            </div>
+          ) : (
+            /* INPUT FORM VIEW INSIDE THE CARD */
+            <div className="space-y-3.5">
+              <div className="space-y-0.5 border-b border-[#DCBAB2]/70 pb-3">
+                <h2 className="font-serif text-lg font-normal text-[#2A1816] flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-[#8C241E]" />
+                  <span>Custom Scene Importer</span>
+                </h2>
+                <p className="text-[11px] font-mono text-[#8C5A54]">
+                  Paste custom dialogue or scene draft
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                <div>
+                  <label className="text-[10px] font-mono uppercase font-bold text-[#8C5A54] block mb-1">
+                    Scene Title
+                  </label>
+                  <input
+                    value={inlineTitle}
+                    onChange={(e) => setInlineTitle(e.target.value)}
+                    className="w-full px-3 py-1.5 rounded-xl bg-[#E8D6CF]/70 border border-[#D5AAA2] text-xs font-mono text-[#2A1816] focus:outline-none focus:border-[#8C241E]"
+                    placeholder="e.g. Midnight Act II Duel"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[10px] font-mono uppercase font-bold text-[#8C5A54] block mb-1">
+                    Dialogue Lines (Format: Character: Line)
+                  </label>
+                  <textarea
+                    value={inlineScript}
+                    onChange={(e) => setInlineScript(e.target.value)}
+                    rows={8}
+                    className="w-full rounded-xl border border-[#DCBAB2] bg-[#F5EAE6] p-3 font-mono text-xs text-[#2A1816] leading-relaxed resize-none focus:outline-none focus:border-[#8C241E] custom-scrollbar"
+                    placeholder="John: Hello Mary&#10;Mary: Good day John..."
+                  />
+                </div>
+
+                <button
+                  onClick={() => parseScript()}
+                  disabled={parsing}
+                  className="w-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] py-2.5 rounded-xl font-mono text-xs font-bold uppercase tracking-wider border border-[#A6352F] shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all disabled:opacity-50"
+                >
+                  {parsing ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin text-[#FFD0CC]" />
+                      <span>Extracting Characters...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Wand2 className="w-3.5 h-3.5 text-[#FFD0CC]" />
+                      <span>Parse & Setup Rehearsal</span>
+                    </>
+                  )}
+                </button>
+
+                {error && (
+                  <div className="bg-rose-100 border border-rose-300 text-rose-900 rounded-xl p-2.5 text-xs font-mono flex items-start gap-2">
+                    <AlertCircle className="w-3.5 h-3.5 text-rose-700 shrink-0 mt-0.5" />
+                    <span>{error}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+
+      </section>
+
     </div>
   );
 }
