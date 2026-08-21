@@ -170,7 +170,7 @@ export default function MySchedule() {
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <span className="font-serif text-lg text-[#2A1816]">
               {monthNames[displayMonth]} {displayYear}
             </span>
@@ -193,6 +193,27 @@ export default function MySchedule() {
           </div>
         </div>
 
+        {/* Themed Calendar Color Legend */}
+        <div className="flex flex-wrap items-center gap-2.5 text-[10px] font-mono font-bold uppercase tracking-wider text-[#6E4742] pt-1 border-t border-[#DCBAB2]/60">
+          <span className="text-[#8C5A54] mr-1">Roster States:</span>
+          <span className="inline-flex items-center gap-1.5 bg-emerald-700/15 text-emerald-950 border border-emerald-700/30 px-2.5 py-1 rounded-full">
+            <span className="w-2 h-2 rounded-full bg-emerald-700" />
+            <span>Confirmed (Accepted)</span>
+          </span>
+          <span className="inline-flex items-center gap-1.5 bg-amber-700/15 text-amber-950 border border-amber-700/30 px-2.5 py-1 rounded-full">
+            <span className="w-2 h-2 rounded-full bg-amber-600" />
+            <span>Awaiting Reply (Pending)</span>
+          </span>
+          <span className="inline-flex items-center gap-1.5 bg-rose-700/15 text-rose-950 border border-rose-700/30 px-2.5 py-1 rounded-full">
+            <span className="w-2 h-2 rounded-full bg-rose-700" />
+            <span>Declined Call</span>
+          </span>
+          <span className="inline-flex items-center gap-1.5 bg-[#E4D9D2]/80 text-[#6B5550] border border-[#CBB3AC] px-2.5 py-1 rounded-full">
+            <span className="w-2 h-2 rounded-full bg-[#8C5A54]" />
+            <span>Past Event</span>
+          </span>
+        </div>
+
         {/* Themed Calendar Grid */}
         <div className="grid grid-cols-7 gap-1.5 bg-[#DCBAB2]/50 p-1.5 rounded-[1.8rem] border border-[#DCBAB2]">
           {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
@@ -212,7 +233,7 @@ export default function MySchedule() {
           ))}
 
           {calendarDays.map((day) => {
-            const dayEvents = acceptedEvents.filter((e) => {
+            const dayEvents = events.filter((e) => {
               const d = new Date(e.date);
               return (
                 !isNaN(d.getTime()) &&
@@ -230,7 +251,7 @@ export default function MySchedule() {
             return (
               <div
                 key={day.toISOString()}
-                className={`min-h-[95px] p-2 rounded-xl border transition-all flex flex-col justify-between ${
+                className={`min-h-[105px] p-2 rounded-xl border transition-all flex flex-col justify-between ${
                   isToday
                     ? "bg-[#F5EAE6] border-[#8C241E] shadow-2xs ring-1 ring-[#8C241E]/40"
                     : "bg-[#FAF2EE] border-[#DCBAB2]"
@@ -251,19 +272,41 @@ export default function MySchedule() {
                   </span>
                 </div>
 
-                <div className="space-y-1">
-                  {dayEvents.map((e) => (
-                    <div
-                      key={e.id}
-                      className="bg-[#EEDBD5] hover:bg-[#E3CEC6] text-[#2A1816] text-[10px] font-mono font-medium px-2 py-1 rounded-lg truncate border border-[#D5AAA2] transition-colors shadow-2xs"
-                      title={`${e.title} (${e.time}) - ${e.location}`}
-                    >
-                      <span className="font-bold text-[#8C241E] mr-1">
-                        {e.time.split(" - ")[0]}
-                      </span>
-                      {e.title}
-                    </div>
-                  ))}
+                <div className="space-y-1 overflow-y-auto max-h-[85px] custom-scrollbar">
+                  {dayEvents.map((e) => {
+                    const isPast = e.isPast;
+                    let styleClass = "";
+                    let dotColor = "";
+
+                    if (isPast) {
+                      styleClass = "bg-[#E3D7D0]/90 text-[#6B5550] border-[#CBB3AC]";
+                      dotColor = "bg-[#8C5A54]";
+                    } else if (e.status === "Accepted") {
+                      styleClass = "bg-emerald-700/15 hover:bg-emerald-700/25 text-emerald-950 border-emerald-700/30";
+                      dotColor = "bg-emerald-700";
+                    } else if (e.status === "Declined") {
+                      styleClass = "bg-rose-700/15 hover:bg-rose-700/25 text-rose-950 border-rose-700/30";
+                      dotColor = "bg-rose-700";
+                    } else {
+                      // Pending / Undecided
+                      styleClass = "bg-amber-700/15 hover:bg-amber-700/25 text-amber-950 border-amber-700/30";
+                      dotColor = "bg-amber-600";
+                    }
+
+                    return (
+                      <div
+                        key={e.id}
+                        className={`text-[10px] font-mono font-medium px-1.5 py-1 rounded-lg truncate border transition-colors shadow-2xs flex items-center gap-1 ${styleClass}`}
+                        title={`${e.title} (${e.time}) - ${e.location} [Status: ${e.status}${isPast ? " (Past)" : ""}]`}
+                      >
+                        <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${dotColor}`} />
+                        <span className="font-bold shrink-0">
+                          {e.time.split(" - ")[0]}
+                        </span>
+                        <span className="truncate">{e.title}</span>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             );

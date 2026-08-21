@@ -358,6 +358,32 @@ def seed_database():
             "admin": admin_abay
         },
         {
+            "title": "Tech Teardown & Ensemble Debrief Dinner",
+            "description": "Post-showcase technical equipment inventory teardown, stage clearing, and society reflection dinner.",
+            "category": "Meetups",
+            "venue": "SAC Courtyard & Aayam Hub, IIT Madras",
+            "event_date": date(2026, 8, 31),
+            "start_time": time(18, 0),
+            "end_time": time(20, 30),
+            "max_participants": 50,
+            "poster": "/aayam_assets/samatvam_user_4.jpg",
+            "status": "Upcoming",
+            "admin": admin_samarth
+        },
+        {
+            "title": "Autumn Production Kickoff & Script Walkthrough",
+            "description": "Formal rehearsal launch for the September festival season. Character distribution, script review, and proscenium blocking map.",
+            "category": "Rehearsals",
+            "venue": "Rehearsal Hall A, IIT Madras",
+            "event_date": date(2026, 9, 3),
+            "start_time": time(17, 30),
+            "end_time": time(20, 0),
+            "max_participants": 40,
+            "poster": "/aayam_assets/tamashbin_user_3.jpg",
+            "status": "Upcoming",
+            "admin": admin_abay
+        },
+        {
             "title": "Theatre Masterclass with Gyaneshwar Mishra",
             "description": "Exclusive masterclass on voice modulation, spatial awareness, and classical stage blocking.",
             "category": "Workshops",
@@ -369,6 +395,19 @@ def seed_database():
             "poster": "/aayam_assets/kky_user_2.jpg",
             "status": "Upcoming",
             "admin": admin_samarth
+        },
+        {
+            "title": "The Midnight Archives: Table-Read & Blocking Session",
+            "description": "Directorial rehearsal for Abay Nandhiga's original psychological mystery 'The Midnight Archives'. Focus on dialogue pacing and atmospheric subtext.",
+            "category": "Rehearsals",
+            "venue": "Aayam Black Box Studio, IIT Madras",
+            "event_date": date(2026, 9, 8),
+            "start_time": time(17, 0),
+            "end_time": time(20, 0),
+            "max_participants": 25,
+            "poster": "/aayam_assets/dddj_user_1.jpg",
+            "status": "Upcoming",
+            "admin": admin_abay
         },
         {
             "title": "Autumn Street Satire & Dholak Sync Lab",
@@ -384,6 +423,19 @@ def seed_database():
             "admin": admin_utkarsh
         },
         {
+            "title": "Dhoop Ki Chhanv: Open-Air Staging & Vocal Lab",
+            "description": "Open-air staging rehearsal for Aditi's contemporary street drama 'Dhoop Ki Chhanv'. Focusing on vocal projection, chorus coordination, and live timing.",
+            "category": "Rehearsals",
+            "venue": "OAT Amphitheatre Steps, IIT Madras",
+            "event_date": date(2026, 9, 15),
+            "start_time": time(16, 0),
+            "end_time": time(19, 0),
+            "max_participants": 30,
+            "poster": "/aayam_assets/kky_user_5.jpg",
+            "status": "Upcoming",
+            "admin": admin_abay
+        },
+        {
             "title": "Classical Monologue & Navarasa Intensive",
             "description": "Deep-dive session exploring the 9 dramatic rasas through mythological soliloquies and facial control.",
             "category": "Workshops",
@@ -395,6 +447,19 @@ def seed_database():
             "poster": "/aayam_assets/kky_user_5.jpg",
             "status": "Upcoming",
             "admin": admin_abay
+        },
+        {
+            "title": "Society Production Call: Mid-Season Blocking & Run-Through",
+            "description": "Comprehensive ensemble run-through for upcoming festival productions. Scene continuity, cue handoffs, and quick-change logistics.",
+            "category": "Rehearsals",
+            "venue": "CLT Main Stage, IIT Madras",
+            "event_date": date(2026, 9, 21),
+            "start_time": time(18, 0),
+            "end_time": time(21, 0),
+            "max_participants": 60,
+            "poster": "/aayam_assets/dddj_user_3.jpg",
+            "status": "Upcoming",
+            "admin": admin_samarth
         },
         {
             "title": "Nukkad Natak Guidance Session with Om Bhope",
@@ -410,6 +475,19 @@ def seed_database():
             "admin": admin_utkarsh
         },
         {
+            "title": "Costume Fitting & Soundscape Dress Rehearsal",
+            "description": "Full-dress rehearsal with authentic period costumes, makeup checks, mic leveling, and acoustic soundscape sync.",
+            "category": "Rehearsals",
+            "venue": "Rehearsal Hall A & Wardrobe Studio, IIT Madras",
+            "event_date": date(2026, 9, 27),
+            "start_time": time(15, 0),
+            "end_time": time(18, 30),
+            "max_participants": 40,
+            "poster": "/aayam_assets/swati_singh.jpg",
+            "status": "Upcoming",
+            "admin": admin_samarth
+        },
+        {
             "title": "Proscenium Tech Rehearsal & Live Cue Run",
             "description": "Full technical run-through with lighting boards, soundscapes, and backstage prop shifts before festival season.",
             "category": "Plays",
@@ -421,6 +499,19 @@ def seed_database():
             "poster": "/aayam_assets/dddj_user_1.jpg",
             "status": "Upcoming",
             "admin": admin_samarth
+        },
+        {
+            "title": "Pre-Darpan Festival Final Technical Cue-to-Cue Run",
+            "description": "Exhaustive cue-to-cue run for lighting, stage automation, sound effects, and cast entrance safety protocols.",
+            "category": "Plays",
+            "venue": "CLT Main Stage, IIT Madras",
+            "event_date": date(2026, 9, 30),
+            "start_time": time(17, 30),
+            "end_time": time(21, 30),
+            "max_participants": 120,
+            "poster": "/aayam_assets/dddj_user_3.jpg",
+            "status": "Upcoming",
+            "admin": admin_abay
         },
         {
             "title": "Darpan 2026 Annual Drama Festival",
