@@ -52,31 +52,31 @@ export default function BackstagePass() {
   const completionRate = tasks.length > 0 ? Math.round((completedCount / tasks.length) * 100) : 0;
 
   return (
-    <div className="space-y-[32px] font-sans text-[#466272]">
+    <div className="space-y-[32px] font-sans text-[#666361]">
       {/* Title & Status Bar */}
-      <div className="bg-[#f7f3ee] border border-[#e6e2dd] rounded-[8px] p-[24px] md:p-[32px] flex flex-col md:flex-row justify-between items-start md:items-center gap-[24px] mb-[32px] md:mb-[48px]">
+      <div className="bg-[#EFE8E1] border border-[#DDD8CE] rounded-[8px] p-[24px] md:p-[32px] flex flex-col md:flex-row justify-between items-start md:items-center gap-[24px] mb-[32px] md:mb-[48px]">
         <div className="space-y-[8px]">
-          <span className="text-xs uppercase tracking-widest text-[#466272]/70 font-semibold">Technical Crew</span>
-          <h2 className="text-[32px] font-bold font-serif text-[#635f41]">Backstage Pass &amp; Checklists</h2>
-          <p className="text-[14px] text-[#466272]">
+          <span className="text-xs uppercase tracking-widest text-[#666361]/70 font-semibold">Technical Crew</span>
+          <h2 className="text-[32px] font-bold font-serif text-[#353535]">Backstage Pass &amp; Checklists</h2>
+          <p className="text-[14px] text-[#666361]">
             Daily checklist and technical tasks for props, stage lighting cues, and audio syncs.
           </p>
         </div>
-        <div className="bg-white border border-[#e6e2dd] p-4 rounded-[8px] shadow-sm text-center min-w-[120px]">
-          <span className="text-[28px] font-bold font-serif text-[#8CC0EB]">{completionRate}%</span>
-          <p className="text-[10px] text-[#466272]/70 uppercase font-semibold tracking-wider mt-1">Completed Rate</p>
+        <div className="bg-white border border-[#DDD8CE] p-4 rounded-[8px] shadow-sm text-center min-w-[120px]">
+          <span className="text-[28px] font-bold font-serif text-[#E85F57]">{completionRate}%</span>
+          <p className="text-[10px] text-[#666361]/70 uppercase font-semibold tracking-wider mt-1">Completed Rate</p>
         </div>
       </div>
 
       {/* Main Container Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-[24px]">
         {/* Left 2 Cols: Checklists */}
-        <section className="lg:col-span-2 bg-white border border-[#e6e2dd] rounded-[8px] p-6 space-y-6">
-          <div className="flex justify-between items-center border-b border-[#e6e2dd]/80 pb-4">
-            <h3 className="font-bold text-[18px] text-[#635f41] font-serif flex items-center gap-2">
-              <ClipboardList className="w-5 h-5 text-[#8CC0EB]" /> Active Crew Checklist
+        <section className="lg:col-span-2 bg-white border border-[#DDD8CE] rounded-[8px] p-6 space-y-6">
+          <div className="flex justify-between items-center border-b border-[#DDD8CE]/80 pb-4">
+            <h3 className="font-bold text-[18px] text-[#353535] font-serif flex items-center gap-2">
+              <ClipboardList className="w-5 h-5 text-[#E85F57]" /> Active Crew Checklist
             </h3>
-            <span className="text-xs text-[#466272]/70 font-semibold">{completedCount} of {tasks.length} Done</span>
+            <span className="text-xs text-[#666361]/70 font-semibold">{completedCount} of {tasks.length} Done</span>
           </div>
 
           {/* Checklist List */}
@@ -86,14 +86,14 @@ export default function BackstagePass() {
                 key={task.id} 
                 className={`flex items-center justify-between p-4 rounded-[8px] border transition-all ${
                   task.isCompleted 
-                    ? "bg-[#f7f3ee]/40 border-[#e6e2dd]/60 opacity-70" 
-                    : "bg-[#fdf9f4]/20 border-[#e6e2dd] hover:border-[#8CC0EB]/40"
+                    ? "bg-[#EFE8E1]/40 border-[#DDD8CE]/60 opacity-70" 
+                    : "bg-[#E7DDD3]/20 border-[#DDD8CE] hover:border-[#E85F57]/40"
                 }`}
               >
                 <div className="flex items-start gap-3 flex-1">
                   <button 
                     onClick={() => toggleTask(task.id)}
-                    className="text-[#8CC0EB] hover:text-[#8CC0EB]/80 transition-colors mt-0.5"
+                    className="text-[#E85F57] hover:text-[#E85F57]/80 transition-colors mt-0.5"
                   >
                     {task.isCompleted ? (
                       <CheckCircle2 className="w-5 h-5 fill-current text-emerald-600" />
@@ -102,13 +102,13 @@ export default function BackstagePass() {
                     )}
                   </button>
                   <div className="space-y-1">
-                    <p className={`text-sm font-medium text-[#635f41] ${task.isCompleted ? "line-through text-[#466272]/60" : ""}`}>
+                    <p className={`text-sm font-medium text-[#353535] ${task.isCompleted ? "line-through text-[#666361]/60" : ""}`}>
                       {task.task}
                     </p>
-                    <div className="flex flex-wrap items-center gap-2 text-[10px] text-[#466272]/70">
-                      <span>Assigned to: <strong className="font-semibold text-[#635f41]">{task.assignedTo}</strong></span>
+                    <div className="flex flex-wrap items-center gap-2 text-[10px] text-[#666361]/70">
+                      <span>Assigned to: <strong className="font-semibold text-[#353535]">{task.assignedTo}</strong></span>
                       <span>&bull;</span>
-                      <Badge variant="outline" className="border-[#635f41]/25 text-[#635f41] bg-[#635f41]/5 rounded-[4px] px-1.5 py-0">
+                      <Badge variant="outline" className="border-[#353535]/25 text-[#353535] bg-[#353535]/5 rounded-[4px] px-1.5 py-0">
                         {task.category}
                       </Badge>
                     </div>
@@ -127,47 +127,47 @@ export default function BackstagePass() {
             ))}
 
             {tasks.length === 0 && (
-              <p className="text-center text-xs text-[#466272]/50 italic py-8">No backstage tasks logged for today.</p>
+              <p className="text-center text-xs text-[#666361]/50 italic py-8">No backstage tasks logged for today.</p>
             )}
           </div>
         </section>
 
         {/* Right Col: Create Task Form */}
-        <section className="bg-[#f7f3ee] border border-[#e6e2dd] rounded-[8px] p-6 h-fit space-y-6">
+        <section className="bg-[#EFE8E1] border border-[#DDD8CE] rounded-[8px] p-6 h-fit space-y-6">
           <div>
-            <h3 className="font-bold text-[18px] text-[#635f41] font-serif">Quick Create Task</h3>
-            <p className="text-xs text-[#466272]/70">Create and assign a new daily task for the crew roster</p>
+            <h3 className="font-bold text-[18px] text-[#353535] font-serif">Quick Create Task</h3>
+            <p className="text-xs text-[#666361]/70">Create and assign a new daily task for the crew roster</p>
           </div>
 
           <form onSubmit={handleAddTask} className="space-y-4">
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-[#635f41]">Task Description</label>
+              <label className="text-xs font-semibold text-[#353535]">Task Description</label>
               <Input
                 placeholder="e.g., Fill fog machine fluid"
                 value={newTaskText}
                 onChange={(e) => setNewTaskText(e.target.value)}
-                className="border-[#e6e2dd] bg-white focus-visible:ring-[#8CC0EB]"
+                className="border-[#DDD8CE] bg-white focus-visible:ring-[#E85F57]"
                 required
               />
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-[#635f41]">Assigned Crew Member</label>
+              <label className="text-xs font-semibold text-[#353535]">Assigned Crew Member</label>
               <Input
                 placeholder="e.g., M. Chen"
                 value={newAssigned}
                 onChange={(e) => setNewAssigned(e.target.value)}
-                className="border-[#e6e2dd] bg-white focus-visible:ring-[#8CC0EB]"
+                className="border-[#DDD8CE] bg-white focus-visible:ring-[#E85F57]"
                 required
               />
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-[#635f41]">Category</label>
+              <label className="text-xs font-semibold text-[#353535]">Category</label>
               <select
                 value={newCategory}
                 onChange={(e) => setNewCategory(e.target.value as CrewTask["category"])}
-                className="w-full rounded-md border border-[#e6e2dd] bg-white px-3 py-2 text-sm text-[#466272] outline-none focus:ring-1 focus:ring-[#8CC0EB] focus:border-[#8CC0EB]"
+                className="w-full rounded-md border border-[#DDD8CE] bg-white px-3 py-2 text-sm text-[#666361] outline-none focus:ring-1 focus:ring-[#E85F57] focus:border-[#E85F57]"
               >
                 <option value="Props">Props</option>
                 <option value="Wardrobe">Wardrobe</option>
@@ -176,7 +176,7 @@ export default function BackstagePass() {
               </select>
             </div>
 
-            <Button type="submit" className="w-full bg-[#8CC0EB] text-[#1c1b19] hover:bg-[#8CC0EB]/90 font-semibold rounded-[8px] py-2.5 transition-all shadow-sm">
+            <Button type="submit" className="w-full bg-[#E85F57] text-[#2C2A28] hover:bg-[#E85F57]/90 font-semibold rounded-[8px] py-2.5 transition-all shadow-sm">
               <PlusCircle className="w-4 h-4 mr-2" /> Add Crew Task
             </Button>
           </form>

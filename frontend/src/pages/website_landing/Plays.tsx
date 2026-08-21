@@ -1,236 +1,557 @@
-import { useState, useEffect } from "react";
-import { BookOpen, Star, Calendar, MapPin, Clock, Ticket } from "lucide-react";
+// @ts-nocheck
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { 
+  BookOpen, 
+  Star, 
+  Calendar, 
+  MapPin, 
+  Clock, 
+  Ticket, 
+  ArrowRight, 
+  Flame, 
+  ArrowUpRight, 
+  ChevronRight,
+  HeartHandshake,
+  Check,
+  CheckCircle2,
+  X,
+  Sparkles,
+  Layers,
+  FileText
+} from "lucide-react";
+import ScriptPreviewModal from "@/components/ScriptPreviewModal";
+import ProductionDetailModal from "@/components/ProductionDetailModal";
+import type { ProductionDetailData } from "@/components/ProductionDetailModal";
+import { getPlaybookForTitle } from "@/data/playbooksData";
+import type { Playbook } from "@/data/playbooksData";
+import { Info } from "lucide-react";
 
-interface Production {
-  id: string;
+interface PlayItem {
+  id: number;
   title: string;
-  status: string;
-  statusColor: string;
-  description: string;
+  hindi_title?: string;
+  playwright?: string;
   director: string;
-  cast: string;
-  season: string;
-  image: string;
-  venue: string;
-  dates: string;
-  runtime: string;
-  price: string;
+  genre?: string;
+  language?: string;
+  is_past?: boolean;
+  status?: string;
+  tagline?: string;
+  description: string;
+  cast?: string;
+  season?: string;
+  image?: string;
+  venue?: string;
+  dates?: string;
+  runtime?: string;
+  price?: string;
+  acts?: string;
 }
 
-const fallbackProductions: Production[] = [
-  {
-    id: "kky",
-    title: "Karn Ki Yachika",
-    status: "SELLING FAST",
-    statusColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
-    description: "A monumental classical Malayalam/Hindi tragedy exploring Karn's moral dilemma, honor, and destiny on the battleground of Kurukshetra.",
-    director: "S. Sri Vaishnavi",
-    cast: "Abay Nandhiga, Utkarsh (Yuuhi), Samarth Shrivastava",
-    season: "2026 Production Season",
-    image: "/aayam_assets/kky_user_1.jpg",
-    venue: "Kashiyatra Stage, IIT BHU / OAT IIT Madras",
-    dates: "Aug 12 - Sep 04, 2026",
-    runtime: "75 Mins (No Intermission)",
-    price: "Free Admission"
-  },
-  {
-    id: "tamashbin-kathputliya",
-    title: "Tamashbin Kathputliya",
-    status: "LIMITED TICKETS",
-    statusColor: "bg-amber-50 text-amber-700 border-amber-200",
-    description: "A high-energy street play (Nukkad Natak) combining puppetry motifs, live dholak rhythms, and political satire.",
-    director: "Utkarsh (Yuuhi)",
-    cast: "Samarth Shrivastava, Krishna Subramanian, Swati Singh",
-    season: "2026 Production Season",
-    image: "/aayam_assets/tamashbin_user_1.jpg",
-    venue: "Open Air Theatre (OAT), IIT Madras",
-    dates: "Sep 12 - Sep 25, 2026",
-    runtime: "45 Mins (No Intermission)",
-    price: "Free Open Stage"
-  },
-  {
-    id: "dddj",
-    title: "DDDJ - Stage Production",
-    status: "TICKETS ON SALE",
-    statusColor: "bg-purple-50 text-purple-700 border-purple-200",
-    description: "An intense proscenium drama exploring relationship dynamics, ambition, and modern societal pressures.",
-    director: "S. Sri Vaishnavi",
-    cast: "Abay Nandhiga, Krishna Subramanian, Sneha Das",
-    season: "2026 Production Season",
-    image: "/aayam_assets/dddj_user_1.jpg",
-    venue: "CLT Auditorium, IIT Madras",
-    dates: "Sep 28 - Oct 10, 2026",
-    runtime: "85 Mins (With Intermission)",
-    price: "Registration Required"
-  },
-  {
-    id: "samatvam",
-    title: "Samatvam",
-    status: "TICKETS ON SALE",
-    statusColor: "bg-blue-50 text-blue-700 border-blue-200",
-    description: "An intense ensemble drama exploring inner conflict, balance, and human empathy in modern high-pressure academic society.",
-    director: "Tanu Kurade",
-    cast: "Abay Nandhiga, Sneha Das, Anshi Jain",
-    season: "2026 Production Season",
-    image: "/aayam_assets/samatvam_user_1.jpg",
-    venue: "CLT Auditorium, IIT Madras",
-    dates: "Oct 05 - Oct 20, 2026",
-    runtime: "90 Mins (With Intermission)",
-    price: "Free Entry"
-  },
-  {
-    id: "speak-up-tara",
-    title: "Speak Up Tara",
-    status: "SELLING FAST",
-    statusColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
-    description: "A powerful social awareness play highlighting gender equality, courage, and standing up against societal silence.",
-    director: "S. Sri Vaishnavi",
-    cast: "Anshi Jain, Sneha Das, Swati Singh",
-    season: "2026 Production Season",
-    image: "/aayam_assets/speak_up_tara_user_1.webp",
-    venue: "Kashiyatra Festival Stage, IIT BHU",
-    dates: "Nov 02 - Nov 15, 2026",
-    runtime: "60 Mins (No Intermission)",
-    price: "Festival Pass Required"
-  }
-];
-
 export default function Plays() {
-  const [productions, setProductions] = useState<Production[]>(fallbackProductions);
+  const activeUser = JSON.parse(sessionStorage.getItem("aayam_active_user") || "null");
+  const isMaintainer = Boolean(
+    activeUser?.is_maintainer || 
+    activeUser?.role === "Maintainer" ||
+    (activeUser?.roles && Array.isArray(activeUser.roles) && activeUser.roles.some((r: any) => typeof r === "string" ? r.toLowerCase().includes("maintainer") || r.toLowerCase().includes("admin") || r.toLowerCase().includes("director") : (r.name || "").toLowerCase().includes("maintainer") || (r.name || "").toLowerCase().includes("admin")))
+  );
+
+  const [plays, setPlays] = useState<PlayItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<"upcoming" | "past">("upcoming");
+  
+  // Production Detail Modal State
+  const [selectedDetailPlay, setSelectedDetailPlay] = useState<ProductionDetailData | null>(null);
+
+  // Volunteer Modal State
+  const [volunteerOpen, setVolunteerOpen] = useState(false);
+  const [selectedPlayForVolunteer, setSelectedPlayForVolunteer] = useState<PlayItem | null>(null);
+  const [volName, setVolName] = useState("");
+  const [volEmail, setVolEmail] = useState("");
+  const [volPhone, setVolPhone] = useState("");
+  const [volDepartment, setVolDepartment] = useState("Stage Management & Props");
+  const [volAvailability, setVolAvailability] = useState("4-6 Hours / Week");
+  const [volNotes, setVolNotes] = useState("");
+  const [volSubmitting, setVolSubmitting] = useState(false);
+  const [volSuccess, setVolSuccess] = useState(false);
+
+  // Reservation Modal State
+  const [reserveSuccess, setReserveSuccess] = useState<string | null>(null);
+
+  // Script Preview Modal State
+  const [previewScript, setPreviewScript] = useState<Playbook | null>(null);
+  const [scriptModalOpen, setScriptModalOpen] = useState<boolean>(false);
+
+  const handleOpenScriptPreview = (play: PlayItem) => {
+    const playbook = getPlaybookForTitle(play.title);
+    setPreviewScript(playbook);
+    setScriptModalOpen(true);
+  };
+
+  const handleOpenDetails = (play: PlayItem) => {
+    setSelectedDetailPlay({
+      id: play.id,
+      title: play.title,
+      playwright: play.playwright,
+      director: play.director,
+      genre: play.genre,
+      language: play.language,
+      status: play.status || (!play.is_past ? "Upcoming Premiere" : "Archived Production"),
+      is_past: play.is_past,
+      tagline: play.tagline,
+      acts: play.acts,
+      description: play.description,
+      cast: play.cast,
+      season: play.season,
+      image: play.image,
+      venue: play.venue,
+      dates: play.dates,
+      runtime: play.runtime,
+      price: play.price,
+      category: "Stage Play"
+    });
+  };
 
   useEffect(() => {
-    fetch("http://localhost:5005/api/plays")
+    fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005"}/api/plays`)
       .then((res) => {
         if (!res.ok) throw new Error("HTTP error");
         return res.json();
       })
       .then((data) => {
         if (Array.isArray(data) && data.length > 0) {
-          setProductions(data);
+          setPlays(data);
         }
       })
       .catch((err) => {
         console.error("Failed to load plays from backend:", err);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   }, []);
 
+  const upcomingPlays = plays.filter(p => !p.is_past);
+  const pastPlays = plays.filter(p => p.is_past);
+  const displayedPlays = activeTab === "upcoming" ? upcomingPlays : pastPlays;
+
+  const handleOpenVolunteer = (play: PlayItem) => {
+    setSelectedPlayForVolunteer(play);
+    setVolSuccess(false);
+    setVolunteerOpen(true);
+  };
+
+  const handleSubmitVolunteer = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedPlayForVolunteer) return;
+    setVolSubmitting(true);
+
+    const payload = {
+      play_id: selectedPlayForVolunteer.id,
+      production_title: selectedPlayForVolunteer.title,
+      applicant_name: volName || "Volunteer Candidate",
+      applicant_email: volEmail || "volunteer@aayam.org",
+      applicant_phone: volPhone || "+91 98110 44321",
+      department: volDepartment,
+      availability: volAvailability,
+      notes: volNotes || "Passionate about theatre production."
+    };
+
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005"}/api/volunteer`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      if (res.ok) {
+        setVolSuccess(true);
+        setTimeout(() => {
+          setVolunteerOpen(false);
+          setVolSuccess(false);
+          setVolNotes("");
+        }, 2000);
+      } else {
+        alert("Could not record volunteer request. Please try again.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Network error. Please try again.");
+    } finally {
+      setVolSubmitting(false);
+    }
+  };
+
+  const handleReservePass = (playTitle: string) => {
+    setReserveSuccess(`Free Matinee Pass confirmed for "${playTitle}". An entry QR will be dispatched.`);
+    setTimeout(() => setReserveSuccess(null), 4000);
+  };
+
   return (
-    <div className="bg-[#fdf9f4] text-[#1c1b19] min-h-screen font-sans selection:bg-[#c6e4f7] pt-8 pb-16">
-      <main className="max-w-7xl mx-auto px-6 md:px-12">
-        {/* Header Section */}
-        <section className="mb-8 border-b border-[#cac6b9]/25 pb-6">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <span className="text-[10px] font-bold text-[#635f41] uppercase tracking-[0.25em] bg-[#c6e4f7]/30 px-3 py-1 rounded-full inline-block mb-2">
-                Our Stage Plays
-              </span>
-              <h1 className="font-serif text-3xl md:text-5xl text-[#635f41] font-bold tracking-tight">
-                The 2026 Production Season
+    <div className="bg-[#E7DDD3] text-[#2A1816] min-h-screen font-sans selection:bg-[#8C241E]/20 pt-8 pb-20">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12 space-y-12">
+        
+        {/* Toast */}
+        {reserveSuccess && (
+          <div className="fixed bottom-6 right-6 z-50 bg-[#F5EAE6] text-[#2A1816] px-5 py-3.5 rounded-2xl border border-[#DEBEB7] shadow-2xl flex items-center gap-3.5 animate-in fade-in">
+            <CheckCircle2 className="w-4 h-4 text-emerald-800 shrink-0" />
+            <span className="text-xs font-mono font-medium">{reserveSuccess}</span>
+            <button onClick={() => setReserveSuccess(null)} className="text-[#8C5A54] hover:text-[#2A1816]">
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        )}
+
+        {/* Editorial Header Section */}
+        <section className="bg-[#F2E5E0] border border-[#DCBAB2] rounded-[2.5rem] p-8 md:p-12 shadow-xs space-y-6">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div className="space-y-3">
+              <div className="inline-flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-widest text-[#8C5A54]">
+                <Flame className="w-3.5 h-3.5 text-[#8C241E]" />
+                <span>SEASON REPERTOIRE // AAYAM THEATRE SOCIETY</span>
+              </div>
+              <h1 className="font-serif text-4xl sm:text-6xl text-[#2A1816] font-normal tracking-tight leading-none">
+                Curated Stage Productions
               </h1>
-              <p className="text-xs md:text-sm text-[#49473d] max-w-2xl leading-relaxed font-light mt-2">
-                Discover the stories defining our seasonal calendar. Aayam showcases classical and contemporary stagecraft crafted with spatial depth, raw light, and dramatic resonance.
+              <p className="text-xs sm:text-sm text-[#5C3B37] max-w-2xl leading-relaxed font-light">
+                Discover the landmark Indian plays, classical dramas, and proscenium experiments defining Aayam's 2026 performance season.
               </p>
             </div>
+            
+            {/* Tab Switcher */}
+            <div className="flex items-center gap-2 bg-[#FAF2EE] p-1.5 rounded-full border border-[#DCBAB2] shadow-xs shrink-0 self-start md:self-auto">
+              <button
+                onClick={() => setActiveTab("upcoming")}
+                className={`px-5 py-2.5 rounded-full text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-2 ${
+                  activeTab === "upcoming"
+                    ? "bg-[#8C241E] text-[#FDF8F7] shadow-sm border border-[#A6352F]"
+                    : "text-[#5C3B37] hover:text-[#2A1816] hover:bg-[#EEDBD5]"
+                }`}
+              >
+                <span>Upcoming Premieres ({upcomingPlays.length || 3})</span>
+              </button>
+              <button
+                onClick={() => setActiveTab("past")}
+                className={`px-5 py-2.5 rounded-full text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-2 ${
+                  activeTab === "past"
+                    ? "bg-[#8C241E] text-[#FDF8F7] shadow-sm border border-[#A6352F]"
+                    : "text-[#5C3B37] hover:text-[#2A1816] hover:bg-[#EEDBD5]"
+                }`}
+              >
+                <span>Past Repertory ({pastPlays.length || 6})</span>
+              </button>
+            </div>
           </div>
         </section>
 
-        {/* 3-Column Play Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {productions.map((play) => (
-            <div 
-              key={play.id} 
-              className="flex flex-col bg-white border border-[#cac6b9]/25 rounded-2xl overflow-hidden shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 group"
-            >
-              {/* Playbill Poster Image */}
-              <div className="relative aspect-[16/10] overflow-hidden bg-[#f7f3ee]">
-                <img 
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
-                  alt={play.title} 
-                  src={play.image}
-                />
-                <div className="absolute top-4 right-4">
-                  <span className={`inline-flex items-center gap-1 px-3 py-1 text-[10px] font-bold rounded border uppercase tracking-wider bg-white/95 backdrop-blur-sm ${play.statusColor} shadow-sm`}>
-                    {play.status}
-                  </span>
-                </div>
-              </div>
+        {/* Plays Grid */}
+        <section className="space-y-6">
+          <div className="flex items-center justify-between border-b border-[#DCBAB2]/60 pb-3">
+            <h2 className="font-serif text-2xl sm:text-3xl text-[#2A1816] font-normal">
+              {activeTab === "upcoming" ? "Autumn Season 2026 Premieres" : "Archived Repertory Archive"}
+            </h2>
+            <span className="font-mono text-xs text-[#8C5A54]">
+              {displayedPlays.length} Production{displayedPlays.length !== 1 ? "s" : ""}
+            </span>
+          </div>
 
-              {/* Details & Contents */}
-              <div className="p-8 flex flex-col flex-grow justify-between">
-                <div>
-                  <span className="text-[10px] font-bold text-[#466272] tracking-widest uppercase mb-1 block">
-                    {play.season}
+          {loading ? (
+            <div className="text-center py-20 bg-[#FAF2EE] border border-[#DCBAB2] rounded-[2rem] text-[#8C5A54] font-serif italic text-sm">
+              Loading theatrical productions...
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {displayedPlays.map((play, idx) => (
+                <div
+                  key={play.id || idx}
+                  className="bg-[#2C2A28] text-white rounded-[2rem] border border-[#353535] overflow-hidden shadow-xl hover:border-[#E85F57]/50 hover:shadow-2xl transition-all duration-300 flex flex-col justify-between group"
+                >
+                  <div>
+                    {/* Visual Card Image Header */}
+                    <div className="relative aspect-[16/9] overflow-hidden bg-[#353535]">
+                      {play.image ? (
+                        <img
+                          src={play.image}
+                          alt={play.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 filter brightness-90 contrast-105"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-[#353535] text-white/50 font-serif italic text-sm">
+                          Aayam Repertory
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#2C2A28] via-transparent to-transparent" />
+                      
+                      <div className="absolute top-4 right-4">
+                        <span className={`inline-flex items-center gap-1 px-3 py-1 text-[9px] font-mono font-bold rounded-full uppercase tracking-wider shadow-md backdrop-blur-md border ${
+                          !play.is_past
+                            ? "bg-[#2C2A28]/90 text-emerald-300 border-emerald-500/40"
+                            : "bg-[#2C2A28]/90 text-white/60 border-white/20"
+                        }`}>
+                          {!play.is_past ? "Upcoming Premiere" : "Repertory"}
+                        </span>
+                      </div>
+
+                      <div className="absolute bottom-3 left-5 text-xs font-mono font-bold text-white/60 drop-shadow-sm">
+                        0{idx + 1} // {play.genre || "Drama"}
+                      </div>
+                    </div>
+
+                    {/* Card Body */}
+                    <div className="p-6 sm:p-7 space-y-4">
+                      <div className="space-y-1">
+                        <h3 className="font-serif text-2xl font-normal text-[#F7F5F0] group-hover:text-[#E85F57] transition-colors leading-snug">
+                          {play.title}
+                        </h3>
+                        {play.playwright && (
+                          <p className="text-xs text-white/70 font-serif italic">
+                            by <span className="font-normal text-white">{play.playwright}</span>
+                          </p>
+                        )}
+                      </div>
+
+                      <p className="text-xs text-white/70 leading-relaxed font-light line-clamp-2">
+                        {play.description}
+                      </p>
+
+                      <div className="grid grid-cols-2 gap-2 pt-3 border-t border-white/10 text-xs font-mono text-white/70">
+                        <div className="flex items-center gap-1.5 truncate">
+                          <MapPin className="w-3.5 h-3.5 text-[#E85F57] shrink-0" />
+                          <span className="truncate">{play.venue || "CLT Main Stage"}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 truncate">
+                          <Clock className="w-3.5 h-3.5 text-[#E85F57] shrink-0" />
+                          <span className="truncate">{play.runtime || "90 Mins"}</span>
+                        </div>
+                      </div>
+
+                      <div className="bg-[#353535]/50 p-3.5 rounded-xl border border-white/5 text-xs text-white/80 space-y-1">
+                        <div className="truncate"><strong className="text-white">Director:</strong> {play.director}</div>
+                        {play.cast && <div className="truncate text-white/60"><strong>Cast:</strong> {play.cast}</div>}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Card Actions - CLEAN SINGLE LINE WITHOUT ICONS */}
+                  <div className="p-4 sm:p-5 pt-0 border-t border-white/10 pt-3.5 flex items-center gap-2 w-full flex-nowrap">
+                    <button
+                      onClick={() => handleOpenDetails(play)}
+                      className="flex-1 py-2 px-2 rounded-full border border-white/20 hover:bg-white/10 text-white text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer truncate"
+                      title="View full production dossier"
+                    >
+                      Details
+                    </button>
+
+                    <button
+                      onClick={() => handleOpenScriptPreview(play)}
+                      className="flex-1 py-2 px-2 rounded-full border border-white/20 hover:bg-white/10 text-[#E85F57] text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer truncate"
+                      title="Preview Script & Playbook"
+                    >
+                      Script
+                    </button>
+
+                    {!play.is_past ? (
+                      <>
+                        <button
+                          onClick={() => handleReservePass(play.title)}
+                          className="flex-1 py-2 px-2 rounded-full bg-[#E85F57] hover:bg-[#D94538] text-white text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer shadow-md truncate"
+                        >
+                          Reserve
+                        </button>
+                        <button
+                          onClick={() => handleOpenVolunteer(play)}
+                          className="flex-1 py-2 px-2 rounded-full border border-white/20 hover:bg-white/10 text-white text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer truncate"
+                          title="Volunteer for Backstage Crew"
+                        >
+                          Crew
+                        </button>
+                      </>
+                    ) : (
+                      <span className="flex-1 py-2 px-2 rounded-full bg-white/10 border border-white/10 text-white/60 text-xs font-mono font-bold uppercase tracking-wider text-center truncate">
+                        Archived
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+
+        {/* VOLUNTEER FOR CREW MODAL */}
+        {volunteerOpen && selectedPlayForVolunteer && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
+            <div className="bg-[#F5EAE6] border border-[#DEBEB7] text-[#2A1816] rounded-[2.5rem] p-6 sm:p-8 max-w-lg w-full shadow-2xl relative max-h-[90vh] overflow-y-auto custom-scrollbar">
+              {/* Close button */}
+              <button
+                type="button"
+                onClick={() => setVolunteerOpen(false)}
+                className="absolute top-6 right-6 w-9 h-9 rounded-full bg-[#EEDBD5] hover:bg-[#E3CEC6] text-[#5C3B37] hover:text-[#2A1816] flex items-center justify-center transition-all cursor-pointer border border-[#D5AAA2] shadow-xs group z-20"
+              >
+                <X className="w-4 h-4 group-hover:rotate-90 transition-transform duration-200" />
+              </button>
+
+              <div className="space-y-6">
+                <div className="space-y-1.5 pr-8">
+                  <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#8C5A54] bg-[#EEDBD5] px-3 py-1 rounded-full border border-[#D5AAA2] inline-block">
+                    Production Crew Volunteer
                   </span>
-                  <h2 className="font-serif text-2xl font-bold text-[#635f41] group-hover:text-[#635f41]/90 transition-colors mb-4">
-                    {play.title}
+                  <h2 className="text-2xl font-serif text-[#2A1816] tracking-tight font-normal">
+                    Volunteer for: {selectedPlayForVolunteer.title}
                   </h2>
-                  <p className="text-sm text-[#49473d] mb-6 leading-relaxed font-light line-clamp-3">
-                    {play.description}
+                  <p className="text-xs text-[#5C3B37] font-light leading-relaxed">
+                    Join the backstage lighting, sound, makeup, wardrobe, or stage management team.
                   </p>
-
-                  {/* High-Fidelity Metadata Grid */}
-                  <div className="grid grid-cols-2 gap-x-4 gap-y-3 mb-6 pt-4 border-t border-[#cac6b9]/20">
-                    <div className="flex items-center gap-2.5 text-xs text-[#49473d]">
-                      <MapPin className="w-4 h-4 text-[#635f41] flex-shrink-0" />
-                      <span className="truncate">{play.venue}</span>
-                    </div>
-                    <div className="flex items-center gap-2.5 text-xs text-[#49473d]">
-                      <Calendar className="w-4 h-4 text-[#635f41] flex-shrink-0" />
-                      <span className="truncate">{play.dates}</span>
-                    </div>
-                    <div className="flex items-center gap-2.5 text-xs text-[#49473d]">
-                      <Clock className="w-4 h-4 text-[#635f41] flex-shrink-0" />
-                      <span className="truncate">{play.runtime}</span>
-                    </div>
-                    <div className="flex items-center gap-2.5 text-xs text-[#49473d]">
-                      <Ticket className="w-4 h-4 text-[#635f41] flex-shrink-0" />
-                      <span className="font-semibold">{play.price}</span>
-                    </div>
-                  </div>
-
-                  {/* Production Team details */}
-                  <div className="space-y-2 mb-8 bg-[#f7f3ee]/40 p-4 rounded-xl border border-[#cac6b9]/15">
-                    <div className="flex items-center gap-3 text-[#466272] text-xs">
-                      <BookOpen className="w-3.5 h-3.5 text-[#635f41]" />
-                      <span><strong>Director:</strong> {play.director}</span>
-                    </div>
-                    <div className="flex items-center gap-3 text-[#466272] text-xs">
-                      <Star className="w-3.5 h-3.5 text-[#635f41]" />
-                      <span><strong>Cast:</strong> {play.cast}</span>
-                    </div>
-                  </div>
                 </div>
 
-                {/* Interactive Action Buttons */}
-                <div className="flex flex-col gap-3 mt-auto">
-                  <button className="w-full bg-[#635f41] text-white py-3 rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-[#635f41]/90 shadow-sm transition-all active:scale-95 flex items-center justify-center gap-2">
-                    <Ticket className="w-4 h-4" /> Buy Tickets
-                  </button>
-                  <button className="w-full border border-[#cac6b9] text-[#635f41] py-3 text-xs font-bold rounded-xl hover:bg-[#635f41]/5 transition-colors uppercase tracking-widest">
-                    Sponsor this Play
-                  </button>
-                </div>
+                {volSuccess ? (
+                  <div className="p-5 rounded-2xl bg-emerald-700/15 border border-emerald-700/30 text-emerald-950 flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-800 shrink-0 mt-0.5" />
+                    <div className="text-xs space-y-1">
+                      <p className="font-bold font-mono uppercase tracking-wider">Application Received!</p>
+                      <p>The production maintainer desk has received your crew volunteering request. We will contact you soon.</p>
+                    </div>
+                  </div>
+                ) : (
+                  <form onSubmit={handleSubmitVolunteer} className="space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-1">
+                        <label className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#8C5A54] block">
+                          Full Name *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={volName}
+                          onChange={e => setVolName(e.target.value)}
+                          placeholder="Your Name"
+                          className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl px-3.5 py-2.5 text-xs text-[#2A1816] focus:outline-hidden focus:border-[#8C241E]"
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#8C5A54] block">
+                          Email Address *
+                        </label>
+                        <input
+                          type="email"
+                          required
+                          value={volEmail}
+                          onChange={e => setVolEmail(e.target.value)}
+                          placeholder="your.email@aayam.org"
+                          className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl px-3.5 py-2.5 text-xs text-[#2A1816] focus:outline-hidden focus:border-[#8C241E]"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-1">
+                        <label className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#8C5A54] block">
+                          Contact Phone
+                        </label>
+                        <input
+                          type="tel"
+                          value={volPhone}
+                          onChange={e => setVolPhone(e.target.value)}
+                          placeholder="+91 98110 44321"
+                          className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl px-3.5 py-2.5 text-xs text-[#2A1816] focus:outline-hidden focus:border-[#8C241E]"
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#8C5A54] block">
+                          Preferred Department
+                        </label>
+                        <select
+                          value={volDepartment}
+                          onChange={e => setVolDepartment(e.target.value)}
+                          className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl px-3.5 py-2.5 text-xs text-[#2A1816] focus:outline-hidden focus:border-[#8C241E]"
+                        >
+                          <option value="Stage Management & Props">Stage Management & Props</option>
+                          <option value="Lighting Console & DMX Cues">Lighting Console & DMX Cues</option>
+                          <option value="Prosthetics, Mask Craft & SFX">Prosthetics, Mask Craft & SFX</option>
+                          <option value="Wardrobe & Period Costumes">Wardrobe & Period Costumes</option>
+                          <option value="Live Soundscape & Acoustic Audio">Live Soundscape & Acoustic Audio</option>
+                          <option value="Front of House & Ticketing">Front of House & Ticketing</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#8C5A54] block">
+                        Weekly Availability
+                      </label>
+                      <select
+                        value={volAvailability}
+                        onChange={e => setVolAvailability(e.target.value)}
+                        className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl px-3.5 py-2.5 text-xs text-[#2A1816] focus:outline-hidden focus:border-[#8C241E]"
+                      >
+                        <option value="2-4 Hours / Week (Light Support)">2-4 Hours / Week (Light Support)</option>
+                        <option value="4-6 Hours / Week (Regular Rehearsals)">4-6 Hours / Week (Regular Rehearsals)</option>
+                        <option value="8+ Hours / Week (Intensive Production Crew)">8+ Hours / Week (Intensive Production Crew)</option>
+                        <option value="Weekends Only">Weekends Only</option>
+                      </select>
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#8C5A54] block">
+                        Motivation / Experience Note
+                      </label>
+                      <textarea
+                        rows={3}
+                        required
+                        value={volNotes}
+                        onChange={e => setVolNotes(e.target.value)}
+                        placeholder="Tell the director why you'd like to join this crew and any past backstage or creative experience..."
+                        className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl p-3 text-xs text-[#2A1816] focus:outline-hidden focus:border-[#8C241E] leading-relaxed"
+                      />
+                    </div>
+
+                    <div className="pt-2 flex items-center justify-end gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setVolunteerOpen(false)}
+                        className="px-5 py-2.5 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={volSubmitting}
+                        className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-6 py-2.5 rounded-full text-xs font-mono font-bold uppercase tracking-widest shadow-sm flex items-center gap-2 transition-all cursor-pointer border border-[#A6352F] disabled:opacity-50"
+                      >
+                        <Check className="w-4 h-4" />
+                        <span>{volSubmitting ? "Submitting..." : "Submit Volunteer Request"}</span>
+                      </button>
+                    </div>
+                  </form>
+                )}
               </div>
             </div>
-          ))}
-        </div>
-
-        {/* Custom Staging & Hiring Section */}
-        <section className="mt-28 bg-[#c6e4f7]/30 rounded-3xl p-12 text-center border border-[#8CC0EB]/20">
-          <h2 className="font-serif text-3xl md:text-5xl text-[#635f41] mb-6 font-bold tracking-tight">Custom Productions & Staging</h2>
-          <p className="text-base text-[#49473d] max-w-2xl mx-auto mb-10 leading-relaxed font-light">
-            Sponsor a play of your choice or hire our professional ensemble to produce custom theatrical campaigns. We craft tailored productions regarding brand advertisements, corporate messaging, and public awareness campaigns.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-[#635f41] text-white px-8 py-4 rounded-full text-xs font-bold uppercase tracking-wider shadow-md active:scale-95 transition-all">
-              Hire Our Ensemble
-            </button>
-            <button className="border border-[#635f41] text-[#635f41] hover:bg-[#635f41]/5 px-8 py-4 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-300">
-              Inquire for Staging & Ads
-            </button>
           </div>
-        </section>
+        )}
+
+        {/* SCRIPT PREVIEW MODAL */}
+        <ScriptPreviewModal
+          open={scriptModalOpen}
+          onClose={() => setScriptModalOpen(false)}
+          script={previewScript}
+        />
+
+        {/* PRODUCTION FULL DOSSIER DETAIL MODAL */}
+        <ProductionDetailModal
+          open={Boolean(selectedDetailPlay)}
+          onClose={() => setSelectedDetailPlay(null)}
+          production={selectedDetailPlay}
+          onOpenScript={(title) => {
+            const pb = getPlaybookForTitle(title);
+            setPreviewScript(pb);
+            setScriptModalOpen(true);
+          }}
+        />
       </main>
     </div>
   );
 }
+

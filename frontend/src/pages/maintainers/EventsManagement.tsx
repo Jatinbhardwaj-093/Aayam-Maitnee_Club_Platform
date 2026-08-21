@@ -1,1173 +1,1903 @@
 // @ts-nocheck
-import { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import {
-  Calendar,
-  Search,
-  CheckCircle2,
-  Plus,
-  MapPin,
-  Clock,
-  Users,
-  Shield,
-  FileText,
-  ArrowLeft,
-  Save,
-  Send,
-  X,
-  Check,
-  DollarSign,
-  Building,
-  Tag,
-  ExternalLink,
-  Award,
-  BadgeAlert,
-  ThumbsUp,
-  ThumbsDown,
-  Sparkles,
-  Wand2
+  Calendar, Search, Plus, MapPin, Clock, Users, Shield, FileText, ArrowRight,
+  CheckCircle2, DollarSign, Building, Tag, ExternalLink, Activity, PlayCircle,
+  Sparkles, X, HeartHandshake, ClipboardList, Check, AlertCircle, Video, Star,
+  SlidersHorizontal, ChevronRight, ChevronDown, RefreshCw, UserCheck, UserX, MessageSquare,
+  BookOpen, Edit3, Send, CheckSquare, XCircle, ArrowUpRight, Info, Heart, Coins,
+  Lock, Unlock, Flame, Filter
 } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import ScriptPreviewModal from "@/components/ScriptPreviewModal";
+import ProductionDetailModal from "@/components/ProductionDetailModal";
+import type { ProductionDetailData } from "@/components/ProductionDetailModal";
+import ProductionEditModal from "@/components/ProductionEditModal";
+import { getPlaybookForTitle } from "@/data/playbooksData";
+import type { Playbook } from "@/data/playbooksData";
 
-// Default Fallback Data to prevent any blank page rendering
-const DEFAULT_EVENTS = [
+interface EventItem {
+  id: string | number;
+  title: string;
+  category: string;
+  date: string;
+  venue: string;
+  timeRange?: string;
+  status: string;
+  is_past?: boolean;
+  description?: string;
+  play_id?: number;
+  playwright?: string;
+  director?: string;
+  image?: string;
+  cast?: string;
+  genre?: string;
+  language?: string;
+  tagline?: string;
+  acts?: string;
+  price?: string;
+  is_sponsored?: boolean;
+  sponsor_name?: string;
+  sponsor_amount?: string;
+  patronage_open?: boolean;
+  donations_collected?: string;
+  target_budget?: string;
+  auditionCount?: number;
+  applicantCount?: number;
+  volunteerCount?: number;
+}
+
+interface ProposalItem {
+  id: number;
+  name: string;
+  title?: string;
+  description: string;
+  date: string;
+  event_date?: string;
+  venue: string;
+  location_or_link?: string;
+  budget: string;
+  proposalType: string;
+  sourceType: "Member" | "Sponsor";
+  status: string;
+  contact_email: string;
+  contact_phone: string;
+  submitter: {
+    name: string;
+    initials: string;
+    email: string;
+    phone: string;
+  };
+}
+
+// Rich Fallback Upcoming Events (3 Society Open Events taking Donations + 2 Accepted Sponsor Events)
+const fallbackUpcomingEvents: EventItem[] = [
   {
-    id: 1,
-    title: "Musimprov (with Akord) - Musical Improv Session",
-    category: "Meetups",
-    date: "Jul 25, 2026",
-    venue: "Main Auditorium - Royal Stage",
-    description: "Interactive musical improvisation session blending rhythm, dialogue, and spontaneous theatrical scoring.",
-    status: "upcoming",
-    image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=600&auto=format&fit=crop"
-  },
-  {
-    id: 2,
-    title: "Sahitya Sabha - Chit-Chat & Jamming Session",
-    category: "Meetups",
-    date: "Jul 28, 2026",
-    venue: "Rehearsal Hall B",
-    description: "Casual literature gathering, script reading circle, and creative dialogue jamming for members.",
-    status: "upcoming",
-    image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=600&auto=format&fit=crop"
-  },
-  {
-    id: 3,
-    title: "Theatre Masterclass with Gyaneshwar Mishra",
-    category: "Masterclass",
-    date: "Aug 02, 2026",
-    venue: "Aayam Stage 2",
-    description: "In-depth masterclass focusing on vocal projection, body language, and dramatic characterization.",
-    status: "upcoming",
-    image: "https://images.unsplash.com/photo-1460723237483-7a6dc9d0b212?q=80&w=600&auto=format&fit=crop"
-  },
-  {
-    id: 4,
-    title: "Darpan 2026 Annual Drama Festival",
+    id: "play-1",
+    play_id: 1,
+    title: "Hayavadana",
     category: "Plays",
-    date: "Aug 15, 2026",
-    venue: "Royal Stage Auditorium",
-    description: "Annual multi-play dramatic showcase featuring full-ensemble stage productions.",
-    status: "upcoming",
-    image: "https://images.unsplash.com/photo-1507676184212-d0330a151f15?q=80&w=600&auto=format&fit=crop"
-  }
-];
-
-const DEFAULT_SPONSOR_ADS = [
+    date: "Sep 18 - 20, 2026",
+    venue: "CLT Main Stage, IIT Madras",
+    timeRange: "18:00 - 20:30",
+    status: "Upcoming Premiere",
+    is_past: false,
+    is_sponsored: false,
+    patronage_open: true,
+    donations_collected: "₹45,000",
+    target_budget: "₹65,000",
+    description: "Girish Karnad's legendary mythic drama on identity and desire, presented in dual-language Hindi/English translation with live Yakshagana folk percussion.",
+    playwright: "Girish Karnad",
+    director: "Utkarsh (Yuuhi)",
+    cast: "Devadatta (Lead Actor), Kapila (Lead Actor), Padmini (Lead Actress), Hayavadana (Chorus Lead)",
+    genre: "Classical Dramatic Verse",
+    language: "Hindi & English",
+    tagline: "The search for completeness of mind, body, and human intellect.",
+    acts: "2 Acts • Full Length",
+    price: "Free Student Pass",
+    image: "/aayam_assets/tamashbin_user_1.jpg",
+    auditionCount: 4,
+    applicantCount: 8,
+    volunteerCount: 5
+  },
   {
-    id: 1,
+    id: "play-2",
+    play_id: 2,
+    title: "Ashadh Ka Ek Din",
+    category: "Plays",
+    date: "Oct 09 - 11, 2026",
+    venue: "CLT Main Stage, IIT Madras",
+    timeRange: "18:30 - 21:00",
+    status: "Upcoming Premiere",
+    is_past: false,
+    is_sponsored: false,
+    patronage_open: true,
+    donations_collected: "₹32,000",
+    target_budget: "₹50,000",
+    description: "Mohan Rakesh's poetic masterpiece portraying Kalidasa's emotional dilemmas in the misty Himalayan valley of Ujjayini.",
+    playwright: "Mohan Rakesh",
+    director: "Abay Nandhiga",
+    cast: "Kalidasa (Lead Performer), Mallika (Principal Actress), Ambika (Mother), Vilom (Antagonist)",
+    genre: "Modern Classical Hindi Drama",
+    language: "Pure Literary Hindi",
+    tagline: "The eternal conflict between artistic purity and royal patronage.",
+    acts: "3 Acts • 120 Mins",
+    price: "Free Student Pass",
+    image: "/aayam_assets/kky_user_5.jpg",
+    auditionCount: 3,
+    applicantCount: 6,
+    volunteerCount: 4
+  },
+  {
+    id: "play-3",
+    play_id: 3,
+    title: "Charandas Chor",
+    category: "Plays",
+    date: "Oct 24 - 25, 2026",
+    venue: "OAT Amphitheatre, IIT Madras",
+    timeRange: "17:30 - 19:45",
+    status: "Upcoming Premiere",
+    is_past: false,
+    is_sponsored: false,
+    patronage_open: true,
+    donations_collected: "₹28,500",
+    target_budget: "₹40,000",
+    description: "Habib Tanvir's folk satire about an honest thief caught between four vows, staged in open-air Nacha folk theatre style with dholak and singing choruses.",
+    playwright: "Habib Tanvir",
+    director: "Samarth Shrivastava",
+    cast: "Charandas (Principal Lead), Queen (Principal Antagonist), Havaldar (Folk Chorus), Priest",
+    genre: "Chhattisgarhi Folk Satire",
+    language: "Hindi & Folk Dialect",
+    tagline: "Truth in thievery, and deception on royal thrones.",
+    acts: "2 Acts • Folk Musical",
+    price: "Free Student Pass",
+    image: "/aayam_assets/dddj_user_1.jpg",
+    auditionCount: 3,
+    applicantCount: 5,
+    volunteerCount: 6
+  },
+  {
+    id: "evt-sponsor-1",
+    title: "FabIndia Natya Utsav: Traditional Handloom Costume & Folk Staging Showcase",
+    category: "Sponsor Showcase",
+    date: "Oct 04, 2026",
+    venue: "Open Air Theatre (OAT), IIT Madras",
+    timeRange: "17:00 - 21:00",
+    status: "Scheduled Premiere",
+    is_past: false,
+    is_sponsored: true,
+    sponsor_name: "FabIndia Handlooms",
+    sponsor_amount: "₹1,80,000 Funded Deal",
+    patronage_open: false,
+    donations_collected: "₹0",
+    description: "A grand cultural showcase sponsored by FabIndia presenting authentic handloom period costumes, classical Sanskrit verse adaptations, and textile craft exhibitions on proscenium stage.",
+    playwright: "Curated by FabIndia Cultural Trust",
+    director: "Aditi Sharma",
+    genre: "Costume & Classical Sanskrit Showcase",
+    language: "Sanskrit & Hindi",
+    acts: "2 Showcase Acts",
+    price: "Free Pass with Registration",
+    image: "/aayam_assets/samatvam_user_4.jpg",
+    auditionCount: 2,
+    applicantCount: 5,
+    volunteerCount: 6
+  },
+  {
+    id: "evt-sponsor-2",
+    title: "Red Bull Street Monologue & Acoustic Percussion Slam",
+    category: "Sponsor Showcase",
+    date: "Sep 24, 2026",
+    venue: "SAC Amphitheatre & CLT Steps, IIT Madras",
+    timeRange: "16:30 - 20:00",
+    status: "Scheduled Premiere",
+    is_past: false,
+    is_sponsored: true,
     sponsor_name: "Red Bull India",
-    contact_person: "Rohan Sharma (Brand Manager)",
-    contact_email: "rohan.sharma@redbull.co.in",
-    contact_phone: "+91 98110 44321",
-    ad_title: "Energy Lounge & Main Stage Playbill Cover",
-    ad_category: "Playbill Banner",
-    target_event_name: "Tamashbin Kathputliya Courtyard Staging",
-    budget_offered: "₹1,50,000",
-    ad_description: "Official Exclusive Energy Drink & Refreshment Partner for Aayam Cultural Season 2026. Deliverables include a dedicated Red Bull Green Room Lounge for cast and crew, prominent front-cover logo placement on 5,000 physical playbills across all mainstage drama shows, pop-up sampling counters during intermission breaks, and 200 complimentary VIP audience passes with branded coupon vouchers.",
-    status: "Pending",
-    submitted_at: "Jul 21, 2026 • 01:15 PM"
-  },
-  {
-    id: 2,
-    sponsor_name: "FabIndia Ethnic Craft",
-    contact_person: "Ananya Deshmukh (Sponsorship Head)",
-    contact_email: "sponsorships@fabindia.com",
-    contact_phone: "+91 98201 88765",
-    ad_title: "Traditional Costume & Folk Aesthetic Partner",
-    ad_category: "Stage Sidecar",
-    target_event_name: "Karn Ki Yachika Verse Play",
-    budget_offered: "₹85,000",
-    ad_description: "Title Wardrobe Craft & Folk Aesthetic Partner for historical verse plays including 'Karn Ki Yachika' and 'Tamashbin Kathputliya'. FabIndia provides handcrafted silk shawls, authentic handloom drapes, and traditional stage props valued at ₹85,000. Deliverables include dual side-stage banner displays, full-page catalog insertion in physical playbills, and exclusive pre-show foyer exhibition counter.",
-    status: "Approved",
-    submitted_at: "Jul 20, 2026 • 11:30 AM"
-  },
-  {
-    id: 3,
-    sponsor_name: "Zebronics Sound Systems",
-    contact_person: "Vikram Rao (Marketing Director)",
-    contact_email: "events@zebronics.com",
-    contact_phone: "+91 97400 33211",
-    ad_title: "Pro Acoustic & Wireless Mic Gear Sponsorship",
-    ad_category: "Digital Screen",
-    target_event_name: "Annual Aayam Theatre Festival 2026",
-    budget_offered: "₹1,20,000",
-    ad_description: "Audio Technology & Acoustic Hardware Sponsorship for the Annual Aayam Theatre Festival 2026. Zebronics supplies 12 high-definition wireless lapel microphonic systems, stage monitor speakers, and digital soundboard equipment. Deliverables include digital banner loops displayed across auditorium lobby screens 30 minutes before showtime and brand attribution in all press releases.",
-    status: "Pending",
-    submitted_at: "Jul 19, 2026 • 04:45 PM"
+    sponsor_amount: "₹1,50,000 Funded Deal",
+    patronage_open: false,
+    donations_collected: "₹0",
+    description: "High-intensity open-air competitive dramatic monologue slam with live folk dholak percussion rhythms, artist hospitality lounge, and brand sampling kiosks.",
+    playwright: "Aayam Street Theatre Wing",
+    director: "Harsh Aryan",
+    genre: "Competitive Monologue Slam",
+    language: "Multilingual",
+    acts: "3 Slam Rounds",
+    price: "Free Entry",
+    image: "/aayam_assets/dddj_user_2.jpg",
+    auditionCount: 2,
+    applicantCount: 7,
+    volunteerCount: 4
   }
 ];
 
-const DEFAULT_PROPOSALS = [
+// Rich Fallback Pitches (1 Pending Sponsor Pitch + 3 Member Pitches)
+const fallbackPitches: ProposalItem[] = [
   {
     id: 101,
-    name: "Acoustic Folk Jam & Poetry Slam",
-    submitter: { name: "Sneha Das", initials: "SD", email: "sneha.das@aayam.org", phone: "+91 98301 77654" },
-    contact_email: "sneha.das@aayam.org",
-    contact_phone: "+91 98301 77654",
-    date: "Jul 29, 2026",
-    venue: "Aayam Art Foyer & Courtyard",
-    sourceType: "Member",
-    proposalType: "Member Pitch",
-    sponsorshipDeal: "Club Member Pitch",
-    budget: "₹25,000",
-    status: "Reviewing",
-    description: "An intimate open-mic evening for ensemble members and acoustic artists to perform live poetry, folk music, and experimental verse drama in the courtyard lounge."
+    name: "AudioCraft Pro Spatial Acoustics & Live Stagecraft Masterclass",
+    description: "Commercial audio-engineering workshop and masterclass offering 100% sound console equipment sponsorship and ₹1,20,000 event budget in exchange for Aayam stage banner placement and live product showcase.",
+    date: "Oct 18, 2026",
+    venue: "CLT Tech Booth & Acoustic Studio 1",
+    budget: "₹1,20,000 (Funded Sponsorship)",
+    proposalType: "Sponsor Ad Proposal",
+    sourceType: "Sponsor",
+    status: "Pending",
+    contact_email: "partner.relations@audiocraft.in",
+    contact_phone: "+91 98402 77112",
+    submitter: {
+      name: "AudioCraft Pro Systems (Pvt Ltd)",
+      initials: "AC",
+      email: "partner.relations@audiocraft.in",
+      phone: "+91 98402 77112"
+    }
   },
   {
     id: 102,
-    name: "Physical Movement & Mime Masterclass",
-    submitter: { name: "Samarth Shrivastava", initials: "SS", email: "samarth.s@aayam.org", phone: "+91 98712 33445" },
-    contact_email: "samarth.s@aayam.org",
-    contact_phone: "+91 98712 33445",
-    date: "Aug 05, 2026",
-    venue: "Rehearsal Hall B - Studio 2",
+    name: "The Glass Menagerie — Aayam Intimate Blackbox Staging",
+    description: "An intimate memory play exploring psychological vulnerability and southern poetic realism, proposed for a 4-show weekend run inside SAC Blackbox with minimalist lighting design.",
+    date: "Sep 22, 2026",
+    venue: "SAC Intimate Blackbox Studio",
+    budget: "₹30,000",
+    proposalType: "Member Event Pitch",
     sourceType: "Member",
-    proposalType: "Member Pitch",
-    sponsorshipDeal: "Club Member Pitch",
-    budget: "₹35,000",
-    status: "Reviewing",
-    description: "Intensive 3-hour movement workshop focusing on body language, character silhouette, and non-verbal physical theatre techniques led by senior choreographers."
+    status: "Pending",
+    contact_email: "aditi.sharma@study.iitm.ac.in",
+    contact_phone: "+91 98450 12345",
+    submitter: {
+      name: "Aditi Sharma",
+      initials: "AS",
+      email: "aditi.sharma@study.iitm.ac.in",
+      phone: "+91 98450 12345"
+    }
   },
   {
     id: 103,
-    name: "Red Bull Energy Stage & Playbill Showcase",
-    submitter: { name: "Rohan Sharma (Red Bull India)", initials: "RS", email: "rohan.sharma@redbull.co.in", phone: "+91 98110 44321" },
-    contact_email: "rohan.sharma@redbull.co.in",
-    contact_phone: "+91 98110 44321",
-    date: "Aug 15, 2026",
-    venue: "Main Stage Auditorium",
-    sourceType: "Sponsor",
-    proposalType: "Sponsor Ad Proposal",
-    sponsorshipDeal: "₹1,50,000 Corporate Sponsorship",
-    budget: "₹1,50,000",
-    status: "Reviewing",
-    description: "Red Bull India sponsorship proposal featuring custom stage sidecar banners, energy lounges for crew, and branded playbills for the annual drama festival."
-  }
-];
-
-const EVENT_TEMPLATES = [
-  {
-    id: "template-play",
-    name: "Mainstage Play Event",
-    category: "Mainstage Performance",
-    defaultTitle: "Macbeth - Evening Grand Gala",
-    defaultDescription: "Full ensemble production performance with live stagecraft, orchestration, and VIP guest seating.",
-    defaultVenue: "Main Auditorium - Royal Stage",
-    defaultCapacity: "350 seats",
-    defaultDuration: "19:00 - 21:30",
-    tags: ["Mainstage", "Ticketed", "Live Performance"],
-    image: "https://images.unsplash.com/photo-1507676184212-d0330a151f15?q=80&w=600&auto=format&fit=crop"
+    name: "Acoustic Folk Jam & Vocal Modulations",
+    description: "An intimate evening blending vocal breathing exercises, Hindustani folk chanting, and acoustic musical cues with Akord music society.",
+    date: "Sep 10, 2026",
+    venue: "SAC Acoustic Room, IIT Madras",
+    budget: "₹25,000",
+    proposalType: "Member Workshop Pitch",
+    sourceType: "Member",
+    status: "Pending",
+    contact_email: "sneha.das@study.iitm.ac.in",
+    contact_phone: "+91 98301 77654",
+    submitter: {
+      name: "Sneha Das",
+      initials: "SD",
+      email: "sneha.das@study.iitm.ac.in",
+      phone: "+91 98301 77654"
+    }
   },
   {
-    id: "template-meetup",
-    name: "Member Meetup & Social",
-    category: "Club Social",
-    defaultTitle: "Monthly Backstage Script Reading & Mixer",
-    defaultDescription: "Casual gathering for ensemble members to read fresh script drafts, discuss upcoming auditions, and network.",
-    defaultVenue: "Rehearsal Hall B",
-    defaultCapacity: "45 seats",
-    defaultDuration: "17:00 - 18:30",
-    tags: ["Internal", "Free Entry", "Networking"],
-    image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=600&auto=format&fit=crop"
-  },
-  {
-    id: "template-workshop",
-    name: "Workshop & Masterclass",
-    category: "Masterclass",
-    defaultTitle: "Stage Lighting & Scenic Audio Masterclass",
-    defaultDescription: "Hands-on technical workshop covering DMX lighting boards, sound mixing, and stage cue management.",
-    defaultVenue: "Technical Booth & Stage 2",
-    defaultCapacity: "25 seats",
-    defaultDuration: "14:00 - 17:00",
-    tags: ["Workshop", "Technical Crew", "Hands-on"],
-    image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=600&auto=format&fit=crop"
+    id: 104,
+    name: "Physical Movement & Navarasa Mime Masterclass",
+    description: "A 3-hour movement masterclass focusing on body language, character silhouette, and non-verbal physical theatre techniques led by senior choreographers.",
+    date: "Sep 05, 2026",
+    venue: "Rehearsal Hall B - Studio 2",
+    budget: "₹35,000",
+    proposalType: "Member Workshop Pitch",
+    sourceType: "Member",
+    status: "Pending",
+    contact_email: "samarth.s@study.iitm.ac.in",
+    contact_phone: "+91 98712 33445",
+    submitter: {
+      name: "Samarth Shrivastava",
+      initials: "SS",
+      email: "samarth.s@study.iitm.ac.in",
+      phone: "+91 98712 33445"
+    }
   }
 ];
 
 export default function EventsManagement() {
-  const [activeTab, setActiveTab] = useState<"Upcoming" | "Past" | "Proposals" | "Sponsor Ads">("Upcoming");
-  const [proposalSourceFilter, setProposalSourceFilter] = useState<"All" | "Sponsor" | "Member">("All");
+  const [activeTab, setActiveTab] = useState<"calendar" | "pitches">("calendar");
+  const [eventsList, setEventsList] = useState<EventItem[]>(fallbackUpcomingEvents);
+  const [proposalsList, setProposalsList] = useState<ProposalItem[]>(fallbackPitches);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [categoryFilter, setCategoryFilter] = useState<string>("All");
 
-  // Creation Studio View Toggle
-  const [isCreatingEvent, setIsCreatingEvent] = useState(false);
+  // Pitches Tab Filter
+  const [pitchSourceFilter, setPitchSourceFilter] = useState<"all" | "member" | "sponsor">("all");
+  const [pitchStatusFilter, setPitchStatusFilter] = useState<"all" | "pending" | "approved" | "rejected">("all");
+  const [statusDropdownOpen, setStatusDropdownOpen] = useState<boolean>(false);
+  const statusDropdownRef = useRef<HTMLDivElement>(null);
 
-  // Database Events & Proposals State
-  const [dbEvents, setDbEvents] = useState<any[]>(DEFAULT_EVENTS);
-  const [proposals, setProposals] = useState<any[]>(DEFAULT_PROPOSALS);
-  const [selectedProposalId, setSelectedProposalId] = useState<number | null>(101);
-
-  // Database Sponsor Ads Requests State
-  const [sponsorAds, setSponsorAds] = useState<any[]>(DEFAULT_SPONSOR_ADS);
-
-  // Search & Filter
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("All");
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
-
-  // AI Keyword Extractor State
-  const [extractedKeywords, setExtractedKeywords] = useState<Record<string, string[]>>({});
-  const [isExtractingId, setIsExtractingId] = useState<string | number | null>(null);
-
-  const handleToggleAIKeywords = async (keyId: string | number, desc: string) => {
-    const key = String(keyId);
-    if (extractedKeywords[key]) {
-      setExtractedKeywords((prev) => {
-        const copy = { ...prev };
-        delete copy[key];
-        return copy;
-      });
-      return;
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (statusDropdownRef.current && !statusDropdownRef.current.contains(event.target as Node)) {
+        setStatusDropdownOpen(false);
+      }
     }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
-    setIsExtractingId(keyId);
+  // Auditions & Volunteer Data
+  const [allPositions, setAllPositions] = useState<any[]>([]);
+  const [allApplications, setAllApplications] = useState<any[]>([]);
+  const [allVolunteers, setAllVolunteers] = useState<any[]>([]);
+
+  // Modals
+  const [selectedEventForAuditions, setSelectedEventForAuditions] = useState<EventItem | null>(null);
+  const [selectedEventForVolunteers, setSelectedEventForVolunteers] = useState<EventItem | null>(null);
+  const [actionSuccessMsg, setActionSuccessMsg] = useState<string | null>(null);
+
+  // Script Preview Modal
+  const [previewScript, setPreviewScript] = useState<Playbook | null>(null);
+  const [scriptModalOpen, setScriptModalOpen] = useState<boolean>(false);
+
+  // Production Detail & Edit Modals
+  const [selectedDetailProd, setSelectedDetailProd] = useState<ProductionDetailData | null>(null);
+  const [selectedEditProd, setSelectedEditProd] = useState<ProductionDetailData | null>(null);
+
+  // Patronage / Donation Modal
+  const [selectedEventForDonation, setSelectedEventForDonation] = useState<EventItem | null>(null);
+  const [donorPledgeAmount, setDonorPledgeAmount] = useState<string>("₹2,000");
+  const [donorName, setDonorName] = useState<string>("Society Patron / Alum");
+
+  // Review & Edit Pitch Modal (Before Approving to Events)
+  const [editingPitch, setEditingPitch] = useState<ProposalItem | null>(null);
+  const [editFormData, setEditFormData] = useState({
+    title: "",
+    category: "Workshops",
+    venue: "",
+    event_date: "2026-09-15",
+    description: "",
+    budget: "",
+    is_sponsored: false,
+    sponsor_name: "",
+    max_participants: 60
+  });
+  const [submittingDecision, setSubmittingDecision] = useState<boolean>(false);
+
+  const handleOpenScriptPreview = (eventItem: EventItem) => {
+    const playbook = getPlaybookForTitle(eventItem.title);
+    setPreviewScript(playbook);
+    setScriptModalOpen(true);
+  };
+
+  const handleOpenDetails = (ev: EventItem) => {
+    setSelectedDetailProd({
+      id: ev.id,
+      title: ev.title,
+      category: ev.category,
+      venue: ev.venue,
+      dates: ev.date,
+      runtime: ev.timeRange,
+      status: ev.status,
+      is_past: false,
+      description: ev.description,
+      playwright: ev.playwright || "Aayam Repertory",
+      director: ev.director || "Aayam Directorial Council",
+      image: ev.image || "/aayam_assets/tamashbin_user_1.jpg",
+      cast: ev.cast || "",
+      genre: ev.genre,
+      language: ev.language,
+      tagline: ev.tagline,
+      acts: ev.acts,
+      price: ev.price || "Free Society Pass"
+    });
+  };
+
+  const handleOpenEdit = (ev: EventItem) => {
+    setSelectedEditProd({
+      id: ev.id,
+      title: ev.title,
+      category: ev.category,
+      venue: ev.venue,
+      dates: ev.date,
+      runtime: ev.timeRange,
+      status: ev.status,
+      is_past: false,
+      description: ev.description,
+      playwright: ev.playwright || "Aayam Repertory",
+      director: ev.director || "Aayam Directorial Council",
+      image: ev.image || "/aayam_assets/tamashbin_user_1.jpg",
+      cast: ev.cast || "",
+      genre: ev.genre,
+      language: ev.language,
+      tagline: ev.tagline,
+      acts: ev.acts,
+      season: "Autumn 2026",
+      price: ev.price || "Free Society Pass"
+    });
+  };
+
+  const handleProductionEditSuccess = (updated: ProductionDetailData) => {
+    setEventsList(prev => prev.map(item => {
+      if (item.id === updated.id || String(item.id).endsWith(String(updated.id))) {
+        return {
+          ...item,
+          title: updated.title,
+          description: updated.description,
+          venue: updated.venue,
+          date: updated.dates || item.date,
+          timeRange: updated.runtime || item.timeRange,
+          image: updated.image || item.image,
+          status: updated.status || item.status,
+          playwright: updated.playwright || item.playwright,
+          director: updated.director || item.director,
+          cast: updated.cast || item.cast,
+          genre: updated.genre || item.genre,
+          language: updated.language || item.language,
+          tagline: updated.tagline || item.tagline,
+          acts: updated.acts || item.acts,
+          price: updated.price || item.price
+        };
+      }
+      return item;
+    }));
+    setActionSuccessMsg(`Production '${updated.title}' updated successfully.`);
+    setTimeout(() => setActionSuccessMsg(null), 4000);
+  };
+
+  // Load backend data with robust baseUrl and fallback fallback
+  const fetchData = async () => {
+    setLoading(true);
     const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005";
+
     try {
-      const res = await fetch(`${baseUrl}/api/events/extract-keywords`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ description: desc })
-      });
-      const data = await res.json();
-      if (res.ok && data.status === "success" && Array.isArray(data.keywords)) {
-        setExtractedKeywords((prev) => ({ ...prev, [key]: data.keywords }));
-        triggerToast("Keywords extracted via Gemini AI");
+      const [playsRes, eventsRes, posRes, appsRes, volsRes, propsRes] = await Promise.all([
+        fetch(`${baseUrl}/api/plays`).then(r => r.ok ? r.json() : []).catch(() => []),
+        fetch(`${baseUrl}/api/events`).then(r => r.ok ? r.json() : []).catch(() => []),
+        fetch(`${baseUrl}/api/audition-positions`).then(r => r.ok ? r.json() : []).catch(() => []),
+        fetch(`${baseUrl}/api/audition-applications`).then(r => r.ok ? r.json() : []).catch(() => []),
+        fetch(`${baseUrl}/api/volunteers`).then(r => r.ok ? r.json() : []).catch(() => []),
+        fetch(`${baseUrl}/api/proposals`).then(r => r.ok ? r.json() : []).catch(() => [])
+      ]);
+
+      if (Array.isArray(posRes)) setAllPositions(posRes);
+      if (Array.isArray(appsRes)) setAllApplications(appsRes);
+      if (Array.isArray(volsRes)) setAllVolunteers(volsRes);
+
+      const unifiedEvents: EventItem[] = [];
+
+      // Add ONLY UPCOMING Plays (going to happen)
+      if (Array.isArray(playsRes) && playsRes.length > 0) {
+        playsRes
+          .filter((p: any) => !p.is_past && !(p.status || "").toLowerCase().includes("archive"))
+          .forEach((p: any) => {
+            const playPositions = (posRes || []).filter((pos: any) => 
+              (pos.production_name || "").toLowerCase().includes(p.title.toLowerCase()) ||
+              p.title.toLowerCase().includes((pos.production_name || "").toLowerCase())
+            );
+            const playApps = (appsRes || []).filter((app: any) => 
+              (app.production_name || "").toLowerCase().includes(p.title.toLowerCase()) ||
+              p.title.toLowerCase().includes((app.production_name || "").toLowerCase())
+            );
+            const playVols = (volsRes || []).filter((v: any) => 
+              String(v.play_id) === String(p.id) ||
+              (v.play_title || "").toLowerCase().includes(p.title.toLowerCase()) ||
+              p.title.toLowerCase().includes((v.play_title || "").toLowerCase())
+            );
+
+            const isSponsored = Boolean(p.title.toLowerCase().includes("hayavadana") || p.title.toLowerCase().includes("ashadh"));
+
+            unifiedEvents.push({
+              id: `play-${p.id}`,
+              play_id: p.id,
+              title: p.title,
+              category: "Plays",
+              date: p.dates || "Autumn Season 2026",
+              venue: p.venue || "CLT Main Stage",
+              timeRange: p.runtime || "110 Mins",
+              status: "Upcoming Premiere",
+              is_past: false,
+              description: p.description || p.tagline,
+              playwright: p.playwright,
+              director: p.director,
+              genre: p.genre,
+              language: p.language,
+              tagline: p.tagline,
+              acts: p.acts,
+              cast: p.cast,
+              image: p.image || "/aayam_assets/tamashbin_user_1.jpg",
+              price: p.price || "Free Student Pass",
+              is_sponsored: isSponsored,
+              sponsor_name: p.title.toLowerCase().includes("hayavadana") ? "Red Bull India" : (p.title.toLowerCase().includes("ashadh") ? "FabIndia Handlooms" : ""),
+              sponsor_amount: p.title.toLowerCase().includes("hayavadana") ? "₹1,50,000" : (p.title.toLowerCase().includes("ashadh") ? "₹85,000" : ""),
+              patronage_open: !isSponsored,
+              donations_collected: !isSponsored ? "₹18,500" : "₹0",
+              target_budget: "₹35,000",
+              auditionCount: playPositions.length,
+              applicantCount: playApps.length,
+              volunteerCount: playVols.length
+            });
+          });
+      }
+
+      // Add Upcoming Events (Workshops, Meetups, Masterclasses)
+      if (Array.isArray(eventsRes) && eventsRes.length > 0) {
+        eventsRes
+          .filter((ev: any) => ev.status !== "concluded")
+          .forEach((ev: any) => {
+            if (!unifiedEvents.some(e => e.title.toLowerCase() === ev.title.toLowerCase())) {
+              const evPositions = (posRes || []).filter((pos: any) => 
+                (pos.production_name || "").toLowerCase().includes(ev.title.toLowerCase()) ||
+                ev.title.toLowerCase().includes((pos.production_name || "").toLowerCase())
+              );
+              const evApps = (appsRes || []).filter((app: any) => 
+                (app.production_name || "").toLowerCase().includes(ev.title.toLowerCase()) ||
+                ev.title.toLowerCase().includes((app.production_name || "").toLowerCase())
+              );
+              const evVols = (volsRes || []).filter((v: any) => 
+                (v.play_title || "").toLowerCase().includes(ev.title.toLowerCase()) ||
+                ev.title.toLowerCase().includes((v.play_title || "").toLowerCase())
+              );
+
+              const isEvtSponsored = Boolean(ev.title.toLowerCase().includes("lighting") || ev.title.toLowerCase().includes("dmx"));
+
+              unifiedEvents.push({
+                id: `evt-${ev.id}`,
+                title: ev.title,
+                category: ev.category || "Workshops",
+                date: ev.date || "Scheduled 2026",
+                venue: ev.venue || "SAC Main Hall",
+                timeRange: ev.timeRange || "17:30 - 20:00",
+                status: "Scheduled",
+                is_past: false,
+                description: ev.description,
+                image: ev.image || "/aayam_assets/samatvam_user_4.jpg",
+                is_sponsored: isEvtSponsored,
+                sponsor_name: isEvtSponsored ? "AudioCraft Proscenium" : "",
+                sponsor_amount: isEvtSponsored ? "₹1,20,000" : "",
+                patronage_open: !isEvtSponsored,
+                donations_collected: "₹12,000",
+                target_budget: "₹25,000",
+                auditionCount: evPositions.length,
+                applicantCount: evApps.length,
+                volunteerCount: evVols.length
+              });
+            }
+          });
+      }
+
+      // If backend returned events, update; otherwise keep robust fallback
+      if (unifiedEvents.length > 0) {
+        setEventsList(unifiedEvents);
       } else {
-        triggerToast(data.message || "AI servers are down. Please try again later.");
+        setEventsList(fallbackUpcomingEvents);
+      }
+
+      // Proposals & Pitches
+      if (Array.isArray(propsRes) && propsRes.length > 0) {
+        setProposalsList(propsRes);
+      } else {
+        setProposalsList(fallbackPitches);
       }
     } catch (err) {
-      console.error("Backend AI keyword extraction error:", err);
-      triggerToast("AI servers are down. Please try again later.");
+      console.warn("Backend fetch failed, using fallback data:", err);
+      setEventsList(fallbackUpcomingEvents);
+      setProposalsList(fallbackPitches);
     } finally {
-      setIsExtractingId(null);
+      setLoading(false);
     }
-  };
-
-  const handleKeywordClick = (keyword: string) => {
-    setSearchTerm(keyword);
-    triggerToast(`Filtering event requests by keyword: "${keyword}"`);
-  };
-
-  // Form State for Event Creation Studio
-  const [selectedTemplateId, setSelectedTemplateId] = useState<string>("template-play");
-  const [newEventForm, setNewEventForm] = useState({
-    title: "Macbeth - Evening Grand Gala",
-    category: "Mainstage Performance",
-    date: new Date().toISOString().split("T")[0],
-    timeRange: "19:00 - 21:30",
-    venue: "Main Auditorium - Royal Stage",
-    capacity: "350 seats",
-    description: "Full ensemble production performance with live stagecraft, orchestration, and VIP guest seating.",
-    imageUrl: "https://images.unsplash.com/photo-1507676184212-d0330a151f15?q=80&w=600&auto=format&fit=crop"
-  });
-
-  const triggerToast = (msg: string) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3000);
-  };
-
-  const loadEventsFromBackend = () => {
-    const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005";
-    fetch(`${baseUrl}/api/events`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (Array.isArray(data) && data.length > 0) {
-          setDbEvents(data);
-        }
-      })
-      .catch((err) => console.error("Error fetching events:", err));
-  };
-
-  const loadSponsorAdsFromBackend = () => {
-    const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005";
-    fetch(`${baseUrl}/api/sponsor-ads`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (Array.isArray(data) && data.length > 0) {
-          setSponsorAds(data);
-        }
-      })
-      .catch((err) => console.error("Error fetching sponsor ads:", err));
   };
 
   useEffect(() => {
-    loadEventsFromBackend();
-    loadSponsorAdsFromBackend();
-
-    const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005";
-    fetch(`${baseUrl}/api/proposals`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (Array.isArray(data) && data.length > 0) {
-          setProposals(data);
-          setSelectedProposalId(data[0].id);
-        }
-      })
-      .catch((err) => console.error("Error fetching proposals:", err));
+    fetchData();
   }, []);
 
-  // Sponsor Ad Action Handlers
-  const handleUpdateSponsorAdStatus = (adId: number, status: string) => {
-    const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005";
-    fetch(`${baseUrl}/api/sponsor-ads/${adId}/status`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status })
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.status === "success") {
-          setSponsorAds((prev) =>
-            prev.map((ad) => (ad.id === adId ? { ...ad, status } : ad))
-          );
-          triggerToast(`Sponsor Ad request marked as ${status}!`);
-        }
-      })
-      .catch((err) => console.error("Error updating sponsor status:", err));
-  };
-
-  // Select Template in Studio View
-  const handleSelectTemplate = (templateId: string) => {
-    setSelectedTemplateId(templateId);
-    const tmpl = EVENT_TEMPLATES.find((t) => t.id === templateId);
-    if (tmpl) {
-      setNewEventForm({
-        title: tmpl.defaultTitle,
-        category: tmpl.category,
-        date: new Date().toISOString().split("T")[0],
-        timeRange: tmpl.defaultDuration,
-        venue: tmpl.defaultVenue,
-        capacity: tmpl.defaultCapacity,
-        description: tmpl.defaultDescription,
-        imageUrl: tmpl.image
+  // Update volunteer status
+  const handleUpdateVolunteerStatus = async (volId: number, newStatus: string) => {
+    try {
+      const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005";
+      const res = await fetch(`${baseUrl}/api/volunteer/${volId}/status`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus })
       });
+      if (res.ok) {
+        setAllVolunteers(prev => prev.map(v => v.id === volId ? { ...v, status: newStatus } : v));
+        setActionSuccessMsg(`Volunteer request marked as '${newStatus}'.`);
+        setTimeout(() => setActionSuccessMsg(null), 4000);
+      }
+    } catch (err) {
+      console.error("Error updating volunteer status:", err);
     }
   };
 
-  // Submit Create Event Form
-  const handlePublishEventSubmit = (e?: React.FormEvent) => {
+  // Update audition candidate status
+  const handleUpdateAppStatus = async (appId: number, newStatus: string) => {
+    try {
+      const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005";
+      const res = await fetch(`${baseUrl}/api/audition-application/${appId}/status`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus })
+      });
+      if (res.ok) {
+        setAllApplications(prev => prev.map(a => a.id === appId ? { ...a, status: newStatus } : a));
+        setActionSuccessMsg(`Audition candidate marked as '${newStatus}'.`);
+        setTimeout(() => setActionSuccessMsg(null), 4000);
+      }
+    } catch (err) {
+      console.error("Error updating application status:", err);
+    }
+  };
+
+  // Open Edit & Review modal for a pitch
+  const handleOpenEditPitch = (pitch: ProposalItem) => {
+    const isSponsor = (pitch.proposalType || "").toLowerCase().includes("sponsor") || pitch.sourceType === "Sponsor";
+    setEditingPitch(pitch);
+    setEditFormData({
+      title: pitch.name || pitch.title || "",
+      category: (pitch.proposalType || "").toLowerCase().includes("workshop") ? "Workshops" : (isSponsor ? "Plays" : "Meetups"),
+      venue: pitch.venue || pitch.location_or_link || "SAC Main Studio, IIT Madras",
+      event_date: "2026-09-20",
+      description: pitch.description || "",
+      budget: pitch.budget || "₹25,000",
+      is_sponsored: isSponsor,
+      sponsor_name: isSponsor ? pitch.submitter?.name || "Corporate Brand Sponsor" : "",
+      max_participants: 60
+    });
+  };
+
+  // Approve Pitch & Convert into Public Event
+  const handleApproveAndPublishPitch = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (!newEventForm.title) return;
+    if (!editingPitch) return;
+    setSubmittingDecision(true);
 
-    const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005";
-    const payload = {
-      name: newEventForm.title,
-      description: newEventForm.description,
-      category: newEventForm.category,
-      venue: newEventForm.venue,
-      date: newEventForm.date
-    };
+    try {
+      const payload = {
+        title: editFormData.title,
+        category: editFormData.category,
+        venue: editFormData.venue,
+        event_date: editFormData.event_date,
+        description: editFormData.description,
+        budget: editFormData.budget,
+        is_sponsored: editFormData.is_sponsored,
+        sponsor_name: editFormData.sponsor_name,
+        max_participants: editFormData.max_participants
+      };
 
-    const createdLocal = {
-      id: `EVT-${Date.now().toString().slice(-4)}`,
-      title: newEventForm.title,
-      category: newEventForm.category,
-      date: newEventForm.date,
-      timeRange: newEventForm.timeRange,
-      venue: newEventForm.venue,
-      capacity: newEventForm.capacity,
-      description: newEventForm.description,
-      status: "upcoming",
-      image: newEventForm.imageUrl
-    };
+      const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005";
+      await fetch(`${baseUrl}/api/proposals/${editingPitch.id}/approve`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      }).catch(() => null);
 
-    setDbEvents([createdLocal, ...dbEvents]);
-    setIsCreatingEvent(false);
-    setActiveTab("Upcoming");
-    triggerToast(`Event "${createdLocal.title}" successfully created!`);
+      // Update proposal list locally
+      setProposalsList(prev => prev.map(p => p.id === editingPitch.id ? { ...p, status: "Approved", ...payload, name: payload.title } : p));
+      
+      // Append newly created event to Upcoming Events list
+      const newEvt: EventItem = {
+        id: `evt-appr-${editingPitch.id}`,
+        title: payload.title,
+        category: payload.category,
+        date: payload.event_date,
+        venue: payload.venue,
+        timeRange: "17:30 - 20:00",
+        status: "Scheduled",
+        is_past: false,
+        description: payload.description,
+        is_sponsored: editFormData.is_sponsored,
+        sponsor_name: editFormData.is_sponsored ? editFormData.sponsor_name : "",
+        sponsor_amount: editFormData.is_sponsored ? editFormData.budget : "",
+        patronage_open: !editFormData.is_sponsored,
+        donations_collected: "₹0",
+        target_budget: editFormData.budget || "₹25,000",
+        auditionCount: 0,
+        applicantCount: 0,
+        volunteerCount: 0
+      };
+      setEventsList(prev => [newEvt, ...prev]);
 
-    fetch(`${baseUrl}/api/events/create`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.status === "success") {
-          loadEventsFromBackend();
-        }
-      })
-      .catch((err) => console.warn("Backend persistent sync notice:", err));
+      setActionSuccessMsg(`Pitch approved! Published '${payload.title}' to the Upcoming Events roster.`);
+      setTimeout(() => setActionSuccessMsg(null), 5000);
+      setEditingPitch(null);
+    } catch (err) {
+      console.error("Error approving proposal:", err);
+    } finally {
+      setSubmittingDecision(false);
+    }
   };
 
-  // Proposal Actions
-  const handleApproveProposal = (id: number) => {
-    const target = proposals.find((p) => p.id === id);
-    if (!target) return;
+  // Quick Approve Pitch without opening modal
+  const handleQuickApprove = async (pitch: ProposalItem) => {
+    try {
+      const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005";
+      const isSponsor = (pitch.proposalType || "").toLowerCase().includes("sponsor") || pitch.sourceType === "Sponsor";
 
-    const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005";
-    fetch(`${baseUrl}/api/proposals/${id}/approve`, { method: "POST" })
-      .then(() => {
-        setProposals((prev) =>
-          prev.map((p) => (p.id === id ? { ...p, status: "Approved" } : p))
-        );
-        loadEventsFromBackend();
-        triggerToast(`Proposal "${target.name}" approved & scheduled!`);
-      })
-      .catch((err) => console.error("Error approving proposal:", err));
+      await fetch(`${baseUrl}/api/proposals/${pitch.id}/approve`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: pitch.name,
+          description: pitch.description,
+          venue: pitch.venue,
+          budget: pitch.budget
+        })
+      }).catch(() => null);
+
+      setProposalsList(prev => prev.map(p => p.id === pitch.id ? { ...p, status: "Approved" } : p));
+      
+      const newEvt: EventItem = {
+        id: `evt-appr-${pitch.id}`,
+        title: pitch.name,
+        category: pitch.proposalType.includes("Workshop") ? "Workshops" : (isSponsor ? "Plays" : "Meetups"),
+        date: "Autumn 2026",
+        venue: pitch.venue,
+        timeRange: "17:30 - 20:00",
+        status: "Scheduled",
+        is_past: false,
+        description: pitch.description,
+        is_sponsored: isSponsor,
+        sponsor_name: isSponsor ? pitch.submitter?.name : "",
+        sponsor_amount: isSponsor ? pitch.budget : "",
+        patronage_open: !isSponsor,
+        donations_collected: "₹0",
+        target_budget: pitch.budget || "₹25,000",
+        auditionCount: 0,
+        applicantCount: 0,
+        volunteerCount: 0
+      };
+      setEventsList(prev => [newEvt, ...prev]);
+      setActionSuccessMsg(`Pitch '${pitch.name}' approved and scheduled to Upcoming Events.`);
+      setTimeout(() => setActionSuccessMsg(null), 4000);
+    } catch (err) {
+      console.error("Error quick approving pitch:", err);
+    }
   };
 
-  const handleRejectProposal = (id: number) => {
-    const target = proposals.find((p) => p.id === id);
-    if (!target) return;
+  // Reject / Decline Pitch
+  const handleRejectPitch = async (pitchId: number) => {
+    try {
+      const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005";
+      await fetch(`${baseUrl}/api/proposals/${pitchId}/reject`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" }
+      }).catch(() => null);
 
-    const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005";
-    fetch(`${baseUrl}/api/proposals/${id}/reject`, { method: "POST" })
-      .then(() => {
-        setProposals((prev) =>
-          prev.map((p) => (p.id === id ? { ...p, status: "Rejected" } : p))
-        );
-        triggerToast(`Proposal "${target.name}" rejected.`);
-      })
-      .catch((err) => console.error("Error rejecting proposal:", err));
+      setProposalsList(prev => prev.map(p => p.id === pitchId ? { ...p, status: "Rejected" } : p));
+      setActionSuccessMsg("Proposal request declined.");
+      setTimeout(() => setActionSuccessMsg(null), 4000);
+      if (editingPitch && editingPitch.id === pitchId) {
+        setEditingPitch(null);
+      }
+    } catch (err) {
+      console.error("Error rejecting pitch:", err);
+    }
   };
 
-  // Filtered Events
-  const upcomingEvents = useMemo(() => {
-    const filtered = dbEvents.filter((e) => !e.status || e.status.toLowerCase() === "upcoming");
-    return filtered.length > 0 ? filtered : dbEvents;
-  }, [dbEvents]);
+  // Handle Patron Donation Pledge
+  const handlePledgeDonation = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedEventForDonation) return;
 
-  const pastEvents = useMemo(() => {
-    return dbEvents.filter(
-      (e) => e.status && (e.status.toLowerCase() === "concluded" || e.status.toLowerCase() === "past")
+    const numericPledge = parseInt(donorPledgeAmount.replace(/[^0-9]/g, "") || "0", 10);
+    const currentCollected = parseInt((selectedEventForDonation.donations_collected || "0").replace(/[^0-9]/g, "") || "0", 10);
+    const newTotal = `₹${(currentCollected + numericPledge).toLocaleString("en-IN")}`;
+
+    setEventsList(prev => prev.map(ev => ev.id === selectedEventForDonation.id ? { ...ev, donations_collected: newTotal } : ev));
+    setActionSuccessMsg(`Pledge of ${donorPledgeAmount} from ${donorName} logged for '${selectedEventForDonation.title}'.`);
+    setTimeout(() => setActionSuccessMsg(null), 5000);
+    setSelectedEventForDonation(null);
+  };
+
+  // Filtering Events
+  const filteredEvents = eventsList.filter(ev => {
+    const q = searchQuery.toLowerCase();
+    const matchesSearch = !searchQuery ||
+                          (ev.title || "").toLowerCase().includes(q) ||
+                          (ev.venue || "").toLowerCase().includes(q) ||
+                          (ev.description || "").toLowerCase().includes(q) ||
+                          (ev.sponsor_name || "").toLowerCase().includes(q);
+    const matchesCat = 
+      categoryFilter === "All" || 
+      (categoryFilter === "Sponsored" ? ev.is_sponsored : ev.category?.toLowerCase() === categoryFilter.toLowerCase());
+    return matchesSearch && matchesCat;
+  });
+
+  // Filtering Pitches
+  const filteredPitches = proposalsList.filter(p => {
+    const pTitle = (p.name || p.title || "").toLowerCase();
+    const pSubmitter = (p.submitter?.name || "").toLowerCase();
+    const pDesc = (p.description || "").toLowerCase();
+    const matchesSearch = pTitle.includes(searchQuery.toLowerCase()) || 
+                          pSubmitter.includes(searchQuery.toLowerCase()) ||
+                          pDesc.includes(searchQuery.toLowerCase());
+
+    const isMember = (p.proposalType || "").toLowerCase().includes("member") || p.sourceType === "Member";
+    const isSponsor = (p.proposalType || "").toLowerCase().includes("sponsor") || (p.proposalType || "").toLowerCase().includes("ad") || p.sourceType === "Sponsor";
+
+    const matchesSource = 
+      pitchSourceFilter === "all" ? true :
+      pitchSourceFilter === "member" ? isMember :
+      isSponsor;
+
+    const pStatus = (p.status || "pending").toLowerCase();
+    const matchesStatus = 
+      pitchStatusFilter === "all" ? true :
+      pitchStatusFilter === "pending" ? (pStatus === "pending" || pStatus === "reviewing") :
+      pitchStatusFilter === "approved" ? (pStatus === "approved") :
+      (pStatus === "rejected" || pStatus === "declined");
+
+    return matchesSearch && matchesSource && matchesStatus;
+  });
+
+  const memberPitchesCount = proposalsList.filter(p => (p.proposalType || "").toLowerCase().includes("member") || p.sourceType === "Member").length;
+  const sponsorPitchesCount = proposalsList.filter(p => (p.proposalType || "").toLowerCase().includes("sponsor") || (p.proposalType || "").toLowerCase().includes("ad") || p.sourceType === "Sponsor").length;
+
+  const getEventPositions = (eventTitle: string) => {
+    return allPositions.filter(p => 
+      (p.production_name || "").toLowerCase().includes(eventTitle.toLowerCase()) ||
+      eventTitle.toLowerCase().includes((p.production_name || "").toLowerCase())
     );
-  }, [dbEvents]);
+  };
 
-  const filteredProposals = useMemo(() => {
-    return proposals.filter((p) => {
-      const propName = p.name || p.title || "";
-      const submitterName = (p.submitter && p.submitter.name) ? p.submitter.name : "";
-      const desc = p.description || "";
-      const matchesSearch =
-        propName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        submitterName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        desc.toLowerCase().includes(searchTerm.toLowerCase());
-
-      const matchesStatus = statusFilter === "All" || p.status === statusFilter;
-      const matchesSource =
-        proposalSourceFilter === "All" || p.sourceType === proposalSourceFilter;
-
-      return matchesSearch && matchesStatus && matchesSource;
-    });
-  }, [proposals, searchTerm, statusFilter, proposalSourceFilter]);
-
-  const filteredSponsorAds = useMemo(() => {
-    return sponsorAds.filter((ad) => {
-      const title = ad.ad_title || ad.sponsor_name || "";
-      const target = ad.target_event_name || "";
-      const desc = ad.ad_description || "";
-      const contact = ad.contact_email || ad.contact_person || "";
-      return (
-        title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        target.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        desc.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        contact.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    });
-  }, [sponsorAds, searchTerm]);
-
-  const currentProposal = proposals.find((p) => p.id === selectedProposalId) || proposals[0];
-
-  /* ====================================================================
-     FULL PAGE EVENT CREATION STUDIO VIEW
-     ==================================================================== */
-  if (isCreatingEvent) {
-    return (
-      <div className="flex-1 bg-[#fdf9f4] text-[#1c1b19] font-sans pb-16 space-y-6">
-        <div className="max-w-7xl mx-auto space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#e6e2dd]">
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => setIsCreatingEvent(false)}
-                className="p-2 rounded-xl border border-[#cac6b9]/60 bg-white text-[#466272] hover:bg-[#f7f3ee] transition-all flex items-center gap-1.5 text-xs font-semibold"
-              >
-                <ArrowLeft className="w-4 h-4" /> Back
-              </button>
-              <div>
-                <h1 className="font-serif text-2xl md:text-3xl font-bold text-[#635f41] leading-tight">
-                  Create Production Event
-                </h1>
-                <p className="text-xs text-[#466272]">Configure event details and publish to roster.</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <button
-                type="button"
-                onClick={() => triggerToast("Draft saved locally.")}
-                className="px-4 py-2 rounded-xl border border-[#cac6b9] bg-white text-[#466272] hover:bg-[#f7f3ee] text-xs font-semibold transition-all flex items-center gap-1.5"
-              >
-                <Save className="w-4 h-4" /> Save Draft
-              </button>
-              <button
-                type="button"
-                onClick={() => handlePublishEventSubmit()}
-                className="px-5 py-2 rounded-xl bg-[#635f41] text-white hover:bg-[#635f41]/90 text-xs font-bold shadow-xs transition-all flex items-center gap-1.5"
-              >
-                <Send className="w-4 h-4" /> Publish Event
-              </button>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            <div className="lg:col-span-4 space-y-6">
-              <div className="bg-white border border-[#e6e2dd] rounded-2xl p-5 shadow-xs space-y-3">
-                <div className="flex items-center justify-between border-b border-gray-100 pb-2">
-                  <span className="text-xs font-bold text-[#635f41] uppercase tracking-wider">
-                    Select Event Template
-                  </span>
-                  <span className="text-[10px] text-[#466272]/70 font-semibold">3 Options</span>
-                </div>
-
-                <div className="space-y-2">
-                  {EVENT_TEMPLATES.map((tmpl) => (
-                    <button
-                      key={tmpl.id}
-                      type="button"
-                      onClick={() => handleSelectTemplate(tmpl.id)}
-                      className={`w-full p-3 rounded-xl border text-left transition-all flex items-center justify-between ${
-                        selectedTemplateId === tmpl.id
-                          ? "border-[#635f41] bg-[#635f41]/10 font-bold"
-                          : "border-gray-200 bg-white hover:border-[#cac6b9] hover:bg-[#fdf9f4]"
-                      }`}
-                    >
-                      <div className="min-w-0 flex-1">
-                        <div className="text-xs font-bold text-[#1c1b19] truncate">{tmpl.name}</div>
-                        <div className="text-[10px] text-[#466272]/70 truncate">{tmpl.category}</div>
-                      </div>
-                      {selectedTemplateId === tmpl.id && (
-                        <span className="w-2 h-2 rounded-full bg-[#635f41]" />
-                      )}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="lg:col-span-8 space-y-6">
-              <div className="bg-white border border-[#e6e2dd] rounded-2xl p-6 shadow-xs space-y-5">
-                <h3 className="font-serif font-bold text-lg text-[#635f41] border-b border-gray-100 pb-3">
-                  Event Details Configuration
-                </h3>
-
-                <div className="space-y-4 text-xs">
-                  <div>
-                    <label className="font-bold text-[#466272] block mb-1">Event Title</label>
-                    <Input
-                      value={newEventForm.title}
-                      onChange={(e) => setNewEventForm({ ...newEventForm, title: e.target.value })}
-                      placeholder="e.g. Macbeth - Gala Opening Night"
-                      className="bg-[#fdf9f4] border-[#cac6b9]/60 h-10 text-xs rounded-xl"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="font-bold text-[#466272] block mb-1">Date</label>
-                      <Input
-                        type="date"
-                        value={newEventForm.date}
-                        onChange={(e) => setNewEventForm({ ...newEventForm, date: e.target.value })}
-                        className="bg-[#fdf9f4] border-[#cac6b9]/60 h-10 text-xs rounded-xl"
-                      />
-                    </div>
-                    <div>
-                      <label className="font-bold text-[#466272] block mb-1">Venue</label>
-                      <Input
-                        value={newEventForm.venue}
-                        onChange={(e) => setNewEventForm({ ...newEventForm, venue: e.target.value })}
-                        placeholder="Main Auditorium"
-                        className="bg-[#fdf9f4] border-[#cac6b9]/60 h-10 text-xs rounded-xl"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="font-bold text-[#466272] block mb-1">Event Description</label>
-                    <textarea
-                      value={newEventForm.description}
-                      onChange={(e) => setNewEventForm({ ...newEventForm, description: e.target.value })}
-                      rows={4}
-                      className="w-full bg-[#fdf9f4] border border-[#cac6b9]/60 p-3 rounded-xl text-xs text-[#1c1b19] focus:outline-none"
-                      placeholder="Provide event details..."
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+  const getEventApplications = (eventTitle: string) => {
+    return allApplications.filter(a => 
+      (a.production_name || "").toLowerCase().includes(eventTitle.toLowerCase()) ||
+      eventTitle.toLowerCase().includes((a.production_name || "").toLowerCase())
     );
-  }
+  };
 
-  /* ====================================================================
-     DEFAULT DASHBOARD VIEW (UPCOMING / PAST / PROPOSALS / SPONSOR ADS)
-     ==================================================================== */
+  const getEventVolunteers = (eventTitle: string, playId?: number) => {
+    return allVolunteers.filter(v => 
+      (playId && String(v.play_id) === String(playId)) ||
+      (v.play_title || "").toLowerCase().includes(eventTitle.toLowerCase()) ||
+      eventTitle.toLowerCase().includes((v.play_title || "").toLowerCase())
+    );
+  };
+
   return (
-    <div className="flex-1 bg-[#fdf9f4] text-[#1c1b19] font-sans pb-16">
-      <div className="max-w-7xl mx-auto space-y-8">
-        
-        {/* Page Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-[#e6e2dd]">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="px-2.5 py-0.5 rounded-full bg-[#635f41]/10 text-[#635f41] text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
-                <Shield className="w-3 h-3 text-[#635f41]" /> Maintainer Operations
-              </span>
+    <div className="max-w-7xl mx-auto space-y-8 py-6 px-4 md:px-8 font-sans text-[#5C3B37] selection:bg-[#8C241E]/20">
+      
+      {/* Toast Notification */}
+      {actionSuccessMsg && (
+        <div className="fixed bottom-6 right-6 z-50 bg-[#FAF2EE] text-[#2A1816] px-5 py-3.5 rounded-2xl border border-emerald-700/30 shadow-2xl flex items-center gap-3 animate-in fade-in">
+          <CheckCircle2 className="w-4 h-4 text-emerald-800 shrink-0" />
+          <span className="text-xs font-mono font-bold">{actionSuccessMsg}</span>
+          <button onClick={() => setActionSuccessMsg(null)} className="text-[#8C5A54] hover:text-[#2A1816] cursor-pointer">
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
+
+      {/* Editorial Header */}
+      <section className="bg-[#F2E5E0] border border-[#DCBAB2] rounded-[2.5rem] p-8 md:p-10 shadow-xs space-y-6">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-2 text-[10px] font-mono font-bold uppercase tracking-widest text-[#8C5A54]">
+              <Calendar className="w-3.5 h-3.5 text-[#8C241E]" />
+              <span>SOCIETY REPERTOIRE & OPERATIONAL DESK</span>
             </div>
-            <h1 className="font-serif text-3xl md:text-4xl font-bold text-[#635f41] tracking-tight">
-              Events & Sponsor Portal
+            <h1 className="font-serif text-3xl sm:text-5xl text-[#2A1816] font-normal tracking-tight">
+              Events & Season Management
             </h1>
-            <p className="text-xs md:text-sm text-[#466272] mt-1 max-w-2xl">
-              Manage club productions, review member pitches, and curate corporate sponsor ad requests in the database.
+            <p className="text-xs sm:text-sm text-[#6E4742] max-w-2xl font-serif italic">
+              Oversee upcoming productions, manage member event pitches and funded sponsor partnerships, assign budgets, and open society donation patronage.
             </p>
           </div>
-
-          <div className="flex items-center gap-3">
-
-            <button
-              onClick={() => {
-                handleSelectTemplate("template-play");
-                setIsCreatingEvent(true);
-              }}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#635f41] text-white hover:bg-[#635f41]/90 text-xs font-bold shadow-xs transition-all active:scale-95"
+          
+          <div className="flex items-center gap-2 bg-[#FAF2EE] p-1.5 rounded-full border border-[#DCBAB2] shadow-xs shrink-0 self-start md:self-auto">
+            <button 
+              onClick={() => setActiveTab("calendar")}
+              className={`px-5 py-2.5 rounded-full text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                activeTab === 'calendar' 
+                  ? 'bg-[#8C241E] text-[#FDF8F7] shadow-sm border border-[#A6352F]' 
+                  : 'text-[#5C3B37] hover:text-[#2A1816] hover:bg-[#EEDBD5]'
+              }`}
             >
-              <Plus className="w-4 h-4" />
-              Create Event
+              Upcoming Events ({eventsList.length})
+            </button>
+            <button 
+              onClick={() => setActiveTab("pitches")}
+              className={`px-5 py-2.5 rounded-full text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                activeTab === 'pitches' 
+                  ? 'bg-[#8C241E] text-[#FDF8F7] shadow-sm border border-[#A6352F]' 
+                  : 'text-[#5C3B37] hover:text-[#2A1816] hover:bg-[#EEDBD5]'
+              }`}
+            >
+              Pitches & Proposals ({proposalsList.length})
             </button>
           </div>
         </div>
+      </section>
 
-        {/* Maintainer Executive Summary Bar */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-white border border-[#e6e2dd] rounded-2xl p-5 shadow-xs flex items-center justify-between">
-            <div>
-              <span className="text-[11px] font-bold uppercase tracking-wider text-[#466272]">Upcoming Events</span>
-              <div className="text-2xl font-serif font-bold text-[#635f41] mt-0.5">{upcomingEvents.length}</div>
-            </div>
-          </div>
-
-          <div className="bg-white border border-[#e6e2dd] rounded-2xl p-5 shadow-xs flex items-center justify-between">
-            <div>
-              <span className="text-[11px] font-bold uppercase tracking-wider text-[#466272]">Pending Proposals</span>
-              <div className="text-2xl font-serif font-bold text-amber-700 mt-0.5">
-                {proposals.filter((p) => p.status === "Reviewing").length}
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white border border-[#e6e2dd] rounded-2xl p-5 shadow-xs flex items-center justify-between">
-            <div>
-              <span className="text-[11px] font-bold uppercase tracking-wider text-[#466272]">Sponsor Ads in DB</span>
-              <div className="text-2xl font-serif font-bold text-[#1e4463] mt-0.5">
-                {sponsorAds.length} Requests
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white border border-[#e6e2dd] rounded-2xl p-5 shadow-xs flex items-center justify-between">
-            <div>
-              <span className="text-[11px] font-bold uppercase tracking-wider text-[#466272]">Past Productions</span>
-              <div className="text-2xl font-serif font-bold text-[#635f41] mt-0.5">{pastEvents.length}</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Navigation Tabs */}
-        <div className="flex items-center justify-between border-b border-[#e6e2dd]">
-          <div className="flex gap-8 overflow-x-auto no-scrollbar">
-            <button
-              onClick={() => setActiveTab("Upcoming")}
-              className={`pb-3 text-xs font-bold uppercase tracking-wider transition-all relative ${
-                activeTab === "Upcoming"
-                  ? "text-[#635f41]"
-                  : "text-[#466272]/60 hover:text-[#635f41]"
-              }`}
-            >
-              Upcoming Events ({upcomingEvents.length})
-              {activeTab === "Upcoming" && (
-                <span className="absolute bottom-0 left-0 w-full h-[3px] bg-[#635f41] rounded-t-md" />
-              )}
-            </button>
-
-            <button
-              onClick={() => setActiveTab("Sponsor Ads")}
-              className={`pb-3 text-xs font-bold uppercase tracking-wider transition-all relative flex items-center gap-1.5 ${
-                activeTab === "Sponsor Ads"
-                  ? "text-[#635f41]"
-                  : "text-[#466272]/60 hover:text-[#635f41]"
-              }`}
-            >
-              Sponsor Ads Requests
-              <span className="px-2 py-0.5 rounded-full text-[10px] bg-amber-100 text-amber-900 font-bold">
-                {sponsorAds.filter((a) => a.status === "Pending").length} Pending
-              </span>
-              {activeTab === "Sponsor Ads" && (
-                <span className="absolute bottom-0 left-0 w-full h-[3px] bg-[#635f41] rounded-t-md" />
-              )}
-            </button>
-
-            <button
-              onClick={() => setActiveTab("Proposals")}
-              className={`pb-3 text-xs font-bold uppercase tracking-wider transition-all relative flex items-center gap-1.5 ${
-                activeTab === "Proposals"
-                  ? "text-[#635f41]"
-                  : "text-[#466272]/60 hover:text-[#635f41]"
-              }`}
-            >
-              Event Proposals & Pitches
-              {activeTab === "Proposals" && (
-                <span className="absolute bottom-0 left-0 w-full h-[3px] bg-[#635f41] rounded-t-md" />
-              )}
-            </button>
-
-            <button
-              onClick={() => setActiveTab("Past")}
-              className={`pb-3 text-xs font-bold uppercase tracking-wider transition-all relative ${
-                activeTab === "Past"
-                  ? "text-[#635f41]"
-                  : "text-[#466272]/60 hover:text-[#635f41]"
-              }`}
-            >
-              Past Events ({pastEvents.length})
-              {activeTab === "Past" && (
-                <span className="absolute bottom-0 left-0 w-full h-[3px] bg-[#635f41] rounded-t-md" />
-              )}
-            </button>
-          </div>
-        </div>
-
-        {/* TAB 1: UPCOMING EVENTS */}
-        {activeTab === "Upcoming" && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {upcomingEvents.map((evt) => (
-              <div
-                key={evt.id}
-                className="bg-white border border-[#e6e2dd] rounded-2xl overflow-hidden shadow-2xs hover:shadow-md transition-all flex flex-col justify-between"
-              >
-                <div className="h-40 relative">
-                  <img
-                    src={evt.image || "https://images.unsplash.com/photo-1507676184212-d0330a151f15?q=80&w=600&auto=format&fit=crop"}
-                    alt={evt.title}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute top-3 left-3 bg-white/90 text-[#635f41] text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase border border-[#cac6b9]">
-                    {evt.category || "Mainstage"}
-                  </div>
-                </div>
-
-                <div className="p-5 space-y-3 flex-1 flex flex-col justify-between">
-                  <div className="space-y-1.5">
-                    <h3 className="font-serif font-bold text-lg text-[#1c1b19]">{evt.title}</h3>
-                    <p className="text-xs text-[#466272]/80 line-clamp-2">{evt.description}</p>
-                  </div>
-
-                  <div className="pt-3 border-t border-[#e6e2dd]/70 text-xs text-[#466272] space-y-1">
-                    <div className="flex items-center gap-1.5">
-                      <Calendar className="w-3.5 h-3.5 text-[#635f41]" /> {evt.date}
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <MapPin className="w-3.5 h-3.5 text-[#635f41]" /> {evt.venue}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* TAB 2: SPONSOR ADS REQUESTS (DATABASE BACKED) */}
-        {activeTab === "Sponsor Ads" && (
-          <div className="space-y-6">
-            <div className="bg-white border border-[#e6e2dd] p-5 rounded-2xl shadow-xs space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <h2 className="font-serif font-bold text-xl text-[#1c1b19] flex items-center gap-2">
-                  <Building className="w-5 h-5 text-[#635f41]" /> Corporate Sponsor Ad Requests
-                </h2>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="text"
-                    placeholder="Filter sponsor requests by keyword..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="px-3.5 py-1.5 rounded-xl border border-[#cac6b9]/60 bg-[#fdf9f4] text-xs text-[#1c1b19] focus:outline-none focus:border-[#635f41] w-64"
-                  />
-                  {searchTerm && (
-                    <button
-                      onClick={() => setSearchTerm("")}
-                      className="px-2.5 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-[#466272] text-xs font-semibold"
-                    >
-                      Clear
-                    </button>
-                  )}
-                </div>
-              </div>
-              {searchTerm && (
-                <div className="flex items-center gap-2 text-xs text-[#635f41]">
-                  <span>Active Keyword Filter:</span>
-                  <span className="px-2.5 py-0.5 rounded-full bg-[#635f41] text-white font-bold text-[11px] flex items-center gap-1">
-                    {searchTerm}
-                    <button onClick={() => setSearchTerm("")} className="hover:text-amber-200 ml-1">×</button>
-                  </span>
-                </div>
-              )}
+      {/* TAB 1: UPCOMING EVENT ROSTER */}
+      {activeTab === "calendar" && (
+        <section className="space-y-6">
+          {/* Controls Bar */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 border-b border-[#DCBAB2]/60 pb-4">
+            {/* Search Input */}
+            <div className="relative flex-1 max-w-md">
+              <Search className="w-4 h-4 text-[#8C5A54] absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                placeholder="Search upcoming plays, workshops, venues..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl text-xs text-[#2A1816] placeholder-[#8C5A54] focus:outline-hidden focus:border-[#8C241E]"
+              />
             </div>
 
-            {filteredSponsorAds.length === 0 ? (
-              <div className="bg-white border border-[#e6e2dd] p-8 rounded-2xl text-center text-xs text-[#466272]/70 italic">
-                No sponsor requests match your keyword filter "{searchTerm}".
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {filteredSponsorAds.map((ad) => (
-                  <div
-                    key={ad.id}
-                    className="bg-white border border-[#e6e2dd] hover:border-[#635f41] rounded-2xl p-6 shadow-2xs hover:shadow-xs transition-all space-y-4 flex flex-col justify-between"
+            {/* Category Filter Pills */}
+            <div className="flex items-center gap-2 overflow-x-auto custom-scrollbar pb-1 sm:pb-0">
+              {[
+                { id: "All", label: "All Events" },
+                { id: "Plays", label: "Plays" },
+                { id: "Workshops", label: "Workshops" },
+                { id: "Meetups", label: "Meetups" },
+                { id: "Sponsored", label: "Sponsored" }
+              ].map((cat) => {
+                const isActive = categoryFilter === cat.id;
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => setCategoryFilter(cat.id)}
+                    className={`px-4 py-2 rounded-full text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer shrink-0 border ${
+                      isActive
+                        ? "bg-[#8C241E] text-[#FDF8F7] border-[#A6352F] shadow-sm shadow-[#8C241E]/20"
+                        : "bg-[#FAF2EE] text-[#5C3B37] hover:bg-[#EEDBD5] hover:text-[#2A1816] border-[#DCBAB2] shadow-xs"
+                    }`}
                   >
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#635f41]/10 text-[#635f41] border border-[#635f41]/20">
-                          {ad.ad_category}
+                    {cat.label}
+                  </button>
+                );
+              })}
+              
+              <button
+                onClick={fetchData}
+                className="p-2.5 rounded-full border border-[#DCBAB2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] hover:text-[#2A1816] transition-all cursor-pointer shrink-0 shadow-xs"
+                title="Refresh upcoming events"
+              >
+                <RefreshCw className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+
+          {/* Events Grid (Clean & Structured with No Overflow or Emojis) */}
+          {loading ? (
+            <div className="text-center py-20 bg-[#FAF2EE] border border-[#DCBAB2] rounded-[2rem] text-[#8C5A54] font-serif italic text-sm">
+              Loading society productions, auditions, and volunteer calls...
+            </div>
+          ) : filteredEvents.length === 0 ? (
+            <div className="text-center py-20 bg-[#FAF2EE] border border-[#DCBAB2] rounded-[2rem] text-[#8C5A54] font-serif italic text-sm space-y-3">
+              <p>No upcoming events match your search criteria.</p>
+              <button
+                onClick={() => { setSearchQuery(""); setCategoryFilter("All"); }}
+                className="text-xs font-mono text-[#8C241E] font-bold uppercase tracking-wider underline cursor-pointer"
+              >
+                Clear Search & Filters
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+              {filteredEvents.map(ev => {
+                const eventPositions = getEventPositions(ev.title);
+                const eventApps = getEventApplications(ev.title);
+                const eventVols = getEventVolunteers(ev.title, ev.play_id);
+
+                return (
+                  <div 
+                    key={ev.id} 
+                    className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-[2.5rem] p-7 sm:p-8 md:p-9 hover:border-[#B32D25]/50 hover:shadow-xl transition-all flex flex-col justify-between group space-y-6 shadow-xs"
+                  >
+                    <div className="space-y-4">
+                      {/* Top Category & Status Header */}
+                      <div className="flex items-center justify-between gap-3 border-b border-[#DCBAB2]/50 pb-3.5">
+                        <span className="text-xs font-mono text-[#8C5A54] uppercase tracking-wider font-bold truncate">
+                          {ev.category} • {ev.date}
                         </span>
 
-                        <span
-                          className={`px-3 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                            ad.status === "Approved"
-                              ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
-                              : ad.status === "Rejected"
-                              ? "bg-red-100 text-red-800 border border-red-300"
-                              : "bg-amber-100 text-amber-900 border border-amber-300"
-                          }`}
-                        >
-                          {ad.status}
-                        </span>
-                      </div>
-
-                      <div>
-                        <h3 className="font-serif font-bold text-lg text-[#1c1b19] leading-snug">{ad.ad_title}</h3>
-                        <p className="text-xs text-[#635f41] font-semibold flex items-center gap-1 mt-0.5">
-                          <Building className="w-3.5 h-3.5" /> {ad.sponsor_name}
-                        </p>
-                      </div>
-
-                      <div className="p-3.5 bg-[#fdf9f4] rounded-xl border border-[#e6e2dd] space-y-2 text-xs">
-                        <div className="flex items-center justify-between text-[#466272]">
-                          <span>Contact: <strong>{ad.contact_person}</strong></span>
-                          <span className="text-emerald-700 font-bold">{ad.budget_offered}</span>
-                        </div>
-                        <div className="text-[#466272] truncate">
-                          Email: <a href={`mailto:${ad.contact_email}`} className="underline text-[#635f41]">{ad.contact_email}</a>
-                        </div>
-                        {ad.contact_phone && (
-                          <div className="text-[#466272]">
-                            Phone: <strong>{ad.contact_phone}</strong>
-                          </div>
+                        {ev.is_sponsored ? (
+                          <span className="inline-block px-3 py-1 bg-amber-700/15 text-amber-950 border border-amber-700/30 rounded-full text-xs font-mono font-bold uppercase tracking-wider shrink-0">
+                            Sponsored: {ev.sponsor_name || "Partner"}
+                          </span>
+                        ) : (
+                          <span className="inline-block px-3 py-1 bg-emerald-700/15 text-emerald-950 border border-emerald-700/30 rounded-full text-xs font-mono font-bold uppercase tracking-wider shrink-0">
+                            Society Open Event
+                          </span>
                         )}
-                        <div className="pt-1.5 border-t border-[#e6e2dd] text-[11px] text-[#1c1b19]">
-                          Target Event: <strong>{ad.target_event_name}</strong>
-                        </div>
                       </div>
 
-                      {ad.ad_description && (
-                        <div className="space-y-2.5">
-                          <p className="text-xs text-[#466272]/90 leading-relaxed italic bg-gray-50 p-3.5 rounded-xl border border-gray-100">
-                            "{ad.ad_description}"
-                          </p>
+                      {/* Event Title */}
+                      <h3 className="font-serif text-2xl sm:text-3xl text-[#2A1816] leading-snug font-normal group-hover:text-[#8C241E] transition-colors break-words">
+                        {ev.title}
+                      </h3>
 
-                          {/* AI Keyword Extraction Button */}
-                          <div className="flex items-center justify-between gap-2 pt-1">
-                            <span className="text-[11px] font-bold uppercase tracking-wider text-[#635f41]">
-                              AI Key Signals
-                            </span>
-                            <button
-                              type="button"
-                              onClick={() => handleToggleAIKeywords(`sponsor_${ad.id}`, ad.ad_description)}
-                              className="px-3 py-1 rounded-lg bg-[#fdf9f4] hover:bg-[#e6e2dd] text-[#635f41] text-[11px] font-bold transition-all border border-[#cac6b9]/60"
-                            >
-                              {extractedKeywords[`sponsor_${ad.id}`] ? "Hide Keywords" : "Extract & Filter Keywords"}
-                            </button>
-                          </div>
+                      {/* Description */}
+                      {ev.description && (
+                        <p className="text-xs sm:text-sm text-[#5C3B37] font-light leading-relaxed line-clamp-3">
+                          {ev.description}
+                        </p>
+                      )}
 
-                          {/* Extracted AI Keyword Badges Panel */}
-                          {extractedKeywords[`sponsor_${ad.id}`] && (
-                            <div className="p-3 bg-[#fdf9f4] rounded-xl border border-[#cac6b9]/60 space-y-2">
-                              <div className="text-[10px] text-[#635f41] font-semibold">Click keyword to filter requests:</div>
-                              <div className="flex flex-wrap gap-1.5">
-                                {extractedKeywords[`sponsor_${ad.id}`].map((kw, idx) => (
-                                  <button
-                                    key={idx}
-                                    type="button"
-                                    onClick={() => handleKeywordClick(kw)}
-                                    className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-white hover:bg-[#635f41] hover:text-white text-[#1c1b19] border border-[#cac6b9]/50 shadow-2xs transition-all cursor-pointer"
-                                  >
-                                    {kw}
-                                  </button>
-                                ))}
-                              </div>
+                      {/* Unified Calm Editorial Specifications Panel */}
+                      <div className="bg-[#F5EAE6] p-4 sm:p-5 rounded-2xl border border-[#DEBEB7] space-y-3 text-xs sm:text-sm font-mono text-[#5C3B37]">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <span className="text-[#8C5A54] text-xs uppercase font-bold flex items-center gap-1.5">
+                            <MapPin className="w-3.5 h-3.5 text-[#8C241E] shrink-0" />
+                            <span>Venue & Time</span>
+                          </span>
+                          <span className="text-[#2A1816] font-medium truncate">
+                            {ev.venue} • {ev.timeRange || "Evening Call"}
+                          </span>
+                        </div>
+
+                        <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-[#DCBAB2]/40">
+                          <span className="text-[#8C5A54] text-xs uppercase font-bold flex items-center gap-1.5">
+                            <DollarSign className="w-3.5 h-3.5 text-[#8C241E] shrink-0" />
+                            <span>{ev.is_sponsored ? "Sponsorship Backing" : "Patronage Donations"}</span>
+                          </span>
+                          {ev.is_sponsored ? (
+                            <span className="font-bold text-amber-950">{ev.sponsor_amount || "Fully Funded"}</span>
+                          ) : (
+                            <div className="flex items-center gap-2.5">
+                              <span className="font-bold text-emerald-950">{ev.donations_collected || "₹0"} / {ev.target_budget || "₹50,000"}</span>
+                              <button
+                                onClick={() => setSelectedEventForDonation(ev)}
+                                className="text-xs font-bold text-[#8C241E] underline hover:text-[#731B16] cursor-pointer"
+                              >
+                                Donate / Fund
+                              </button>
                             </div>
                           )}
                         </div>
-                      )}
+
+                        <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-[#DCBAB2]/40">
+                          <span className="text-[#8C5A54] text-xs uppercase font-bold flex items-center gap-1.5">
+                            <Users className="w-3.5 h-3.5 text-[#8C241E] shrink-0" />
+                            <span>Production Roster</span>
+                          </span>
+                          <span className="text-[#2A1816] font-medium">
+                            {eventPositions.length} Roles ({eventApps.length} Applicants) • {eventVols.length} Backstage Crew
+                          </span>
+                        </div>
+                      </div>
                     </div>
 
-                    <div className="pt-3 border-t border-[#e6e2dd] flex items-center justify-between gap-3 text-xs font-bold">
-                      <span className="text-[10px] text-gray-400 font-normal">{ad.submitted_at}</span>
-                      
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => handleUpdateSponsorAdStatus(ad.id, "Rejected")}
-                          disabled={ad.status === "Rejected"}
-                          className="px-3 py-1.5 rounded-lg border border-red-200 text-red-700 hover:bg-red-50 text-xs transition-all disabled:opacity-50"
-                        >
-                          Reject
-                        </button>
-                        <button
-                          onClick={() => handleUpdateSponsorAdStatus(ad.id, "Approved")}
-                          disabled={ad.status === "Approved"}
-                          className="px-3 py-1.5 rounded-lg bg-[#635f41] text-white hover:bg-[#4d4a32] text-xs transition-all disabled:opacity-50"
-                        >
-                          Approve Ad
-                        </button>
-                      </div>
+                    {/* ACTION CONTROLS - 3 CLEAN BUTTONS WITH THEMED ICONS */}
+                    <div className="pt-4 border-t border-[#DCBAB2]/60 flex items-center gap-3 w-full">
+                      <button
+                        onClick={() => handleOpenScriptPreview(ev)}
+                        className="flex-1 py-2.5 px-3 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] hover:text-[#2A1816] text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs"
+                        title="Preview Society Playbook Script"
+                      >
+                        <FileText className="w-3.5 h-3.5 text-[#8C241E]" />
+                        <span>Script</span>
+                      </button>
+
+                      <button
+                        onClick={() => handleOpenDetails(ev)}
+                        className="flex-1 py-2.5 px-3 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] hover:text-[#2A1816] text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs"
+                        title="View detailed production dossier"
+                      >
+                        <Info className="w-3.5 h-3.5 text-[#8C241E]" />
+                        <span>Full Details</span>
+                      </button>
+
+                      <button
+                        onClick={() => handleOpenEdit(ev)}
+                        className="flex-1 py-2.5 px-3 rounded-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm border border-[#A6352F]"
+                        title="Edit upcoming production metadata & details"
+                      >
+                        <Edit3 className="w-3.5 h-3.5 text-[#FFD0CC]" />
+                        <span>Edit Event</span>
+                      </button>
                     </div>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
+                );
+              })}
+            </div>
+          )}
+        </section>
+      )}
 
-        {/* TAB 3: EVENT PROPOSALS & PITCHES */}
-        {activeTab === "Proposals" && (
-          <div className="space-y-6">
-            <div className="bg-white border border-[#e6e2dd] p-5 rounded-2xl shadow-xs space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <h2 className="font-serif font-bold text-xl text-[#1c1b19] flex items-center gap-2">
-                  Event Proposals & Member Pitches
-                </h2>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="text"
-                    placeholder="Filter proposals by keyword..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="px-3.5 py-1.5 rounded-xl border border-[#cac6b9]/60 bg-[#fdf9f4] text-xs text-[#1c1b19] focus:outline-none focus:border-[#635f41] w-64"
-                  />
-                  {searchTerm && (
-                    <button
-                      onClick={() => setSearchTerm("")}
-                      className="px-2.5 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-[#466272] text-xs font-semibold"
-                    >
-                      Clear
-                    </button>
-                  )}
-                </div>
-              </div>
-              {searchTerm && (
-                <div className="flex items-center gap-2 text-xs text-[#635f41]">
-                  <span>Active Keyword Filter:</span>
-                  <span className="px-2.5 py-0.5 rounded-full bg-[#635f41] text-white font-bold text-[11px] flex items-center gap-1">
-                    {searchTerm}
-                    <button onClick={() => setSearchTerm("")} className="hover:text-amber-200 ml-1">×</button>
-                  </span>
-                </div>
-              )}
+      {/* TAB 2: PITCHES & PROPOSALS (Editorial Cards for Member & Sponsor Requests) */}
+      {activeTab === "pitches" && (
+        <section className="space-y-6">
+          {/* Filter Bar */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#DCBAB2]/60 pb-4">
+            {/* Search Input */}
+            <div className="relative flex-1 max-w-md">
+              <Search className="w-4 h-4 text-[#8C5A54] absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                placeholder="Search pitches by title, submitter, keywords..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl text-xs text-[#2A1816] placeholder-[#8C5A54] focus:outline-hidden focus:border-[#8C241E]"
+              />
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-              <div className="lg:col-span-7 bg-white border border-[#e6e2dd] rounded-2xl shadow-xs overflow-hidden">
-                <div className="p-4 border-b border-[#e6e2dd] bg-[#fdf9f4] flex justify-between items-center">
-                  <h3 className="font-serif font-bold text-base text-[#635f41]">
-                    Submitted Proposals ({filteredProposals.length})
-                  </h3>
-                </div>
-
-                <div className="divide-y divide-gray-100 max-h-[600px] overflow-y-auto">
-                  {filteredProposals.map((prop) => (
-                    <div
-                      key={prop.id}
-                      onClick={() => setSelectedProposalId(prop.id)}
-                      className={`p-4 hover:bg-[#fdf9f4]/60 transition-all cursor-pointer flex items-start justify-between gap-4 ${
-                        selectedProposalId === prop.id
-                          ? "bg-[#fdf9f4] border-l-4 border-[#8CC0EB]"
-                          : "border-l-4 border-transparent"
-                      }`}
-                    >
-                      <div className="space-y-1.5 flex-1 min-w-0">
-                        <div className="flex items-center justify-between gap-2">
-                          <div className="flex items-center gap-2">
-                            <span className="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-[#635f41]/10 text-[#635f41]">
-                              {prop.proposalType || prop.sourceType || "Proposal"}
-                            </span>
-                            <span className="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-amber-50 text-amber-800 border border-amber-200">
-                              {prop.status}
-                            </span>
-                          </div>
-                          <span className="text-[10px] text-emerald-700 font-bold">{prop.budget || prop.sponsorshipDeal || "₹50,000"}</span>
-                        </div>
-                        <h4 className="font-bold text-sm text-[#1c1b19] truncate">{prop.name}</h4>
-                        <div className="text-[11px] text-[#466272] flex flex-wrap gap-x-2 gap-y-0.5 items-center">
-                          <span>By <strong>{prop.submitter?.name || prop.submitter_name || "Ensemble Member"}</strong></span>
-                          <span>•</span>
-                          <span>{prop.contact_email || prop.submitter?.email}</span>
-                          {prop.contact_phone && (
-                            <>
-                              <span>•</span>
-                              <span>{prop.contact_phone}</span>
-                            </>
-                          )}
-                        </div>
-                        <div className="text-[10px] text-gray-500 truncate mt-0.5">
-                          Stage: <strong>{prop.venue}</strong>
-                        </div>
-                        {prop.description && (
-                          <p className="text-[11px] text-[#466272]/85 line-clamp-2 italic mt-1 bg-gray-50/70 p-2 rounded-lg border border-gray-100">
-                            "{prop.description}"
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
+            <div className="flex items-center gap-3 flex-wrap">
+              {/* Source Filter Buttons */}
+              <div className="flex items-center gap-1.5 bg-[#FAF2EE] p-1.5 rounded-full border border-[#DCBAB2] shadow-xs">
+                <button
+                  type="button"
+                  onClick={() => setPitchSourceFilter("all")}
+                  className={`px-4 py-2 rounded-full text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                    pitchSourceFilter === "all"
+                      ? "bg-[#8C241E] text-[#FDF8F7] shadow-sm border border-[#A6352F]"
+                      : "text-[#5C3B37] hover:text-[#2A1816] hover:bg-[#EEDBD5] border border-transparent"
+                  }`}
+                >
+                  All ({proposalsList.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPitchSourceFilter("member")}
+                  className={`px-4 py-2 rounded-full text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                    pitchSourceFilter === "member"
+                      ? "bg-[#8C241E] text-[#FDF8F7] shadow-sm border border-[#A6352F]"
+                      : "text-[#5C3B37] hover:text-[#2A1816] hover:bg-[#EEDBD5] border border-transparent"
+                  }`}
+                >
+                  Member Pitches ({memberPitchesCount})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPitchSourceFilter("sponsor")}
+                  className={`px-4 py-2 rounded-full text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                    pitchSourceFilter === "sponsor"
+                      ? "bg-[#8C241E] text-[#FDF8F7] shadow-sm border border-[#A6352F]"
+                      : "text-[#5C3B37] hover:text-[#2A1816] hover:bg-[#EEDBD5] border border-transparent"
+                  }`}
+                >
+                  Sponsor Ads ({sponsorPitchesCount})
+                </button>
               </div>
 
-              <div className="lg:col-span-5 bg-white border border-[#e6e2dd] rounded-2xl shadow-xs p-6 flex flex-col justify-between space-y-6">
-                {currentProposal && (
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#635f41]/10 text-[#635f41]">
-                        {currentProposal.proposalType || currentProposal.sourceType || "Proposal Pitch"}
-                      </span>
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-50 text-amber-800 border border-amber-200">
-                        {currentProposal.status || "Reviewing"}
-                      </span>
-                    </div>
+              {/* Custom Theatrical Status Dropdown Menu */}
+              <div className="relative" ref={statusDropdownRef}>
+                <button
+                  type="button"
+                  onClick={() => setStatusDropdownOpen(!statusDropdownOpen)}
+                  className="bg-[#FAF2EE] hover:bg-[#EEDBD5] border border-[#DCBAB2] rounded-full px-4 py-2.5 text-xs font-mono font-bold uppercase tracking-wider text-[#2A1816] flex items-center gap-2.5 transition-all cursor-pointer shadow-xs"
+                >
+                  <SlidersHorizontal className="w-3.5 h-3.5 text-[#8C241E]" />
+                  <span>
+                    {pitchStatusFilter === "all"
+                      ? "All Statuses"
+                      : pitchStatusFilter === "pending"
+                      ? "Pending Review"
+                      : pitchStatusFilter === "approved"
+                      ? "Approved"
+                      : "Declined"}
+                  </span>
+                  <ChevronDown className={`w-3.5 h-3.5 text-[#8C5A54] transition-transform duration-200 ${statusDropdownOpen ? "rotate-180" : ""}`} />
+                </button>
 
-                    <h3 className="font-serif text-xl font-bold text-[#1c1b19] leading-snug">{currentProposal.name}</h3>
-
-                    <div className="p-3.5 bg-[#fdf9f4] rounded-xl border border-[#e6e2dd] space-y-2 text-xs">
-                      <div className="flex items-center justify-between text-[#466272]">
-                        <span>Submitter: <strong>{currentProposal.submitter?.name || "Ensemble Member"}</strong></span>
-                        <span className="text-emerald-700 font-bold">{currentProposal.budget || currentProposal.sponsorshipDeal || "₹50,000"}</span>
-                      </div>
-                      <div className="text-[#466272] truncate">
-                        Email: <a href={`mailto:${currentProposal.contact_email || currentProposal.submitter?.email}`} className="underline text-[#635f41]">{currentProposal.contact_email || currentProposal.submitter?.email || "partner@aayam.org"}</a>
-                      </div>
-                      {currentProposal.contact_phone && (
-                        <div className="text-[#466272]">
-                          Phone: <strong>{currentProposal.contact_phone}</strong>
-                        </div>
-                      )}
-                      <div className="pt-1.5 border-t border-[#e6e2dd] text-[11px] text-[#1c1b19]">
-                        Target Stage / Venue: <strong>{currentProposal.venue}</strong>
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-[#635f41] block">Proposal Description & Objectives</span>
-                      <p className="text-xs text-[#466272] bg-gray-50 p-3.5 rounded-xl border border-gray-100 leading-relaxed italic">
-                        "{currentProposal.description || "No description provided."}"
-                      </p>
-
-                      {/* AI Keyword Extraction Button */}
-                      <div className="flex items-center justify-between gap-2 pt-1">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-[#635f41]">
-                          AI Key Signals
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => handleToggleAIKeywords(`prop_${currentProposal.id}`, currentProposal.description)}
-                          className="px-3 py-1 rounded-lg bg-[#fdf9f4] hover:bg-[#e6e2dd] text-[#635f41] text-[11px] font-bold transition-all border border-[#cac6b9]/60"
-                        >
-                          {extractedKeywords[`prop_${currentProposal.id}`] ? "Hide Keywords" : "Extract & Filter Keywords"}
-                        </button>
-                      </div>
-
-                      {/* Extracted AI Keyword Badges Panel */}
-                      {extractedKeywords[`prop_${currentProposal.id}`] && (
-                        <div className="p-3 bg-[#fdf9f4] rounded-xl border border-[#cac6b9]/60 space-y-2">
-                          <div className="text-[10px] text-[#635f41] font-semibold">Click keyword to filter requests:</div>
-                          <div className="flex flex-wrap gap-1.5">
-                            {extractedKeywords[`prop_${currentProposal.id}`].map((kw, idx) => (
-                              <button
-                                key={idx}
-                                type="button"
-                                onClick={() => handleKeywordClick(kw)}
-                                className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-white hover:bg-[#635f41] hover:text-white text-[#1c1b19] border border-[#cac6b9]/50 shadow-2xs transition-all cursor-pointer"
-                              >
-                                {kw}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="flex gap-3 pt-2">
+                {statusDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-56 bg-[#F5EAE6] border border-[#DEBEB7] rounded-2xl p-2 shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-150 space-y-1">
+                    {[
+                      { value: "all", label: "All Statuses", dot: "bg-[#8C5A54]" },
+                      { value: "pending", label: "Pending Review", dot: "bg-amber-600" },
+                      { value: "approved", label: "Approved", dot: "bg-emerald-600" },
+                      { value: "rejected", label: "Declined", dot: "bg-rose-600" }
+                    ].map((opt) => (
                       <button
-                        onClick={() => handleRejectProposal(currentProposal.id)}
-                        className="flex-1 border border-red-200 text-red-600 hover:bg-red-50 text-xs font-bold py-2.5 rounded-xl transition-all"
+                        key={opt.value}
+                        type="button"
+                        onClick={() => {
+                          setPitchStatusFilter(opt.value as any);
+                          setStatusDropdownOpen(false);
+                        }}
+                        className={`w-full text-left rounded-xl px-3.5 py-2.5 text-xs font-mono font-bold flex items-center justify-between transition-all cursor-pointer ${
+                          pitchStatusFilter === opt.value
+                            ? "bg-[#8C241E] text-[#FDF8F7] shadow-xs"
+                            : "text-[#2A1816] hover:bg-[#EEDBD5]"
+                        }`}
                       >
-                        Reject Proposal
+                        <div className="flex items-center gap-2.5">
+                          <span className={`w-2 h-2 rounded-full ${opt.dot}`} />
+                          <span>{opt.label}</span>
+                        </div>
+                        {pitchStatusFilter === opt.value && <Check className="w-3.5 h-3.5 text-[#FFD0CC]" />}
                       </button>
-                      <button
-                        onClick={() => handleApproveProposal(currentProposal.id)}
-                        className="flex-1 bg-[#635f41] text-white hover:bg-[#4d4a32] text-xs font-bold py-2.5 rounded-xl transition-all shadow-xs"
-                      >
-                        Approve & Schedule Event
-                      </button>
-                    </div>
+                    ))}
                   </div>
                 )}
               </div>
             </div>
           </div>
-        )}
 
-        {/* TAB 4: PAST EVENTS */}
-        {activeTab === "Past" && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {pastEvents.map((evt) => (
-              <div key={evt.id} className="bg-white border border-[#e6e2dd] rounded-2xl p-5 shadow-2xs space-y-2 opacity-80">
-                <h3 className="font-serif font-bold text-base text-[#1c1b19]">{evt.title}</h3>
-                <p className="text-xs text-[#466272]">{evt.date} • {evt.venue}</p>
+          {/* Pitches Cards Grid */}
+          {filteredPitches.length === 0 ? (
+            <div className="text-center py-20 bg-[#FAF2EE] border border-[#DCBAB2] rounded-[2rem] text-[#8C5A54] font-serif italic text-sm space-y-2">
+              <p>No proposals match your current filter settings.</p>
+              <button
+                onClick={() => { setSearchQuery(""); setPitchSourceFilter("all"); setPitchStatusFilter("all"); }}
+                className="text-xs font-mono text-[#8C241E] font-bold uppercase underline cursor-pointer"
+              >
+                Reset Pitch Filters
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+              {filteredPitches.map(pitch => {
+                const isMember = (pitch.proposalType || "").toLowerCase().includes("member") || pitch.sourceType === "Member";
+                const isApproved = (pitch.status || "").toLowerCase() === "approved";
+                const isRejected = (pitch.status || "").toLowerCase() === "rejected" || (pitch.status || "").toLowerCase() === "declined";
+
+                return (
+                  <div
+                    key={pitch.id}
+                    className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-[2.5rem] p-7 sm:p-8 md:p-9 hover:border-[#B32D25]/50 hover:shadow-xl transition-all flex flex-col justify-between space-y-6 shadow-xs group"
+                  >
+                    <div className="space-y-4">
+                      {/* Top Header: Submitter & Type Tag */}
+                      <div className="flex items-center justify-between gap-3 border-b border-[#DCBAB2]/50 pb-3.5">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-9 h-9 rounded-full bg-[#EEDBD5] border border-[#D5AAA2] text-[#8C241E] font-mono text-xs font-bold flex items-center justify-center shrink-0 shadow-xs">
+                            {pitch.submitter?.initials || (isMember ? "M" : "SP")}
+                          </div>
+                          <div className="min-w-0">
+                            <h4 className="font-serif text-base text-[#2A1816] font-normal truncate">
+                              {pitch.submitter?.name || "Ensemble Member"}
+                            </h4>
+                            <p className="text-xs font-mono text-[#8C5A54] truncate">
+                              {pitch.contact_email || pitch.submitter?.email || ""}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2 shrink-0">
+                          <span className={`text-xs font-mono font-bold uppercase tracking-wider px-3 py-1 rounded-full border ${
+                            isMember 
+                              ? "bg-[#EEDBD5] text-[#8C241E] border-[#D5AAA2]"
+                              : "bg-amber-700/15 text-amber-950 border-amber-700/30"
+                          }`}>
+                            {isMember ? "Member Pitch" : "Sponsor Proposal"}
+                          </span>
+
+                          <span className={`text-xs font-mono font-bold uppercase tracking-wider px-3 py-1 rounded-full border ${
+                            isApproved
+                              ? "bg-emerald-700/15 text-emerald-950 border-emerald-700/30"
+                              : isRejected
+                              ? "bg-stone-200 text-stone-600 border-stone-300"
+                              : "bg-amber-700/15 text-amber-950 border-amber-700/30"
+                          }`}>
+                            {pitch.status || "Pending"}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Pitch Title */}
+                      <h3 className="font-serif text-2xl sm:text-3xl text-[#2A1816] leading-snug font-normal group-hover:text-[#8C241E] transition-colors break-words">
+                        {pitch.name || pitch.title}
+                      </h3>
+
+                      {/* Description */}
+                      <p className="text-xs sm:text-sm text-[#5C3B37] font-light leading-relaxed line-clamp-3">
+                        {pitch.description}
+                      </p>
+
+                      {/* Specifications Panel */}
+                      <div className="bg-[#F5EAE6] p-4 sm:p-5 rounded-2xl border border-[#DEBEB7] space-y-3 text-xs sm:text-sm font-mono text-[#5C3B37]">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <span className="text-[#8C5A54] text-xs uppercase font-bold flex items-center gap-1.5">
+                            <MapPin className="w-3.5 h-3.5 text-[#8C241E] shrink-0" />
+                            <span>Target Venue & Date</span>
+                          </span>
+                          <span className="text-[#2A1816] font-medium truncate">
+                            {pitch.venue || pitch.location_or_link || "SAC Rehearsal Studio"} • {pitch.date || "Autumn 2026"}
+                          </span>
+                        </div>
+                        <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-[#DCBAB2]/40">
+                          <span className="text-[#8C5A54] text-xs uppercase font-bold flex items-center gap-1.5">
+                            <DollarSign className="w-3.5 h-3.5 text-[#8C241E] shrink-0" />
+                            <span>Financial Terms</span>
+                          </span>
+                          <span className="text-[#2A1816] font-bold text-emerald-950">
+                            {pitch.budget || "₹25,000"}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Bottom Action Controls in Single Line */}
+                    <div className="pt-4 border-t border-[#DCBAB2]/60 flex items-center gap-2 w-full flex-nowrap">
+                      <button
+                        onClick={() => handleOpenEditPitch(pitch)}
+                        className="flex-1 py-2.5 px-3 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] hover:text-[#2A1816] text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer shadow-xs truncate"
+                        title="Review pitch details, adjust date/venue/budget, and approve to upcoming events"
+                      >
+                        Review & Edit
+                      </button>
+
+                      {!isApproved && (
+                        <button
+                          onClick={() => handleQuickApprove(pitch)}
+                          className="flex-1 py-2.5 px-3 rounded-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer shadow-xs border border-[#A6352F] truncate"
+                          title="Quick approve and schedule to upcoming events"
+                        >
+                          Approve
+                        </button>
+                      )}
+
+                      {!isApproved && !isRejected && (
+                        <button
+                          onClick={() => handleRejectPitch(pitch.id)}
+                          className="py-2.5 px-4 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-stone-200 text-stone-600 hover:text-stone-900 text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer shadow-xs truncate"
+                          title="Decline proposal"
+                        >
+                          Decline
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </section>
+      )}
+
+      {/* MODAL: REVIEW & EDIT PITCH BEFORE PASSING TO UPCOMING EVENTS */}
+      {editingPitch && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-[#F5EAE6] border border-[#DEBEB7] text-[#2A1816] rounded-3xl max-w-4xl w-full shadow-2xl relative max-h-[90vh] flex flex-col overflow-hidden">
+            {/* Modal Fixed Header */}
+            <div className="px-7 sm:px-9 pt-7 pb-5 border-b border-[#DCBAB2]/70 flex items-start justify-between gap-4 shrink-0 bg-[#F5EAE6]">
+              <div className="space-y-1.5 max-w-2xl">
+                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#8C241E] bg-[#EEDBD5] px-3 py-1 rounded-full border border-[#D5AAA2] inline-block shadow-xs">
+                  Directorial Proposal Review & Adjustment
+                </span>
+                <h2 className="text-2xl sm:text-3xl font-serif text-[#2A1816] tracking-tight font-normal">
+                  Review & Edit Pitch Details
+                </h2>
+                <p className="text-xs sm:text-sm text-[#5C3B37] font-light leading-relaxed">
+                  Submitted by <strong className="text-[#2A1816] font-semibold">{editingPitch.submitter?.name || "Ensemble Member"}</strong> ({editingPitch.contact_email || editingPitch.submitter?.email}). You can adjust the scheduled date, venue, sponsorship terms, and dramaturgy description before publishing to the Upcoming Events roster.
+                </p>
               </div>
-            ))}
+
+              <button
+                type="button"
+                onClick={() => setEditingPitch(null)}
+                className="w-9 h-9 rounded-full bg-[#EEDBD5] hover:bg-[#E3CEC6] text-[#5C3B37] hover:text-[#2A1816] flex items-center justify-center transition-all cursor-pointer border border-[#D5AAA2] shadow-xs group shrink-0"
+                title="Close"
+              >
+                <X className="w-4 h-4 group-hover:rotate-90 transition-transform duration-200" />
+              </button>
+            </div>
+
+            {/* Edit Form with Scrollable Body and Fixed Action Footer */}
+            <form onSubmit={handleApproveAndPublishPitch} className="flex flex-col flex-1 overflow-hidden">
+              <div className="p-7 sm:p-9 overflow-y-auto flex-1 custom-scrollbar space-y-6 text-xs font-mono pr-5 sm:pr-7">
+                <div className="space-y-1.5">
+                  <label className="font-bold text-[#8C5A54] uppercase tracking-wider block">Event Title</label>
+                  <input
+                    type="text"
+                    required
+                    value={editFormData.title}
+                    onChange={(e) => setEditFormData({ ...editFormData, title: e.target.value })}
+                    className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl px-4 py-2.5 text-xs sm:text-sm text-[#2A1816] focus:outline-hidden focus:border-[#8C241E] shadow-xs"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <div className="space-y-1.5">
+                    <label className="font-bold text-[#8C5A54] uppercase tracking-wider block">Category</label>
+                    <select
+                      value={editFormData.category}
+                      onChange={(e) => setEditFormData({ ...editFormData, category: e.target.value })}
+                      className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl px-4 py-2.5 text-xs text-[#2A1816] focus:outline-hidden focus:border-[#8C241E] cursor-pointer shadow-xs"
+                    >
+                      <option value="Workshops">Workshops & Masterclasses</option>
+                      <option value="Meetups">Meetups & Script Readings</option>
+                      <option value="Plays">Stage Production Preview</option>
+                      <option value="Sponsor Showcase">Sponsor Showcase</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="font-bold text-[#8C5A54] uppercase tracking-wider block">Scheduled Staging Date</label>
+                    <input
+                      type="date"
+                      required
+                      value={editFormData.event_date}
+                      onChange={(e) => setEditFormData({ ...editFormData, event_date: e.target.value })}
+                      className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl px-4 py-2.5 text-xs text-[#2A1816] focus:outline-hidden focus:border-[#8C241E] shadow-xs"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <div className="space-y-1.5">
+                    <label className="font-bold text-[#8C5A54] uppercase tracking-wider block">Assigned Venue</label>
+                    <input
+                      type="text"
+                      required
+                      value={editFormData.venue}
+                      onChange={(e) => setEditFormData({ ...editFormData, venue: e.target.value })}
+                      className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl px-4 py-2.5 text-xs text-[#2A1816] focus:outline-hidden focus:border-[#8C241E] shadow-xs"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="font-bold text-[#8C5A54] uppercase tracking-wider block">Financial Budget / Terms</label>
+                    <input
+                      type="text"
+                      value={editFormData.budget}
+                      onChange={(e) => setEditFormData({ ...editFormData, budget: e.target.value })}
+                      className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl px-4 py-2.5 text-xs text-[#2A1816] focus:outline-hidden focus:border-[#8C241E] shadow-xs"
+                    />
+                  </div>
+                </div>
+
+                {/* Sponsorship / Donation Mode Toggle */}
+                <div className="p-5 bg-[#FAF2EE] border border-[#DCBAB2] rounded-2xl space-y-3.5 shadow-xs">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="font-bold text-[#8C5A54] uppercase tracking-wider block">Funding & Sponsorship Mode</span>
+                    <span className="text-[11px] text-[#8C5A54]">Governs public card badge & donation option</span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <label className={`p-4 rounded-xl border flex items-start gap-3 cursor-pointer transition-all ${
+                      !editFormData.is_sponsored 
+                        ? "bg-[#EEDBD5] border-[#8C241E] text-[#2A1816] shadow-xs" 
+                        : "bg-[#F5EAE6] border-[#DCBAB2] text-[#5C3B37] hover:bg-[#FAF2EE]"
+                    }`}>
+                      <input
+                        type="radio"
+                        name="is_sponsored"
+                        checked={!editFormData.is_sponsored}
+                        onChange={() => setEditFormData({ ...editFormData, is_sponsored: false })}
+                        className="accent-[#8C241E] mt-0.5"
+                      />
+                      <div className="space-y-0.5">
+                        <span className="font-bold block text-xs text-[#2A1816]">Member / Society Open Event</span>
+                        <span className="text-[10px] text-[#8C5A54] block leading-normal">Unfunded • Enables community donation & society patronage pledges</span>
+                      </div>
+                    </label>
+
+                    <label className={`p-4 rounded-xl border flex items-start gap-3 cursor-pointer transition-all ${
+                      editFormData.is_sponsored 
+                        ? "bg-[#EEDBD5] border-[#8C241E] text-[#2A1816] shadow-xs" 
+                        : "bg-[#F5EAE6] border-[#DCBAB2] text-[#5C3B37] hover:bg-[#FAF2EE]"
+                    }`}>
+                      <input
+                        type="radio"
+                        name="is_sponsored"
+                        checked={editFormData.is_sponsored}
+                        onChange={() => setEditFormData({ ...editFormData, is_sponsored: true })}
+                        className="accent-[#8C241E] mt-0.5"
+                      />
+                      <div className="space-y-0.5">
+                        <span className="font-bold block text-xs text-[#2A1816]">Corporate Sponsor Funded Event</span>
+                        <span className="text-[10px] text-[#8C5A54] block leading-normal">Funded by commercial brand deal • Displays partner badge</span>
+                      </div>
+                    </label>
+                  </div>
+
+                  {editFormData.is_sponsored && (
+                    <div className="pt-2">
+                      <label className="font-bold text-[#8C5A54] uppercase tracking-wider block pb-1.5">Sponsor Brand Name</label>
+                      <input
+                        type="text"
+                        value={editFormData.sponsor_name}
+                        onChange={(e) => setEditFormData({ ...editFormData, sponsor_name: e.target.value })}
+                        placeholder="e.g. Red Bull India / FabIndia Handlooms / AudioCraft Pro"
+                        className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl px-4 py-2.5 text-xs text-[#2A1816] focus:outline-hidden focus:border-[#8C241E] shadow-xs"
+                      />
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="font-bold text-[#8C5A54] uppercase tracking-wider block">Description & Dramaturgy Agenda</label>
+                  <textarea
+                    rows={4}
+                    required
+                    value={editFormData.description}
+                    onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
+                    className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl p-4 text-xs sm:text-sm text-[#2A1816] focus:outline-hidden focus:border-[#8C241E] leading-relaxed font-sans font-normal shadow-xs"
+                  />
+                </div>
+              </div>
+
+              {/* Modal Fixed Footer */}
+              <div className="px-7 sm:px-9 py-5 bg-[#FAF2EE] border-t border-[#DCBAB2]/70 flex flex-wrap items-center justify-between gap-3 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => handleRejectPitch(editingPitch.id)}
+                  className="px-5 py-2.5 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-rose-100 hover:text-rose-900 text-rose-800 text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer shadow-xs"
+                >
+                  Decline Pitch
+                </button>
+
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setEditingPitch(null)}
+                    className="px-5 py-2.5 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer shadow-xs"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={submittingDecision}
+                    className="px-7 py-2.5 rounded-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] text-xs font-mono font-bold uppercase tracking-widest flex items-center gap-2 cursor-pointer shadow-md shadow-[#8C241E]/20 border border-[#A6352F] disabled:opacity-50 transition-all"
+                  >
+                    <Check className="w-4 h-4 text-[#FFD0CC]" />
+                    <span>{submittingDecision ? "Publishing..." : "Approve & Publish to Upcoming Events"}</span>
+                  </button>
+                </div>
+              </div>
+            </form>
           </div>
-        )}
-
-      </div>
-
-      {/* Global Toast */}
-      {toastMessage && (
-        <div className="fixed bottom-6 right-6 bg-[#31302d] text-white border border-[#cac6b9]/30 rounded-xl px-4 py-3 shadow-xl z-50 flex items-center gap-3 text-xs font-semibold">
-          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-          {toastMessage}
         </div>
       )}
+
+      {/* MODAL: PATRONAGE & SOCIETY DONATION DESK */}
+      {selectedEventForDonation && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-[#F5EAE6] border border-[#DEBEB7] text-[#2A1816] rounded-3xl max-w-lg w-full shadow-2xl relative max-h-[90vh] flex flex-col overflow-hidden">
+            {/* Header */}
+            <div className="px-7 pt-7 pb-5 border-b border-[#DCBAB2]/70 flex items-start justify-between gap-4 shrink-0 bg-[#F5EAE6]">
+              <div className="space-y-1">
+                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#8C241E] bg-[#EEDBD5] px-3 py-1 rounded-full border border-[#D5AAA2] inline-block shadow-xs">
+                  Society Patronage & Production Funding
+                </span>
+                <h2 className="text-2xl sm:text-3xl font-serif text-[#2A1816] tracking-tight font-normal">
+                  {selectedEventForDonation.title}
+                </h2>
+                <p className="text-xs text-[#5C3B37] font-light leading-relaxed">
+                  Support collegiate theatre production expenses, props crafting, and hall rental through alumni and member patronage.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setSelectedEventForDonation(null)}
+                className="w-9 h-9 rounded-full bg-[#EEDBD5] hover:bg-[#E3CEC6] text-[#5C3B37] hover:text-[#2A1816] flex items-center justify-center transition-all cursor-pointer border border-[#D5AAA2] shadow-xs group shrink-0"
+                title="Close"
+              >
+                <X className="w-4 h-4 group-hover:rotate-90 transition-transform duration-200" />
+              </button>
+            </div>
+
+            {/* Form with Scrollable Body and Fixed Footer */}
+            <form onSubmit={handlePledgeDonation} className="flex flex-col flex-1 overflow-hidden">
+              <div className="p-7 overflow-y-auto flex-1 custom-scrollbar space-y-5 text-xs font-mono pr-5">
+                {/* Donation Stats */}
+                <div className="p-4 bg-[#FAF2EE] rounded-2xl border border-[#DCBAB2] space-y-2 text-xs font-mono shadow-xs">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[#8C5A54] uppercase font-bold">Collected So Far:</span>
+                    <span className="text-emerald-950 font-bold text-base">{selectedEventForDonation.donations_collected || "₹0"}</span>
+                  </div>
+                  <div className="flex items-center justify-between pt-1 border-t border-[#DCBAB2]/50">
+                    <span className="text-[#8C5A54] uppercase font-bold">Estimated Production Target:</span>
+                    <span className="text-[#2A1816] font-bold">{selectedEventForDonation.target_budget || "₹50,000"}</span>
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="font-bold text-[#8C5A54] uppercase tracking-wider block">Pledge / Patron Name</label>
+                  <input
+                    type="text"
+                    required
+                    value={donorName}
+                    onChange={(e) => setDonorName(e.target.value)}
+                    className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl px-4 py-2.5 text-xs text-[#2A1816] focus:outline-hidden focus:border-[#8C241E] shadow-xs"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="font-bold text-[#8C5A54] uppercase tracking-wider block">Pledge Donation Amount</label>
+                  <input
+                    type="text"
+                    required
+                    value={donorPledgeAmount}
+                    onChange={(e) => setDonorPledgeAmount(e.target.value)}
+                    className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl px-4 py-2.5 text-xs text-[#2A1816] focus:outline-hidden focus:border-[#8C241E] shadow-xs"
+                  />
+                </div>
+              </div>
+
+              {/* Fixed Footer */}
+              <div className="px-7 py-4 bg-[#FAF2EE] border-t border-[#DCBAB2]/70 flex items-center justify-between gap-3 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setSelectedEventForDonation(null)}
+                  className="px-5 py-2.5 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer shadow-xs"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-6 py-2.5 rounded-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-2 cursor-pointer shadow-sm border border-[#A6352F] transition-all"
+                >
+                  <Heart className="w-4 h-4 text-[#FFD0CC]" />
+                  <span>Log Patron Pledge</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* AUDITIONS & CANDIDATES MODAL */}
+      {selectedEventForAuditions && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-[#F5EAE6] border border-[#DEBEB7] text-[#2A1816] rounded-3xl max-w-4xl w-full shadow-2xl relative max-h-[90vh] flex flex-col overflow-hidden">
+            {/* Modal Fixed Header */}
+            <div className="px-7 sm:px-9 pt-7 pb-5 border-b border-[#DCBAB2]/70 flex items-start justify-between gap-4 shrink-0 bg-[#F5EAE6]">
+              <div className="space-y-1 max-w-2xl">
+                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#8C241E] bg-[#EEDBD5] px-3 py-1 rounded-full border border-[#D5AAA2] inline-block shadow-xs">
+                  Audition & Casting Calls
+                </span>
+                <h2 className="text-2xl sm:text-3xl font-serif text-[#2A1816] tracking-tight font-normal">
+                  {selectedEventForAuditions.title}
+                </h2>
+                <p className="text-xs sm:text-sm text-[#5C3B37] font-light leading-relaxed">
+                  Review open role quotas and evaluate submitted actor/crew audition reels.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setSelectedEventForAuditions(null)}
+                className="w-9 h-9 rounded-full bg-[#EEDBD5] hover:bg-[#E3CEC6] text-[#5C3B37] hover:text-[#2A1816] flex items-center justify-center transition-all cursor-pointer border border-[#D5AAA2] shadow-xs group shrink-0"
+                title="Close"
+              >
+                <X className="w-4 h-4 group-hover:rotate-90 transition-transform duration-200" />
+              </button>
+            </div>
+
+            {/* Modal Scrollable Body */}
+            <div className="p-7 sm:p-9 overflow-y-auto flex-1 custom-scrollbar space-y-6 text-xs font-mono pr-5 sm:pr-7">
+              {/* Sub-section 1: Open Calling Roles */}
+              <div className="space-y-3">
+                <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-[#8C5A54] flex items-center gap-1.5">
+                  <Tag className="w-3.5 h-3.5 text-[#8C241E]" />
+                  <span>Open Audition Roles ({getEventPositions(selectedEventForAuditions.title).length})</span>
+                </h3>
+
+                {getEventPositions(selectedEventForAuditions.title).length === 0 ? (
+                  <div className="p-5 bg-[#FAF2EE] border border-[#DCBAB2] rounded-2xl text-xs font-serif italic text-[#8C5A54]">
+                    No specific calling positions logged for this event. You can create roles in the Auditions Management portal.
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    {getEventPositions(selectedEventForAuditions.title).map(pos => (
+                      <div key={pos.id} className="p-4 sm:p-5 bg-[#FAF2EE] border border-[#DCBAB2] rounded-2xl space-y-2 shadow-xs">
+                        <div className="flex items-start justify-between gap-2">
+                          <div>
+                            <span className="text-[10px] font-mono uppercase font-bold text-[#8C241E] block">
+                              {pos.role_category}
+                            </span>
+                            <h4 className="font-serif text-base text-[#2A1816] font-normal leading-tight">
+                              {pos.role_name}
+                            </h4>
+                          </div>
+                          <span className="text-[10px] font-mono font-bold bg-[#EEDBD5] px-2.5 py-0.5 rounded-full text-[#8C241E] shrink-0 border border-[#D5AAA2]">
+                            {pos.slots_available} Slots
+                          </span>
+                        </div>
+                        {pos.requirements && (
+                          <p className="text-xs text-[#6E4742] line-clamp-2 leading-relaxed">
+                            <strong>Req:</strong> {pos.requirements}
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Sub-section 2: Candidate Applications */}
+              <div className="space-y-3 pt-2">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-[#8C5A54] flex items-center gap-1.5">
+                    <Users className="w-3.5 h-3.5 text-[#8C241E]" />
+                    <span>Submitted Candidate Applications ({getEventApplications(selectedEventForAuditions.title).length})</span>
+                  </h3>
+                  <Link
+                    to="/auditions-admin"
+                    className="text-xs font-mono font-bold text-[#8C241E] hover:underline flex items-center gap-1 uppercase tracking-wider"
+                  >
+                    <span>Open Full Casting Desk</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </Link>
+                </div>
+
+                {getEventApplications(selectedEventForAuditions.title).length === 0 ? (
+                  <div className="p-6 bg-[#FAF2EE] border border-[#DCBAB2] rounded-2xl text-center text-xs font-serif italic text-[#8C5A54]">
+                    No audition reels submitted yet for this production.
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {getEventApplications(selectedEventForAuditions.title).map(app => (
+                      <div key={app.id} className="p-4 sm:p-5 bg-[#FAF2EE] border border-[#DCBAB2] rounded-2xl space-y-3 shadow-xs">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#DCBAB2]/40 pb-2.5">
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="font-serif text-lg text-[#2A1816] font-normal">{app.candidate_name}</span>
+                              <span className="text-[10px] font-mono text-[#8C5A54]">({app.applicant_email || app.roll_number})</span>
+                            </div>
+                            <span className="text-xs font-mono text-[#8C241E] font-semibold">Applying for: {app.role_name}</span>
+                          </div>
+
+                          {/* Status update controls */}
+                          <div className="flex items-center gap-2">
+                            <select
+                              value={app.status || "Under Review"}
+                              onChange={(e) => handleUpdateAppStatus(app.id, e.target.value)}
+                              className="bg-[#F5EAE6] border border-[#D5AAA2] rounded-xl px-3 py-1.5 text-xs font-mono text-[#2A1816] font-semibold focus:outline-hidden focus:border-[#8C241E] cursor-pointer"
+                            >
+                              <option value="Under Review">Under Review</option>
+                              <option value="Audition Scheduled">Audition Scheduled</option>
+                              <option value="Selected">Selected</option>
+                              <option value="Waitlisted">Waitlisted</option>
+                              <option value="Declined">Declined</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        {/* Statement / Video */}
+                        <div className="space-y-1 text-xs text-[#5C3B37]">
+                          {app.audition_statement && (
+                            <p className="font-light italic text-[#6E4742]">"{app.audition_statement}"</p>
+                          )}
+                          {app.video_url && (
+                            <p className="flex items-center gap-1.5 text-[#8C241E] font-mono text-[11px] pt-1">
+                              <Video className="w-3.5 h-3.5" />
+                              <a href={app.video_url} target="_blank" rel="noreferrer" className="underline font-bold">
+                                View Audition Reel / Slate
+                              </a>
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* VOLUNTEER REQUESTS MODAL */}
+      {selectedEventForVolunteers && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-[#F5EAE6] border border-[#DEBEB7] text-[#2A1816] rounded-3xl max-w-4xl w-full shadow-2xl relative max-h-[90vh] flex flex-col overflow-hidden">
+            {/* Modal Fixed Header */}
+            <div className="px-7 sm:px-9 pt-7 pb-5 border-b border-[#DCBAB2]/70 flex items-start justify-between gap-4 shrink-0 bg-[#F5EAE6]">
+              <div className="space-y-1 max-w-2xl">
+                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#8C241E] bg-[#EEDBD5] px-3 py-1 rounded-full border border-[#D5AAA2] inline-block shadow-xs">
+                  Production Crew Volunteers
+                </span>
+                <h2 className="text-2xl sm:text-3xl font-serif text-[#2A1816] tracking-tight font-normal">
+                  Volunteer Calls for {selectedEventForVolunteers.title}
+                </h2>
+                <p className="text-xs sm:text-sm text-[#5C3B37] font-light leading-relaxed">
+                  Review student crew applications for backstage lighting, stagehands, makeup, and front-of-house management.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setSelectedEventForVolunteers(null)}
+                className="w-9 h-9 rounded-full bg-[#EEDBD5] hover:bg-[#E3CEC6] text-[#5C3B37] hover:text-[#2A1816] flex items-center justify-center transition-all cursor-pointer border border-[#D5AAA2] shadow-xs group shrink-0"
+                title="Close"
+              >
+                <X className="w-4 h-4 group-hover:rotate-90 transition-transform duration-200" />
+              </button>
+            </div>
+
+            {/* Volunteer List Scrollable Body */}
+            <div className="p-7 sm:p-9 overflow-y-auto flex-1 custom-scrollbar space-y-4 text-xs font-mono pr-5 sm:pr-7">
+              {getEventVolunteers(selectedEventForVolunteers.title, selectedEventForVolunteers.play_id).length === 0 ? (
+                <div className="p-8 bg-[#FAF2EE] border border-[#DCBAB2] rounded-2xl text-center text-xs font-serif italic text-[#8C5A54] space-y-2">
+                  <p>No volunteer applications submitted yet for this event.</p>
+                  <p className="text-[11px] font-mono text-[#8C5A54]">Member applications through the portal will appear here immediately.</p>
+                </div>
+              ) : (
+                <div className="space-y-3.5">
+                  {getEventVolunteers(selectedEventForVolunteers.title, selectedEventForVolunteers.play_id).map(vol => (
+                    <div 
+                      key={vol.id}
+                      className="p-5 bg-[#FAF2EE] border border-[#DCBAB2] rounded-2xl space-y-3 hover:border-[#B32D25]/40 transition-all shadow-xs"
+                    >
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#DCBAB2]/40 pb-3">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h4 className="font-serif text-lg text-[#2A1816] font-normal">{vol.applicant_name}</h4>
+                            <span className="text-[10px] font-mono text-[#8C5A54]">({vol.applicant_email})</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-xs font-mono pt-0.5">
+                            <span className="text-[#8C241E] font-bold uppercase">{vol.department}</span>
+                            <span className="text-[#8C5A54]">•</span>
+                            <span className="text-[#5C3B37]">{vol.phone || "No phone provided"}</span>
+                          </div>
+                        </div>
+
+                        {/* Status pill & quick decision buttons */}
+                        <div className="flex items-center gap-2">
+                          <span className={`text-[10px] font-mono font-bold uppercase tracking-wider px-3 py-1 rounded-full border ${
+                            vol.status === "Approved"
+                              ? "bg-emerald-700/15 text-emerald-950 border-emerald-700/30"
+                              : vol.status === "Declined"
+                              ? "bg-stone-200 text-stone-600 border-stone-300"
+                              : "bg-amber-700/15 text-amber-950 border-amber-700/30"
+                          }`}>
+                            {vol.status || "Pending Review"}
+                          </span>
+
+                          {vol.status !== "Approved" && (
+                            <button
+                              onClick={() => handleUpdateVolunteerStatus(vol.id, "Approved")}
+                              className="px-3 py-1 rounded-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] text-[10px] font-mono font-bold uppercase tracking-wider flex items-center gap-1 transition-all cursor-pointer border border-[#A6352F]"
+                              title="Approve volunteer for this crew department"
+                            >
+                              <UserCheck className="w-3 h-3 text-[#FFD0CC]" />
+                              <span>Approve</span>
+                            </button>
+                          )}
+
+                          {vol.status !== "Declined" && (
+                            <button
+                              onClick={() => handleUpdateVolunteerStatus(vol.id, "Declined")}
+                              className="px-3 py-1 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#6E4742] text-[10px] font-mono font-bold uppercase tracking-wider flex items-center gap-1 transition-all cursor-pointer"
+                              title="Decline volunteer application"
+                            >
+                              <UserX className="w-3 h-3 text-[#8C241E]" />
+                              <span>Decline</span>
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Statement & Details */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                        {vol.availability && (
+                          <div className="bg-[#F5EAE6] p-2.5 rounded-xl border border-[#DEBEB7]">
+                            <span className="font-mono text-[10px] uppercase font-bold text-[#8C5A54] block">Availability</span>
+                            <span className="text-[#5C3B37]">{vol.availability}</span>
+                          </div>
+                        )}
+                        {vol.experience && (
+                          <div className="bg-[#F5EAE6] p-2.5 rounded-xl border border-[#DEBEB7]">
+                            <span className="font-mono text-[10px] uppercase font-bold text-[#8C5A54] block">Past Experience</span>
+                            <span className="text-[#5C3B37]">{vol.experience}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* SCRIPT PREVIEW MODAL */}
+      <ScriptPreviewModal
+        open={scriptModalOpen}
+        onClose={() => setScriptModalOpen(false)}
+        script={previewScript}
+      />
+
+      {/* PRODUCTION FULL DOSSIER DETAIL MODAL */}
+      <ProductionDetailModal
+        open={Boolean(selectedDetailProd)}
+        onClose={() => setSelectedDetailProd(null)}
+        production={selectedDetailProd}
+        onOpenScript={(title) => {
+          const pb = getPlaybookForTitle(title);
+          setPreviewScript(pb);
+          setScriptModalOpen(true);
+        }}
+      />
+
+      {/* PRODUCTION MAINTAINER EDIT MODAL */}
+      <ProductionEditModal
+        open={Boolean(selectedEditProd)}
+        onClose={() => setSelectedEditProd(null)}
+        production={selectedEditProd}
+        onSuccess={handleProductionEditSuccess}
+      />
     </div>
   );
 }

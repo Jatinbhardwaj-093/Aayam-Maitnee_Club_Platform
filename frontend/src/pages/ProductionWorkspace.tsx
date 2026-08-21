@@ -82,79 +82,79 @@ export default function ProductionWorkspace() {
   };
 
   return (
-    <div className="space-y-[32px] font-sans text-[#466272]">
+    <div className="space-y-[32px] font-sans text-[#666361]">
       {/* Welcome & Overview */}
-      <div className="bg-[#f7f3ee] border border-[#e6e2dd] rounded-[8px] p-[24px] md:p-[32px] flex flex-col md:flex-row justify-between items-start md:items-center gap-[24px] mb-[32px] md:mb-[48px]">
+      <div className="bg-[#EFE8E1] border border-[#DDD8CE] rounded-[8px] p-[24px] md:p-[32px] flex flex-col md:flex-row justify-between items-start md:items-center gap-[24px] mb-[32px] md:mb-[48px]">
         <div>
-          <span className="text-xs uppercase tracking-widest text-[#466272]/70 font-semibold">Active Workspace</span>
-          <h2 className="text-[32px] font-bold font-serif text-[#635f41] mt-1">Production Workspace: Macbeth</h2>
-          <p className="text-[14px] text-[#466272] mt-2 max-w-xl">
+          <span className="text-xs uppercase tracking-widest text-[#666361]/70 font-semibold">Active Workspace</span>
+          <h2 className="text-[32px] font-bold font-serif text-[#353535] mt-1">Production Workspace: Macbeth</h2>
+          <p className="text-[14px] text-[#666361] mt-2 max-w-xl">
             Manage physical asset checkouts, track expenditures, log prop receipts, and coordinate rehearsals for the Macbeth season.
           </p>
         </div>
         <div className="flex flex-wrap gap-[12px]">
-          <Button variant="outline" className="border-2 border-[#8CC0EB] text-[#8CC0EB] hover:bg-[#8CC0EB]/5 font-semibold rounded-[8px] py-[10px] px-[20px] gap-2 shadow-sm transition-all active:scale-95">
-            <FileText className="w-4 h-4 text-[#8CC0EB]" /> Download Script.pdf
+          <Button variant="outline" className="border-2 border-[#E85F57] text-[#E85F57] hover:bg-[#E85F57]/5 font-semibold rounded-[8px] py-[10px] px-[20px] gap-2 shadow-sm transition-all active:scale-95">
+            <FileText className="w-4 h-4 text-[#E85F57]" /> Download Script.pdf
           </Button>
         </div>
       </div>
 
       {/* Asset Tracking Section */}
-      <section className="bg-white border border-[#e6e2dd] rounded-[8px] overflow-hidden shadow-sm space-y-4">
-        <div className="px-[24px] py-[20px] border-b border-[#e6e2dd] bg-[#f7f3ee]/30 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <section className="bg-white border border-[#DDD8CE] rounded-[8px] overflow-hidden shadow-sm space-y-4">
+        <div className="px-[24px] py-[20px] border-b border-[#DDD8CE] bg-[#EFE8E1]/30 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h3 className="font-bold text-[18px] text-[#635f41] font-serif flex items-center gap-2">
-              <ClipboardList className="w-5 h-5 text-[#635f41]/75" />
+            <h3 className="font-bold text-[18px] text-[#353535] font-serif flex items-center gap-2">
+              <ClipboardList className="w-5 h-5 text-[#353535]/75" />
               Props &amp; Costumes Checkouts
             </h3>
-            <p className="text-xs text-[#466272]/70">Track which borrower holds the active physical stage props</p>
+            <p className="text-xs text-[#666361]/70">Track which borrower holds the active physical stage props</p>
           </div>
           <Dialog open={assetOpen} onOpenChange={setAssetOpen}>
-            <DialogTrigger render={<Button size="sm" className="bg-[#8CC0EB] text-[#1c1b19] hover:bg-[#8CC0EB]/90 font-semibold rounded-[8px] py-[10px] px-[20px] gap-1.5 transition-all active:scale-95" />}>
+            <DialogTrigger render={<Button size="sm" className="bg-[#E85F57] text-[#2C2A28] hover:bg-[#E85F57]/90 font-semibold rounded-[8px] py-[10px] px-[20px] gap-1.5 transition-all active:scale-95" />}>
               <PlusCircle className="w-4 h-4" /> Register Prop Transfer
             </DialogTrigger>
-            <DialogContent className="bg-[#fdf9f4] border border-[#e6e2dd] text-[#466272]">
+            <DialogContent className="bg-[#E7DDD3] border border-[#DDD8CE] text-[#666361]">
               <form onSubmit={handleAddAsset}>
                 <DialogHeader className="space-y-2">
-                  <DialogTitle className="font-serif text-[#635f41]">Register Prop Transfer</DialogTitle>
-                  <DialogDescription className="text-[#466272]/85 text-xs">
+                  <DialogTitle className="font-serif text-[#353535]">Register Prop Transfer</DialogTitle>
+                  <DialogDescription className="text-[#666361]/85 text-xs">
                     Assign a physical asset to a cast or crew member checkout list.
                   </DialogDescription>
                 </DialogHeader>
                 <div className="py-4 space-y-4">
                   <div className="space-y-1">
-                    <label className="text-xs font-semibold text-[#635f41]">Prop Item Name</label>
+                    <label className="text-xs font-semibold text-[#353535]">Prop Item Name</label>
                     <Input
                       placeholder="e.g., Ornamental Golden Dagger"
                       value={newAssetItem}
                       onChange={(e) => setNewAssetItem(e.target.value)}
-                      className="border-[#e6e2dd] focus-visible:ring-[#8CC0EB]"
+                      className="border-[#DDD8CE] focus-visible:ring-[#E85F57]"
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-xs font-semibold text-[#635f41]">Borrower Name</label>
+                    <label className="text-xs font-semibold text-[#353535]">Borrower Name</label>
                     <Input
                       placeholder="e.g., Sneha Vyas"
                       value={newAssetBorrower}
                       onChange={(e) => setNewAssetBorrower(e.target.value)}
-                      className="border-[#e6e2dd] focus-visible:ring-[#8CC0EB]"
+                      className="border-[#DDD8CE] focus-visible:ring-[#E85F57]"
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-xs font-semibold text-[#635f41]">Due Period / Return Timer</label>
+                    <label className="text-xs font-semibold text-[#353535]">Due Period / Return Timer</label>
                     <Input
                       placeholder="e.g., 2 Days Remaining"
                       value={newAssetTimer}
                       onChange={(e) => setNewAssetTimer(e.target.value)}
-                      className="border-[#e6e2dd] focus-visible:ring-[#8CC0EB]"
+                      className="border-[#DDD8CE] focus-visible:ring-[#E85F57]"
                     />
                   </div>
                 </div>
                 <DialogFooter>
-                  <Button type="button" variant="outline" onClick={() => setAssetOpen(false)} className="border-2 border-[#8CC0EB] text-[#8CC0EB] hover:bg-[#8CC0EB]/5 rounded-[8px]">
+                  <Button type="button" variant="outline" onClick={() => setAssetOpen(false)} className="border-2 border-[#E85F57] text-[#E85F57] hover:bg-[#E85F57]/5 rounded-[8px]">
                     Cancel
                   </Button>
-                  <Button type="submit" className="bg-[#8CC0EB] text-[#1c1b19] hover:bg-[#8CC0EB]/90 rounded-[8px]">
+                  <Button type="submit" className="bg-[#E85F57] text-[#2C2A28] hover:bg-[#E85F57]/90 rounded-[8px]">
                     Register Transfer
                   </Button>
                 </DialogFooter>
@@ -166,19 +166,19 @@ export default function ProductionWorkspace() {
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
-              <TableRow className="border-b border-[#e6e2dd] hover:bg-transparent">
-                <TableHead className="text-[#635f41] font-semibold w-24">Asset ID</TableHead>
-                <TableHead className="text-[#635f41] font-semibold">Stage Prop/Item</TableHead>
-                <TableHead className="text-[#635f41] font-semibold">Active Borrower</TableHead>
-                <TableHead className="text-[#635f41] font-semibold">Due Timer</TableHead>
+              <TableRow className="border-b border-[#DDD8CE] hover:bg-transparent">
+                <TableHead className="text-[#353535] font-semibold w-24">Asset ID</TableHead>
+                <TableHead className="text-[#353535] font-semibold">Stage Prop/Item</TableHead>
+                <TableHead className="text-[#353535] font-semibold">Active Borrower</TableHead>
+                <TableHead className="text-[#353535] font-semibold">Due Timer</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {assets.map((asset) => (
-                <TableRow key={asset.id} className="border-b border-[#e6e2dd]/60 hover:bg-[#fdf9f4]/45">
-                  <TableCell className="font-semibold text-xs text-[#466272]/70 py-[16px]">{asset.id}</TableCell>
-                  <TableCell className="font-medium text-[#635f41] py-[16px]">{asset.item}</TableCell>
-                  <TableCell className="text-sm text-[#466272] py-[16px]">{asset.borrower}</TableCell>
+                <TableRow key={asset.id} className="border-b border-[#DDD8CE]/60 hover:bg-[#E7DDD3]/45">
+                  <TableCell className="font-semibold text-xs text-[#666361]/70 py-[16px]">{asset.id}</TableCell>
+                  <TableCell className="font-medium text-[#353535] py-[16px]">{asset.item}</TableCell>
+                  <TableCell className="text-sm text-[#666361] py-[16px]">{asset.borrower}</TableCell>
                   <TableCell className="py-[16px]">
                     <Badge className="rounded-[4px] bg-amber-600/10 text-amber-700 border-amber-600/20">
                       <Clock className="w-3 h-3 mr-1 inline-block text-amber-600" /> {asset.timer}
@@ -192,54 +192,54 @@ export default function ProductionWorkspace() {
       </section>
 
       {/* Expense Tracker Section */}
-      <section className="bg-white border border-[#e6e2dd] rounded-[8px] overflow-hidden shadow-sm space-y-4">
-        <div className="px-[24px] py-[20px] border-b border-[#e6e2dd] bg-[#f7f3ee]/30 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <section className="bg-white border border-[#DDD8CE] rounded-[8px] overflow-hidden shadow-sm space-y-4">
+        <div className="px-[24px] py-[20px] border-b border-[#DDD8CE] bg-[#EFE8E1]/30 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h3 className="font-bold text-[18px] text-[#635f41] font-serif flex items-center gap-2">
-              <CheckCircle2 className="w-5 h-5 text-[#635f41]/75" />
+            <h3 className="font-bold text-[18px] text-[#353535] font-serif flex items-center gap-2">
+              <CheckCircle2 className="w-5 h-5 text-[#353535]/75" />
               Budget &amp; Expense Tracker
             </h3>
-            <p className="text-xs text-[#466272]/70">Review and log budget claims for Macbeth production props</p>
+            <p className="text-xs text-[#666361]/70">Review and log budget claims for Macbeth production props</p>
           </div>
           <Dialog open={expenseOpen} onOpenChange={setExpenseOpen}>
-            <DialogTrigger render={<Button size="sm" variant="outline" className="border-2 border-[#8CC0EB] text-[#8CC0EB] hover:bg-[#8CC0EB]/5 font-semibold rounded-[8px] py-[10px] px-[20px] gap-1.5 transition-all active:scale-95" />}>
+            <DialogTrigger render={<Button size="sm" variant="outline" className="border-2 border-[#E85F57] text-[#E85F57] hover:bg-[#E85F57]/5 font-semibold rounded-[8px] py-[10px] px-[20px] gap-1.5 transition-all active:scale-95" />}>
               <PlusCircle className="w-4 h-4" /> Submit New Claim
             </DialogTrigger>
-            <DialogContent className="bg-[#fdf9f4] border border-[#e6e2dd] text-[#466272]">
+            <DialogContent className="bg-[#E7DDD3] border border-[#DDD8CE] text-[#666361]">
               <form onSubmit={handleAddExpense}>
                 <DialogHeader className="space-y-2">
-                  <DialogTitle className="font-serif text-[#635f41]">Submit New Expense Claim</DialogTitle>
-                  <DialogDescription className="text-[#466272]/85 text-xs">
+                  <DialogTitle className="font-serif text-[#353535]">Submit New Expense Claim</DialogTitle>
+                  <DialogDescription className="text-[#666361]/85 text-xs">
                     Log expenditures for prop fabrics, materials, and production kits.
                   </DialogDescription>
                 </DialogHeader>
                 <div className="py-4 space-y-4">
                   <div className="space-y-1">
-                    <label className="text-xs font-semibold text-[#635f41]">Item Description</label>
+                    <label className="text-xs font-semibold text-[#353535]">Item Description</label>
                     <Input
                       placeholder="e.g., Dry Ice Machine Fluid"
                       value={newExpenseDesc}
                       onChange={(e) => setNewExpenseDesc(e.target.value)}
-                      className="border-[#e6e2dd] focus-visible:ring-[#8CC0EB]"
+                      className="border-[#DDD8CE] focus-visible:ring-[#E85F57]"
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-xs font-semibold text-[#635f41]">Amount ($)</label>
+                    <label className="text-xs font-semibold text-[#353535]">Amount ($)</label>
                     <Input
                       type="number"
                       step="0.01"
                       placeholder="45.50"
                       value={newExpenseAmt}
                       onChange={(e) => setNewExpenseAmt(e.target.value)}
-                      className="border-[#e6e2dd] focus-visible:ring-[#8CC0EB]"
+                      className="border-[#DDD8CE] focus-visible:ring-[#E85F57]"
                     />
                   </div>
                 </div>
                 <DialogFooter>
-                  <Button type="button" variant="outline" onClick={() => setExpenseOpen(false)} className="border-2 border-[#8CC0EB] text-[#8CC0EB] hover:bg-[#8CC0EB]/5 rounded-[8px]">
+                  <Button type="button" variant="outline" onClick={() => setExpenseOpen(false)} className="border-2 border-[#E85F57] text-[#E85F57] hover:bg-[#E85F57]/5 rounded-[8px]">
                     Cancel
                   </Button>
-                  <Button type="submit" className="bg-[#8CC0EB] text-[#1c1b19] hover:bg-[#8CC0EB]/90 rounded-[8px]">
+                  <Button type="submit" className="bg-[#E85F57] text-[#2C2A28] hover:bg-[#E85F57]/90 rounded-[8px]">
                     Submit Claim
                   </Button>
                 </DialogFooter>
@@ -251,20 +251,20 @@ export default function ProductionWorkspace() {
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
-              <TableRow className="border-b border-[#e6e2dd] hover:bg-transparent">
-                <TableHead className="text-[#635f41] font-semibold w-32">Date Logged</TableHead>
-                <TableHead className="text-[#635f41] font-semibold">Item Description</TableHead>
-                <TableHead className="text-[#635f41] font-semibold">Amount</TableHead>
-                <TableHead className="text-[#635f41] font-semibold">Claim Status</TableHead>
-                <TableHead className="text-[#635f41] font-semibold text-right">Receipt File</TableHead>
+              <TableRow className="border-b border-[#DDD8CE] hover:bg-transparent">
+                <TableHead className="text-[#353535] font-semibold w-32">Date Logged</TableHead>
+                <TableHead className="text-[#353535] font-semibold">Item Description</TableHead>
+                <TableHead className="text-[#353535] font-semibold">Amount</TableHead>
+                <TableHead className="text-[#353535] font-semibold">Claim Status</TableHead>
+                <TableHead className="text-[#353535] font-semibold text-right">Receipt File</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {expenses.map((expense) => (
-                <TableRow key={expense.id} className="border-b border-[#e6e2dd]/60 hover:bg-[#fdf9f4]/45">
-                  <TableCell className="text-xs text-[#466272] py-[16px]">{expense.date}</TableCell>
-                  <TableCell className="font-semibold text-sm text-[#635f41] py-[16px]">{expense.description}</TableCell>
-                  <TableCell className="text-sm font-medium text-[#635f41] py-[16px]">{expense.amount}</TableCell>
+                <TableRow key={expense.id} className="border-b border-[#DDD8CE]/60 hover:bg-[#E7DDD3]/45">
+                  <TableCell className="text-xs text-[#666361] py-[16px]">{expense.date}</TableCell>
+                  <TableCell className="font-semibold text-sm text-[#353535] py-[16px]">{expense.description}</TableCell>
+                  <TableCell className="text-sm font-medium text-[#353535] py-[16px]">{expense.amount}</TableCell>
                   <TableCell className="py-[16px]">
                     <Badge className={`rounded-[4px] ${
                       expense.status === "Approved" ? "bg-emerald-600/10 text-emerald-700 border-emerald-600/20" :
@@ -274,7 +274,7 @@ export default function ProductionWorkspace() {
                       {expense.status}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-right py-[16px] text-xs font-medium text-[#8CC0EB] hover:underline cursor-pointer">
+                  <TableCell className="text-right py-[16px] text-xs font-medium text-[#E85F57] hover:underline cursor-pointer">
                     {expense.receipt}
                   </TableCell>
                 </TableRow>

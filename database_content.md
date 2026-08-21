@@ -68,15 +68,24 @@
 
 ---
 
-## 5. Events (5 Events)
+## 5. Events (14 Events)
 
-| # | Title | Category | Venue | Date | Time | Max | Poster | Organizer |
-|---|-------|----------|-------|------|------|-----|--------|-----------|
-| 1 | Musimprov (with Akord) – Musical Improv Session | Workshops | SAC, IIT Madras | Aug 15, 2026 | 5:00–7:30 PM | 60 | `tamashbin_user_3.jpg` | Abay |
-| 2 | Sahitya Sabha – Chit-Chat & Jamming Session | Meetups | Aayam Lounge, IITM | Aug 22, 2026 | 6:00–8:00 PM | 50 | `samatvam_user_4.jpg` | Yuuhi |
-| 3 | Theatre Masterclass with Gyaneshwar Mishra | Workshops | CLT Seminar Room, IIT Madras | Sep 10, 2026 | 10:00 AM–2:00 PM | 40 | `kky_user_2.jpg` | Samarth |
-| 4 | Darpan 2026 Annual Drama Festival | Plays | OAT & CLT, IIT Madras | Oct 05, 2026 | All Day–10 PM | 300 | `dddj_user_3.jpg` | Abay |
-| 5 | Nukkad Natak Guidance Session with Om Bhope | Workshops | OAT Stage Grounds, IIT Madras | Sep 28, 2026 | 4:00–6:30 PM | 45 | `tamashbin_user_4.jpg` | Yuuhi |
+| # | Title | Category | Venue | Date | Time | Max | Poster | Status |
+|---|-------|----------|-------|------|------|-----|--------|--------|
+| 1 | August Orientation & Welcome Meetup | Meetups | Aayam Hub & SAC Courtyard | Aug 02, 2026 | 5:30–7:30 PM | 80 | `tamashbin_user_3.jpg` | Concluded |
+| 2 | Natyashastra Movement & Body Control | Workshops | Rehearsal Hall B | Aug 05, 2026 | 4:00–6:30 PM | 40 | `samatvam_user_4.jpg` | Concluded |
+| 3 | Sunday Chai & Monologue Jamming | Meetups | OAT Amphitheatre Lawns | Aug 09, 2026 | 4:30–6:30 PM | 50 | `kky_user_2.jpg` | Concluded |
+| 4 | Stage Lighting & DMX Rigging Masterclass | Workshops | CLT Tech Booth | Aug 12, 2026 | 2:00–5:00 PM | 35 | `krishna_subramanian.jpg` | Concluded |
+| 5 | Musimprov (with Akord) Session | Workshops | SAC, IIT Madras | Aug 15, 2026 | 5:00–7:30 PM | 60 | `tamashbin_user_3.jpg` | Concluded |
+| 6 | August Script Reading Circle | Meetups | Aayam Conf Room 2 | Aug 23, 2026 | 6:00–8:30 PM | 45 | `dddj_user_3.jpg` | Upcoming |
+| 7 | Backstage Props & Set Crafting | Meetups | Aayam Art Studio | Aug 27, 2026 | 3:00–6:00 PM | 40 | `sneha_das.jpg` | Upcoming |
+| 8 | Monthly Ensemble Showcase & Open Mic | Plays | Open Air Theatre (OAT) | Aug 30, 2026 | 6:30–9:30 PM | 200 | `tamashbin_user_4.jpg` | Upcoming |
+| 9 | Theatre Masterclass with Gyaneshwar Mishra | Workshops | CLT Seminar Room | Sep 05, 2026 | 10:00 AM–2:00 PM | 40 | `kky_user_2.jpg` | Upcoming |
+| 10 | Autumn Street Satire & Dholak Sync Lab | Workshops | SAC Courtyard | Sep 12, 2026 | 4:30–7:00 PM | 50 | `tamashbin_user_1.jpg` | Upcoming |
+| 11 | Classical Monologue & Navarasa Intensive | Workshops | Rehearsal Hall B | Sep 18, 2026 | 3:00–6:00 PM | 35 | `kky_user_5.jpg` | Upcoming |
+| 12 | Nukkad Natak Guidance with Om Bhope | Workshops | OAT Stage Grounds | Sep 24, 2026 | 4:00–6:30 PM | 45 | `tamashbin_user_4.jpg` | Upcoming |
+| 13 | Proscenium Tech Rehearsal & Live Cue Run | Plays | CLT Auditorium | Sep 29, 2026 | 5:00–9:00 PM | 100 | `dddj_user_1.jpg` | Upcoming |
+| 14 | Darpan 2026 Annual Drama Festival | Plays | OAT & CLT, IIT Madras | Oct 05, 2026 | All Day–10 PM | 300 | `dddj_user_3.jpg` | Upcoming |
 
 ---
 

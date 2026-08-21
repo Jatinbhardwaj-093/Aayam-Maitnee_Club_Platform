@@ -1,6 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AppLayout from "./components/AppLayout";
-import MemberDashboard from "./pages/member/MemberDashboard";
 import MySchedule from "./pages/member/MySchedule";
 import ProductionWorkspace from "./pages/ProductionWorkspace";
 import AuditionsCasting from "./pages/member/AuditionsCasting";
@@ -16,7 +15,6 @@ import ScriptBuilder from "./pages/member/ScriptBuilder";
 import AiRehearsalStudio from "./pages/member/AiRehearsalStudio";
 
 // Maintainer pages
-import MaintainerDashboard from "./pages/maintainers/MaintainerDashboard";
 import PlatformAnalytics from "./pages/maintainers/PlatformAnalytics";
 import ProductionControlPanel from "./pages/maintainers/ProductionControlPanel";
 import MemberProfileAudit from "./pages/maintainers/MemberProfileAudit";
@@ -24,6 +22,7 @@ import MediaModeration from "./pages/maintainers/MediaModeration";
 import EventsManagement from "./pages/maintainers/EventsManagement";
 import AllMembersDirectory from "./pages/maintainers/AllMembersDirectory";
 import AuditionsManagement from "./pages/maintainers/AuditionsManagement";
+import MaintainerSchedule from "./pages/maintainers/MaintainerSchedule";
 
 // Landing pages
 import Landing from "./pages/website_landing/Landing";
@@ -34,6 +33,7 @@ import Gallery from "./pages/website_landing/Gallery";
 import Profile from "./pages/website_landing/Profile";
 import About from "./pages/website_landing/About";
 import JoinClub from "./pages/JoinClub";
+import Login from "./pages/Login";
 
 export default function App() {
   return (
@@ -53,9 +53,10 @@ export default function App() {
           <Route path="profile/edit" element={<EditProfile />} />
           <Route path="profile/:memberId" element={<Profile />} />
           <Route path="join" element={<JoinClub />} />
+          <Route path="login" element={<Login />} />
 
-          {/* Portal / Dashboard paths */}
-          <Route path="member" element={<MemberDashboard />} />
+          {/* Member portal paths */}
+          <Route path="member" element={<MySchedule />} />
           <Route path="schedule" element={<MySchedule />} />
           <Route path="workspace" element={<ProductionWorkspace />} />
           <Route path="auditions" element={<AuditionsCasting />} />
@@ -69,8 +70,10 @@ export default function App() {
           <Route path="member-gallery" element={<ProductionGallery />} />
           <Route path="admin" element={<ProductionOffice />} />
           <Route path="backstage" element={<BackstagePass />} />
-          <Route path="maintainer" element={<MaintainerDashboard />} />
-          <Route path="schedule-admin" element={<MySchedule />} />
+
+          {/* Maintainer portal paths */}
+          <Route path="maintainer" element={<MaintainerSchedule />} />
+          <Route path="schedule-admin" element={<MaintainerSchedule />} />
           <Route path="analytics" element={<PlatformAnalytics />} />
           <Route path="control-panel" element={<ProductionControlPanel />} />
           <Route path="profile-audit" element={<MemberProfileAudit />} />

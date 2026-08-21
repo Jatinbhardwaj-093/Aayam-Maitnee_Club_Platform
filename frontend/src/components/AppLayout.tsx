@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import {
   Home,
-  LayoutDashboard,
   Users,
   ClipboardList,
   Bell,
@@ -13,16 +12,15 @@ import {
   Calendar,
   Menu,
   ShieldAlert,
-  PlayCircle,
   FileText,
   Eye,
   EyeOff,
-  Bot
+  Bot,
+  Globe
 } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 
 interface NavItem {
@@ -35,17 +33,15 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { label: "Drama Club Home", path: "/", icon: Home, description: "Public landing page" },
-  { label: "Member Dashboard", path: "/member", icon: LayoutDashboard, description: "Your rehearsals & schedules" },
-  { label: "My Schedule", path: "/schedule", icon: Calendar, description: "Your production schedule" },
-  { label: "Auditions", path: "/auditions", icon: ClipboardList, description: "Apply for play casting" },
-  { label: "Plays & Productions", path: "/member-plays", icon: PlayCircle, description: "Production lineup & scripts" },
+  { label: "My Schedule", path: "/schedule", icon: Calendar, description: "Your rehearsals & call attendance" },
+  { label: "Auditions & Casting", path: "/auditions", icon: ClipboardList, description: "Apply for play casting" },
   { label: "Script Vault", path: "/member-scripts", icon: FileText, description: "Confidential play scripts" },
   { label: "Rehearsal Studio", path: "/ai-rehearsal", icon: Bot, description: "Interactive voice script rehearsal & memory test" },
 ];
 
 const maintainerNavItems: NavItem[] = [
-  { label: "Maintainer Dashboard", path: "/maintainer", icon: LayoutDashboard, description: "Executive overview & live metrics" },
-  { label: "My Schedule", path: "/schedule-admin", icon: Calendar, description: "Personal production & rehearsal schedule" },
+  { label: "My Schedule", path: "/schedule", icon: Calendar, description: "Your rehearsals & call attendance" },
+  { label: "Production Callboard", path: "/schedule-admin", icon: Calendar, description: "Rehearsal call sheets & attendance roster" },
   { label: "Events Management", path: "/events-admin", icon: Calendar, description: "Proposal curation & sponsor deals" },
   { label: "Auditions & Casting", path: "/auditions-admin", icon: ClipboardList, description: "Role callings & candidate requests" },
   { label: "Members Directory", path: "/directory-admin", icon: Users, description: "Ensemble & crew directory" },
@@ -60,6 +56,45 @@ export default function AppLayout() {
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [profilePopoverOpen, setProfilePopoverOpen] = useState(false);
+  const popoverRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (popoverRef.current && !popoverRef.current.contains(event.target as Node)) {
+        setProfilePopoverOpen(false);
+      }
+    }
+    if (profilePopoverOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [profilePopoverOpen]);
+
+
+  useEffect(() => {
+    const token = sessionStorage.getItem("aayam_session_token");
+    if (token && activeUser) {
+      const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005";
+      fetch(`${baseUrl}/api/profile/get`, {
+        headers: { "Authorization": `Bearer ${token}` }
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data && !data.error) {
+          const updatedUser = { ...activeUser, ...data, image: data.image || data.avatarUrl };
+          setActiveUser(updatedUser);
+          sessionStorage.setItem("aayam_active_user", JSON.stringify(updatedUser));
+        }
+      })
+      .catch(() => {});
+    }
+  }, []);
+
 
   // Active User Profile (persisted in sessionStorage to survive page refresh and allow multiple sessions across tabs)
   const [activeUser, setActiveUser] = useState<any>(() => {
@@ -78,6 +113,21 @@ export default function AppLayout() {
   // Interactive States
   const [hasUnread, setHasUnread] = useState(true);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const notificationRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleNotifClickOutside(event: MouseEvent) {
+      if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
+        setNotificationsOpen(false);
+      }
+    }
+    if (notificationsOpen) {
+      document.addEventListener("mousedown", handleNotifClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleNotifClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleNotifClickOutside);
+  }, [notificationsOpen]);
   const [portalOpen, setPortalOpen] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -131,8 +181,8 @@ export default function AppLayout() {
       }
       const isNormalMember = !isMaintainer;
       if (isNormalMember) {
-        // Display Member Dashboard, My Schedule, Auditions, Plays, Scripts, and Rehearsal Studio.
-        return ["/member", "/schedule", "/auditions", "/member-plays", "/member-scripts", "/ai-rehearsal"].includes(item.path);
+        // Display My Schedule, Auditions, Plays, Scripts, and Rehearsal Studio.
+        return ["/schedule", "/auditions", "/member-plays", "/member-scripts", "/ai-rehearsal"].includes(item.path);
       }
       return true;
     });
@@ -168,12 +218,8 @@ export default function AppLayout() {
         setActiveUser(user);
         setPortalOpen(false);
 
-        // Redirect based on role
-        if (user.role.toLowerCase().includes("maintainer") || user.isAdmin) {
-          navigate("/maintainer");
-        } else {
-          navigate("/member");
-        }
+        // Default dashboard landing page is My Schedule for all members & maintainers
+        navigate("/schedule");
       } else {
         setLoginError("Invalid response from login endpoint");
         return;
@@ -192,13 +238,35 @@ export default function AppLayout() {
   };
 
   const isMember = activeUser ? !isMaintainer : false;
-  const isAllowedPath = ["/", "/member", "/schedule", "/auditions", "/auditions-admin", "/member-plays", "/member-scripts", "/script-builder", "/ai-rehearsal", "/plays", "/events", "/events-admin", "/directory-admin", "/maintainer", "/analytics", "/directory", "/gallery", "/public-gallery"].includes(location.pathname) || location.pathname.startsWith("/profile") || location.pathname.startsWith("/script-builder") || location.pathname.startsWith("/ai-rehearsal");
+  const isAllowedPath = ["/", "/member", "/schedule", "/schedule-admin", "/auditions", "/auditions-admin", "/member-plays", "/member-scripts", "/script-builder", "/ai-rehearsal", "/plays", "/events", "/events-admin", "/directory-admin", "/maintainer", "/analytics", "/directory", "/gallery", "/public-gallery"].includes(location.pathname) || location.pathname.startsWith("/profile") || location.pathname.startsWith("/script-builder") || location.pathname.startsWith("/ai-rehearsal");
   const showAccessDenied = activeUser && !isMaintainer && isMember && !isAllowedPath;
 
-  const sidebarWidthClass = isCollapsed ? "w-[72px]" : "w-64 xl:w-72";
+  const sidebarWidthClass = isCollapsed ? "w-[72px]" : "w-56 xl:w-64";
+
+  
+  const avatarFallbackMap: Record<string, string> = {
+    "Aditi": "/aayam_assets/profiles/aditi_drama.jpg",
+    "Samarth Shrivastava": "/aayam_assets/profiles/samarth_shrivastava.jpg",
+    "Krishna Subramanian": "/aayam_assets/profiles/krishna_subramanian.jpg",
+    "Harsh Aryan": "/aayam_assets/profiles/harsh_aryan.jpg",
+    "Swati Singh": "/aayam_assets/profiles/swati_singh.jpg",
+    "Sneha Das": "/aayam_assets/profiles/sylene_bansal.jpg",
+    "Tanu Kurade": "/aayam_assets/profiles/tanu_kurade.jpg",
+    "Akanksha Kadam": "/aayam_assets/profiles/akanksha_kadam.jpg",
+    "Chirag Kumar": "/aayam_assets/profiles/chirag_kumar.jpg",
+    "Sylene Bansal": "/aayam_assets/profiles/sylene_bansal.jpg",
+    "Esha Hinde": "/aayam_assets/profiles/esha_hinde.jpg",
+    "Aarav Varma": "/aayam_assets/profiles/kanishk_mishra.jpg",
+    "Abay Nandhiga": "/aayam_assets/profiles/utkarsh_yuuhi.jpg",
+    "Yuuhi": "/aayam_assets/profiles/abay_nandhiga.jpg",
+    "Utkarsh / Yuuhi": "/aayam_assets/profiles/abay_nandhiga.jpg"
+  };
+
+  const resolvedAvatar = activeUser?.image || activeUser?.avatarUrl || (activeUser ? avatarFallbackMap[activeUser.name] : null);
+
 
   return (
-    <div className="min-h-screen flex bg-[#fdf9f4] text-[#466272] font-sans">
+    <div className="min-h-screen flex bg-[#E7DDD3] text-[#666361] font-sans">
       {/* Desktop Sidebar */}
       {!isLandingPage && activeUser && (
         <aside className={`hidden md:block ${sidebarWidthClass} flex-shrink-0 transition-all duration-300`}>
@@ -207,9 +275,9 @@ export default function AppLayout() {
               isCollapsed={isCollapsed}
               setIsCollapsed={setIsCollapsed}
               filteredNavItems={filteredNavItems}
-              activeUser={activeUser}
+              
               isMobile={false}
-              onLogOut={handleLogOut}
+              
             />
           </div>
         </aside>
@@ -219,60 +287,62 @@ export default function AppLayout() {
       <div className="flex-1 flex flex-col min-w-0">
         {/* Fixed Top Navigation Bar */}
         {isLandingPage ? (
-          <header className="sticky top-0 z-40 bg-[#fdf9f4]/90 backdrop-blur-xl border-b border-[#cac6b9]/40 h-20 transition-all duration-300">
+          <header className="sticky top-0 z-40 bg-[#E7DDD3]/90 backdrop-blur-xl border-b border-[#D5C9BE]/40 h-20 transition-all duration-300">
             <div className="flex justify-between items-center px-6 md:px-12 w-full max-w-7xl mx-auto h-full">
               {/* Logo / Brand */}
-              <div className="flex items-center gap-12">
+              <div className="flex items-center gap-10">
                 <Link
                   to="/"
-                  className="font-serif text-2xl font-bold tracking-tight text-[#635f41] hover:opacity-90 active:scale-95 transition-all"
+                  className="group flex items-center gap-2.5"
                 >
-                  AAYAM
+                  <span className="font-serif text-2xl font-semibold tracking-wider text-[#2C2A28] group-hover:text-[#E85F57] transition-colors">
+                    AAYAM
+                  </span>
                 </Link>
 
                 {/* Desktop Nav Links */}
                 <nav className="hidden md:flex items-center gap-8">
                   <Link
                     to="/about"
-                    className={`text-sm font-semibold tracking-wide transition-all ${location.pathname === "/about" || location.pathname === "/manifesto"
-                      ? "text-[#635f41] border-b-2 border-[#635f41] pb-1"
-                      : "text-[#466272] hover:text-[#635f41]"
+                    className={`text-xs font-bold uppercase tracking-widest transition-all ${location.pathname === "/about" || location.pathname === "/manifesto"
+                      ? "text-[#E85F57] border-b-2 border-[#E85F57] pb-1"
+                      : "text-[#666361] hover:text-[#2C2A28]"
                       }`}
                   >
-                    About / Manifesto
+                    Manifesto
                   </Link>
                   <Link
                     to="/plays"
-                    className={`text-sm font-semibold tracking-wide transition-all ${location.pathname === "/plays"
-                      ? "text-[#635f41] border-b-2 border-[#635f41] pb-1"
-                      : "text-[#466272] hover:text-[#635f41]"
+                    className={`text-xs font-bold uppercase tracking-widest transition-all ${location.pathname === "/plays"
+                      ? "text-[#E85F57] border-b-2 border-[#E85F57] pb-1"
+                      : "text-[#666361] hover:text-[#2C2A28]"
                       }`}
                   >
                     Our Plays
                   </Link>
                   <Link
                     to="/events"
-                    className={`text-sm font-semibold tracking-wide transition-all ${location.pathname === "/events"
-                      ? "text-[#635f41] border-b-2 border-[#635f41] pb-1"
-                      : "text-[#466272] hover:text-[#635f41]"
+                    className={`text-xs font-bold uppercase tracking-widest transition-all ${location.pathname === "/events"
+                      ? "text-[#E85F57] border-b-2 border-[#E85F57] pb-1"
+                      : "text-[#666361] hover:text-[#2C2A28]"
                       }`}
                   >
                     Events
                   </Link>
                   <Link
                     to="/directory"
-                    className={`text-sm font-semibold tracking-wide transition-all ${location.pathname === "/directory"
-                      ? "text-[#635f41] border-b-2 border-[#635f41] pb-1"
-                      : "text-[#466272] hover:text-[#635f41]"
+                    className={`text-xs font-bold uppercase tracking-widest transition-all ${location.pathname === "/directory"
+                      ? "text-[#E85F57] border-b-2 border-[#E85F57] pb-1"
+                      : "text-[#666361] hover:text-[#2C2A28]"
                       }`}
                   >
                     Member Directory
                   </Link>
                   <Link
                     to="/gallery"
-                    className={`text-sm font-semibold tracking-wide transition-all ${location.pathname === "/gallery" || location.pathname === "/public-gallery"
-                      ? "text-[#635f41] border-b-2 border-[#635f41] pb-1"
-                      : "text-[#466272] hover:text-[#635f41]"
+                    className={`text-xs font-bold uppercase tracking-widest transition-all ${location.pathname === "/gallery" || location.pathname === "/public-gallery"
+                      ? "text-[#E85F57] border-b-2 border-[#E85F57] pb-1"
+                      : "text-[#666361] hover:text-[#2C2A28]"
                       }`}
                   >
                     Gallery
@@ -283,39 +353,44 @@ export default function AppLayout() {
               {/* Right Side Actions */}
               <div className="flex items-center gap-4">
                 {activeUser ? (
-                  <Link
-                    to={isMaintainer ? "/maintainer" : "/member"}
-                    className="bg-[#635f41] text-white hover:bg-[#635f41]/90 rounded-[8px] h-9 px-4 flex items-center text-xs font-semibold tracking-wider transition-all uppercase"
-                  >
-                    Dashboard
-                  </Link>
+                  <div className="flex items-center gap-3">
+                    <Link
+                      to="/schedule"
+                      className="group bg-[#2C2A28] text-white hover:bg-[#E85F57] pl-5 pr-1.5 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all shadow-md flex items-center gap-3 border border-[#353535] hover:border-[#E85F57]"
+                    >
+                      <span>{isMaintainer ? "Maintainer Schedule" : "My Schedule"}</span>
+                      <div className="w-7 h-7 bg-[#F7F5F0]/20 rounded-full flex items-center justify-center group-hover:bg-[#F7F5F0]/30 transition-colors">
+                        <Calendar className="w-3.5 h-3.5" />
+                      </div>
+                    </Link>
+                  </div>
                 ) : (
-                  <>
+                  <div className="flex items-center gap-3">
                     <Link
                       to="/join"
-                      className="bg-[#635f41] text-white hover:bg-[#635f41]/90 rounded-[8px] h-9 px-4 flex items-center text-xs font-bold uppercase tracking-wider transition-all"
+                      className="border border-[#2C2A28]/20 text-[#2C2A28] hover:bg-[#2C2A28] hover:text-white px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all"
                     >
                       Join Club
                     </Link>
-                    <Button
-                      onClick={() => setPortalOpen(true)}
-                      className="gap-2 bg-[#8CC0EB] text-[#1c1b19] hover:bg-[#8CC0EB]/95 font-semibold rounded-[8px] h-9 px-4 transition-all active:scale-95 flex items-center"
+                    <Link
+                      to="/login"
+                      className="bg-[#E85F57] text-white hover:bg-[#D94538] font-bold rounded-full h-9 px-5 transition-all active:scale-95 flex items-center gap-2 shadow-xs text-xs uppercase tracking-wider"
                     >
-                      <User className="w-4 h-4 text-[#1c1b19]" />
-                      <span className="text-xs font-semibold">Portal Access</span>
-                    </Button>
-                  </>
+                      <User className="w-3.5 h-3.5" />
+                      <span>Portal Access</span>
+                    </Link>
+                  </div>
                 )}
               </div>
             </div>
           </header>
         ) : (
-          <header className="sticky top-0 z-40 bg-[#fdf9f4]/80 backdrop-blur-md border-b border-[#e6e2dd] h-16 flex items-center justify-between px-6">
+          <header className="sticky top-0 z-40 bg-[#E7DDD3]/95 backdrop-blur-xl border-b border-[#D5C9BE]/50 h-20 flex items-center justify-between px-6 md:px-10 transition-all">
             <div className="flex items-center gap-4">
               {/* Mobile Sidebar Trigger */}
               {!isLandingPage && activeUser && (
                 <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-                  <SheetTrigger render={<Button variant="ghost" size="icon" className="md:hidden text-[#466272] hover:bg-[#f7f3ee]" />}>
+                  <SheetTrigger render={<Button variant="ghost" size="icon" className="md:hidden text-[#666361] hover:bg-[#EFE8E1]" />}>
                     <Menu className="w-5 h-5" />
                   </SheetTrigger>
                   <SheetContent side="left" className="p-0 w-72 border-r-0">
@@ -323,20 +398,20 @@ export default function AppLayout() {
                       isCollapsed={isCollapsed}
                       setIsCollapsed={setIsCollapsed}
                       filteredNavItems={filteredNavItems}
-                      activeUser={activeUser}
+                      
                       setMobileOpen={setMobileOpen}
                       isMobile={true}
-                      onLogOut={handleLogOut}
+                      
                     />
                   </SheetContent>
                 </Sheet>
               )}
 
               <div>
-                <span className="text-[10px] uppercase tracking-widest text-[#466272]/75 font-semibold hidden sm:inline">
+                <span className="text-[9px] uppercase tracking-[0.2em] text-[#E85F57] font-mono font-bold hidden sm:block mb-1">
                   {activeItem.description}
                 </span>
-                <h1 className="text-lg font-bold font-serif text-[#635f41] leading-tight">
+                <h1 className="text-2xl md:text-3xl font-bold font-serif text-[#2C2A28] leading-none tracking-tight">
                   {activeItem.label}
                 </h1>
               </div>
@@ -348,80 +423,166 @@ export default function AppLayout() {
                 <>
                   <Link
                     to="/"
-                    className="border border-[#cac6b9]/40 text-[#635f41] hover:bg-[#e6e2dd]/40 rounded-[8px] h-9 px-4 flex items-center text-xs font-semibold tracking-wider transition-all uppercase"
+                    className="group border border-[#D5C9BE]/80 bg-[#F7F5F0]/50 text-[#666361] hover:bg-[#F7F5F0] hover:text-[#E85F57] hover:border-[#E85F57]/50 rounded-full h-10 pl-4 pr-1.5 flex items-center gap-3 text-[10px] font-bold tracking-widest transition-all uppercase shadow-sm"
                   >
-                    Landing Page
+                    <span>Public Site</span>
+                    <div className="w-7 h-7 bg-[#E7DDD3] rounded-full flex items-center justify-center group-hover:bg-[#F8E8E4] transition-colors">
+                      <Globe className="w-3.5 h-3.5" />
+                    </div>
                   </Link>
                   {/* Notification Trigger */}
-                  <Dialog open={notificationsOpen} onOpenChange={(openState) => {
-                    setNotificationsOpen(openState);
-                    if (openState) {
-                      handleMarkAllRead();
-                    }
-                  }}>
-                    <DialogTrigger render={<Button variant="ghost" size="icon" className="relative text-[#466272] hover:bg-[#f7f3ee] rounded-full" />}>
+
+                  <div className="relative">
+                    <button 
+                      onClick={() => setProfilePopoverOpen(!profilePopoverOpen)}
+                      className="w-10 h-10 rounded-xl bg-[#2C2A28] border border-[#353535] flex items-center justify-center text-white font-serif font-bold text-lg flex-shrink-0 hover:bg-[#353535] transition-colors ml-2 overflow-hidden"
+                    >
+                      {resolvedAvatar ? (
+                        <img src={resolvedAvatar} alt="Profile" className="w-full h-full object-cover" />
+                      ) : (
+                        activeUser?.initials || activeUser?.name?.slice(0, 1).toUpperCase() || "A"
+                      )}
+                    </button>
+                    
+                    {profilePopoverOpen && (
+                      <div className="absolute top-12 right-0 w-64 bg-[#2C2A28] border border-[#353535] shadow-2xl rounded-2xl p-5 z-50 text-left">
+                        <div className="flex items-start justify-between mb-4 border-b border-[#353535] pb-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 rounded-xl bg-[#F7F5F0]/10 border border-white/20 flex items-center justify-center text-[#E85F57] font-serif font-bold text-xl overflow-hidden">
+                              {resolvedAvatar ? (
+                                <img src={resolvedAvatar} alt="Profile" className="w-full h-full object-cover" />
+                              ) : (
+                                activeUser?.initials || activeUser?.name?.slice(0, 1).toUpperCase() || "A"
+                              )}
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-base font-serif font-bold text-[#F7F5F0] truncate">{activeUser?.name || "Member"}</p>
+                              <p className="text-[9px] font-mono font-bold text-[#E85F57] uppercase tracking-widest truncate">{activeUser?.role || "Role"}</p>
+                            </div>
+                          </div>
+                          <button 
+                            onClick={() => setProfilePopoverOpen(false)} 
+                            className="text-white/40 hover:text-white p-1 rounded-full hover:bg-[#F7F5F0]/10 transition-all"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                        
+                        {activeUser?.email && (
+                          <div className="mb-4">
+                            <span className="text-[9px] font-mono text-white/40 uppercase tracking-widest block mb-0.5">Linked Email</span>
+                            <span className="text-xs font-sans text-white/80 truncate block">{activeUser.email}</span>
+                          </div>
+                        )}
+                        
+                        <div className="space-y-2">
+                          <Link
+                            to="/profile/view"
+                            onClick={() => setProfilePopoverOpen(false)}
+                            className="w-full bg-[#F7F5F0]/10 text-white hover:bg-[#F7F5F0]/20 rounded-xl text-xs font-mono font-bold uppercase tracking-wider py-2.5 px-3 transition-all text-center block"
+                          >
+                            Full Profile
+                          </Link>
+                          <Link
+                            to="/profile/edit"
+                            onClick={() => setProfilePopoverOpen(false)}
+                            className="w-full bg-[#F7F5F0]/10 text-white hover:bg-[#F7F5F0]/20 rounded-xl text-xs font-mono font-bold uppercase tracking-wider py-2.5 px-3 transition-all text-center block"
+                          >
+                            Edit Profile
+                          </Link>
+                          <button
+                            onClick={() => {
+                              setProfilePopoverOpen(false);
+                              handleLogOut();
+                            }}
+                            className="w-full border border-red-500/30 text-red-400 hover:bg-red-500/10 rounded-xl text-xs font-mono font-bold uppercase tracking-wider py-2.5 px-3 transition-all text-center"
+                          >
+                            Sign Out
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  
+                  
+                  <div className="relative" ref={notificationRef}>
+                    <button 
+                      onClick={() => {
+                        setNotificationsOpen(!notificationsOpen);
+                        if (!notificationsOpen) handleMarkAllRead();
+                      }}
+                      className="relative w-10 h-10 rounded-xl hover:bg-[#D5C9BE]/30 flex items-center justify-center text-[#353535] transition-colors"
+                    >
                       <Bell className="w-5 h-5" />
                       {hasUnread && (
-                        <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full border border-[#fdf9f4]"></span>
+                        <span className="absolute top-2.5 right-2.5 w-2.5 h-2.5 bg-[#E85F57] rounded-full border-2 border-[#E7DDD3]"></span>
                       )}
-                    </DialogTrigger>
-                    <DialogContent className="bg-[#fdf9f4] border border-[#e6e2dd] text-[#466272] max-w-md">
-                      <DialogHeader>
-                        <DialogTitle className="font-serif text-[#635f41] flex items-center justify-between gap-2">
-                          <span className="flex items-center gap-2">
-                            <Bell className="w-5 h-5 text-[#8CC0EB]" /> Notifications Inbox
-                          </span>
-                          {hasUnread && (
-                            <Badge className="bg-red-100 text-red-700 text-[10px] font-bold">New Updates</Badge>
-                          )}
-                        </DialogTitle>
-                        <DialogDescription className="text-xs text-[#466272]/85">
-                          Live dispatches and production updates for <strong>{activeUser.name}</strong>.
-                        </DialogDescription>
-                      </DialogHeader>
+                    </button>
 
-                      <div className="py-4 space-y-3 max-h-[60vh] overflow-y-auto pr-1">
-                        {dbNotifications.length === 0 ? (
-                          <div className="p-6 text-center text-xs text-[#466272]/70 italic">
-                            No notifications in your inbox.
-                          </div>
-                        ) : (
-                          dbNotifications.map((notif) => (
-                            <div
-                              key={notif.id}
-                              className={`p-3.5 border rounded-[10px] space-y-1 transition-all ${notif.is_read ? "bg-white/70 border-[#e6e2dd]" : "bg-white border-[#8CC0EB] shadow-xs"
-                                }`}
-                            >
-                              <div className="flex justify-between items-center gap-2">
-                                <span className="text-xs font-bold text-[#635f41] flex items-center gap-1.5">
-                                  {!notif.is_read && <span className="w-2 h-2 rounded-full bg-[#8CC0EB] inline-block"></span>}
-                                  {notif.title || "Production Notice"}
-                                </span>
-                                <span className="text-[10px] text-[#466272]/60 font-mono flex-shrink-0">
-                                  {notif.created_at || "Recent"}
-                                </span>
-                              </div>
-                              <p className="text-xs text-[#466272]/90 leading-relaxed font-light">
-                                {notif.message}
-                              </p>
+                    {notificationsOpen && (
+                      <div className="absolute top-12 right-0 w-80 bg-[#2C2A28] border border-[#353535] shadow-2xl rounded-2xl p-0 z-50 text-left overflow-hidden flex flex-col max-h-[70vh]">
+                        
+                        <div className="p-5 border-b border-[#353535] flex items-center justify-between shrink-0 bg-[#2C2A28]">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-[#E85F57]/20 flex items-center justify-center text-[#E85F57]">
+                              <Bell className="w-4 h-4" />
                             </div>
-                          ))
-                        )}
-                      </div>
-
-                      <DialogFooter className="sm:justify-between items-center gap-4 border-t border-[#e6e2dd] pt-3">
-                        <span className="text-[11px] text-[#466272]/60 italic">Live SQLite DB Feed</span>
-                        <div className="flex gap-2">
-                          <Button onClick={handleMarkAllRead} variant="outline" className="text-xs font-bold border-[#e6e2dd] text-[#635f41]">
-                            Mark All Read
-                          </Button>
-                          <Button onClick={() => setNotificationsOpen(false)} className="bg-[#8CC0EB] text-[#001e2c] font-bold hover:bg-[#8CC0EB]/90 rounded-[8px]">
-                            Dismiss
-                          </Button>
+                            <div>
+                              <h3 className="font-serif text-[#F7F5F0] font-bold text-lg leading-none">Inbox</h3>
+                              <p className="text-[9px] font-mono uppercase tracking-widest text-white/50 mt-1">Live Dispatches</p>
+                            </div>
+                          </div>
+                          {hasUnread && (
+                            <span className="bg-[#E85F57] text-[#F7F5F0] text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full">
+                              New
+                            </span>
+                          )}
                         </div>
-                      </DialogFooter>
-                    </DialogContent>
-                  </Dialog>
+
+                        <div className="overflow-y-auto flex-1 p-3 space-y-2 no-scrollbar">
+                          {dbNotifications.length === 0 ? (
+                            <div className="p-8 text-center flex flex-col items-center">
+                              <Bell className="w-8 h-8 text-white/10 mb-3" />
+                              <p className="text-xs font-mono uppercase tracking-widest text-white/40">Inbox is empty</p>
+                            </div>
+                          ) : (
+                            dbNotifications.map((notif) => (
+                              <div
+                                key={notif.id}
+                                className={`p-4 rounded-xl transition-all border ${
+                                  notif.is_read 
+                                    ? "bg-[#F7F5F0]/5 border-white/5 hover:bg-[#F7F5F0]/10" 
+                                    : "bg-[#353535] border-[#E85F57]/30 shadow-lg"
+                                }`}
+                              >
+                                <div className="flex justify-between items-start gap-2 mb-1.5">
+                                  <span className="text-xs font-bold text-[#F7F5F0] flex items-center gap-2">
+                                    {!notif.is_read && <span className="w-1.5 h-1.5 rounded-full bg-[#E85F57] shrink-0"></span>}
+                                    {notif.title || "Notice"}
+                                  </span>
+                                  <span className="text-[9px] text-[#E85F57] font-mono tracking-wider shrink-0 mt-0.5">
+                                    {notif.created_at ? notif.created_at.split(" ")[1].substring(0, 5) : "Now"}
+                                  </span>
+                                </div>
+                                <p className="text-xs text-white/70 leading-relaxed font-sans">
+                                  {notif.message}
+                                </p>
+                              </div>
+                            ))
+                          )}
+                        </div>
+                        
+                        <div className="p-3 border-t border-[#353535] bg-[#353535]/30 shrink-0">
+                          <button 
+                            onClick={() => setNotificationsOpen(false)}
+                            className="w-full bg-[#F7F5F0]/5 hover:bg-[#F7F5F0]/10 text-[#F7F5F0] rounded-xl text-[10px] font-mono font-bold uppercase tracking-widest py-2 transition-all"
+                          >
+                            Close Inbox
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </>
               )}
 
@@ -429,9 +590,9 @@ export default function AppLayout() {
               {!activeUser && (
                 <Button
                   onClick={() => setPortalOpen(true)}
-                  className="gap-2 bg-[#8CC0EB] text-[#1c1b19] hover:bg-[#8CC0EB]/95 font-semibold rounded-[8px] h-9 px-4 transition-all active:scale-95 flex items-center"
+                  className="gap-2 bg-[#E85F57] text-[#2C2A28] hover:bg-[#E85F57]/95 font-semibold rounded-[8px] h-9 px-4 transition-all active:scale-95 flex items-center"
                 >
-                  <User className="w-4 h-4 text-[#1c1b19]" />
+                  <User className="w-4 h-4 text-[#2C2A28]" />
                   <span className="text-xs font-semibold">Portal Access</span>
                 </Button>
               )}
@@ -444,13 +605,13 @@ export default function AppLayout() {
 
         {/* Login Dialog */}
         <Dialog open={portalOpen} onOpenChange={setPortalOpen}>
-          <DialogContent className="bg-[#fdf9f4]/95 backdrop-blur-md border border-[#cac6b9]/80 text-[#466272] max-w-md rounded-3xl shadow-2xl p-7 transition-all duration-300">
-            <DialogHeader className="border-b border-[#e6e2dd]/80 pb-4 text-center space-y-1.5">
-              <div className="mx-auto w-12 h-12 rounded-2xl bg-[#635f41]/10 flex items-center justify-center mb-1 text-[#635f41] shadow-inner">
+          <DialogContent className="bg-[#E7DDD3]/95 backdrop-blur-md border border-[#D5C9BE]/80 text-[#666361] max-w-md rounded-3xl shadow-2xl p-7 transition-all duration-300">
+            <DialogHeader className="border-b border-[#DDD8CE]/80 pb-4 text-center space-y-1.5">
+              <div className="mx-auto w-12 h-12 rounded-2xl bg-[#353535]/10 flex items-center justify-center mb-1 text-[#353535] shadow-inner">
                 <User className="w-6 h-6" />
               </div>
-              <DialogTitle className="font-serif text-2xl font-bold text-[#635f41] tracking-tight">Ensemble Portal</DialogTitle>
-              <DialogDescription className="text-xs text-[#466272]/80 font-medium max-w-xs mx-auto">
+              <DialogTitle className="font-serif text-2xl font-bold text-[#353535] tracking-tight">Ensemble Portal</DialogTitle>
+              <DialogDescription className="text-xs text-[#666361]/80 font-medium max-w-xs mx-auto">
                 Sign in with your username or email address to access your Aayam workspace.
               </DialogDescription>
             </DialogHeader>
@@ -467,14 +628,14 @@ export default function AppLayout() {
               )}
 
               <div className="space-y-1.5">
-                <label className="text-[11px] uppercase tracking-wider text-[#635f41] font-bold block">
+                <label className="text-[11px] uppercase tracking-wider text-[#353535] font-bold block">
                   Username or Email Address
                 </label>
                 <Input
                   type="text"
                   name="identifier"
                   placeholder="Username or user@domain.com"
-                  className="border-[#e6e2dd] h-11 bg-white/90 focus-visible:ring-2 focus-visible:ring-[#635f41]/40 focus-visible:border-[#635f41] transition-all text-sm rounded-xl px-3.5 shadow-sm"
+                  className="border-[#DDD8CE] h-11 bg-[#F7F5F0]/90 focus-visible:ring-2 focus-visible:ring-[#353535]/40 focus-visible:border-[#353535] transition-all text-sm rounded-xl px-3.5 shadow-sm"
                   required
                   autoFocus
                 />
@@ -482,13 +643,13 @@ export default function AppLayout() {
 
               <div className="space-y-1.5">
                 <div className="flex justify-between items-center">
-                  <label className="text-[11px] uppercase tracking-wider text-[#635f41] font-bold">
+                  <label className="text-[11px] uppercase tracking-wider text-[#353535] font-bold">
                     Password
                   </label>
                   <a
                     href="#"
                     onClick={(e) => { e.preventDefault(); alert("Prototype info: any password is accepted."); }}
-                    className="text-[11px] text-[#635f41] hover:underline font-semibold transition-colors"
+                    className="text-[11px] text-[#353535] hover:underline font-semibold transition-colors"
                   >
                     Forgot?
                   </a>
@@ -498,13 +659,13 @@ export default function AppLayout() {
                     type={showPassword ? "text" : "password"}
                     name="password"
                     placeholder="Enter your password"
-                    className="border-[#e6e2dd] h-11 bg-white/90 focus-visible:ring-2 focus-visible:ring-[#635f41]/40 focus-visible:border-[#635f41] transition-all text-sm rounded-xl pl-3.5 pr-10 shadow-sm"
+                    className="border-[#DDD8CE] h-11 bg-[#F7F5F0]/90 focus-visible:ring-2 focus-visible:ring-[#353535]/40 focus-visible:border-[#353535] transition-all text-sm rounded-xl pl-3.5 pr-10 shadow-sm"
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#466272]/60 hover:text-[#635f41] transition-colors focus:outline-none p-1"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#666361]/60 hover:text-[#353535] transition-colors focus:outline-none p-1"
                     title={showPassword ? "Hide password" : "Show password"}
                   >
                     {showPassword ? (
@@ -516,8 +677,8 @@ export default function AppLayout() {
                 </div>
               </div>
 
-              <div className="bg-[#f4efe8]/70 border border-[#e6e2dd] rounded-xl p-2.5">
-                <span className="text-[10px] text-[#466272]/85 leading-relaxed block text-center">
+              <div className="bg-[#f4efe8]/70 border border-[#DDD8CE] rounded-xl p-2.5">
+                <span className="text-[10px] text-[#666361]/85 leading-relaxed block text-center">
                   <strong>Tip:</strong> Log in with <strong>username</strong> or <strong>email</strong> (e.g. <em>maintainer@matinee.club</em> for Admin).
                 </span>
               </div>
@@ -527,13 +688,13 @@ export default function AppLayout() {
                   type="button"
                   variant="outline"
                   onClick={() => setPortalOpen(false)}
-                  className="border-[#cac6b9] text-[#466272] hover:bg-[#f7f3ee] rounded-xl text-xs font-semibold h-11 flex-1 shadow-sm transition-all"
+                  className="border-[#D5C9BE] text-[#666361] hover:bg-[#EFE8E1] rounded-xl text-xs font-semibold h-11 flex-1 shadow-sm transition-all"
                 >
                   Cancel
                 </Button>
                 <Button
                   type="submit"
-                  className="bg-[#635f41] text-white hover:bg-[#4d4a32] active:scale-[0.99] rounded-xl text-xs font-bold h-11 flex-1 shadow-md hover:shadow-lg transition-all"
+                  className="bg-[#353535] text-white hover:bg-[#4d4a32] active:scale-[0.99] rounded-xl text-xs font-bold h-11 flex-1 shadow-md hover:shadow-lg transition-all"
                 >
                   Sign In
                 </Button>
@@ -550,18 +711,18 @@ export default function AppLayout() {
             </main>
 
             {/* Footer */}
-            <footer className="bg-white py-16 px-6 md:px-12 border-t border-[#cac6b9]/30 mt-auto w-full">
+            <footer className="bg-[#E7DDD3] py-16 px-6 md:px-12 border-t border-[#D5C9BE]/50 mt-auto w-full">
               <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
-                <div className="text-center md:text-left">
-                  <h3 className="font-serif text-3xl font-bold text-[#635f41] mb-2 tracking-tight">AAYAM</h3>
-                  <p className="text-sm text-[#466272]/70">Celebrating theatrical excellence and refined stagecraft.</p>
+                <div className="text-center md:text-left space-y-1">
+                  <h3 className="font-serif text-3xl font-normal text-[#2C2A28] tracking-tight">AAYAM</h3>
+                  <p className="text-xs text-[#666361]">Celebrating theatrical excellence and archival stagecraft.</p>
                 </div>
-                <nav className="flex flex-wrap justify-center gap-8 text-xs font-bold uppercase tracking-wider">
-                  <Link className="text-[#466272]/85 hover:text-[#635f41] transition-colors" to="/">Home</Link>
-                  <Link className="text-[#466272]/85 hover:text-[#635f41] transition-colors" to="/plays">Our Plays</Link>
-                  <Link className="text-[#466272]/85 hover:text-[#635f41] transition-colors" to="/events">Upcoming Events</Link>
-                  <Link className="text-[#466272]/85 hover:text-[#635f41] transition-colors" to="/directory">Member Directory</Link>
-                  <Link className="text-[#466272]/85 hover:text-[#635f41] transition-colors" to="/public-gallery">Gallery</Link>
+                <nav className="flex flex-wrap justify-center gap-8 text-xs font-bold uppercase tracking-widest">
+                  <Link className="text-[#666361] hover:text-[#E85F57] transition-colors" to="/">Home</Link>
+                  <Link className="text-[#666361] hover:text-[#E85F57] transition-colors" to="/plays">Our Plays</Link>
+                  <Link className="text-[#666361] hover:text-[#E85F57] transition-colors" to="/events">Upcoming Events</Link>
+                  <Link className="text-[#666361] hover:text-[#E85F57] transition-colors" to="/directory">Member Directory</Link>
+                  <Link className="text-[#666361] hover:text-[#E85F57] transition-colors" to="/public-gallery">Gallery</Link>
                 </nav>
               </div>
             </footer>
@@ -569,21 +730,21 @@ export default function AppLayout() {
         ) : (
           <main className="flex-1 px-4 md:px-8 py-4 md:py-6 max-w-[1280px] mx-auto w-full">
             {showAccessDenied ? (
-              <div className="flex flex-col items-center justify-center text-center py-12 px-4 bg-white border border-[#e6e2dd] rounded-[8px] space-y-6 shadow-xs max-w-md mx-auto mt-8">
+              <div className="flex flex-col items-center justify-center text-center py-12 px-4 bg-[#F7F5F0] border border-[#DDD8CE] rounded-[8px] space-y-6 shadow-xs max-w-md mx-auto mt-8">
                 <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center text-red-500 border border-red-100">
                   <ShieldAlert className="w-8 h-8" />
                 </div>
                 <div className="space-y-2">
-                  <h3 className="text-xl font-bold font-serif text-[#635f41]">Restricted Stage Access</h3>
-                  <p className="text-sm text-[#466272] leading-relaxed">
-                    Your current role (<strong className="text-[#635f41]">{activeUser.role}</strong>) does not have authorization to access this operational area.
+                  <h3 className="text-xl font-bold font-serif text-[#353535]">Restricted Stage Access</h3>
+                  <p className="text-sm text-[#666361] leading-relaxed">
+                    Your current role (<strong className="text-[#353535]">{activeUser.role}</strong>) does not have authorization to access this operational area.
                   </p>
                 </div>
                 <Link
-                  to="/member"
-                  className="bg-[#8CC0EB] hover:bg-[#8CC0EB]/90 text-[#1c1b19] font-semibold text-xs rounded-[8px] py-2.5 px-6 shadow-sm transition-all active:scale-95 flex items-center gap-2"
+                  to="/schedule"
+                  className="bg-[#E85F57] hover:bg-[#E85F57]/90 text-[#2C2A28] font-semibold text-xs rounded-[8px] py-2.5 px-6 shadow-sm transition-all active:scale-95 flex items-center gap-2"
                 >
-                  Return to Dashboard
+                  Return to My Schedule
                 </Link>
               </div>
             ) : (

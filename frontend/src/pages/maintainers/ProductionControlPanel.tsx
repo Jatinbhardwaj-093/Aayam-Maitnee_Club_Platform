@@ -265,7 +265,7 @@ export default function ProductionControlPanel() {
     );
 
     return (
-        <div className="production-control w-full bg-[#fdf9f4] text-[#1c1b19] font-sans antialiased min-h-screen pb-16 selection:bg-[#8CC0EB]/30 relative">
+        <div className="production-control w-full bg-[#E7DDD3] text-[#2C2A28] font-sans antialiased min-h-screen pb-16 selection:bg-[#E85F57]/30 relative">
             {/* Ambient Background Effect */}
             <div className="absolute inset-0 z-0 pointer-events-none opacity-20" style={{
                 background: "radial-gradient(circle at 80% 20%, #c9e7fa 0%, transparent 50%), radial-gradient(circle at 10% 80%, #fff9d2 0%, transparent 55%)"
@@ -274,26 +274,26 @@ export default function ProductionControlPanel() {
             <div className="relative z-10 max-w-[1280px] mx-auto px-6 pt-8">
                 {/* Page Header */}
                 <div className="mb-10">
-                    <div className="flex items-center gap-2 mb-2 text-[#49473d]/60 text-sm font-semibold uppercase tracking-wider">
+                    <div className="flex items-center gap-2 mb-2 text-[#666361]/60 text-sm font-semibold uppercase tracking-wider">
                         <ShieldAlert className="w-4 h-4 text-[#ba1a1a]" />
                         <span>System Maintenance</span>
                     </div>
-                    <h2 className="font-serif text-[40px] md:text-[32px] text-[#1c1b19] font-bold tracking-tight mb-2 leading-tight">
-                        Production Control Panel: <span className="text-[#635f41] italic">Macbeth</span>
+                    <h2 className="font-serif text-[40px] md:text-[32px] text-[#2C2A28] font-bold tracking-tight mb-2 leading-tight">
+                        Production Control Panel: <span className="text-[#2C2A28] italic">Macbeth</span>
                     </h2>
-                    <p className="text-lg text-[#49473d] max-w-2xl leading-relaxed">
+                    <p className="text-lg text-[#666361] max-w-2xl leading-relaxed">
                         Technical oversight, access management, and system dependencies.
                     </p>
                 </div>
 
                 {/* Tabs Navigation */}
-                <div className="mb-8 border-b border-[#e6e2dd]">
+                <div className="mb-8 border-b border-[#D5C9BE]/70">
                     <div className="flex gap-8" role="tablist">
                         <button
                             aria-selected={activeTab === 'access'}
                             className={`py-4 text-sm font-semibold transition-all focus:outline-none flex items-center gap-2 border-b-2 ${activeTab === 'access'
-                                ? 'text-[#635f41] border-[#635f41]'
-                                : 'text-[#49473d]/60 border-transparent hover:text-[#635f41] hover:border-[#cac6b9]'
+                                ? 'text-[#2C2A28] border-[#353535]'
+                                : 'text-[#666361]/60 border-transparent hover:text-[#2C2A28] hover:border-[#D5C9BE]'
                                 }`}
                             onClick={() => setActiveTab('access')}
                             role="tab"
@@ -304,8 +304,8 @@ export default function ProductionControlPanel() {
                         <button
                             aria-selected={activeTab === 'deps'}
                             className={`py-4 text-sm font-semibold transition-all focus:outline-none flex items-center gap-2 border-b-2 ${activeTab === 'deps'
-                                ? 'text-[#635f41] border-[#635f41]'
-                                : 'text-[#49473d]/60 border-transparent hover:text-[#635f41] hover:border-[#cac6b9]'
+                                ? 'text-[#2C2A28] border-[#353535]'
+                                : 'text-[#666361]/60 border-transparent hover:text-[#2C2A28] hover:border-[#D5C9BE]'
                                 }`}
                             onClick={() => setActiveTab('deps')}
                             role="tab"
@@ -321,19 +321,19 @@ export default function ProductionControlPanel() {
                     <div className="animate-fadeIn">
                         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-6">
                             <div>
-                                <h3 className="font-serif text-[28px] font-bold text-[#1c1b19] mb-1">Personnel Access</h3>
-                                <p className="text-sm text-[#49473d]/80 leading-normal">Manage roles and technical permissions for the production team.</p>
+                                <h3 className="font-serif text-[28px] font-bold text-[#2C2A28] mb-1">Personnel Access</h3>
+                                <p className="text-sm text-[#666361]/80 leading-normal">Manage roles and technical permissions for the production team.</p>
                             </div>
                             <div className="flex flex-wrap gap-3">
                                 <button
                                     onClick={handleRevokeAllNonEssential}
-                                    className="px-4 py-2 border border-[#8CC0EB] text-[#466272] rounded text-sm font-semibold hover:bg-[#8CC0EB]/10 transition-colors focus:outline-none focus:ring-2 focus:ring-[#8CC0EB]/50"
+                                    className="px-4 py-2 border border-[#E85F57] text-[#666361] rounded text-sm font-semibold hover:bg-[#E85F57]/10 transition-colors focus:outline-none focus:ring-2 focus:ring-[#E85F57]/50"
                                 >
                                     Revoke All Non-Essential
                                 </button>
                                 <button
                                     onClick={() => setShowTempAccessModal(true)}
-                                    className="px-4 py-2 bg-[#fff9d2] text-[#767253] border border-[#635f41]/20 rounded text-sm font-semibold hover:bg-[#fff9d2]/80 transition-colors focus:outline-none shadow-sm"
+                                    className="px-4 py-2 bg-[#fff9d2] text-[#767253] border border-[#353535]/20 rounded text-sm font-semibold hover:bg-[#fff9d2]/80 transition-colors focus:outline-none shadow-sm"
                                 >
                                     Grant Temporary Access
                                 </button>
@@ -342,10 +342,10 @@ export default function ProductionControlPanel() {
 
                         {/* Search Filter for Access Control */}
                         <div className="relative mb-6 w-full max-w-sm">
-                            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#49473d]/50" />
+                            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#666361]/50" />
                             <input
                                 type="text"
-                                className="matte-input w-full pl-10 pr-4 py-2 text-sm focus:border-b-2 focus:border-[#635f41] focus:ring-0 focus:outline-none transition-colors border-0 border-b border-[#E1E2E6] bg-[#F8F9FA] rounded-none placeholder:text-[#7a776c]"
+                                className="matte-input w-full pl-10 pr-4 py-2 text-sm focus:border-b-2 focus:border-[#353535] focus:ring-0 focus:outline-none transition-colors border-0 border-b border-[#E1E2E6] bg-[#F8F9FA] rounded-none placeholder:text-[#7a776c]"
                                 placeholder="Search crew members..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -365,28 +365,28 @@ export default function ProductionControlPanel() {
                                             ? 'bg-[#fff9d2] border-[#E1E2E6]'
                                             : person.accessScope === 'Temporary'
                                                 ? 'bg-[#c9e7fa] border-[#E1E2E6]'
-                                                : 'bg-[#fdf9f4] border-[#E1E2E6]'
+                                                : 'bg-[#E7DDD3] border-[#E1E2E6]'
                                             }`}
                                     >
                                         <div className="flex justify-between items-start">
                                             <div className="flex items-center gap-4">
-                                                <div className={`w-12 h-12 rounded border border-[#cac6b9]/30 flex items-center justify-center ${person.accessScope === 'Full Access' ? 'bg-white/50' : 'bg-[#e6e2dd]/50'}`}>
+                                                <div className={`w-12 h-12 rounded border border-[#D5C9BE]/30 flex items-center justify-center ${person.accessScope === 'Full Access' ? 'bg-[#F7F5F0]/50' : 'bg-[#DDD8CE]/50'}`}>
                                                     {person.avatarIcon === 'person' ? (
-                                                        <User className="w-6 h-6 text-[#635f41]" />
+                                                        <User className="w-6 h-6 text-[#2C2A28]" />
                                                     ) : (
-                                                        <Tv className="w-6 h-6 text-[#466272]" />
+                                                        <Tv className="w-6 h-6 text-[#666361]" />
                                                     )}
                                                 </div>
                                                 <div>
-                                                    <h4 className="font-bold text-[#1c1b19] text-base font-sans">{person.name}</h4>
-                                                    <p className="text-xs text-[#49473d]/70 uppercase tracking-wider font-semibold mt-0.5">{person.role}</p>
+                                                    <h4 className="font-bold text-[#2C2A28] text-base font-sans">{person.name}</h4>
+                                                    <p className="text-xs text-[#666361]/70 uppercase tracking-wider font-semibold mt-0.5">{person.role}</p>
                                                 </div>
                                             </div>
                                             <span className={`px-2 py-1 text-[11px] font-bold rounded uppercase tracking-wider border ${person.accessScope === 'Full Access'
-                                                ? 'bg-[#FFEBCC] text-[#1c1b19] border-[#cac6b9]/25'
+                                                ? 'bg-[#FFEBCC] text-[#2C2A28] border-[#D5C9BE]/25'
                                                 : person.accessScope === 'Temporary'
-                                                    ? 'bg-[#c9e7fa] text-[#001e2c] border-[#cac6b9]/25'
-                                                    : 'bg-[#e6e2dd] text-[#1c1b19] border-[#cac6b9]/25'
+                                                    ? 'bg-[#c9e7fa] text-[#001e2c] border-[#D5C9BE]/25'
+                                                    : 'bg-[#DDD8CE] text-[#2C2A28] border-[#D5C9BE]/25'
                                                 }`}>
                                                 {person.accessScope}
                                             </span>
@@ -394,9 +394,9 @@ export default function ProductionControlPanel() {
 
                                         <div className="space-y-4">
                                             <div>
-                                                <label className="block text-xs uppercase font-bold tracking-wider text-[#49473d] mb-1">Permission Level</label>
+                                                <label className="block text-xs uppercase font-bold tracking-wider text-[#666361] mb-1">Permission Level</label>
                                                 <select
-                                                    className="matte-input w-full py-2 px-1 text-sm text-[#1c1b19] focus:ring-0 cursor-pointer"
+                                                    className="matte-input w-full py-2 px-1 text-sm text-[#2C2A28] focus:ring-0 cursor-pointer"
                                                     value={person.permissionLevel}
                                                     onChange={(e) => handlePermissionChange(person.id, e.target.value as any)}
                                                 >
@@ -406,12 +406,12 @@ export default function ProductionControlPanel() {
                                                 </select>
                                             </div>
 
-                                            <div className="pt-2 border-t border-[#e6e2dd]/60">
-                                                <p className="text-xs uppercase font-bold tracking-wider text-[#49473d] mb-3">System Toggles</p>
+                                            <div className="pt-2 border-t border-[#D5C9BE]/70/60">
+                                                <p className="text-xs uppercase font-bold tracking-wider text-[#666361] mb-3">System Toggles</p>
                                                 <div className="flex flex-col gap-3">
                                                     {/* Toggle: Lighting */}
                                                     <label className={`flex items-center justify-between cursor-pointer group ${isRestricted || isViewOnly ? 'opacity-50' : ''}`}>
-                                                        <span className="text-sm text-[#1c1b19] group-hover:text-[#635f41] transition-colors">
+                                                        <span className="text-sm text-[#2C2A28] group-hover:text-[#2C2A28] transition-colors">
                                                             Lighting Rig Access
                                                         </span>
                                                         <div className="relative">
@@ -422,16 +422,16 @@ export default function ProductionControlPanel() {
                                                                 checked={person.toggles.lighting}
                                                                 onChange={() => handleToggle(person.id, 'lighting')}
                                                             />
-                                                            <div className={`w-10 h-5 bg-[#e6e2dd] rounded-full peer ${isRestricted || isViewOnly ? '' : 'peer-focus:ring-2 peer-focus:ring-[#8CC0EB] peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[\'\'] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#8CC0EB]'}`}></div>
+                                                            <div className={`w-10 h-5 bg-[#DDD8CE] rounded-full peer ${isRestricted || isViewOnly ? '' : 'peer-focus:ring-2 peer-focus:ring-[#E85F57] peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[\'\'] after:absolute after:top-[2px] after:left-[2px] after:bg-[#F7F5F0] after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#E85F57]'}`}></div>
                                                             {(isRestricted || isViewOnly) && (
-                                                                <Lock className="w-3.5 h-3.5 text-[#49473d]/70 absolute right-1 top-1/2 -translate-y-1/2" />
+                                                                <Lock className="w-3.5 h-3.5 text-[#666361]/70 absolute right-1 top-1/2 -translate-y-1/2" />
                                                             )}
                                                         </div>
                                                     </label>
 
                                                     {/* Toggle: Audio Comms */}
                                                     <label className={`flex items-center justify-between cursor-pointer group ${isViewOnly ? 'opacity-50' : ''}`}>
-                                                        <span className="text-sm text-[#1c1b19] group-hover:text-[#635f41] transition-colors">
+                                                        <span className="text-sm text-[#2C2A28] group-hover:text-[#2C2A28] transition-colors">
                                                             Audio Console (Comms)
                                                         </span>
                                                         <div className="relative">
@@ -442,16 +442,16 @@ export default function ProductionControlPanel() {
                                                                 checked={person.toggles.audio}
                                                                 onChange={() => handleToggle(person.id, 'audio')}
                                                             />
-                                                            <div className={`w-10 h-5 bg-[#e6e2dd] rounded-full peer ${isViewOnly ? '' : 'peer-focus:ring-2 peer-focus:ring-[#8CC0EB] peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[\'\'] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#8CC0EB]'}`}></div>
+                                                            <div className={`w-10 h-5 bg-[#DDD8CE] rounded-full peer ${isViewOnly ? '' : 'peer-focus:ring-2 peer-focus:ring-[#E85F57] peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[\'\'] after:absolute after:top-[2px] after:left-[2px] after:bg-[#F7F5F0] after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#E85F57]'}`}></div>
                                                             {isViewOnly && (
-                                                                <Lock className="w-3.5 h-3.5 text-[#49473d]/70 absolute right-1 top-1/2 -translate-y-1/2" />
+                                                                <Lock className="w-3.5 h-3.5 text-[#666361]/70 absolute right-1 top-1/2 -translate-y-1/2" />
                                                             )}
                                                         </div>
                                                     </label>
 
                                                     {/* Toggle: Stage Door Override */}
                                                     <label className={`flex items-center justify-between cursor-pointer group ${isRestricted || isViewOnly ? 'opacity-50' : ''}`}>
-                                                        <span className="text-sm text-[#1c1b19] group-hover:text-[#635f41] transition-colors">
+                                                        <span className="text-sm text-[#2C2A28] group-hover:text-[#2C2A28] transition-colors">
                                                             Stage Door Security (Override)
                                                         </span>
                                                         <div className="relative">
@@ -462,9 +462,9 @@ export default function ProductionControlPanel() {
                                                                 checked={person.toggles.security}
                                                                 onChange={() => handleToggle(person.id, 'security')}
                                                             />
-                                                            <div className={`w-10 h-5 bg-[#e6e2dd] rounded-full peer ${isRestricted || isViewOnly ? '' : 'peer-focus:ring-2 peer-focus:ring-[#8CC0EB] peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[\'\'] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#8CC0EB]'}`}></div>
+                                                            <div className={`w-10 h-5 bg-[#DDD8CE] rounded-full peer ${isRestricted || isViewOnly ? '' : 'peer-focus:ring-2 peer-focus:ring-[#E85F57] peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[\'\'] after:absolute after:top-[2px] after:left-[2px] after:bg-[#F7F5F0] after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#E85F57]'}`}></div>
                                                             {(isRestricted || isViewOnly) && (
-                                                                <Lock className="w-3.5 h-3.5 text-[#49473d]/70 absolute right-1 top-1/2 -translate-y-1/2" />
+                                                                <Lock className="w-3.5 h-3.5 text-[#666361]/70 absolute right-1 top-1/2 -translate-y-1/2" />
                                                             )}
                                                         </div>
                                                     </label>
@@ -482,52 +482,52 @@ export default function ProductionControlPanel() {
                 {activeTab === 'deps' && (
                     <div className="animate-fadeIn">
                         <div className="mb-6">
-                            <h3 className="font-serif text-[28px] font-bold text-[#1c1b19] mb-1">Equipment Logs &amp; Bookings</h3>
-                            <p className="text-sm text-[#49473d]/80 leading-normal">Monitor hardware status and resolve space conflicts.</p>
+                            <h3 className="font-serif text-[28px] font-bold text-[#2C2A28] mb-1">Equipment Logs &amp; Bookings</h3>
+                            <p className="text-sm text-[#666361]/80 leading-normal">Monitor hardware status and resolve space conflicts.</p>
                         </div>
 
                         {/* Dependencies Table */}
-                        <div className="bg-white/50 backdrop-blur-sm border border-[#E1E2E6] rounded-lg overflow-hidden shadow-sm">
+                        <div className="bg-[#F7F5F0]/50 backdrop-blur-sm border border-[#E1E2E6] rounded-lg overflow-hidden shadow-sm">
                             <div className="overflow-x-auto">
                                 <table className="w-full text-left border-collapse">
                                     <thead>
-                                        <tr className="border-b border-[#e6e2dd]/50 bg-[#f7f3ee]/50 font-sans">
-                                            <th className="py-4 px-6 font-bold text-sm text-[#49473d] font-sans">Resource / Dependency</th>
-                                            <th className="py-4 px-6 font-bold text-sm text-[#49473d] font-sans">Status</th>
-                                            <th className="py-4 px-6 font-bold text-sm text-[#49473d] font-sans">Time / Allocation</th>
-                                            <th className="py-4 px-6 font-bold text-sm text-[#49473d] font-sans text-right">Actions</th>
+                                        <tr className="border-b border-[#D5C9BE]/70/50 bg-[#E7DDD3]/50 font-sans">
+                                            <th className="py-4 px-6 font-bold text-sm text-[#666361] font-sans">Resource / Dependency</th>
+                                            <th className="py-4 px-6 font-bold text-sm text-[#666361] font-sans">Status</th>
+                                            <th className="py-4 px-6 font-bold text-sm text-[#666361] font-sans">Time / Allocation</th>
+                                            <th className="py-4 px-6 font-bold text-sm text-[#666361] font-sans text-right">Actions</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-[#e6e2dd]/30 font-sans text-xs text-[#1c1b19]">
+                                    <tbody className="divide-y divide-[#DDD8CE]/30 font-sans text-xs text-[#2C2A28]">
                                         {dependencies.map((dep) => {
                                             const isConflict = dep.status === 'Conflict';
                                             return (
                                                 <tr
                                                     key={dep.id}
-                                                    className={`hover:bg-[#e6e2dd]/10 transition-colors ${isConflict ? 'bg-[#ffdad6]/10' : ''
+                                                    className={`hover:bg-[#DDD8CE]/10 transition-colors ${isConflict ? 'bg-[#ffdad6]/10' : ''
                                                         }`}
                                                 >
                                                     <td className="py-4 px-6">
                                                         <div className="flex items-center gap-3">
-                                                            <div className="w-8 h-8 rounded bg-white/80 border border-[#cac6b9]/30 flex items-center justify-center">
+                                                            <div className="w-8 h-8 rounded bg-[#F7F5F0]/80 border border-[#D5C9BE]/30 flex items-center justify-center">
                                                                 {dep.icon === 'theater_comedy' ? (
-                                                                    <Tv className="w-4 h-4 text-[#466272]" />
+                                                                    <Tv className="w-4 h-4 text-[#666361]" />
                                                                 ) : dep.icon === 'highlight' ? (
                                                                     <Lightbulb className="w-4 h-4 text-amber-500" />
                                                                 ) : (
-                                                                    <Mic className="w-4 h-4 text-[#635f41]" />
+                                                                    <Mic className="w-4 h-4 text-[#2C2A28]" />
                                                                 )}
                                                             </div>
                                                             <div>
-                                                                <p className="font-bold text-[#1c1b19] text-sm">{dep.name}</p>
-                                                                <p className="text-xs text-[#49473d]/70 mt-0.5">{dep.desc}</p>
+                                                                <p className="font-bold text-[#2C2A28] text-sm">{dep.name}</p>
+                                                                <p className="text-xs text-[#666361]/70 mt-0.5">{dep.desc}</p>
                                                             </div>
                                                         </div>
                                                     </td>
                                                     <td className="py-4 px-6">
                                                         {dep.status === 'Active' && (
-                                                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-[#c6e4f7] text-[#466272] text-[12px] font-bold uppercase tracking-wider">
-                                                                <span className="w-1.5 h-1.5 rounded-full bg-[#8CC0EB]"></span> Active
+                                                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-[#F8E8E4] text-[#666361] text-[12px] font-bold uppercase tracking-wider">
+                                                                <span className="w-1.5 h-1.5 rounded-full bg-[#E85F57]"></span> Active
                                                             </span>
                                                         )}
                                                         {dep.status === 'Conflict' && (
@@ -536,7 +536,7 @@ export default function ProductionControlPanel() {
                                                             </span>
                                                         )}
                                                         {dep.status === 'Booked' && (
-                                                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-[#e6e2dd] text-[#49473d] text-[12px] font-bold uppercase tracking-wider">
+                                                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-[#DDD8CE] text-[#666361] text-[12px] font-bold uppercase tracking-wider">
                                                                 <span className="w-1.5 h-1.5 rounded-full bg-[#7a776c]"></span> Booked
                                                             </span>
                                                         )}
@@ -546,7 +546,7 @@ export default function ProductionControlPanel() {
                                                             </span>
                                                         )}
                                                     </td>
-                                                    <td className="py-4 px-6 text-[#49473d] text-sm">
+                                                    <td className="py-4 px-6 text-[#666361] text-sm">
                                                         {dep.time}
                                                     </td>
                                                     <td className="py-4 px-6 text-right">
@@ -561,7 +561,7 @@ export default function ProductionControlPanel() {
                                                             ) : dep.status === 'Booked' ? (
                                                                 <button
                                                                     onClick={() => handleCancelReservation(dep.id, dep.name)}
-                                                                    className="p-2 text-[#49473d]/60 hover:text-[#ba1a1a] transition-colors focus:outline-none"
+                                                                    className="p-2 text-[#666361]/60 hover:text-[#ba1a1a] transition-colors focus:outline-none"
                                                                     title="Cancel Reservation"
                                                                 >
                                                                     <XCircle className="w-5 h-5" />
@@ -569,7 +569,7 @@ export default function ProductionControlPanel() {
                                                             ) : dep.status === 'Active' ? (
                                                                 <button
                                                                     onClick={() => openEditAllocation(dep)}
-                                                                    className="p-2 text-[#49473d]/60 hover:text-[#635f41] transition-colors focus:outline-none"
+                                                                    className="p-2 text-[#666361]/60 hover:text-[#2C2A28] transition-colors focus:outline-none"
                                                                     title="Edit Allocation"
                                                                 >
                                                                     <Edit2 className="w-5 h-5" />
@@ -591,24 +591,24 @@ export default function ProductionControlPanel() {
             {/* Grant Temporary Access Modal */}
             {showTempAccessModal && (
                 <div className="fixed inset-0 bg-[#31302d]/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <div className="bg-white border border-[#cac6b9]/65 rounded-xl max-w-sm w-full shadow-2xl overflow-hidden flex flex-col">
-                        <div className="bg-[#f7f3ee] px-6 py-4 border-b border-[#cac6b9]/40 flex items-center justify-between">
-                            <h3 className="font-serif text-sm font-bold text-[#49473d] uppercase tracking-wider">Grant Temporary Access</h3>
+                    <div className="bg-[#F7F5F0] border border-[#D5C9BE]/65 rounded-xl max-w-sm w-full shadow-2xl overflow-hidden flex flex-col">
+                        <div className="bg-[#E7DDD3] px-6 py-4 border-b border-[#D5C9BE]/40 flex items-center justify-between">
+                            <h3 className="font-serif text-sm font-bold text-[#666361] uppercase tracking-wider">Grant Temporary Access</h3>
                             <button
                                 onClick={() => setShowTempAccessModal(false)}
-                                className="p-1 hover:bg-[#cac6b9]/30 rounded-full transition-colors"
+                                className="p-1 hover:bg-[#D5C9BE]/30 rounded-full transition-colors"
                             >
-                                <X className="w-4 h-4 text-[#49473d]" />
+                                <X className="w-4 h-4 text-[#666361]" />
                             </button>
                         </div>
 
                         <form onSubmit={handleAddTempAccess} className="p-6 space-y-4">
                             <div>
-                                <label className="block text-[10px] uppercase font-bold tracking-wider text-[#49473d] mb-1">Crew Member Name</label>
+                                <label className="block text-[10px] uppercase font-bold tracking-wider text-[#666361] mb-1">Crew Member Name</label>
                                 <input
                                     type="text"
                                     required
-                                    className="w-full bg-[#F8F9FA] border-0 border-b border-[#cac6b9] focus:border-[#635f41] focus:ring-0 text-xs px-2 py-2.5 rounded-t-sm"
+                                    className="w-full bg-[#F8F9FA] border-0 border-b border-[#D5C9BE] focus:border-[#353535] focus:ring-0 text-xs px-2 py-2.5 rounded-t-sm"
                                     placeholder="e.g. Sarah Connor"
                                     value={tempName}
                                     onChange={(e) => setTempName(e.target.value)}
@@ -616,9 +616,9 @@ export default function ProductionControlPanel() {
                             </div>
 
                             <div>
-                                <label className="block text-[10px] uppercase font-bold tracking-wider text-[#49473d] mb-1">Production Role</label>
+                                <label className="block text-[10px] uppercase font-bold tracking-wider text-[#666361] mb-1">Production Role</label>
                                 <select
-                                    className="w-full bg-[#F8F9FA] border-0 border-b border-[#cac6b9] focus:ring-0 cursor-pointer font-sans text-xs focus:border-[#635f41] py-2 px-1 text-[#1c1b19]"
+                                    className="w-full bg-[#F8F9FA] border-0 border-b border-[#D5C9BE] focus:ring-0 cursor-pointer font-sans text-xs focus:border-[#353535] py-2 px-1 text-[#2C2A28]"
                                     value={tempRole}
                                     onChange={(e) => setTempRole(e.target.value)}
                                 >
@@ -630,22 +630,22 @@ export default function ProductionControlPanel() {
                             </div>
 
                             <div>
-                                <label className="block text-[10px] uppercase font-bold tracking-wider text-[#49473d] mb-1">Clearance Level</label>
+                                <label className="block text-[10px] uppercase font-bold tracking-wider text-[#666361] mb-1">Clearance Level</label>
                                 <div className="flex gap-4 mt-2">
-                                    <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-[#1c1b19]">
+                                    <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-[#2C2A28]">
                                         <input
                                             type="radio"
-                                            className="text-[#635f41] focus:ring-0 focus:ring-offset-0"
+                                            className="text-[#2C2A28] focus:ring-0 focus:ring-offset-0"
                                             name="tempLevel"
                                             checked={tempLevel === 'Standard Contributor'}
                                             onChange={() => setTempLevel('Standard Contributor')}
                                         />
                                         Standard
                                     </label>
-                                    <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-[#1c1b19]">
+                                    <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-[#2C2A28]">
                                         <input
                                             type="radio"
-                                            className="text-[#635f41] focus:ring-0 focus:ring-offset-0"
+                                            className="text-[#2C2A28] focus:ring-0 focus:ring-offset-0"
                                             name="tempLevel"
                                             checked={tempLevel === 'View Only'}
                                             onChange={() => setTempLevel('View Only')}
@@ -659,13 +659,13 @@ export default function ProductionControlPanel() {
                                 <button
                                     type="button"
                                     onClick={() => setShowTempAccessModal(false)}
-                                    className="flex-grow border border-[#cac6b9] text-xs font-semibold py-2 px-3 hover:bg-[#e6e2dd]/40 rounded-lg text-[#1c1b19]"
+                                    className="flex-grow border border-[#D5C9BE] text-xs font-semibold py-2 px-3 hover:bg-[#DDD8CE]/40 rounded-lg text-[#2C2A28]"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
-                                    className="flex-grow bg-[#635f41] hover:bg-[#635f41]/90 text-white font-bold text-xs py-2 px-3 rounded-lg transition-colors shadow-sm"
+                                    className="flex-grow bg-[#353535] hover:bg-[#353535]/90 text-white font-bold text-xs py-2 px-3 rounded-lg transition-colors shadow-sm"
                                 >
                                     Grant Access
                                 </button>
@@ -678,23 +678,23 @@ export default function ProductionControlPanel() {
             {/* Edit Allocation Modal */}
             {showEditAllocationModal && editDep && (
                 <div className="fixed inset-0 bg-[#31302d]/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <div className="bg-white border border-[#cac6b9]/65 rounded-xl max-w-sm w-full shadow-2xl overflow-hidden flex flex-col">
-                        <div className="bg-[#f7f3ee] px-6 py-4 border-b border-[#cac6b9]/40 flex items-center justify-between">
-                            <h3 className="font-serif text-sm font-bold text-[#49473d] uppercase tracking-wider">Edit Allocation: {editDep.name}</h3>
+                    <div className="bg-[#F7F5F0] border border-[#D5C9BE]/65 rounded-xl max-w-sm w-full shadow-2xl overflow-hidden flex flex-col">
+                        <div className="bg-[#E7DDD3] px-6 py-4 border-b border-[#D5C9BE]/40 flex items-center justify-between">
+                            <h3 className="font-serif text-sm font-bold text-[#666361] uppercase tracking-wider">Edit Allocation: {editDep.name}</h3>
                             <button
                                 onClick={() => setShowEditAllocationModal(false)}
-                                className="p-1 hover:bg-[#cac6b9]/30 rounded-full transition-colors"
+                                className="p-1 hover:bg-[#D5C9BE]/30 rounded-full transition-colors"
                             >
-                                <X className="w-4 h-4 text-[#49473d]" />
+                                <X className="w-4 h-4 text-[#666361]" />
                             </button>
                         </div>
 
                         <div className="p-6 space-y-4">
                             <div>
-                                <label className="block text-[10px] uppercase font-bold tracking-wider text-[#49473d] mb-1">Time / Allocation Slot</label>
+                                <label className="block text-[10px] uppercase font-bold tracking-wider text-[#666361] mb-1">Time / Allocation Slot</label>
                                 <input
                                     type="text"
-                                    className="w-full bg-[#F8F9FA] border-0 border-b border-[#cac6b9] focus:border-[#635f41] focus:ring-0 text-xs px-2 py-2.5 rounded-t-sm"
+                                    className="w-full bg-[#F8F9FA] border-0 border-b border-[#D5C9BE] focus:border-[#353535] focus:ring-0 text-xs px-2 py-2.5 rounded-t-sm"
                                     value={editTime}
                                     onChange={(e) => setEditTime(e.target.value)}
                                 />
@@ -704,14 +704,14 @@ export default function ProductionControlPanel() {
                                 <button
                                     type="button"
                                     onClick={() => setShowEditAllocationModal(false)}
-                                    className="flex-grow border border-[#cac6b9] text-xs font-semibold py-2 px-3 hover:bg-[#e6e2dd]/40 rounded-lg text-[#1c1b19]"
+                                    className="flex-grow border border-[#D5C9BE] text-xs font-semibold py-2 px-3 hover:bg-[#DDD8CE]/40 rounded-lg text-[#2C2A28]"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="button"
                                     onClick={handleSaveAllocation}
-                                    className="flex-grow bg-[#635f41] hover:bg-[#635f41]/90 text-white font-bold text-xs py-2 px-3 rounded-lg transition-colors shadow-sm"
+                                    className="flex-grow bg-[#353535] hover:bg-[#353535]/90 text-white font-bold text-xs py-2 px-3 rounded-lg transition-colors shadow-sm"
                                 >
                                     Save changes
                                 </button>
@@ -723,7 +723,7 @@ export default function ProductionControlPanel() {
 
             {/* Dynamic Toast System */}
             {toastMessage && (
-                <div className="fixed bottom-6 right-6 bg-[#31302d] text-white border border-[#cac6b9]/30 rounded-xl px-5 py-3.5 shadow-2xl z-50 flex items-center gap-3 animate-slide-in max-w-sm">
+                <div className="fixed bottom-6 right-6 bg-[#31302d] text-white border border-[#D5C9BE]/30 rounded-xl px-5 py-3.5 shadow-2xl z-50 flex items-center gap-3 animate-slide-in max-w-sm">
                     <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0" />
                     <span className="text-[11px] font-semibold leading-normal">{toastMessage}</span>
                 </div>

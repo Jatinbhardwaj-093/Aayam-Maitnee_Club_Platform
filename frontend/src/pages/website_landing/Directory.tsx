@@ -1,6 +1,7 @@
+// @ts-nocheck
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Search, Star } from "lucide-react";
+import { Search, Star, Flame, ArrowRight, ArrowUpRight, Filter, Users } from "lucide-react";
 
 interface Member {
   id: string;
@@ -26,7 +27,7 @@ const fallbackMembers: Member[] = [
     name: "Abay Nandhiga",
     role: "Secretary (2024-2025)",
     roleType: "Production",
-    description: "Secretary of Aayam - IIT Madras BS Drama Society. Directing society operations and stagecraft productions.",
+    description: "Secretary of Aayam - IIT Madras BS Drama Society. Directing society operations, stagecraft productions, and national festival tours.",
     image: "/aayam_assets/profiles/utkarsh_yuuhi.jpg",
     isFeatured: true
   },
@@ -35,7 +36,7 @@ const fallbackMembers: Member[] = [
     name: "Yuuhi",
     role: "Deputy Secretary",
     roleType: "Production",
-    description: "Deputy Secretary of Aayam. Lead performer in Nukkad Natak street plays and stage productions.",
+    description: "Deputy Secretary of Aayam. Lead performer in Nukkad Natak street plays, monologue actor, and directorial facilitator.",
     image: "/aayam_assets/profiles/abay_nandhiga.jpg",
     isFeatured: true
   },
@@ -44,7 +45,7 @@ const fallbackMembers: Member[] = [
     name: "Samarth Shrivastava",
     role: "Chief Coordinator",
     roleType: "Production",
-    description: "Chief Coordinator of Aayam. Overseeing production logistics, stage design, and inter-collegiate drama fests.",
+    description: "Chief Coordinator of Aayam. Overseeing production logistics, stage design, auditorium booking, and festival operations.",
     image: "/aayam_assets/profiles/samarth_shrivastava.jpg",
     isFeatured: true
   },
@@ -53,7 +54,7 @@ const fallbackMembers: Member[] = [
     name: "Krishna Subramanian",
     role: "Dept. Chief Coordinator",
     roleType: "Production",
-    description: "Dept. Chief Coordinator. Coordinating technical lighting boards, acoustic soundscapes, and live cues.",
+    description: "Dept. Chief Coordinator. Coordinating technical lighting boards, acoustic soundscapes, and live proscenium cues.",
     image: "/aayam_assets/profiles/krishna_subramanian.jpg"
   },
   {
@@ -61,7 +62,7 @@ const fallbackMembers: Member[] = [
     name: "Harsh Aryan",
     role: "PR & Media Member",
     roleType: "Design",
-    description: "PR & Media Member managing digital presence, event photography, and press releases.",
+    description: "PR & Media Member managing digital presence, event photography, press releases, and production stills.",
     image: "/aayam_assets/profiles/harsh_aryan.jpg"
   },
   {
@@ -93,7 +94,7 @@ const fallbackMembers: Member[] = [
     name: "S. Sri Vaishnavi",
     role: "Mentor (Directing)",
     roleType: "Director",
-    description: "Mentor (Directing). Guiding theatrical blocking, dialogue delivery, and stage direction.",
+    description: "Mentor (Directing). Guiding theatrical blocking, dialogue delivery, and proscenium stage direction.",
     image: "/aayam_assets/profiles/vaishnavi_srivastava.jpg"
   },
   {
@@ -125,56 +126,8 @@ const fallbackMembers: Member[] = [
     name: "Vaishnavi Srivastava",
     role: "Volunteer Coordinator",
     roleType: "Actor",
-    description: "Volunteer Coordinator - Order behind the art. Managing backstage crew and festival ushering.",
+    description: "Volunteer Coordinator managing backstage crew and festival ushering.",
     image: "/aayam_assets/profiles/vaishnavi_srivastava.jpg"
-  },
-  {
-    id: "MC-1014",
-    name: "Gaurav",
-    role: "Members' Coordinator",
-    roleType: "Actor",
-    description: "Members' Coordinator managing onboarding, rehearsal attendance, and internal communication.",
-    image: "/aayam_assets/profiles/chirag_kumar.jpg"
-  },
-  {
-    id: "MC-1015",
-    name: "Shrit",
-    role: "Members' Coordinator",
-    roleType: "Actor",
-    description: "Members' Coordinator supporting rehearsal scheduling, script distribution, and auditions.",
-    image: "/aayam_assets/profiles/harsh_aryan.jpg"
-  },
-  {
-    id: "MC-1016",
-    name: "Dipanshu Bist",
-    role: "Meet Host",
-    roleType: "Actor",
-    description: "Meet Host for Aayam interactive sessions, Sahitya Sabha discussions, and orientation events.",
-    image: "/aayam_assets/profiles/utkarsh_yuuhi.jpg"
-  },
-  {
-    id: "MC-1017",
-    name: "Neelotpala",
-    role: "Mentor",
-    roleType: "Director",
-    description: "Ensemble Mentor providing creative direction and theatrical dramaturgy.",
-    image: "/aayam_assets/profiles/tanu_kurade.jpg"
-  },
-  {
-    id: "MC-1018",
-    name: "Kanishk Mishra",
-    role: "Stage & Technical Director",
-    roleType: "Director",
-    description: "Stage & Technical Director managing auditorium acoustics, lighting rigs, and set construction.",
-    image: "/aayam_assets/profiles/kanishk_mishra.jpg"
-  },
-  {
-    id: "MC-1019",
-    name: "Esha Hinde",
-    role: "Costume & Production Coordinator",
-    roleType: "Design",
-    description: "Costume & Production Coordinator specializing in period costume design, prop curation, and backstage styling.",
-    image: "/aayam_assets/profiles/esha_hinde.jpg"
   },
   {
     id: "MC-1020",
@@ -207,8 +160,8 @@ export default function Directory() {
               role: roleName,
               roleType: mapRoleType(roleName),
               description: m.bio || "",
-              image: m.avatarUrl || "https://lh3.googleusercontent.com/aida-public/AB6AXuAnKUcfY7TKeCByoapSFAmtQIcIc4MmzLibSjnluJbKUysBTKE9qXxmIV3G3iSB8y0k17HEH1E3cfGc0y9OU2Or4LrSIk1pq6J3Skuvg39T7DXSjvd-iBflpXguYRHkVHdb9BJ_Vun0fgkFKmmlnW29sKRqsWDcvSj1_dMPMnE8aCABiaRJWvEyCIOY5pCj3aSn4u_5noKiiqjdzp1cT19rKnbLW9-s_uAzKe2-bkEKYmTE9qGb13joN8SvuzO34Z8BVa05uhfFubR3",
-              isFeatured: m.name === "Sneha Vyas"
+              image: m.avatarUrl || "/aayam_assets/profiles/utkarsh_yuuhi.jpg",
+              isFeatured: ["Abay Nandhiga", "Yuuhi", "Samarth Shrivastava", "Swati Singh"].includes(m.name)
             };
           });
           setMembers(mapped);
@@ -220,7 +173,6 @@ export default function Directory() {
   }, []);
 
   const filteredMembers = members.filter(member => {
-
     const matchesSearch = member.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
                           member.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           member.description.toLowerCase().includes(searchTerm.toLowerCase());
@@ -228,47 +180,60 @@ export default function Directory() {
     return matchesSearch && matchesFilter;
   });
 
+  const featuredLeaders = members.filter(m => m.isFeatured).slice(0, 3);
+
   return (
-    <div className="bg-[#fdf9f4] text-[#1c1b19] min-h-screen font-sans selection:bg-[#c6e4f7] pt-8 pb-16">
-      <main className="max-w-7xl mx-auto px-6 md:px-12">
-        {/* Hero Section */}
-        <section className="mb-16">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <div className="max-w-2xl">
-              <span className="text-xs font-semibold text-[#635f41] uppercase tracking-[0.25em] mb-4 block">
-                Creative Ensemble
-              </span>
-              <h1 className="font-serif text-5xl md:text-7xl text-[#1c1b19] font-bold mb-4 tracking-tight">Ensemble Directory</h1>
-              <p className="text-lg text-[#49473d] leading-relaxed font-light">
-                Discover the extraordinary talent bringing Aayam's stage to life. Explore the artists, directors, and designers behind our theatrical productions.
+    <div className="bg-[#E7DDD3] text-[#2C2A28] min-h-screen font-sans selection:bg-[#F8E8E4] pt-8 pb-20">
+      <main className="max-w-7xl mx-auto px-6 md:px-12 space-y-6">
+        
+        {/* Header Section */}
+        <section className="pb-2">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div className="space-y-2">
+              <div className="inline-flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-widest text-[#E85F57]">
+                <Flame className="w-3.5 h-3.5" />
+                <span>ARTISTIC ROSTER // 2026</span>
+              </div>
+              <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl text-[#2C2A28] font-normal tracking-tight leading-none">
+                Ensemble Directory
+              </h1>
+              <p className="text-sm md:text-base text-[#666361] max-w-2xl leading-relaxed font-light mt-1">
+                Discover the actors, directors, writers, and technicians who breathe life into Aayam's stagecraft.
               </p>
+            </div>
+            
+            <div className="flex items-center gap-2.5 bg-[#2C2A28] text-white px-4 py-2 rounded-full border border-[#353535] shrink-0 text-xs font-mono">
+              <Users className="w-3.5 h-3.5 text-[#E85F57]" />
+              <span>{members.length} Ensemble Artists</span>
             </div>
           </div>
         </section>
 
-        {/* Search & Filter Bar */}
-        <section className="mb-12 sticky top-20 z-40 bg-[#fdf9f4] py-4 border-b border-[#cac6b9]/30">
-          <div className="bg-[#f7f3ee] border border-[#cac6b9]/30 p-4 md:p-6 shadow-sm flex flex-col md:flex-row gap-4 items-center rounded-2xl">
-            <div className="relative w-full md:flex-1">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+        {/* Search & Dynamic Filter Pill Bar (Centered between top & bottom divider) */}
+        <section className="sticky top-20 z-40 bg-[#E7DDD3]/95 backdrop-blur-md py-4 border-y border-[#D5C9BE]/60">
+          <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
+            {/* Search Input */}
+            <div className="relative w-full lg:max-w-md">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#E85F57] w-4 h-4" />
               <input 
-                className="w-full pl-12 pr-4 py-3 bg-white border-0 border-b border-[#cac6b9]/40 focus:ring-0 focus:border-[#635f41] text-sm text-[#1c1b19] placeholder-gray-400" 
-                placeholder="Search by name or keyword..." 
+                className="w-full pl-11 pr-4 py-3 bg-white/80 border border-[#D5C9BE] rounded-full focus:outline-none focus:border-[#E85F57] text-xs font-mono text-[#2C2A28] placeholder-[#666361]/60 shadow-xs transition-all" 
+                placeholder="Search artists by name, role, or craft..." 
                 type="text"
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
               />
             </div>
-            <div className="flex flex-wrap gap-2 items-center w-full md:w-auto">
-              <label className="text-xs font-bold text-[#49473d] mr-2 uppercase tracking-wider">Roles:</label>
+
+            {/* Filter Pills */}
+            <div className="flex flex-wrap gap-2 items-center w-full lg:w-auto">
               {(["All", "Actor", "Director", "Design", "Production"] as const).map(role => (
                 <button 
                   key={role}
                   onClick={() => setFilter(role)}
-                  className={`px-4 py-1.5 text-xs font-bold rounded-full transition-all uppercase tracking-wider ${
+                  className={`px-5 py-2.5 text-xs font-mono font-bold rounded-full transition-all uppercase tracking-wider ${
                     filter === role 
-                      ? "bg-[#635f41] text-white shadow-sm" 
-                      : "bg-[#c6e4f7] text-[#2e4a5a] hover:bg-[#c6e4f7]/80"
+                      ? "bg-[#2C2A28] text-white shadow-md" 
+                      : "bg-white/60 text-[#666361] hover:bg-white border border-[#D5C9BE]/60"
                   }`}
                 >
                   {role}
@@ -278,46 +243,69 @@ export default function Directory() {
           </div>
         </section>
 
-        {/* Member Grid */}
-        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredMembers.map((member, index) => (
-            <div key={index} className="group bg-white border border-[#cac6b9]/25 overflow-hidden rounded-2xl shadow-sm hover:border-[#635f41]/25 transition-all duration-300 flex flex-col justify-between">
+        {/* Member Grid (Magazine / Editorial Style Cards) */}
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-7">
+          {filteredMembers.map((member) => (
+            <div 
+              key={member.id} 
+              className="group bg-[#2C2A28] text-white border border-[#353535] rounded-[2rem] overflow-hidden shadow-xl hover:border-[#E85F57]/50 hover:shadow-2xl transition-all duration-300 flex flex-col justify-between"
+            >
               <div>
-                <div className="relative aspect-[4/5] overflow-hidden bg-[#f7f3ee]">
+                {/* Profile Photo */}
+                <div className="relative aspect-[4/5] overflow-hidden bg-[#353535]">
                   <img 
-                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 hover:scale-105" 
+                    className="w-full h-full object-cover object-top filter grayscale group-hover:grayscale-0 transition-all duration-700 hover:scale-105 brightness-90 contrast-105" 
                     alt={member.name} 
                     src={member.image}
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = "/aayam_assets/profiles/utkarsh_yuuhi.jpg";
+                    }}
                   />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#2C2A28] via-[#2C2A28]/20 to-transparent" />
+                  
                   {member.isFeatured && (
                     <div className="absolute top-4 right-4">
-                      <span className="bg-[#fff9d2] border border-[#635f41]/20 text-[#635f41] text-[10px] uppercase tracking-widest px-3 py-1 font-bold rounded flex items-center gap-1 shadow-md">
-                        <Star className="w-3 h-3 fill-[#635f41]" /> Featured
+                      <span className="bg-[#2C2A28]/90 border border-[#E85F57]/40 text-[#E85F57] text-[9px] font-mono uppercase tracking-widest px-3 py-1 font-bold rounded-full flex items-center gap-1 shadow-md backdrop-blur-md">
+                        <Star className="w-3 h-3 fill-[#E85F57]" /> Council
                       </span>
                     </div>
                   )}
-                </div>
-                <div className="p-6">
-                  <div className="flex flex-col gap-1 mb-4">
-                    <h3 className="font-serif text-xl font-bold text-[#1c1b19] group-hover:text-[#635f41] transition-colors">{member.name}</h3>
-                    <span className="text-xs font-bold text-[#466272] tracking-widest uppercase">{member.role}</span>
+
+                  <div className="absolute bottom-3 left-5 right-5">
+                    <span className="text-[10px] font-mono font-bold text-[#E85F57] tracking-widest uppercase block mb-1">
+                      {member.roleType}
+                    </span>
+                    <h3 className="font-serif text-2xl font-normal text-[#F7F5F0] group-hover:text-[#E85F57] transition-colors leading-snug">
+                      {member.name}
+                    </h3>
                   </div>
-                  <p className="text-sm text-[#49473d] leading-relaxed line-clamp-3 font-light">
+                </div>
+
+                {/* Details */}
+                <div className="p-6 space-y-3">
+                  <div className="text-xs font-mono text-white/60 pb-2 border-b border-white/10">
+                    {member.role}
+                  </div>
+                  <p className="text-xs text-white/70 leading-relaxed line-clamp-3 font-light">
                     {member.description}
                   </p>
                 </div>
               </div>
+
+              {/* Action Button */}
               <div className="p-6 pt-0">
                 <Link 
                   to={`/profile/${member.id}`} 
-                  className="w-full py-3 bg-[#635f41] text-white hover:bg-[#635f41]/90 font-bold text-xs uppercase tracking-wider block text-center rounded-xl shadow-md transition-all active:scale-95"
+                  className="w-full py-3 bg-[#E85F57] hover:bg-[#D94538] text-white font-bold text-xs font-mono uppercase tracking-widest block text-center rounded-full shadow-md transition-all active:scale-95 flex items-center justify-center gap-2"
                 >
-                  View Portfolio
+                  <span>View Portfolio</span>
+                  <ArrowUpRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
             </div>
           ))}
         </section>
+
       </main>
     </div>
   );

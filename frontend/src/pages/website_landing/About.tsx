@@ -1,226 +1,260 @@
 // @ts-nocheck
 import React from "react";
-import { Link } from "react-router-dom";
-import { Sparkles, Users, BookOpen, HeartHandshake, ArrowRight, Compass, Theater, Mail, ExternalLink, ShieldCheck } from "lucide-react";
+import { Link, useOutletContext } from "react-router-dom";
+import { Sparkles, Users, BookOpen, HeartHandshake, ArrowRight, Compass, Theater, Mail, ExternalLink, Quote, Flame, Eye, Landmark, MoveRight, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 
 export default function About() {
+  const contextData = useOutletContext<any>() || {};
+  const activeUser = contextData.activeUser || JSON.parse(sessionStorage.getItem("aayam_active_user") || "null");
+
+  const auditionPath = activeUser 
+    ? (activeUser.role?.includes("Maintainer") || activeUser.role?.includes("Secretary") || activeUser.role?.includes("Chief") ? "/auditions-admin" : "/auditions")
+    : "/join";
+
   return (
-    <div className="min-h-screen bg-[#fdf9f4] text-[#466272] font-sans pb-20">
-      {/* Hero Section - Warm Aayam Theme */}
-      <section className="bg-[#f7f3ee] border-b border-[#e6e2dd] py-20 md:py-28 px-6 md:px-12">
-        <div className="max-w-5xl mx-auto space-y-8 text-center md:text-left">
-          <div className="inline-flex items-center gap-2 bg-[#635f41]/10 border border-[#635f41]/20 rounded-full px-4 py-1.5 text-xs text-[#635f41] font-mono uppercase tracking-widest">
-            <Sparkles className="w-3.5 h-3.5 text-[#635f41]" /> The Manifesto | About Aayam
+    <div className="min-h-screen bg-[#E7DDD3] text-[#2C2A28] font-sans pb-24 selection:bg-[#F8E8E4]">
+      
+      {/* 1. MANIFESTO HERO HEADER WITH IMAGE */}
+      <section className="relative pt-32 pb-24 md:pt-40 md:pb-32 px-6 md:px-12 overflow-hidden border-b border-[#D5C9BE]/40">
+        <div className="absolute inset-0 z-0">
+          <img src="/aayam_assets/aayam_site_img_1.jpg" alt="Aayam Hero" className="w-full h-full object-cover opacity-20 object-center mix-blend-multiply" />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#E7DDD3]/80 via-[#E7DDD3]/95 to-[#E7DDD3]" />
+        </div>
+        
+        <div className="max-w-6xl mx-auto space-y-8 relative z-10 text-center flex flex-col items-center">
+          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-[#E85F57]/15 text-[#E85F57] text-xs font-mono font-bold uppercase tracking-widest border border-[#E85F57]/30">
+            <span className="w-2 h-2 rounded-full bg-[#E85F57] animate-pulse" />
+            <span>FOUNDING TREATISE // AAYAM 2026</span>
           </div>
 
-          <h1 className="text-4xl md:text-6xl font-bold font-serif tracking-tight leading-tight text-[#635f41]">
+          <h1 className="text-5xl sm:text-7xl md:text-8xl font-normal font-serif tracking-tight leading-[0.92] text-[#2C2A28] max-w-4xl mx-auto">
             We do not just act. <br />
-            <span className="text-[#8CC0EB] italic font-normal">We inhabit.</span>
+            <span className="italic font-serif font-light text-[#E85F57]">We inhabit.</span>
           </h1>
 
-          <p className="text-base md:text-xl text-[#466272] max-w-3xl leading-relaxed font-light">
-            Read our philosophy and open a channel. Aayam is the official drama society of IIT Madras BS. We cultivate character, street satire, and dramatic storytelling across physical courtyards and proscenium auditoriums.
+          <p className="text-base sm:text-xl text-[#666361] max-w-2xl mx-auto leading-relaxed font-normal">
+            Aayam is the archival theatrical collective of IIT Madras BS. We exist to reclaim the raw physical vitality of the stage — fusing visceral street satire with the intellectual weight of classical tragedy.
           </p>
 
-          <div className="pt-4 flex flex-wrap gap-4 justify-center md:justify-start">
-            <Link to="/directory">
-              <Button className="bg-[#8CC0EB] hover:bg-[#8CC0EB]/90 text-[#001e2c] font-bold rounded-lg px-6 py-3 text-sm transition-all active:scale-95 shadow-sm flex items-center gap-2">
-                <Users className="w-4 h-4 text-[#001e2c]" /> Explore Ensemble Roster
-              </Button>
-            </Link>
-            <Link to="/plays">
-              <Button variant="outline" className="border border-[#e6e2dd] bg-white text-[#635f41] hover:bg-[#f7f3ee] rounded-lg px-6 py-3 text-sm font-semibold transition-all">
-                Staged Productions <ArrowRight className="w-4 h-4 ml-1 text-[#635f41]" />
-              </Button>
+          <div className="pt-8 flex flex-wrap gap-4 items-center justify-center w-full">
+            <Link
+              to="/plays"
+              className="bg-[#E85F57] text-white hover:bg-[#D94538] px-9 py-4 rounded-full text-xs font-bold uppercase tracking-widest shadow-md hover:shadow-xl active:scale-95 transition-all flex items-center gap-2.5 group"
+            >
+              <span>Explore Theatrical Works</span>
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Core Philosophy & Pillars */}
-      <section className="py-20 px-6 md:px-12 max-w-6xl mx-auto space-y-16">
-        <div className="text-center space-y-4 max-w-2xl mx-auto">
-          <Badge className="bg-[#635f41] text-white border-0 uppercase tracking-widest text-[10px] font-bold px-3 py-1">
-            Artistic Pillars
-          </Badge>
-          <h2 className="text-3xl md:text-4xl font-bold font-serif text-[#635f41]">The Philosophy of Aayam</h2>
-          <p className="text-sm text-[#466272] leading-relaxed font-light">
-            Four core tenets defining our creative vision, character building, and theatrical productions.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {/* Pillar 1 */}
-          <div className="bg-white border border-[#e6e2dd] p-8 rounded-2xl space-y-4 hover:border-[#635f41] transition-all hover:shadow-md">
-            <div className="w-12 h-12 rounded-xl bg-[#635f41]/10 text-[#635f41] flex items-center justify-center font-bold">
-              <Theater className="w-6 h-6 text-[#635f41]" />
+      {/* 2. THE MANIFESTO TREATISE (EDITORIAL ESSAY) WITH SPLIT LAYOUT */}
+      <section className="py-24 px-6 md:px-12 max-w-7xl mx-auto space-y-16 border-b border-[#D5C9BE]/40">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          <div className="space-y-8">
+            <div className="space-y-3">
+              <span className="text-xs font-mono font-bold uppercase tracking-widest text-[#E85F57]">
+                ARTICLE I // CONVICTION
+              </span>
+              <h3 className="font-serif text-4xl md:text-5xl font-normal text-[#2C2A28] leading-snug">
+                The Stage as an Arena of Truth
+              </h3>
             </div>
-            <h3 className="text-xl font-bold font-serif text-[#635f41]">Street Satire</h3>
-            <p className="text-xs text-[#466272] leading-relaxed font-light">
-              High-impact Nukkad Natak street theatre. Breaking barriers in open courtyards to trigger social awareness and dialogue.
-            </p>
+
+            <div className="space-y-6 text-sm md:text-lg text-[#666361] leading-relaxed font-light">
+              <p>
+                In an era dominated by transient digital feeds and passive consumption, live dramaturgy remains the singular space where human beings gather in real space, breathing identical air, witnessing real vulnerability without a safety net.
+              </p>
+              <p>
+                We reject sterile imitation. Whether performing in the unvarnished dust of the Student Activity Centre courtyard for a <em>Nukkad Natak</em>, or under the calibrated spotlights of the Central Lecture Theatre, every actor at Aayam is trained to dissolve self-consciousness into the character’s moral spine.
+              </p>
+              <p className="font-medium text-[#2C2A28]">
+                Theatre is not a mirror reflecting society; it is a hammer shaping it. We build that hammer through relentless rehearsal, intellectual rigor, and an uncompromising dedication to the ensemble.
+              </p>
+            </div>
           </div>
-
-          {/* Pillar 2 */}
-          <div className="bg-white border border-[#e6e2dd] p-8 rounded-2xl space-y-4 hover:border-[#635f41] transition-all hover:shadow-md">
-            <div className="w-12 h-12 rounded-xl bg-[#8CC0EB]/20 text-[#001e2c] flex items-center justify-center font-bold">
-              <BookOpen className="w-6 h-6 text-[#001e2c]" />
-            </div>
-            <h3 className="text-xl font-bold font-serif text-[#635f41]">Classical Weight</h3>
-            <p className="text-xs text-[#466272] leading-relaxed font-light">
-              Respecting classical drama, verse tragedy, and moral dilemmas performed on stage with intensity and authenticity.
-            </p>
-          </div>
-
-          {/* Pillar 3 */}
-          <div className="bg-white border border-[#e6e2dd] p-8 rounded-2xl space-y-4 hover:border-[#635f41] transition-all hover:shadow-md">
-            <div className="w-12 h-12 rounded-xl bg-[#635f41]/10 text-[#635f41] flex items-center justify-center font-bold">
-              <Compass className="w-6 h-6 text-[#635f41]" />
-            </div>
-            <h3 className="text-xl font-bold font-serif text-[#635f41]">Physical Expression</h3>
-            <p className="text-xs text-[#466272] leading-relaxed font-light">
-              Synchronized movement, rhythmic breathwork, and body language balancing the visual rhythm of the ensemble.
-            </p>
-          </div>
-
-          {/* Pillar 4 */}
-          <div className="bg-white border border-[#e6e2dd] p-8 rounded-2xl space-y-4 hover:border-[#635f41] transition-all hover:shadow-md">
-            <div className="w-12 h-12 rounded-xl bg-[#8CC0EB]/20 text-[#001e2c] flex items-center justify-center font-bold">
-              <HeartHandshake className="w-6 h-6 text-[#001e2c]" />
-            </div>
-            <h3 className="text-xl font-bold font-serif text-[#635f41]">Inclusive Platform</h3>
-            <p className="text-xs text-[#466272] leading-relaxed font-light">
-              Welcoming student actors, scriptwriters, directors, prop designers, sound engineers, and production leads nationwide.
-            </p>
+          
+          <div className="relative">
+             <div className="aspect-[4/5] overflow-hidden rounded-3xl shadow-2xl">
+               <img src="/aayam_assets/aayam_site_img_2.jpg" alt="Aayam Performance" className="w-full h-full object-cover filter contrast-125 brightness-90" />
+             </div>
+             <div className="absolute -bottom-10 -left-10 bg-[#2C2A28] text-white p-8 rounded-3xl border border-[#353535] shadow-2xl max-w-sm hidden md:block">
+               <Quote className="w-8 h-8 text-[#E85F57] opacity-80 mb-4" />
+               <p className="font-serif text-lg leading-relaxed">"Theatre does not exist to comfort our certainties. It exists to dismantle them."</p>
+             </div>
           </div>
         </div>
       </section>
 
-      {/* Ensemble Lineage & Executive Leadership */}
-      <section className="py-16 px-6 md:px-12 max-w-6xl mx-auto space-y-12">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-[#e6e2dd] pb-8">
+      {/* 3. FOUR CORE ARTISTIC DOCTRINES (ENHANCED) */}
+      <section className="py-24 px-6 md:px-12 max-w-7xl mx-auto space-y-16 border-b border-[#D5C9BE]/40">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 text-center md:text-left">
+          <div className="max-w-2xl">
+            <div className="inline-flex items-center gap-2 text-xs font-mono font-semibold uppercase tracking-widest text-[#E85F57] mb-3">
+              <span>ARTICLE II // PILLARS</span>
+            </div>
+            <h2 className="font-serif text-4xl md:text-6xl font-normal text-[#2C2A28] tracking-tight">
+              Artistic Doctrines
+            </h2>
+            <p className="mt-4 text-[#666361] text-lg">The foundational methodologies that govern our rehearsal spaces and stagecraft.</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {[
+            { id: "01", title: "Street Satire", desc: "High-impact Nukkad Natak street theatre. We break formal boundaries by using the natural resonance of dholak beats, choral sync, and biting satire.", img: "/aayam_assets/tamashbin_1.jpg", icon: Theater, tag: "NATAK" },
+            { id: "02", title: "Classical Weight", desc: "Rigorous script analysis and classical verse performance. We honor historical tragedies, ethical dilemmas, and multi-layered proscenium narratives.", img: "/aayam_assets/kky_1.jpg", icon: BookOpen, tag: "SAHITYA" },
+            { id: "03", title: "Physical Expression", desc: "Movement is dialogue. From Navarasa facial control to synchronized ensemble stage blocking, we construct compelling spatial tableaux.", img: "/aayam_assets/samatvam_1.jpg", icon: Compass, tag: "ABHINAYA" },
+            { id: "04", title: "Collaborative Craft", desc: "An inclusive home for student actors, scriptwriters, directors, light technicians, costume designers, and cultural patrons.", img: "/aayam_assets/dddj_1.jpg", icon: HeartHandshake, tag: "SANGHA" }
+          ].map((doc, idx) => (
+            <div key={idx} className="group bg-[#2C2A28] text-white border border-[#353535] rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 flex flex-col md:flex-row">
+              <div className="md:w-2/5 aspect-square md:aspect-auto overflow-hidden">
+                <img src={doc.img} alt={doc.title} className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-700" />
+              </div>
+              <div className="p-8 md:p-10 space-y-4 md:w-3/5 flex flex-col justify-center">
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-xs text-[#E85F57] font-bold tracking-widest">{doc.id} // {doc.tag}</span>
+                  <doc.icon className="w-5 h-5 text-white/40" />
+                </div>
+                <h3 className="text-2xl font-normal font-serif text-[#F7F5F0]">{doc.title}</h3>
+                <p className="text-sm text-white/70 leading-relaxed font-light">
+                  {doc.desc}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* 4. EXECUTIVE COMMITTEE & GOVERNANCE */}
+      <section className="py-24 px-6 md:px-12 max-w-7xl mx-auto space-y-12">
+        <div className="flex flex-col md:flex-row justify-between items-center md:items-end gap-6 border-b border-[#D5C9BE]/40 pb-8 text-center md:text-left">
           <div className="space-y-2">
-            <Badge className="bg-[#8CC0EB] text-[#001e2c] border-0 font-bold text-[10px] uppercase tracking-wider">
-              Ensemble Leadership
-            </Badge>
-            <h2 className="text-3xl font-bold font-serif text-[#635f41]">Executive Committee (2024–2025)</h2>
+            <div className="inline-flex items-center justify-center md:justify-start gap-2 text-xs font-mono font-semibold uppercase tracking-widest text-[#E85F57]">
+              <span>EXECUTIVE GOVERNANCE</span>
+            </div>
+            <h2 className="text-4xl md:text-6xl font-normal font-serif text-[#2C2A28] tracking-tight">
+              Directorial Council
+            </h2>
           </div>
-          <Link to="/directory" className="text-xs font-bold text-[#8CC0EB] hover:text-[#635f41] flex items-center gap-1">
-            View Complete Ensemble Directory <ArrowRight className="w-4 h-4" />
+          <Link to="/directory" className="text-xs font-bold text-[#2C2A28] hover:text-[#E85F57] uppercase tracking-widest flex items-center gap-1.5 transition-colors bg-white/40 px-6 py-3 rounded-full border border-[#353535]/10 hover:bg-[#2C2A28] hover:text-white">
+            <span>View Ensemble Directory</span> <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {/* Abay */}
-          <div className="bg-white border border-[#e6e2dd] rounded-xl overflow-hidden p-6 space-y-4 shadow-xs">
-            <img src="/aayam_assets/profiles/utkarsh_yuuhi.jpg" alt="Abay Nandhiga" className="w-full h-48 object-cover rounded-lg" />
+          <div className="bg-[#2C2A28] text-white border border-[#353535] rounded-3xl overflow-hidden p-6 space-y-4 shadow-xl hover:border-[#E85F57]/50 transition-all">
+            <img src="/aayam_assets/profiles/utkarsh_yuuhi.jpg" alt="Abay Nandhiga" className="w-full h-56 object-cover object-top rounded-2xl filter brightness-90 contrast-105" />
             <div>
-              <h4 className="font-bold font-serif text-lg text-[#635f41]">Abay Nandhiga</h4>
-              <span className="text-xs font-semibold text-[#8CC0EB] block">Secretary Aayam</span>
+              <h4 className="font-normal font-serif text-xl text-[#F7F5F0]">Abay Nandhiga</h4>
+              <span className="text-[10px] font-mono font-semibold text-[#E85F57] uppercase tracking-wider block">Secretary Aayam</span>
             </div>
-            <p className="text-xs text-[#466272] leading-relaxed font-light">
+            <p className="text-xs text-white/70 leading-relaxed font-light">
               Directing play runs, managing society governance, and inter-collegiate drama festival tours.
             </p>
           </div>
 
           {/* Yuuhi */}
-          <div className="bg-white border border-[#e6e2dd] rounded-xl overflow-hidden p-6 space-y-4 shadow-xs">
-            <img src="/aayam_assets/profiles/abay_nandhiga.jpg" alt="Yuuhi" className="w-full h-48 object-cover rounded-lg" />
+          <div className="bg-[#2C2A28] text-white border border-[#353535] rounded-3xl overflow-hidden p-6 space-y-4 shadow-xl hover:border-[#E85F57]/50 transition-all">
+            <img src="/aayam_assets/profiles/abay_nandhiga.jpg" alt="Yuuhi" className="w-full h-56 object-cover object-top rounded-2xl filter brightness-90 contrast-105" />
             <div>
-              <h4 className="font-bold font-serif text-lg text-[#635f41]">Yuuhi</h4>
-              <span className="text-xs font-semibold text-[#8CC0EB] block">Deputy Secretary</span>
+              <h4 className="font-normal font-serif text-xl text-[#F7F5F0]">Yuuhi</h4>
+              <span className="text-[10px] font-mono font-semibold text-[#E85F57] uppercase tracking-wider block">Deputy Secretary</span>
             </div>
-            <p className="text-xs text-[#466272] leading-relaxed font-light">
+            <p className="text-xs text-white/70 leading-relaxed font-light">
               Lead street theatre performer, Nukkad Natak director, and acting masterclass facilitator.
             </p>
           </div>
 
           {/* Samarth */}
-          <div className="bg-white border border-[#e6e2dd] rounded-xl overflow-hidden p-6 space-y-4 shadow-xs">
-            <img src="/aayam_assets/profiles/samarth_shrivastava.jpg" alt="Samarth Shrivastava" className="w-full h-48 object-cover rounded-lg" />
+          <div className="bg-[#2C2A28] text-white border border-[#353535] rounded-3xl overflow-hidden p-6 space-y-4 shadow-xl hover:border-[#E85F57]/50 transition-all">
+            <img src="/aayam_assets/profiles/samarth_shrivastava.jpg" alt="Samarth Shrivastava" className="w-full h-56 object-cover object-top rounded-2xl filter brightness-90 contrast-105" />
             <div>
-              <h4 className="font-bold font-serif text-lg text-[#635f41]">Samarth Shrivastava</h4>
-              <span className="text-xs font-semibold text-[#8CC0EB] block">Chief Coordinator</span>
+              <h4 className="font-normal font-serif text-xl text-[#F7F5F0]">Samarth Shrivastava</h4>
+              <span className="text-[10px] font-mono font-semibold text-[#E85F57] uppercase tracking-wider block">Chief Coordinator</span>
             </div>
-            <p className="text-xs text-[#466272] leading-relaxed font-light">
+            <p className="text-xs text-white/70 leading-relaxed font-light">
               Overseeing stage production logistics, venue allocations, and auditorium technical setups.
             </p>
           </div>
 
           {/* Swati */}
-          <div className="bg-white border border-[#e6e2dd] rounded-xl overflow-hidden p-6 space-y-4 shadow-xs">
-            <img src="/aayam_assets/profiles/swati_singh.jpg" alt="Swati Singh" className="w-full h-48 object-cover rounded-lg" />
+          <div className="bg-[#2C2A28] text-white border border-[#353535] rounded-3xl overflow-hidden p-6 space-y-4 shadow-xl hover:border-[#E85F57]/50 transition-all">
+            <img src="/aayam_assets/profiles/swati_singh.jpg" alt="Swati Singh" className="w-full h-56 object-cover object-top rounded-2xl filter brightness-90 contrast-105" />
             <div>
-              <h4 className="font-bold font-serif text-lg text-[#635f41]">Swati Singh</h4>
-              <span className="text-xs font-semibold text-[#8CC0EB] block">Content & Web Lead</span>
+              <h4 className="font-normal font-serif text-xl text-[#F7F5F0]">Swati Singh</h4>
+              <span className="text-[10px] font-mono font-semibold text-[#E85F57] uppercase tracking-wider block">Content & Web Lead</span>
             </div>
-            <p className="text-xs text-[#466272] leading-relaxed font-light">
+            <p className="text-xs text-white/70 leading-relaxed font-light">
               Managing digital archives, web portal infrastructure, and official script publications.
             </p>
           </div>
         </div>
       </section>
 
-      {/* Official Channels & Contact */}
-      <section className="bg-[#f7f3ee] border-t border-[#e6e2dd] py-20 px-6 md:px-12">
-        <div className="max-w-4xl mx-auto text-center space-y-8">
-          <Badge className="bg-[#635f41] text-white border-0 font-bold uppercase tracking-widest text-[10px] px-3 py-1">
-            Open Channel
-          </Badge>
-          <h2 className="text-3xl md:text-5xl font-bold font-serif text-[#635f41]">Connect With Aayam Drama Society</h2>
-          <p className="text-sm md:text-base text-[#466272] max-w-2xl mx-auto leading-relaxed font-light">
-            Follow our rehearsal logs, watch performance highlights, or reach out to the executive team.
-          </p>
+      {/* 5. OFFICIAL CHANNELS & AUDITIONS CTA */}
+      <section className="px-6 md:px-12 pt-12 pb-12">
+        <div className="max-w-7xl mx-auto bg-[#2C2A28] text-white rounded-[3rem] p-12 md:p-24 text-center space-y-8 border border-[#353535] shadow-2xl relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-full bg-[url('/aayam_assets/aayam_site_img_3.jpg')] opacity-10 bg-cover bg-center mix-blend-screen pointer-events-none" />
+          
+          <div className="relative z-10">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#E85F57]/20 text-[#E85F57] text-[10px] font-mono font-bold uppercase tracking-widest border border-[#E85F57]/30 mb-6">
+              <span>OFFICIAL DESK // REACH OUT</span>
+            </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-3xl mx-auto pt-4">
-            <a 
-              href="https://www.instagram.com/iitmbs_dramasociety" 
-              target="_blank" 
-              rel="noreferrer"
-              className="bg-white border border-[#e6e2dd] hover:border-[#635f41] p-4 rounded-xl flex items-center justify-center gap-3 text-xs font-semibold text-[#466272] hover:text-[#635f41] transition-all shadow-xs"
-            >
-              <svg className="w-4 h-4 text-[#8CC0EB]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="20" height="20" rx="5" ry="5" strokeWidth="2"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z" strokeWidth="2"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5" strokeWidth="2"/></svg> Instagram <ExternalLink className="w-3 h-3 opacity-60" />
-            </a>
+            <h2 className="text-4xl md:text-7xl font-normal font-serif text-[#F7F5F0] tracking-tight max-w-3xl mx-auto leading-tight">
+              Step Into the Circle
+            </h2>
 
-            <a 
-              href="https://www.youtube.com/@AayamIITMBSDramaSociety" 
-              target="_blank" 
-              rel="noreferrer"
-              className="bg-white border border-[#e6e2dd] hover:border-[#635f41] p-4 rounded-xl flex items-center justify-center gap-3 text-xs font-semibold text-[#466272] hover:text-[#635f41] transition-all shadow-xs"
-            >
-              <svg className="w-4 h-4 text-red-500" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg> YouTube <ExternalLink className="w-3 h-3 opacity-60" />
-            </a>
+            <p className="text-base md:text-xl text-white/70 max-w-2xl mx-auto leading-relaxed font-light mt-6 mb-12">
+              Whether you are an aspiring actor, seasoned scriptwriter, or backstage coordinator — your voice belongs on the stage. Join the ensemble.
+            </p>
 
-            <a 
-              href="https://linktr.ee/aayamdramasociety" 
-              target="_blank" 
-              rel="noreferrer"
-              className="bg-white border border-[#e6e2dd] hover:border-[#635f41] p-4 rounded-xl flex items-center justify-center gap-3 text-xs font-semibold text-[#466272] hover:text-[#635f41] transition-all shadow-xs"
-            >
-              <ExternalLink className="w-4 h-4 text-emerald-600" /> Linktree
-            </a>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-3xl mx-auto mb-10">
+              <a 
+                href="https://www.instagram.com/iitmbs_dramasociety" 
+                target="_blank" 
+                rel="noreferrer"
+                className="bg-[#353535]/80 hover:bg-[#E85F57] border border-white/10 hover:border-transparent p-4 rounded-2xl flex flex-col items-center justify-center gap-2 text-xs font-mono text-white/80 hover:text-white transition-all shadow-xs group"
+              >
+                <ExternalLink className="w-5 h-5 text-[#E85F57] group-hover:text-white mb-1" /> Instagram
+              </a>
 
-            <a 
-              href="mailto:drama.society@study.iitm.ac.in" 
-              className="bg-white border border-[#e6e2dd] hover:border-[#635f41] p-4 rounded-xl flex items-center justify-center gap-3 text-xs font-semibold text-[#466272] hover:text-[#635f41] transition-all shadow-xs"
-            >
-              <Mail className="w-4 h-4 text-[#635f41]" /> Official Email
-            </a>
-          </div>
+              <a 
+                href="https://www.youtube.com/@AayamIITMBSDramaSociety" 
+                target="_blank" 
+                rel="noreferrer"
+                className="bg-[#353535]/80 hover:bg-[#E85F57] border border-white/10 hover:border-transparent p-4 rounded-2xl flex flex-col items-center justify-center gap-2 text-xs font-mono text-white/80 hover:text-white transition-all shadow-xs group"
+              >
+                <ExternalLink className="w-5 h-5 text-[#E85F57] group-hover:text-white mb-1" /> YouTube
+              </a>
 
-          <div className="pt-6 flex flex-wrap gap-4 justify-center">
-            <Link to="/auditions">
-              <Button className="bg-[#8CC0EB] text-[#001e2c] hover:bg-[#8CC0EB]/90 font-bold px-8 py-3 rounded-lg text-sm transition-all shadow-sm">
-                Apply for Auditions
-              </Button>
-            </Link>
-            <Link to="/events">
-              <Button variant="outline" className="border border-[#e6e2dd] bg-white text-[#635f41] hover:bg-[#f7f3ee] px-8 py-3 rounded-lg text-sm font-semibold transition-all">
-                Attend Workshops
-              </Button>
-            </Link>
+              <a 
+                href="https://linktr.ee/aayamdramasociety" 
+                target="_blank" 
+                rel="noreferrer"
+                className="bg-[#353535]/80 hover:bg-[#E85F57] border border-white/10 hover:border-transparent p-4 rounded-2xl flex flex-col items-center justify-center gap-2 text-xs font-mono text-white/80 hover:text-white transition-all shadow-xs group"
+              >
+                <ExternalLink className="w-5 h-5 text-[#E85F57] group-hover:text-white mb-1" /> Linktree
+              </a>
+
+              <a 
+                href="mailto:drama.society@study.iitm.ac.in" 
+                className="bg-[#353535]/80 hover:bg-[#E85F57] border border-white/10 hover:border-transparent p-4 rounded-2xl flex flex-col items-center justify-center gap-2 text-xs font-mono text-white/80 hover:text-white transition-all shadow-xs group"
+              >
+                <Mail className="w-5 h-5 text-[#E85F57] group-hover:text-white mb-1" /> Email
+              </a>
+            </div>
+
+            <div className="flex flex-wrap gap-4 justify-center">
+              <Link to={auditionPath}>
+                <Button className="bg-[#E85F57] hover:bg-white hover:text-[#E85F57] text-white font-bold px-10 py-6 rounded-full text-sm uppercase tracking-widest transition-all shadow-xl active:scale-95">
+                  {activeUser ? "Auditions & Casting Portal" : "Apply for Auditions"}
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </section>

@@ -227,7 +227,7 @@ export default function ComplianceLedger() {
                         <div className="mt-6 flex justify-end">
                             <button
                                 onClick={triggerAuditScan}
-                                className="bg-[#635f41] text-white rounded-lg py-2 px-6 font-sans text-xs font-semibold hover:opacity-90 transition-opacity"
+                                className="bg-[#353535] text-white rounded-lg py-2 px-6 font-sans text-xs font-semibold hover:opacity-90 transition-opacity"
                             >
                                 Run Full Audit Scan
                             </button>
@@ -364,7 +364,7 @@ export default function ComplianceLedger() {
                                                 <td className="py-4 px-6 font-semibold text-primary">{trx.event}</td>
                                                 <td className="py-4 px-6 font-medium">{trx.member}</td>
                                                 <td className="py-4 px-6 text-on-surface-variant">{trx.type}</td>
-                                                <td className={`py-4 px-6 text-right font-medium ${trx.amount < 0 ? "text-[#ba1a1a]" : "text-[#635f41]"}`}>
+                                                <td className={`py-4 px-6 text-right font-medium ${trx.amount < 0 ? "text-[#ba1a1a]" : "text-[#353535]"}`}>
                                                     {trx.amount < 0 ? "-" : "+"}${Math.abs(trx.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                                 </td>
                                                 <td className="py-4 px-6 text-center">
@@ -404,7 +404,7 @@ export default function ComplianceLedger() {
                             <button className="w-8 h-8 rounded hover:bg-surface-container font-sans text-xs font-semibold flex items-center justify-center text-on-surface">3</button>
                             <span className="px-2 text-xs font-semibold text-outline">...</span>
                             <button className="w-8 h-8 rounded hover:bg-surface-container font-sans text-xs font-semibold flex items-center justify-center text-on-surface">42</button>
-                            <button className="p-1 rounded hover:bg-surface-container text-[#1c1b19] flex items-center justify-center">
+                            <button className="p-1 rounded hover:bg-surface-container text-[#2C2A28] flex items-center justify-center">
                                 <ChevronRight className="w-4 h-4" />
                             </button>
                         </div>
@@ -415,12 +415,12 @@ export default function ComplianceLedger() {
             {/* Scan Simulation Dialog Frame */}
             {isScanning && (
                 <div className="fixed inset-0 bg-[#31302d]/45 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <div className="bg-[#fdf9f4] border border-[#cac6b9]/60 rounded-xl p-8 max-w-sm w-full shadow-2xl flex flex-col items-center justify-center text-center">
-                        <Loader2 className="w-10 h-10 text-[#635f41] animate-spin mb-4" />
-                        <h3 className="font-serif font-bold text-base text-[#635f41]">Run Compliance Audit Scan</h3>
-                        <p className="text-xs text-[#49473d]/80 mt-2 h-6 animate-pulse font-mono">{scanText}</p>
-                        <div className="w-full bg-[#cac6b9]/30 h-1 rounded-full mt-4 overflow-hidden">
-                            <div className="h-full bg-[#635f41] rounded-full animate-loading-bar" style={{ width: '100%' }}></div>
+                    <div className="bg-[#E7DDD3] border border-[#D5C9BE]/60 rounded-xl p-8 max-w-sm w-full shadow-2xl flex flex-col items-center justify-center text-center">
+                        <Loader2 className="w-10 h-10 text-[#353535] animate-spin mb-4" />
+                        <h3 className="font-serif font-bold text-base text-[#353535]">Run Compliance Audit Scan</h3>
+                        <p className="text-xs text-[#666361]/80 mt-2 h-6 animate-pulse font-mono">{scanText}</p>
+                        <div className="w-full bg-[#D5C9BE]/30 h-1 rounded-full mt-4 overflow-hidden">
+                            <div className="h-full bg-[#353535] rounded-full animate-loading-bar" style={{ width: '100%' }}></div>
                         </div>
                     </div>
                 </div>
@@ -429,17 +429,17 @@ export default function ComplianceLedger() {
             {/* Scan Completed Success Dialogue */}
             {showScanComplete && (
                 <div className="fixed inset-0 bg-[#31302d]/45 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <div className="bg-[#fdf9f4] border border-[#cac6b9]/60 rounded-xl p-6 max-w-sm w-full shadow-2xl flex flex-col items-center">
+                    <div className="bg-[#E7DDD3] border border-[#D5C9BE]/60 rounded-xl p-6 max-w-sm w-full shadow-2xl flex flex-col items-center">
                         <div className="w-10 h-10 rounded-full bg-emerald-50 border border-emerald-250 text-emerald-600 flex items-center justify-center mb-3">
                             <CheckCircle2 className="w-5 h-5 text-emerald-650" />
                         </div>
                         <h3 className="font-serif font-bold text-base text-emerald-800 text-center">Scan Assessment Complete</h3>
-                        <p className="text-xs text-[#49473d]/90 text-center mt-2 leading-relaxed">
+                        <p className="text-xs text-[#666361]/90 text-center mt-2 leading-relaxed">
                             Audit check performed across 248 transaction items. All compliance checkpoints matched successfully.
                         </p>
                         <Button
                             onClick={() => setShowScanComplete(false)}
-                            className="bg-[#635f41] hover:bg-[#635f41]/90 text-white font-bold text-xs w-full py-2.5 mt-5 rounded-lg border border-amber-900/10"
+                            className="bg-[#353535] hover:bg-[#353535]/90 text-white font-bold text-xs w-full py-2.5 mt-5 rounded-lg border border-amber-900/10"
                         >
                             Back To Ledger Dashboard
                         </Button>
@@ -450,19 +450,19 @@ export default function ComplianceLedger() {
             {/* Anomaly Details Inspect Modal */}
             {activeAnomalyDetail && (
                 <div className="fixed inset-0 bg-[#31302d]/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <div className="bg-white border border-[#cac6b9]/60 rounded-xl max-w-md w-full shadow-2xl overflow-hidden flex flex-col">
+                    <div className="bg-white border border-[#D5C9BE]/60 rounded-xl max-w-md w-full shadow-2xl overflow-hidden flex flex-col">
 
                         {/* Title Bar */}
-                        <div className="bg-[#f7f3ee] px-6 py-4 border-b border-[#cac6b9]/40 flex items-center justify-between">
+                        <div className="bg-[#EFE8E1] px-6 py-4 border-b border-[#D5C9BE]/40 flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <FileWarning className="w-4 h-4 text-[#ba1a1a]" />
-                                <h3 className="font-serif font-bold text-xs uppercase tracking-wider text-[#49473d]">Compliance Audit Verification</h3>
+                                <h3 className="font-serif font-bold text-xs uppercase tracking-wider text-[#666361]">Compliance Audit Verification</h3>
                             </div>
                             <button
                                 onClick={() => setActiveAnomalyDetail(null)}
-                                className="p-1 hover:bg-[#cac6b9]/20 rounded-full transition-colors"
+                                className="p-1 hover:bg-[#D5C9BE]/20 rounded-full transition-colors"
                             >
-                                <X className="w-4 h-4 text-[#49473d]" />
+                                <X className="w-4 h-4 text-[#666361]" />
                             </button>
                         </div>
 
@@ -475,21 +475,21 @@ export default function ComplianceLedger() {
                                     }`}>
                                     Severity: {activeAnomalyDetail.severity}
                                 </span>
-                                <h4 className="font-serif text-base font-bold text-[#1c1b19] mt-2">{activeAnomalyDetail.title}</h4>
-                                <p className="text-xs text-[#49473d] mt-1 leading-relaxed">{activeAnomalyDetail.description}</p>
+                                <h4 className="font-serif text-base font-bold text-[#2C2A28] mt-2">{activeAnomalyDetail.title}</h4>
+                                <p className="text-xs text-[#666361] mt-1 leading-relaxed">{activeAnomalyDetail.description}</p>
                             </div>
 
                             {/* Metadata */}
-                            <div className="bg-[#fcf9f5] border border-[#cac6b9]/30 rounded-lg p-3 text-xs space-y-2">
+                            <div className="bg-[#fcf9f5] border border-[#D5C9BE]/30 rounded-lg p-3 text-xs space-y-2">
                                 <div className="flex justify-between">
                                     <span className="text-[#7a776c] font-semibold">Flagged Item:</span>
-                                    <span className="font-mono font-bold text-[#1c1b19]">{activeAnomalyDetail.trxId}</span>
+                                    <span className="font-mono font-bold text-[#2C2A28]">{activeAnomalyDetail.trxId}</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-[#7a776c] font-semibold">Trigger Rule:</span>
-                                    <span className="text-[#49473d] text-right font-medium max-w-[200px]">{activeAnomalyDetail.rule}</span>
+                                    <span className="text-[#666361] text-right font-medium max-w-[200px]">{activeAnomalyDetail.rule}</span>
                                 </div>
-                                <div className="flex justify-between border-t border-[#cac6b9]/15 pt-2">
+                                <div className="flex justify-between border-t border-[#D5C9BE]/15 pt-2">
                                     <span className="text-[#7a776c] font-semibold">Matched Account:</span>
                                     <span className="font-semibold text-primary">
                                         {transactions.find(t => t.id === activeAnomalyDetail.trxId)?.member || "System Account"}
@@ -510,10 +510,10 @@ export default function ComplianceLedger() {
                         </div>
 
                         {/* Actions buttons */}
-                        <div className="bg-[#fcf9f5] border-t border-[#cac6b9]/25 p-4 flex gap-3">
+                        <div className="bg-[#fcf9f5] border-t border-[#D5C9BE]/25 p-4 flex gap-3">
                             <button
                                 onClick={() => setActiveAnomalyDetail(null)}
-                                className="flex-grow border border-[#cac6b9] text-xs font-semibold py-2 px-3 hover:bg-[#e6e2dd]/40 rounded-lg transition-colors text-[#1c1b19]"
+                                className="flex-grow border border-[#D5C9BE] text-xs font-semibold py-2 px-3 hover:bg-[#DDD8CE]/40 rounded-lg transition-colors text-[#2C2A28]"
                             >
                                 Cancel
                             </button>
@@ -527,7 +527,7 @@ export default function ComplianceLedger() {
                                     </button>
                                     <button
                                         onClick={() => handleResolveAnomaly(activeAnomalyDetail, 'upload')}
-                                        className="bg-[#635f41] hover:bg-[#635f41]/90 text-white font-bold text-xs py-2 px-3 rounded-lg transition-colors"
+                                        className="bg-[#353535] hover:bg-[#353535]/90 text-white font-bold text-xs py-2 px-3 rounded-lg transition-colors"
                                     >
                                         Upload Receipt
                                     </button>
@@ -535,14 +535,14 @@ export default function ComplianceLedger() {
                             ) : activeAnomalyDetail.title === "Duplicate Entry Warning" ? (
                                 <button
                                     onClick={() => handleResolveAnomaly(activeAnomalyDetail, 'merge')}
-                                    className="flex-grow bg-[#635f41] hover:bg-[#635f41]/90 text-white font-bold text-xs py-2 px-3 rounded-lg transition-colors"
+                                    className="flex-grow bg-[#353535] hover:bg-[#353535]/90 text-white font-bold text-xs py-2 px-3 rounded-lg transition-colors"
                                 >
                                     Merge Items
                                 </button>
                             ) : (
                                 <button
                                     onClick={() => handleResolveAnomaly(activeAnomalyDetail, 'dismiss')}
-                                    className="flex-grow bg-[#635f41] hover:bg-[#635f41]/90 text-white font-bold text-xs py-2 px-3 rounded-lg transition-colors"
+                                    className="flex-grow bg-[#353535] hover:bg-[#353535]/90 text-white font-bold text-xs py-2 px-3 rounded-lg transition-colors"
                                 >
                                     Dismiss Flag
                                 </button>
@@ -554,7 +554,7 @@ export default function ComplianceLedger() {
 
             {/* Dynamic bottom toast block */}
             {toastMessage && (
-                <div className="fixed bottom-6 right-6 bg-[#31302d] text-white border border-[#cac6b9]/30 rounded-xl px-5 py-3.5 shadow-2xl z-50 flex items-center gap-3 animate-slide-in max-w-sm">
+                <div className="fixed bottom-6 right-6 bg-[#31302d] text-white border border-[#D5C9BE]/30 rounded-xl px-5 py-3.5 shadow-2xl z-50 flex items-center gap-3 animate-slide-in max-w-sm">
                     <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0" />
                     <span className="text-[11px] font-semibold leading-normal">{toastMessage}</span>
                 </div>

@@ -128,50 +128,50 @@ export default function ProductionGallery() {
     : media.filter(item => item.category === categoryFilter);
 
   return (
-    <div className="space-y-[32px] font-sans text-[#466272]">
+    <div className="space-y-[32px] font-sans text-[#666361]">
       {/* Gallery Title Block */}
-      <div className="bg-[#f7f3ee] border border-[#e6e2dd] rounded-[8px] p-[24px] md:p-[32px] flex flex-col md:flex-row justify-between items-start md:items-center gap-[24px] mb-[32px] md:mb-[48px]">
+      <div className="bg-[#E7DDD3] border border-[#D5C9BE]/70 rounded-xl p-[24px] md:p-[32px] flex flex-col md:flex-row justify-between items-start md:items-center gap-[24px] mb-[32px] md:mb-[48px]">
         <div className="space-y-[8px]">
-          <span className="text-xs uppercase tracking-widest text-[#466272]/70 font-semibold">Media Center</span>
-          <h2 className="text-[32px] font-bold font-serif text-[#635f41]">Gallery</h2>
-          <p className="text-[14px] text-[#466272]">
+          <span className="text-xs uppercase tracking-widest text-[#666361]/70 font-semibold">Media Center</span>
+          <h2 className="text-[32px] font-bold font-serif text-[#2C2A28]">Gallery</h2>
+          <p className="text-[14px] text-[#666361]">
             Visual archive of live stage snapshots, backstage wardrobe fittings, and active scene rehearsals.
           </p>
         </div>
         
         <Dialog open={uploadOpen} onOpenChange={setUploadOpen}>
-          <DialogTrigger render={<Button className="bg-[#8CC0EB] hover:bg-[#8CC0EB]/90 text-[#1c1b19] font-semibold rounded-[8px] py-[10px] px-[20px] gap-2 shadow-sm transition-all active:scale-95" />}>
+          <DialogTrigger render={<Button className="bg-[#E85F57] hover:bg-[#E85F57]/90 text-[#2C2A28] font-semibold rounded-xl py-[10px] px-[20px] gap-2 shadow-sm transition-all active:scale-95" />}>
             <Upload className="w-4 h-4" /> Upload Stage Photo
           </DialogTrigger>
-          <DialogContent className="bg-[#fdf9f4] border border-[#e6e2dd] text-[#466272] max-w-md">
+          <DialogContent className="bg-[#E7DDD3] border border-[#D5C9BE]/70 text-[#666361] max-w-md">
             <form onSubmit={handleUploadSubmit}>
               <DialogHeader>
-                <DialogTitle className="font-serif text-[#635f41] text-lg font-bold flex items-center gap-2">
-                  <ImageIcon className="w-5 h-5 text-[#8CC0EB]" /> Upload Stage Photo
+                <DialogTitle className="font-serif text-[#2C2A28] text-lg font-bold flex items-center gap-2">
+                  <ImageIcon className="w-5 h-5 text-[#E85F57]" /> Upload Stage Photo
                 </DialogTitle>
-                <DialogDescription className="text-xs text-[#466272]/85">
+                <DialogDescription className="text-xs text-[#666361]/85">
                   Share behind-the-scenes memories or workspace progress with the club.
                 </DialogDescription>
               </DialogHeader>
               
               <div className="py-4 space-y-4 text-left">
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-[#635f41]">Photo Title</label>
+                  <label className="text-xs font-semibold text-[#2C2A28]">Photo Title</label>
                   <Input 
                     placeholder="e.g., Apparition Makeup Fitting" 
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    className="border-[#e6e2dd] focus-visible:ring-[#8CC0EB] text-xs h-9 bg-white"
+                    className="border-[#D5C9BE]/70 focus-visible:ring-[#E85F57] text-xs h-9 bg-[#F7F5F0]"
                     required
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-[#635f41] block mb-1">Category / Area</label>
+                  <label className="text-xs font-semibold text-[#2C2A28] block mb-1">Category / Area</label>
                   <select 
                     value={category} 
                     onChange={(e) => setCategory(e.target.value as any)}
-                    className="w-full border border-[#e6e2dd] rounded-[8px] bg-white text-xs p-2 h-9 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#8CC0EB]"
+                    className="w-full border border-[#D5C9BE]/70 rounded-xl bg-[#F7F5F0] text-xs p-2 h-9 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#E85F57]"
                   >
                     <option value="Rehearsals">Rehearsals</option>
                     <option value="Live Show">Live Show</option>
@@ -180,21 +180,21 @@ export default function ProductionGallery() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-[#635f41]">Photographer / Contributor</label>
+                  <label className="text-xs font-semibold text-[#2C2A28]">Photographer / Contributor</label>
                   <Input 
                     value={photographer}
                     onChange={(e) => setPhotographer(e.target.value)}
-                    className="border-[#e6e2dd] focus-visible:ring-[#8CC0EB] text-xs h-9 bg-white"
+                    className="border-[#D5C9BE]/70 focus-visible:ring-[#E85F57] text-xs h-9 bg-[#F7F5F0]"
                     required
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-[#635f41] block mb-1">Select Stage Memory Template</label>
+                  <label className="text-xs font-semibold text-[#2C2A28] block mb-1">Select Stage Memory Template</label>
                   <select 
                     value={imageUrl} 
                     onChange={(e) => setImageUrl(e.target.value)}
-                    className="w-full border border-[#e6e2dd] rounded-[8px] bg-white text-xs p-2 h-9 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#8CC0EB]"
+                    className="w-full border border-[#D5C9BE]/70 rounded-xl bg-[#F7F5F0] text-xs p-2 h-9 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#E85F57]"
                   >
                     {presetImages.map((img, i) => (
                       <option key={i} value={img.url}>{img.label}</option>
@@ -204,10 +204,10 @@ export default function ProductionGallery() {
               </div>
               
               <DialogFooter className="gap-2">
-                <Button type="button" variant="outline" onClick={() => setUploadOpen(false)} className="border-2 border-[#8CC0EB] text-[#8CC0EB] hover:bg-[#8CC0EB]/5 rounded-[8px] text-xs">
+                <Button type="button" variant="outline" onClick={() => setUploadOpen(false)} className="border-2 border-[#E85F57] text-[#E85F57] hover:bg-[#E85F57]/5 rounded-xl text-xs">
                   Cancel
                 </Button>
-                <Button type="submit" className="bg-[#8CC0EB] text-[#1c1b19] hover:bg-[#8CC0EB]/90 rounded-[8px] font-semibold text-xs">
+                <Button type="submit" className="bg-[#E85F57] text-[#2C2A28] hover:bg-[#E85F57]/90 rounded-xl font-semibold text-xs">
                   Upload Photo
                 </Button>
               </DialogFooter>
@@ -217,17 +217,17 @@ export default function ProductionGallery() {
       </div>
 
       {/* Categories Filtering */}
-      <div className="flex flex-wrap gap-[12px] items-center border-b border-[#e6e2dd]/80 pb-4 mb-[24px]">
-        <Filter className="w-4 h-4 text-[#635f41]" />
+      <div className="flex flex-wrap gap-[12px] items-center border-b border-[#D5C9BE]/70/80 pb-4 mb-[24px]">
+        <Filter className="w-4 h-4 text-[#2C2A28]" />
         {(["All", "Rehearsals", "Live Show", "Backstage"] as const).map((cat) => (
           <Button
             key={cat}
             variant={categoryFilter === cat ? "default" : "outline"}
             onClick={() => setCategoryFilter(cat)}
-            className={`rounded-[8px] font-semibold text-xs py-1.5 px-4 transition-all ${
+            className={`rounded-xl font-semibold text-xs py-1.5 px-4 transition-all ${
               categoryFilter === cat
-                ? "bg-[#8CC0EB] text-[#1c1b19] hover:bg-[#8CC0EB]/90"
-                : "border-2 border-[#e6e2dd] text-[#466272] hover:bg-[#f7f3ee]"
+                ? "bg-[#E85F57] text-[#2C2A28] hover:bg-[#E85F57]/90"
+                : "border-2 border-[#D5C9BE]/70 text-[#666361] hover:bg-[#E7DDD3]"
             }`}
           >
             {cat}
@@ -238,7 +238,7 @@ export default function ProductionGallery() {
       {/* Image Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[24px]">
         {filteredMedia.map((item) => (
-          <div key={item.id} className="bg-[#f7f3ee] border border-[#e6e2dd] rounded-[8px] overflow-hidden flex flex-col justify-between transition-all hover:shadow-md hover:border-[#8CC0EB]/40 group">
+          <div key={item.id} className="bg-[#E7DDD3] border border-[#D5C9BE]/70 rounded-xl overflow-hidden flex flex-col justify-between transition-all hover:shadow-md hover:border-[#E85F57]/40 group">
             {/* Image Wrapper */}
             <div className="relative aspect-video overflow-hidden bg-gray-100">
               <img
@@ -246,7 +246,7 @@ export default function ProductionGallery() {
                 alt={item.title}
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
-              <Badge className="absolute top-3 left-3 bg-[#fdf9f4] border border-[#e6e2dd] text-[#635f41] hover:bg-[#fdf9f4]/90 rounded-[4px]">
+              <Badge className="absolute top-3 left-3 bg-[#E7DDD3] border border-[#D5C9BE]/70 text-[#2C2A28] hover:bg-[#E7DDD3]/90 rounded-[4px]">
                 {item.category}
               </Badge>
             </div>
@@ -254,21 +254,21 @@ export default function ProductionGallery() {
             {/* Info Body */}
             <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
               <div className="space-y-1">
-                <h4 className="font-bold text-[16px] text-[#635f41] font-serif group-hover:text-[#8CC0EB] transition-colors">
+                <h4 className="font-bold text-[16px] text-[#2C2A28] font-serif group-hover:text-[#E85F57] transition-colors">
                   {item.title}
                 </h4>
-                <p className="text-xs text-[#466272]/70">Photo by {item.photographer}</p>
+                <p className="text-xs text-[#666361]/70">Photo by {item.photographer}</p>
               </div>
 
-              <div className="flex justify-between items-center border-t border-[#e6e2dd]/60 pt-3">
-                <span className="text-xs text-[#466272]/70 font-semibold">{item.likes} Likes</span>
+              <div className="flex justify-between items-center border-t border-[#D5C9BE]/70/60 pt-3">
+                <span className="text-xs text-[#666361]/70 font-semibold">{item.likes} Likes</span>
                 <div className="flex gap-1">
                   <Button
                     size="sm"
                     variant="ghost"
                     onClick={() => handleLike(item.id)}
                     className={`h-8 px-2.5 rounded-[4px] gap-1.5 transition-colors ${
-                      item.liked ? "text-red-500 hover:text-red-600 bg-red-50" : "text-[#466272]/70 hover:text-red-500 hover:bg-red-50"
+                      item.liked ? "text-red-500 hover:text-red-600 bg-red-50" : "text-[#666361]/70 hover:text-red-500 hover:bg-red-50"
                     }`}
                   >
                     <Heart className={`w-4 h-4 ${item.liked ? "fill-current" : ""}`} />
@@ -278,7 +278,7 @@ export default function ProductionGallery() {
                     size="sm"
                     variant="ghost"
                     onClick={() => handleDownload(item.imageUrl, item.title)}
-                    className="h-8 px-2.5 rounded-[4px] gap-1.5 text-[#466272]/70 hover:text-[#8CC0EB] hover:bg-[#8CC0EB]/10 transition-colors"
+                    className="h-8 px-2.5 rounded-[4px] gap-1.5 text-[#666361]/70 hover:text-[#E85F57] hover:bg-[#E85F57]/10 transition-colors"
                     title="Download high-resolution image"
                   >
                     <Download className="w-4 h-4" />
