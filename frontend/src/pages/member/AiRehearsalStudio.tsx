@@ -216,7 +216,7 @@ export default function AiRehearsalStudio() {
   const activeTurnRef = useRef<any | null>(null);
   const micBlockedRef = useRef(false);
 
-  // Scroll to top on route / scene changes
+  // Scroll to top on route / view changes
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "instant" });
   }, [scriptId, session ? 1 : 0, isSceneFinished]);
@@ -264,7 +264,7 @@ export default function AiRehearsalStudio() {
     setIsSceneFinished(false);
   };
 
-  // Gracefully stop everything and navigate back to rehearsal catalog
+  // Exit rehearsal and return to repertoire view
   const handleExitRehearsal = async () => {
     stopListening();
     if (audioPlayerRef.current) {
@@ -289,7 +289,7 @@ export default function AiRehearsalStudio() {
     }
 
     clearRehearsalState();
-    navigate("/ai-rehearsal", { replace: false });
+    navigate("/ai-rehearsal", { replace: true });
     window.scrollTo({ top: 0, left: 0, behavior: "instant" });
   };
 
@@ -334,7 +334,7 @@ export default function AiRehearsalStudio() {
       return;
     }
     if (!scriptId) {
-      if (activeScript && location.pathname === "/ai-rehearsal") {
+      if (location.pathname === "/ai-rehearsal") {
         clearRehearsalState();
       } else {
         setActiveScript(null);
@@ -929,10 +929,10 @@ export default function AiRehearsalStudio() {
       tierLabel = "Mastery — Opening Night Ready";
       tierColor = "emerald";
     } else if (wordAccuracy >= 70) {
-      tierLabel = "Proficient — Strong Delivery";
+      tierLabel = "Proficient — Strong Stage Presence";
       tierColor = "emerald";
     } else if (wordAccuracy >= 45) {
-      tierLabel = "In Progress — Needs Polish";
+      tierLabel = "In Rehearsal — Line Polish Recommended";
       tierColor = "amber";
     }
 
@@ -959,6 +959,7 @@ export default function AiRehearsalStudio() {
         {/* TOP BAR */}
         <header className="flex items-center justify-between gap-4 px-2 pt-2">
           <button
+            type="button"
             onClick={handleExitRehearsal}
             className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider text-[#8C5A54] hover:text-[#8C241E] transition-colors cursor-pointer"
           >
@@ -971,25 +972,30 @@ export default function AiRehearsalStudio() {
         </header>
 
         {/* PERFORMANCE SUMMARY CARD */}
-        <section className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-[3rem] p-8 sm:p-12 shadow-sm relative text-center space-y-8">
+        <section className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-[3rem] p-8 sm:p-12 shadow-xs relative text-center space-y-8">
           
-          <div className="space-y-3">
-            <div className="w-16 h-16 rounded-full bg-emerald-700/15 border border-emerald-700/30 flex items-center justify-center mx-auto text-emerald-900 shadow-2xs">
+          <div className="space-y-3.5">
+            <div className="w-16 h-16 rounded-full bg-emerald-700/15 border border-emerald-700/30 flex items-center justify-center mx-auto text-emerald-900 shadow-xs">
               <Award className="w-8 h-8" />
             </div>
             
             <div className="space-y-1">
               <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#8C5A54]">
-                Scene Rehearsal Concluded
+                Aayam Rehearsal Assessment · Call Sheet Debrief
               </span>
-              <h1 className="font-serif text-3xl sm:text-4xl text-[#2A1816] font-normal tracking-tight">
+              <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl text-[#2A1816] font-normal tracking-tight">
                 {currentTitle}
               </h1>
+              {activeScript?.playwright && (
+                <p className="text-xs font-serif italic text-[#6E4742] pt-0.5">
+                  by {activeScript.playwright}
+                </p>
+              )}
             </div>
 
             {/* THEATRICAL VERDICT BADGE */}
-            <div className="pt-1">
-              <span className={`inline-flex items-center gap-2 px-5 py-2 rounded-full font-mono text-xs font-bold uppercase tracking-widest border ${
+            <div className="pt-2">
+              <span className={`inline-flex items-center gap-2 px-6 py-2 rounded-full font-mono text-xs font-bold uppercase tracking-widest border ${
                 reportMetrics.tierColor === "emerald"
                   ? "bg-emerald-700/15 text-emerald-900 border-emerald-700/30"
                   : "bg-amber-700/15 text-amber-950 border-amber-700/30"
@@ -1002,68 +1008,68 @@ export default function AiRehearsalStudio() {
 
           {/* 4 SUMMARY METRIC CARDS */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5 text-left">
-            <div className="bg-gradient-to-b from-[#F5EAE6] to-[#EEDBD5] border border-[#DEBEB7] rounded-2xl p-4 space-y-1 shadow-2xs">
-              <span className="text-[10px] font-mono uppercase text-[#8C5A54] block">
+            <div className="bg-gradient-to-br from-[#F5EAE6] to-[#EEDBD5] border border-[#DEBEB7] rounded-2xl p-5 space-y-1 shadow-2xs">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54] block">
                 Word Accuracy
               </span>
-              <div className="font-serif text-3xl text-[#2A1816] font-normal">
+              <div className="font-serif text-3xl sm:text-4xl text-[#2A1816] font-normal tracking-tight">
                 {reportMetrics.wordAccuracy}%
               </div>
-              <span className="text-[9px] font-mono text-[#8C5A54] block">
-                {reportMetrics.totalSpokenMatchedWords} / {reportMetrics.totalExpectedWords || 1} words
+              <span className="text-[10px] font-mono text-[#8C5A54] block">
+                {reportMetrics.totalSpokenMatchedWords} / {reportMetrics.totalExpectedWords || 1} tokens
               </span>
             </div>
 
-            <div className="bg-gradient-to-b from-[#F5EAE6] to-[#EEDBD5] border border-[#DEBEB7] rounded-2xl p-4 space-y-1 shadow-2xs">
-              <span className="text-[10px] font-mono uppercase text-[#8C5A54] block">
+            <div className="bg-gradient-to-br from-[#F5EAE6] to-[#EEDBD5] border border-[#DEBEB7] rounded-2xl p-5 space-y-1 shadow-2xs">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54] block">
                 Accurate Cues
               </span>
-              <div className="font-serif text-3xl text-[#2A1816] font-normal">
+              <div className="font-serif text-3xl sm:text-4xl text-[#2A1816] font-normal tracking-tight">
                 {reportMetrics.accuratelyDelivered}
               </div>
-              <span className="text-[9px] font-mono text-[#8C5A54] block">
+              <span className="text-[10px] font-mono text-[#8C5A54] block">
                 of {reportMetrics.totalLines} actor cues
               </span>
             </div>
 
-            <div className="bg-gradient-to-b from-[#F5EAE6] to-[#EEDBD5] border border-[#DEBEB7] rounded-2xl p-4 space-y-1 shadow-2xs">
-              <span className="text-[10px] font-mono uppercase text-[#8C5A54] block">
+            <div className="bg-gradient-to-br from-[#F5EAE6] to-[#EEDBD5] border border-[#DEBEB7] rounded-2xl p-5 space-y-1 shadow-2xs">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54] block">
                 Skipped Lines
               </span>
-              <div className="font-serif text-3xl text-[#2A1816] font-normal">
+              <div className="font-serif text-3xl sm:text-4xl text-[#2A1816] font-normal tracking-tight">
                 {reportMetrics.skippedLines}
               </div>
-              <span className="text-[9px] font-mono text-[#8C5A54] block">
-                forwarded without speech
+              <span className="text-[10px] font-mono text-[#8C5A54] block">
+                forwarded lines
               </span>
             </div>
 
-            <div className="bg-gradient-to-b from-[#F5EAE6] to-[#EEDBD5] border border-[#DEBEB7] rounded-2xl p-4 space-y-1 shadow-2xs">
-              <span className="text-[10px] font-mono uppercase text-[#8C5A54] block">
-                Dialogue Cues
+            <div className="bg-gradient-to-br from-[#F5EAE6] to-[#EEDBD5] border border-[#DEBEB7] rounded-2xl p-5 space-y-1 shadow-2xs">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54] block">
+                Scene Coverage
               </span>
-              <div className="font-serif text-3xl text-[#2A1816] font-normal">
+              <div className="font-serif text-3xl sm:text-4xl text-[#2A1816] font-normal tracking-tight">
                 {displayScene.turns?.length || 0}
               </div>
-              <span className="text-[9px] font-mono text-[#8C5A54] block">
-                full scene parsed
+              <span className="text-[10px] font-mono text-[#8C5A54] block">
+                cues rehearsed
               </span>
             </div>
           </div>
 
           {/* PER-LINE PERFORMANCE LOG */}
-          <div className="text-left space-y-3 pt-2">
-            <div className="flex items-center justify-between border-b border-[#DCBAB2]/70 pb-2">
-              <h3 className="font-serif text-base text-[#2A1816] font-normal flex items-center gap-2">
+          <div className="text-left space-y-3.5 pt-2">
+            <div className="flex items-center justify-between border-b border-[#DCBAB2]/70 pb-3">
+              <h3 className="font-serif text-lg text-[#2A1816] font-normal flex items-center gap-2">
                 <BarChart3 className="w-4 h-4 text-[#8C241E]" />
-                <span>Actor Line Delivery Breakdown</span>
+                <span>Actor Line Delivery Ledger</span>
               </h3>
-              <span className="text-[10px] font-mono text-[#8C5A54]">
+              <span className="text-[10px] font-mono uppercase font-bold text-[#8C5A54]">
                 Word Timing & Accuracy
               </span>
             </div>
 
-            <div className="space-y-2.5 max-h-[320px] overflow-y-auto custom-scrollbar pr-1">
+            <div className="space-y-3 max-h-[340px] overflow-y-auto custom-scrollbar pr-1">
               {(displayScene.turns || [])
                 .filter((turn: any) => assignments[turn.character] === "human")
                 .map((turn: any, idx: number) => {
@@ -1075,40 +1081,40 @@ export default function AiRehearsalStudio() {
                   return (
                     <div
                       key={turn.id || idx}
-                      className="bg-[#F5EAE6] border border-[#DCBAB2] rounded-2xl p-4 space-y-2 text-left shadow-2xs"
+                      className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-2xl p-5 space-y-3 text-left shadow-2xs"
                     >
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2">
-                          <span className="font-serif font-bold text-xs text-[#2A1816]">
+                          <span className="font-serif font-bold text-sm text-[#2A1816]">
                             {turn.character}
                           </span>
-                          <span className="text-[9px] font-mono text-[#8C5A54]">
+                          <span className="text-[10px] font-mono text-[#8C5A54]">
                             Cue #{idx + 1}
                           </span>
                         </div>
 
-                        <span className={`text-[10px] font-mono font-bold uppercase px-2.5 py-0.5 rounded-full border ${
+                        <span className={`text-[10px] font-mono font-bold uppercase px-3 py-1 rounded-full border ${
                           isSkipped
-                            ? "bg-rose-100 text-rose-900 border-rose-300"
+                            ? "bg-rose-700/15 text-rose-900 border-rose-700/30"
                             : accuracy >= 70
                               ? "bg-emerald-700/15 text-emerald-900 border-emerald-700/30"
                               : "bg-amber-700/15 text-amber-950 border-amber-700/30"
                         }`}>
-                          {isSkipped ? "Skipped Line" : `${accuracy}% Spoken Accuracy`}
+                          {isSkipped ? "Skipped Cue" : `${accuracy}% Spoken Accuracy`}
                         </span>
                       </div>
 
                       {/* Line with word matching highlight */}
-                      <p className="font-serif text-sm leading-relaxed text-[#2A1816]">
+                      <p className="font-serif text-base sm:text-lg leading-relaxed text-[#2A1816]">
                         {(turn.words || turn.text.split(/\s+/)).map((w: string, wIdx: number) => {
                           const isMatched = matchedIndices.includes(wIdx);
                           return (
                             <span
                               key={`${w}-${wIdx}`}
-                              className={`inline-block mr-1 ${
+                              className={`inline-block mr-1.5 ${
                                 isMatched
-                                  ? "text-emerald-900 font-medium underline decoration-emerald-600/40"
-                                  : "text-[#5C3B37]"
+                                  ? "text-[#2A1816] font-medium underline decoration-emerald-700/60 decoration-2 underline-offset-4 bg-emerald-700/10 px-1 py-0.5 rounded"
+                                  : "text-[#8C5A54]/80"
                               }`}
                             >
                               {w}
@@ -1118,9 +1124,14 @@ export default function AiRehearsalStudio() {
                       </p>
 
                       {turnReport?.spokenTranscript && turnReport.spokenTranscript !== "[Skipped Line]" && (
-                        <p className="font-mono text-[10px] text-[#8C5A54] italic pt-1 border-t border-[#DCBAB2]/50">
-                          Captured Speech: "{turnReport.spokenTranscript}"
-                        </p>
+                        <div className="pt-2 border-t border-[#DCBAB2]/50 flex items-center gap-2 text-xs">
+                          <span className="font-mono text-[10px] uppercase font-bold text-[#8C5A54]">
+                            Captured Speech:
+                          </span>
+                          <span className="font-serif italic text-xs text-[#5C3B37]">
+                            "{turnReport.spokenTranscript}"
+                          </span>
+                        </div>
                       )}
                     </div>
                   );
@@ -1129,8 +1140,9 @@ export default function AiRehearsalStudio() {
           </div>
 
           {/* ACTION BUTTONS */}
-          <div className="flex flex-wrap items-center justify-center gap-3 pt-4 border-t border-[#DCBAB2]/70">
+          <div className="flex flex-wrap items-center justify-center gap-3.5 pt-4 border-t border-[#DCBAB2]/70">
             <button
+              type="button"
               onClick={startSession}
               className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-8 py-3.5 rounded-full font-mono text-xs font-bold uppercase tracking-widest border border-[#A6352F] shadow-md shadow-[#8C241E]/20 flex items-center gap-2 cursor-pointer transition-transform hover:scale-102"
             >
@@ -1139,8 +1151,9 @@ export default function AiRehearsalStudio() {
             </button>
 
             <button
+              type="button"
               onClick={handleExitRehearsal}
-              className="px-6 py-3.5 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-2 transition-colors cursor-pointer"
+              className="px-7 py-3.5 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-2 transition-colors cursor-pointer shadow-2xs"
             >
               <BookOpen className="w-4 h-4 text-[#8C241E]" />
               <span>Back to Repertoire</span>
@@ -1163,6 +1176,7 @@ export default function AiRehearsalStudio() {
         {/* MINIMALIST TOP NAV & SCENE HEADER */}
         <header className="flex items-center justify-between gap-4 px-2 pt-2">
           <button
+            type="button"
             onClick={handleExitRehearsal}
             className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider text-[#8C5A54] hover:text-[#8C241E] transition-colors cursor-pointer"
             title="Stop rehearsal and return to repertoire"
@@ -1253,6 +1267,7 @@ export default function AiRehearsalStudio() {
                     </p>
                     <div className="flex items-center justify-center gap-2 flex-wrap">
                       <button
+                        type="button"
                         onClick={startListening}
                         className="px-3.5 py-1.5 rounded-full bg-[#EEDBD5] hover:bg-[#E3CEC6] text-[#8C241E] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors cursor-pointer border border-[#D5AAA2]"
                       >
@@ -1261,6 +1276,7 @@ export default function AiRehearsalStudio() {
                       </button>
 
                       <button
+                        type="button"
                         onClick={() => handleSkipOrAdvanceCue(false)}
                         className="px-4 py-1.5 rounded-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors cursor-pointer border border-[#A6352F] shadow-xs"
                       >
@@ -1270,6 +1286,7 @@ export default function AiRehearsalStudio() {
 
                       {/* FAST FORWARD / SKIP LINE BUTTON */}
                       <button
+                        type="button"
                         onClick={() => handleSkipOrAdvanceCue(true)}
                         className="px-3.5 py-1.5 rounded-full bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors cursor-pointer border border-[#D5AAA2]"
                         title="Skip this line"
@@ -1288,6 +1305,7 @@ export default function AiRehearsalStudio() {
 
                     <div>
                       <button
+                        type="button"
                         onClick={() => handleSkipOrAdvanceCue(true)}
                         className="px-3.5 py-1.5 rounded-full bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider inline-flex items-center gap-1.5 transition-colors cursor-pointer border border-[#D5AAA2]"
                         title="Skip AI line and advance"
@@ -1307,6 +1325,7 @@ export default function AiRehearsalStudio() {
               </div>
               <h2 className="font-serif text-2xl font-normal text-[#2A1816]">Scene Concluded</h2>
               <button
+                type="button"
                 onClick={handleEndAndShowReport}
                 className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-6 py-2.5 rounded-full font-mono text-xs font-bold uppercase tracking-wider inline-flex items-center gap-2 border border-[#A6352F] cursor-pointer"
               >
@@ -1328,6 +1347,7 @@ export default function AiRehearsalStudio() {
           {!session || session.scene_status !== "active" ? (
             <>
               <button
+                type="button"
                 onClick={startSession}
                 className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-8 py-3.5 rounded-full font-mono text-xs font-bold uppercase tracking-widest border border-[#A6352F] shadow-md shadow-[#8C241E]/20 flex items-center gap-2 cursor-pointer transition-transform hover:scale-102"
               >
@@ -1336,6 +1356,7 @@ export default function AiRehearsalStudio() {
               </button>
 
               <button
+                type="button"
                 onClick={handleExitRehearsal}
                 className="px-5 py-3.5 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
               >
@@ -1346,6 +1367,7 @@ export default function AiRehearsalStudio() {
           ) : (
             <>
               <button
+                type="button"
                 onClick={stopSession}
                 className="bg-rose-900 hover:bg-rose-950 text-[#FDF8F7] px-6 py-3.5 rounded-full font-mono text-xs font-bold uppercase tracking-widest border border-rose-950 shadow-md flex items-center gap-2 cursor-pointer transition-transform hover:scale-102"
               >
@@ -1354,6 +1376,7 @@ export default function AiRehearsalStudio() {
               </button>
 
               <button
+                type="button"
                 onClick={() => handleSkipOrAdvanceCue(true)}
                 className="px-5 py-3.5 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-2 transition-colors cursor-pointer shadow-2xs"
               >
@@ -1362,6 +1385,7 @@ export default function AiRehearsalStudio() {
               </button>
 
               <button
+                type="button"
                 onClick={handleEndAndShowReport}
                 className="px-5 py-3.5 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
               >
@@ -1370,6 +1394,7 @@ export default function AiRehearsalStudio() {
               </button>
 
               <button
+                type="button"
                 onClick={handleExitRehearsal}
                 className="px-5 py-3.5 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
                 title="Stop rehearsal and return to repertoire"
@@ -1381,6 +1406,7 @@ export default function AiRehearsalStudio() {
           )}
 
           <button
+            type="button"
             onClick={() => setShowCastConfig(!showCastConfig)}
             className="px-5 py-3.5 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
           >
@@ -1390,6 +1416,7 @@ export default function AiRehearsalStudio() {
           </button>
 
           <button
+            type="button"
             onClick={() => {
               setSession(null);
               if (activeScript) parseScript(activeScript);
@@ -1561,6 +1588,7 @@ export default function AiRehearsalStudio() {
 
         <div className="flex flex-wrap items-center gap-2.5 shrink-0">
           <button
+            type="button"
             onClick={parseDemoScript}
             disabled={parsing}
             className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-4 py-2 rounded-xl font-mono text-xs font-bold uppercase tracking-wider border border-[#A6352F] shadow-xs flex items-center gap-1.5 cursor-pointer transition-colors"
@@ -1570,6 +1598,7 @@ export default function AiRehearsalStudio() {
           </button>
 
           <button
+            type="button"
             onClick={() => navigate("/member/scripts")}
             className="px-4 py-2 rounded-xl border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors cursor-pointer"
           >
@@ -1604,6 +1633,7 @@ export default function AiRehearsalStudio() {
                       {script.genre || "Drama"}
                     </span>
                     <button
+                      type="button"
                       onClick={(e) => togglePinScript(script.id, e)}
                       className="text-[#8C241E] p-0.5"
                       title="Unpin Script"
@@ -1676,6 +1706,7 @@ export default function AiRehearsalStudio() {
                 >
                   <div className="flex items-center gap-2 min-w-0">
                     <button
+                      type="button"
                       onClick={(e) => togglePinScript(script.id, e)}
                       className="p-1 rounded-full text-[#8C5A54] hover:text-[#8C241E] transition-colors cursor-pointer shrink-0"
                       title={isPinned ? "Unpin script" : "Pin script to top"}
@@ -1713,6 +1744,7 @@ export default function AiRehearsalStudio() {
                     </div>
 
                     <button
+                      type="button"
                       onClick={() => navigate(`/ai-rehearsal/${script.id}`)}
                       className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-3 py-1.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs border border-[#A6352F]"
                     >
@@ -1827,6 +1859,7 @@ export default function AiRehearsalStudio() {
               </div>
 
               <button
+                type="button"
                 onClick={startSession}
                 className="w-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] py-2.5 rounded-xl font-mono text-xs font-bold uppercase tracking-widest border border-[#A6352F] shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all"
               >
@@ -1874,6 +1907,7 @@ export default function AiRehearsalStudio() {
                 </div>
 
                 <button
+                  type="button"
                   onClick={() => parseScript()}
                   disabled={parsing}
                   className="w-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] py-2.5 rounded-xl font-mono text-xs font-bold uppercase tracking-wider border border-[#A6352F] shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all disabled:opacity-50"
