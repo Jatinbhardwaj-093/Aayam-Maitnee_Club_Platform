@@ -60,6 +60,7 @@ export default function ProductionEditModal({
   const [imageFileName, setImageFileName] = useState<string>("");
   const [imageFileSize, setImageFileSize] = useState<string>("");
   const [isDraggingImage, setIsDraggingImage] = useState<boolean>(false);
+  const [imageUploading, setImageUploading] = useState<boolean>(false);
 
   const [scriptUploadFileName, setScriptUploadFileName] = useState<string>("");
   const [scriptUploadSize, setScriptUploadSize] = useState<string>("");
@@ -126,10 +127,12 @@ export default function ProductionEditModal({
     }
   }, [production, isPast]);
 
-  const handleImageFile = (file: File) => {
+  // Upload image file immediately to backend → get back a server URL
+  const handleImageFile = async (file: File) => {
     if (!file) return;
-    if (!file.type.startsWith("image/")) {
-      setErrorMsg("Please provide a valid image file (PNG, JPG, WEBP, AVIF).");
+    const validTypes = ["image/png", "image/jpeg", "image/gif", "image/webp", "image/avif"];
+    if (!validTypes.includes(file.type)) {
+      setErrorMsg("Invalid file type. Use PNG, JPG, WEBP, GIF or AVIF.");
       return;
     }
 
@@ -137,26 +140,33 @@ export default function ProductionEditModal({
     const sizeKb = (file.size / 1024).toFixed(1);
     const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
     setImageFileSize(file.size > 1024 * 1024 ? `${sizeMb} MB` : `${sizeKb} KB`);
+    setImageUploading(true);
+    setErrorMsg(null);
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const result = event.target?.result as string;
-      if (result) {
-        setFormData((prev) => ({ ...prev, image: result }));
-        setErrorMsg(null);
+    try {
+      const fd = new FormData();
+      fd.append("image", file);
+      const res = await fetch("/api/upload-image", { method: "POST", body: fd });
+      const json = await res.json();
+      if (!res.ok || !json.url) {
+        throw new Error(json.error || "Upload failed");
       }
-    };
-    reader.onerror = () => {
-      setErrorMsg("Failed to read image file from device. Please try again.");
-    };
-    reader.readAsDataURL(file);
+      // Store the server-returned URL path — this is what gets saved to the DB
+      setFormData((prev) => ({ ...prev, image: json.url }));
+    } catch (err: any) {
+      setErrorMsg(`Image upload failed: ${err.message}. Please try again.`);
+      setImageFileName("");
+      setImageFileSize("");
+    } finally {
+      setImageUploading(false);
+    }
   };
 
   const handleImageInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      handleImageFile(file);
-    }
+    if (file) handleImageFile(file);
+    // Reset so same file can be picked again
+    e.target.value = "";
   };
 
   const handleScriptFile = (file: File) => {
@@ -179,24 +189,17 @@ export default function ProductionEditModal({
       };
       reader.readAsText(file);
     } else {
-      reader.onload = (event) => {
-        const result = event.target?.result as string;
-        if (result) {
-          setFormData((prev) => ({
-            ...prev,
-            script_url: result
-          }));
-        }
-      };
-      reader.readAsDataURL(file);
+      // For PDF/DOCX just note the filename; full script upload can be extended later
+      setFormData((prev) => ({
+        ...prev,
+        script_url: `/vault/scripts/${file.name}`
+      }));
     }
   };
 
   const handleScriptInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      handleScriptFile(file);
-    }
+    if (file) handleScriptFile(file);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -358,32 +361,50 @@ export default function ProductionEditModal({
 
                   {/* Drag & Drop Upload Zone */}
                   <div
-                    onClick={() => imageFileInputRef.current?.click()}
-                    onDragOver={(e) => { e.preventDefault(); setIsDraggingImage(true); }}
+                    onClick={() => !imageUploading && imageFileInputRef.current?.click()}
+                    onDragOver={(e) => { e.preventDefault(); if (!imageUploading) setIsDraggingImage(true); }}
                     onDragLeave={(e) => { e.preventDefault(); setIsDraggingImage(false); }}
                     onDrop={(e) => {
                       e.preventDefault();
                       setIsDraggingImage(false);
-                      const file = e.dataTransfer.files?.[0];
-                      if (file) handleImageFile(file);
+                      if (!imageUploading) {
+                        const file = e.dataTransfer.files?.[0];
+                        if (file) handleImageFile(file);
+                      }
                     }}
-                    className={`border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-2 ${
-                      isDraggingImage
-                        ? "border-[#8C241E] bg-[#EEDBD5] scale-[1.01]"
-                        : "border-[#DCBAB2] hover:border-[#8C241E] bg-[#F5EAE6] hover:bg-[#EEDBD5]/60"
+                    className={`border-2 border-dashed rounded-2xl p-6 text-center transition-all flex flex-col items-center justify-center gap-2 min-h-[120px] ${
+                      imageUploading
+                        ? "border-[#8C241E]/50 bg-[#EEDBD5]/50 cursor-wait"
+                        : isDraggingImage
+                          ? "border-[#8C241E] bg-[#EEDBD5] scale-[1.01] cursor-copy"
+                          : "border-[#DCBAB2] hover:border-[#8C241E] bg-[#F5EAE6] hover:bg-[#EEDBD5]/60 cursor-pointer"
                     }`}
                   >
-                    <div className="w-12 h-12 rounded-full bg-[#EEDBD5] border border-[#D5AAA2] flex items-center justify-center text-[#8C241E] shadow-xs">
-                      <Upload className="w-5 h-5" />
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-xs font-mono font-bold text-[#2A1816]">
-                        {imageFileName ? "Replace Image File" : "Choose Image File from Computer"}
-                      </p>
-                      <p className="text-[11px] text-[#8C5A54] font-light">
-                        Drag & drop here or click to browse (PNG, JPG, WEBP, AVIF)
-                      </p>
-                    </div>
+                    {imageUploading ? (
+                      <>
+                        <div className="w-12 h-12 rounded-full bg-[#EEDBD5] border border-[#D5AAA2] flex items-center justify-center text-[#8C241E] shadow-xs animate-pulse">
+                          <Upload className="w-5 h-5" />
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-xs font-mono font-bold text-[#8C241E]">Uploading to server…</p>
+                          <p className="text-[11px] text-[#8C5A54] font-light">{imageFileName}</p>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="w-12 h-12 rounded-full bg-[#EEDBD5] border border-[#D5AAA2] flex items-center justify-center text-[#8C241E] shadow-xs">
+                          <Upload className="w-5 h-5" />
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-xs font-mono font-bold text-[#2A1816]">
+                            {imageFileName ? "Replace Image File" : "Choose Image File from Computer"}
+                          </p>
+                          <p className="text-[11px] text-[#8C5A54] font-light">
+                            Drag & drop here or click to browse · PNG, JPG, WEBP, AVIF
+                          </p>
+                        </div>
+                      </>
+                    )}
                   </div>
 
                   {/* Quick Society Archive Presets */}
@@ -723,11 +744,13 @@ export default function ProductionEditModal({
             </button>
             <button
               type="submit"
-              disabled={submitting}
+              disabled={submitting || imageUploading}
               className="px-7 py-2.5 rounded-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] text-xs font-mono font-bold uppercase tracking-widest flex items-center gap-2 cursor-pointer shadow-md shadow-[#8C241E]/20 border border-[#A6352F] disabled:opacity-50 transition-all"
             >
               <Check className="w-4 h-4 text-[#FFD0CC]" />
-              <span>{submitting ? "Saving..." : isPast ? "Save Artwork" : "Publish Production Updates"}</span>
+              <span>
+                {imageUploading ? "Uploading Image…" : submitting ? "Saving..." : isPast ? "Save Artwork" : "Publish Production Updates"}
+              </span>
             </button>
           </div>
         </div>

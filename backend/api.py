@@ -2044,6 +2044,40 @@ def upload():
 
     return jsonify(report)
 
+# ─────────────────────────────────────────────────────────
+# IMAGE UPLOAD – used by maintainer production/event edit
+# Accepts: multipart/form-data  field: "image"
+# Returns: { "url": "/uploads/images/<filename>" }
+# ─────────────────────────────────────────────────────────
+ALLOWED_IMAGE_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp', 'avif'}
+
+def _allowed_image(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_IMAGE_EXTENSIONS
+
+@api_bp.route('/upload-image', methods=['POST'])
+def upload_image():
+    if 'image' not in request.files:
+        return jsonify({'error': 'No image file provided'}), 400
+
+    file = request.files['image']
+    if file.filename == '':
+        return jsonify({'error': 'No file selected'}), 400
+
+    if not _allowed_image(file.filename):
+        return jsonify({'error': 'File type not allowed. Use PNG, JPG, WEBP, GIF or AVIF.'}), 400
+
+    filename = secure_filename(file.filename)
+    # Prepend a short timestamp to avoid name collisions
+    import time
+    unique_name = f"{int(time.time())}_{filename}"
+
+    save_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'uploads', 'images')
+    os.makedirs(save_dir, exist_ok=True)
+    file.save(os.path.join(save_dir, unique_name))
+
+    url = f"/uploads/images/{unique_name}"
+    return jsonify({'status': 'success', 'url': url}), 200
+
 # ==========================================
 # Character Extractor & SSE API Endpoints
 # ==========================================

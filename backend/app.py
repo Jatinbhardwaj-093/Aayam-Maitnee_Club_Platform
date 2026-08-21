@@ -17,7 +17,15 @@ db.init_app(app)
 # Register Blueprint
 app.register_blueprint(api_bp, url_prefix='/api')
 
-from flask import jsonify, request
+from flask import jsonify, request, send_from_directory
+
+# Serve uploaded images (e.g. production cover art uploaded via maintainer edit)
+UPLOADS_DIR = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'uploads')
+
+@app.route('/uploads/<path:filename>')
+def serve_upload(filename):
+    return send_from_directory(UPLOADS_DIR, filename)
+
 
 @app.route('/')
 def home_page():
