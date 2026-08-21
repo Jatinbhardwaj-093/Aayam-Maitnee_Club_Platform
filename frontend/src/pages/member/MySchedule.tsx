@@ -53,11 +53,23 @@ export default function MySchedule() {
         if (response.ok) {
           const data = await response.json();
           const formatted = data.map((e: any) => {
-            const parsedDate = new Date(e.date);
+            const parsedDate = e.event_date ? new Date(e.event_date) : new Date(e.date);
             const isInvalidDate = isNaN(parsedDate.getTime());
-            const eventDay = isInvalidDate
-              ? new Date()
-              : new Date(parsedDate.getFullYear(), parsedDate.getMonth(), parsedDate.getDate());
+            const year = isInvalidDate ? 2026 : parsedDate.getFullYear();
+            const month = isInvalidDate ? 7 : parsedDate.getMonth();
+            const day = isInvalidDate ? 1 : parsedDate.getDate();
+
+            let timeHours = 0;
+            let timeMinutes = 0;
+            if (e.timeRange && e.timeRange.includes(":")) {
+              const startPart = e.timeRange.split("-")[0].trim();
+              const parts = startPart.split(":").map(Number);
+              if (!isNaN(parts[0])) timeHours = parts[0];
+              if (!isNaN(parts[1])) timeMinutes = parts[1];
+            }
+
+            const eventDateTime = new Date(year, month, day, timeHours, timeMinutes);
+            const eventDay = new Date(year, month, day);
             const isPast = eventDay.getTime() < referenceToday.getTime();
 
             return {
@@ -71,6 +83,7 @@ export default function MySchedule() {
               roleRequired: e.category,
               directorNotes: e.description,
               rawDate: eventDay,
+              timestamp: eventDateTime.getTime(),
               isPast: isPast,
             };
           });
@@ -89,7 +102,7 @@ export default function MySchedule() {
       const upcomingAccepted = accepted.filter((e) => !e.isPast);
       const targetList = upcomingAccepted.length > 0 ? upcomingAccepted : accepted;
       const earliest = [...targetList].sort(
-        (a, b) => (a.rawDate?.getTime() || 0) - (b.rawDate?.getTime() || 0)
+        (a, b) => (a.timestamp || 0) - (b.timestamp || 0)
       )[0];
       if (earliest && earliest.rawDate) {
         setCalendarDate(new Date(earliest.rawDate.getFullYear(), earliest.rawDate.getMonth(), 1));
@@ -364,31 +377,23 @@ export default function MySchedule() {
         <div className="w-full space-y-3">
           
           {/* Table Header Row */}
-          <div className="hidden lg:grid grid-cols-[1.5fr_1fr_1fr_0.8fr_1.1fr] gap-4 px-5 py-2.5 bg-[#F2E5E0] rounded-2xl border border-[#DCBAB2] text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
+          {/* Table Header Row */}
+          <div className="hidden lg:grid grid-cols-[1.7fr_1.1fr_1.1fr_1.3fr] gap-4 px-5 py-2.5 bg-[#F2E5E0] rounded-2xl border border-[#DCBAB2] text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
             <div>Production & Details</div>
             <div>Date & Time</div>
             <div>Venue / Hall</div>
-            <div>Call State</div>
             <div className="text-right">
-              {scheduleView === "upcoming" ? "Your Confirmation" : "Record State"}
+              {scheduleView === "upcoming" ? "Your Attendance & Status" : "Record State"}
             </div>
           </div>
 
-          {/* Roster Items */}
+          {/* Roster Items (Sorted Chronologically in Ascending Order) */}
           {[...currentDisplayList]
-            .sort((a, b) => {
-              if (scheduleView === "upcoming") {
-                if (a.status === "Pending" && b.status !== "Pending") return -1;
-                if (a.status !== "Pending" && b.status === "Pending") return 1;
-                return (a.rawDate?.getTime() || 0) - (b.rawDate?.getTime() || 0);
-              } else {
-                return (b.rawDate?.getTime() || 0) - (a.rawDate?.getTime() || 0);
-              }
-            })
+            .sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0))
             .map((event) => (
               <div
                 key={event.id}
-                className="w-full bg-[#FAF2EE] hover:bg-[#F5EAE6] border border-[#DCBAB2] hover:border-[#8C241E]/40 rounded-2xl p-4 sm:p-5 transition-all shadow-2xs flex flex-col lg:grid lg:grid-cols-[1.5fr_1fr_1fr_0.8fr_1.1fr] gap-3 lg:gap-4 lg:items-center"
+                className="w-full bg-[#FAF2EE] hover:bg-[#F5EAE6] border border-[#DCBAB2] hover:border-[#8C241E]/40 rounded-2xl p-4 sm:p-5 transition-all shadow-2xs flex flex-col lg:grid lg:grid-cols-[1.7fr_1.1fr_1.1fr_1.3fr] gap-3 lg:gap-4 lg:items-center"
               >
                 {/* 1. Production Details */}
                 <div className="space-y-1 min-w-0">
@@ -427,27 +432,10 @@ export default function MySchedule() {
                   <span className="font-medium truncate">{event.location}</span>
                 </div>
 
-                {/* 4. Call State Badge */}
-                <div>
-                  <span
-                    className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider border ${
-                      event.status === "Accepted"
-                        ? "bg-emerald-700/15 text-emerald-950 border-emerald-700/30"
-                        : event.status === "Declined"
-                          ? "bg-rose-700/15 text-rose-950 border-rose-700/30"
-                          : event.isPast
-                            ? "bg-[#EEDBD5] text-[#8C5A54] border-[#D5AAA2]"
-                            : "bg-amber-700/15 text-amber-950 border-amber-700/30"
-                    }`}
-                  >
-                    {event.isPast && event.status === "Pending" ? "Unanswered" : event.status}
-                  </span>
-                </div>
-
-                {/* 5. Confirmation Action Buttons */}
-                <div className="flex items-center justify-start lg:justify-end gap-2 pt-2 lg:pt-0 border-t border-[#DCBAB2]/50 lg:border-t-0">
+                {/* 4. Combined Attendance Status & Actions */}
+                <div className="flex items-center justify-start lg:justify-end gap-2.5 pt-2 lg:pt-0 border-t border-[#DCBAB2]/50 lg:border-t-0 flex-wrap">
                   {event.isPast ? (
-                    <span className="text-[11px] font-mono font-medium text-[#8C5A54]">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-[#E4D9D2]/80 text-[#6B5550] border border-[#CBB3AC]">
                       {event.status === "Accepted"
                         ? "Attended / Concluded"
                         : event.status === "Declined"
@@ -455,7 +443,10 @@ export default function MySchedule() {
                           : "Call Concluded"}
                     </span>
                   ) : event.status === "Pending" ? (
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap justify-start lg:justify-end">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[9px] font-mono font-bold uppercase tracking-wider bg-amber-700/15 text-amber-950 border border-amber-700/30">
+                        Awaiting RSVP
+                      </span>
                       <button
                         onClick={() => handleStatusChange(event.id, "Accepted")}
                         className="bg-emerald-800 hover:bg-emerald-900 text-[#FDF8F7] px-3.5 py-1.5 rounded-full text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1 transition-all cursor-pointer shadow-xs border border-emerald-900"
@@ -463,7 +454,6 @@ export default function MySchedule() {
                         <Check className="w-3.5 h-3.5 text-emerald-200" />
                         <span>Accept</span>
                       </button>
-
                       <button
                         onClick={() => handleStatusChange(event.id, "Declined")}
                         className="bg-[#FAF2EE] hover:bg-rose-50 text-rose-800 hover:text-rose-900 px-3 py-1.5 rounded-full text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1 transition-all cursor-pointer border border-rose-300 shadow-2xs"
@@ -472,19 +462,28 @@ export default function MySchedule() {
                         <span>Decline</span>
                       </button>
                     </div>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-mono text-[#6E4742] italic">
-                        {event.status === "Accepted" ? "Confirmed" : "Declined"}
+                  ) : event.status === "Accepted" ? (
+                    <div className="flex items-center gap-2 justify-start lg:justify-end">
+                      <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-emerald-700/15 text-emerald-950 border border-emerald-700/30">
+                        <Check className="w-3 h-3 text-emerald-800" />
+                        <span>Confirmed</span>
                       </span>
                       <button
-                        onClick={() =>
-                          handleStatusChange(
-                            event.id,
-                            event.status === "Accepted" ? "Declined" : "Accepted"
-                          )
-                        }
+                        onClick={() => handleStatusChange(event.id, "Declined")}
                         className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C241E] hover:text-[#731B16] bg-[#EEDBD5] hover:bg-[#E3CEC6] px-2.5 py-1 rounded-full border border-[#D5AAA2] transition-colors cursor-pointer"
+                      >
+                        Change
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2 justify-start lg:justify-end">
+                      <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-rose-700/15 text-rose-950 border border-rose-700/30">
+                        <X className="w-3 h-3 text-rose-800" />
+                        <span>Declined</span>
+                      </span>
+                      <button
+                        onClick={() => handleStatusChange(event.id, "Accepted")}
+                        className="text-[10px] font-mono font-bold uppercase tracking-wider text-emerald-900 hover:text-emerald-950 bg-emerald-700/15 hover:bg-emerald-700/25 px-2.5 py-1 rounded-full border border-emerald-700/30 transition-colors cursor-pointer"
                       >
                         Change
                       </button>
