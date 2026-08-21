@@ -1,13 +1,13 @@
 // @ts-nocheck
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import {
   Calendar, Search, Plus, MapPin, Clock, Users, Shield, FileText, ArrowRight,
   CheckCircle2, DollarSign, Building, Tag, ExternalLink, Activity, PlayCircle,
   Sparkles, X, HeartHandshake, ClipboardList, Check, AlertCircle, Video, Star,
-  SlidersHorizontal, ChevronRight, RefreshCw, UserCheck, UserX, MessageSquare,
+  SlidersHorizontal, ChevronRight, ChevronDown, RefreshCw, UserCheck, UserX, MessageSquare,
   BookOpen, Edit3, Send, CheckSquare, XCircle, ArrowUpRight, Info, Heart, Coins,
-  Lock, Unlock, Flame
+  Lock, Unlock, Flame, Filter
 } from "lucide-react";
 import ScriptPreviewModal from "@/components/ScriptPreviewModal";
 import ProductionDetailModal from "@/components/ProductionDetailModal";
@@ -301,6 +301,18 @@ export default function EventsManagement() {
   // Pitches Tab Filter
   const [pitchSourceFilter, setPitchSourceFilter] = useState<"all" | "member" | "sponsor">("all");
   const [pitchStatusFilter, setPitchStatusFilter] = useState<"all" | "pending" | "approved" | "rejected">("all");
+  const [statusDropdownOpen, setStatusDropdownOpen] = useState<boolean>(false);
+  const statusDropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (statusDropdownRef.current && !statusDropdownRef.current.contains(event.target as Node)) {
+        setStatusDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // Auditions & Volunteer Data
   const [allPositions, setAllPositions] = useState<any[]>([]);
@@ -769,9 +781,15 @@ export default function EventsManagement() {
 
   // Filtering Events
   const filteredEvents = eventsList.filter(ev => {
-    const matchesSearch = (ev.title || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          (ev.venue || "").toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCat = categoryFilter === "All" || ev.category.toLowerCase() === categoryFilter.toLowerCase();
+    const q = searchQuery.toLowerCase();
+    const matchesSearch = !searchQuery ||
+                          (ev.title || "").toLowerCase().includes(q) ||
+                          (ev.venue || "").toLowerCase().includes(q) ||
+                          (ev.description || "").toLowerCase().includes(q) ||
+                          (ev.sponsor_name || "").toLowerCase().includes(q);
+    const matchesCat = 
+      categoryFilter === "All" || 
+      (categoryFilter === "Sponsored" ? ev.is_sponsored : ev.category?.toLowerCase() === categoryFilter.toLowerCase());
     return matchesSearch && matchesCat;
   });
 
@@ -899,25 +917,34 @@ export default function EventsManagement() {
               />
             </div>
 
-            {/* Category Pills */}
-            <div className="flex items-center gap-1.5 overflow-x-auto custom-scrollbar pb-1 sm:pb-0">
-              {["All", "Plays", "Workshops", "Meetups"].map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => setCategoryFilter(cat)}
-                  className={`px-4 py-2 rounded-full text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer shrink-0 ${
-                    categoryFilter === cat
-                      ? "bg-[#8C241E] text-[#FDF8F7] border border-[#A6352F] shadow-xs"
-                      : "bg-[#FAF2EE] text-[#5C3B37] hover:bg-[#EEDBD5] border border-[#DCBAB2]"
-                  }`}
-                >
-                  {cat}
-                </button>
-              ))}
+            {/* Category Filter Pills */}
+            <div className="flex items-center gap-2 overflow-x-auto custom-scrollbar pb-1 sm:pb-0">
+              {[
+                { id: "All", label: "All Events" },
+                { id: "Plays", label: "Plays" },
+                { id: "Workshops", label: "Workshops" },
+                { id: "Meetups", label: "Meetups" },
+                { id: "Sponsored", label: "Sponsored" }
+              ].map((cat) => {
+                const isActive = categoryFilter === cat.id;
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => setCategoryFilter(cat.id)}
+                    className={`px-4 py-2 rounded-full text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer shrink-0 border ${
+                      isActive
+                        ? "bg-[#8C241E] text-[#FDF8F7] border-[#A6352F] shadow-sm shadow-[#8C241E]/20"
+                        : "bg-[#FAF2EE] text-[#5C3B37] hover:bg-[#EEDBD5] hover:text-[#2A1816] border-[#DCBAB2] shadow-xs"
+                    }`}
+                  >
+                    {cat.label}
+                  </button>
+                );
+              })}
               
               <button
                 onClick={fetchData}
-                className="p-2 rounded-full border border-[#DCBAB2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] transition-all cursor-pointer shrink-0"
+                className="p-2.5 rounded-full border border-[#DCBAB2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] hover:text-[#2A1816] transition-all cursor-pointer shrink-0 shadow-xs"
                 title="Refresh upcoming events"
               >
                 <RefreshCw className="w-3.5 h-3.5" />
@@ -1081,51 +1108,94 @@ export default function EventsManagement() {
             </div>
 
             <div className="flex items-center gap-3 flex-wrap">
-              {/* Source Tabs */}
-              <div className="flex items-center gap-1 bg-[#FAF2EE] p-1 rounded-full border border-[#DCBAB2] shadow-xs">
+              {/* Source Filter Buttons */}
+              <div className="flex items-center gap-1.5 bg-[#FAF2EE] p-1.5 rounded-full border border-[#DCBAB2] shadow-xs">
                 <button
+                  type="button"
                   onClick={() => setPitchSourceFilter("all")}
-                  className={`px-3.5 py-1.5 rounded-full text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                  className={`px-4 py-2 rounded-full text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer ${
                     pitchSourceFilter === "all"
-                      ? "bg-[#8C241E] text-[#FDF8F7]"
-                      : "text-[#5C3B37] hover:bg-[#EEDBD5]"
+                      ? "bg-[#8C241E] text-[#FDF8F7] shadow-sm border border-[#A6352F]"
+                      : "text-[#5C3B37] hover:text-[#2A1816] hover:bg-[#EEDBD5] border border-transparent"
                   }`}
                 >
                   All ({proposalsList.length})
                 </button>
                 <button
+                  type="button"
                   onClick={() => setPitchSourceFilter("member")}
-                  className={`px-3.5 py-1.5 rounded-full text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                  className={`px-4 py-2 rounded-full text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer ${
                     pitchSourceFilter === "member"
-                      ? "bg-[#8C241E] text-[#FDF8F7]"
-                      : "text-[#5C3B37] hover:bg-[#EEDBD5]"
+                      ? "bg-[#8C241E] text-[#FDF8F7] shadow-sm border border-[#A6352F]"
+                      : "text-[#5C3B37] hover:text-[#2A1816] hover:bg-[#EEDBD5] border border-transparent"
                   }`}
                 >
                   Member Pitches ({memberPitchesCount})
                 </button>
                 <button
+                  type="button"
                   onClick={() => setPitchSourceFilter("sponsor")}
-                  className={`px-3.5 py-1.5 rounded-full text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                  className={`px-4 py-2 rounded-full text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer ${
                     pitchSourceFilter === "sponsor"
-                      ? "bg-[#8C241E] text-[#FDF8F7]"
-                      : "text-[#5C3B37] hover:bg-[#EEDBD5]"
+                      ? "bg-[#8C241E] text-[#FDF8F7] shadow-sm border border-[#A6352F]"
+                      : "text-[#5C3B37] hover:text-[#2A1816] hover:bg-[#EEDBD5] border border-transparent"
                   }`}
                 >
                   Sponsor Ads ({sponsorPitchesCount})
                 </button>
               </div>
 
-              {/* Status Filter */}
-              <select
-                value={pitchStatusFilter}
-                onChange={(e) => setPitchStatusFilter(e.target.value as any)}
-                className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-full px-3.5 py-1.5 text-xs font-mono text-[#2A1816] font-semibold focus:outline-hidden cursor-pointer"
-              >
-                <option value="all">All Statuses</option>
-                <option value="pending">Pending Review</option>
-                <option value="approved">Approved</option>
-                <option value="rejected">Declined</option>
-              </select>
+              {/* Custom Theatrical Status Dropdown Menu */}
+              <div className="relative" ref={statusDropdownRef}>
+                <button
+                  type="button"
+                  onClick={() => setStatusDropdownOpen(!statusDropdownOpen)}
+                  className="bg-[#FAF2EE] hover:bg-[#EEDBD5] border border-[#DCBAB2] rounded-full px-4 py-2.5 text-xs font-mono font-bold uppercase tracking-wider text-[#2A1816] flex items-center gap-2.5 transition-all cursor-pointer shadow-xs"
+                >
+                  <SlidersHorizontal className="w-3.5 h-3.5 text-[#8C241E]" />
+                  <span>
+                    {pitchStatusFilter === "all"
+                      ? "All Statuses"
+                      : pitchStatusFilter === "pending"
+                      ? "Pending Review"
+                      : pitchStatusFilter === "approved"
+                      ? "Approved"
+                      : "Declined"}
+                  </span>
+                  <ChevronDown className={`w-3.5 h-3.5 text-[#8C5A54] transition-transform duration-200 ${statusDropdownOpen ? "rotate-180" : ""}`} />
+                </button>
+
+                {statusDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-56 bg-[#F5EAE6] border border-[#DEBEB7] rounded-2xl p-2 shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-150 space-y-1">
+                    {[
+                      { value: "all", label: "All Statuses", dot: "bg-[#8C5A54]" },
+                      { value: "pending", label: "Pending Review", dot: "bg-amber-600" },
+                      { value: "approved", label: "Approved", dot: "bg-emerald-600" },
+                      { value: "rejected", label: "Declined", dot: "bg-rose-600" }
+                    ].map((opt) => (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => {
+                          setPitchStatusFilter(opt.value as any);
+                          setStatusDropdownOpen(false);
+                        }}
+                        className={`w-full text-left rounded-xl px-3.5 py-2.5 text-xs font-mono font-bold flex items-center justify-between transition-all cursor-pointer ${
+                          pitchStatusFilter === opt.value
+                            ? "bg-[#8C241E] text-[#FDF8F7] shadow-xs"
+                            : "text-[#2A1816] hover:bg-[#EEDBD5]"
+                        }`}
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <span className={`w-2 h-2 rounded-full ${opt.dot}`} />
+                          <span>{opt.label}</span>
+                        </div>
+                        {pitchStatusFilter === opt.value && <Check className="w-3.5 h-3.5 text-[#FFD0CC]" />}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
