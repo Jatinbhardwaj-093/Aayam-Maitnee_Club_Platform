@@ -603,6 +603,88 @@ scripts_seed_list = [
         "author_email": "aditi.drama@handle.com",
         "author_name": "Aditi",
         "status": "Draft"
+    },
+    {
+        "title": "Court of Shadows",
+        "playwright": "Abay Nandhiga",
+        "genre": "Psychological Thriller",
+        "language": "English & Hindi",
+        "acts": "2 Acts",
+        "pages": 18,
+        "roles_count": "4 Roles (Abay, Devendra, Rathore, Roy)",
+        "rehearsal_focus": "Courtroom Delivery & Tension Staging",
+        "excerpt": "[SESSION COURT 4] ABAY: In the dim light of this court, truth is treated like a bargaining chip...",
+        "abstract": "A noir psychological courtroom thriller investigating a high-stakes conspiracy.",
+        "theme": "Justice vs Corruption",
+        "settingInfo": "Session Courtroom 4, Midnight",
+        "labels": "Courtroom, Thriller, Noir",
+        "characters": [
+            { "id": "c1", "name": "Abay", "traits": "Lead Defense Attorney", "color": "#635f41", "role": "Protagonist" },
+            { "id": "c2", "name": "Prosecutor Devendra", "traits": "Rival Prosecutor", "color": "#d97706", "role": "Antagonist" },
+            { "id": "c3", "name": "Inspector Rathore", "traits": "Key Witness / Police Officer", "color": "#059669", "role": "Supporting" },
+            { "id": "c4", "name": "Judge Roy", "traits": "Presiding Magistrate", "color": "#7c3aed", "role": "Supporting" }
+        ],
+        "lines": [
+            { "id": "l1", "characterId": "c1", "characterName": "Abay", "color": "#635f41", "text": "In the dim light of this court, truth is treated like a bargaining chip..." },
+            { "id": "l2", "characterId": "c2", "characterName": "Prosecutor Devendra", "color": "#d97706", "text": "Objection, Your Honor! Counsel is indulging in poetic melodrama instead of facts." },
+            { "id": "l3", "characterId": "c4", "characterName": "Judge Roy", "color": "#7c3aed", "text": "Sustained. Mr. Abay, present your primary evidence or yield the floor." },
+            { "id": "l4", "characterId": "c3", "characterName": "Inspector Rathore", "color": "#059669", "text": "[Stepping to witness box] The logbook entries for that midnight shift were altered, Your Honor." },
+            { "id": "l5", "characterId": "c1", "characterName": "Abay", "color": "#635f41", "text": "And who had access to the master lock-up key, Inspector? Tell the court!" }
+        ],
+        "author_email": "23f2000668@ds.study.iitm.ac.in",
+        "author_name": "Abay Nandhiga",
+        "status": "Draft"
+    },
+    {
+        "title": "Whispers of the Banyan Tree",
+        "playwright": "Aditi",
+        "genre": "Social Realism",
+        "language": "Hindi",
+        "acts": "1 Act",
+        "pages": 10,
+        "roles_count": "3 Roles",
+        "rehearsal_focus": "Rural Dialogue & Folk Cadence",
+        "excerpt": "[VILLAGE SQUARE] ADITI: The roots of this banyan tree run deep, Pradhan Ji, but so does our children's right to learn!",
+        "abstract": "A rural social drama centered on a teacher building a girl's school under an ancient village banyan tree.",
+        "theme": "Education & Reform",
+        "settingInfo": "Under Banyan Tree, Village Square",
+        "labels": "Social Realism, Village Life",
+        "characters": [
+            { "id": "c1", "name": "Aditi", "traits": "Village Schoolteacher", "color": "#059669", "role": "Protagonist" },
+            { "id": "c2", "name": "Gram Pradhan", "traits": "Village Headman Antagonist", "color": "#d97706", "role": "Antagonist" },
+            { "id": "c3", "name": "Dadi Janki", "traits": "Respected Village Matriarch", "color": "#7c3aed", "role": "Supporting" }
+        ],
+        "lines": [
+            { "id": "l1", "characterId": "c1", "characterName": "Aditi", "color": "#059669", "text": "The roots of this banyan tree run deep, Pradhan Ji, but so does our children's right to learn!" },
+            { "id": "l2", "characterId": "c2", "characterName": "Gram Pradhan", "color": "#d97706", "text": "Books won't till the fields, Aditi. Traditions cannot be broken overnight." }
+        ],
+        "author_email": "aditi.drama@handle.com",
+        "author_name": "Aditi",
+        "status": "Draft"
+    },
+    {
+        "title": "Ek Nayi Subah",
+        "playwright": "Aditi",
+        "genre": "Inspirational Drama",
+        "language": "Hindi",
+        "acts": "1 Act",
+        "pages": 8,
+        "roles_count": "2 Roles",
+        "rehearsal_focus": "Youth Empowerment & Monologue",
+        "excerpt": "[CAMPUS LAWN] ADITI: Morning comes not when the sun rises, but when we choose to wake up...",
+        "abstract": "A story of youth empowerment and community action.",
+        "theme": "Hope & Action",
+        "settingInfo": "College Campus",
+        "labels": "Youth, Social",
+        "characters": [
+            { "id": "c1", "name": "Aditi", "traits": "Protagonist", "color": "#8CC0EB", "role": "Protagonist" }
+        ],
+        "lines": [
+            { "id": "l1", "characterId": "c1", "characterName": "Aditi", "color": "#8CC0EB", "text": "Morning comes not when the sun rises, but when we choose to wake up..." }
+        ],
+        "author_email": "aditi.drama@handle.com",
+        "author_name": "Aditi",
+        "status": "Pending"
     }
 ]
 
