@@ -43,6 +43,8 @@ const navItems: NavItem[] = [
 
 const maintainerNavItems: NavItem[] = [
   { label: "Production Callboard", path: "/schedule-admin", icon: Calendar, description: "Rehearsal call sheets & attendance roster" },
+  { label: "My Schedule", path: "/schedule", icon: Calendar, description: "Your rehearsals & call attendance" },
+  { label: "Plays & Productions", path: "/member-plays", icon: PlayCircle, description: "Production lineup & scripts" },
   { label: "Events Management", path: "/events-admin", icon: Calendar, description: "Proposal curation & sponsor deals" },
   { label: "Auditions & Casting", path: "/auditions-admin", icon: ClipboardList, description: "Role callings & candidate requests" },
   { label: "Members Directory", path: "/directory-admin", icon: Users, description: "Ensemble & crew directory" },

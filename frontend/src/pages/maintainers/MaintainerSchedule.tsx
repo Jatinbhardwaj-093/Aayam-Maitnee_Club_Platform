@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import {
   Calendar, Clock, MapPin, Users, Plus, CheckCircle2, Clock3, XCircle,
   Search, Filter, Sparkles, Trash2, ChevronRight, UserCheck, AlertCircle,
@@ -290,7 +291,14 @@ export default function MaintainerSchedule() {
           </p>
         </div>
         
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <Link
+            to="/schedule"
+            className="px-5 py-3 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer shadow-xs"
+          >
+            <Calendar className="w-4 h-4 text-[#8C241E]" />
+            <span>My Personal Schedule</span>
+          </Link>
           <button
             onClick={() => setCreateModalOpen(true)}
             className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-6 py-3 rounded-full text-xs font-mono font-bold uppercase tracking-widest shadow-lg shadow-[#8C241E]/20 flex items-center gap-2 transition-all cursor-pointer border border-[#A6352F]"
