@@ -86,14 +86,13 @@ const localMatchSpokenWords = (expectedWords: string[], transcriptText: string) 
   };
 };
 
-// Premium voice scorer to select natural human voices across browsers as fallback
 const rankVoice = (voice: SpeechSynthesisVoice, preference: VoicePreference): number => {
   const name = voice.name.toLowerCase();
   const lang = (voice.lang || "").toLowerCase();
   let score = 0;
 
   if (lang.startsWith("en")) score += 40;
-  if (lang.includes("en-us") || lang.includes("en-gb") || lang.includes("en-in") || lang.includes("en-au")) score += 20;
+  if (lang.includes("en-us") || lang.includes("en-gb") || lang.includes("en-in")) score += 20;
 
   if (name.includes("natural") || name.includes("online (natural)")) score += 150;
   if (name.includes("premium") || name.includes("enhanced")) score += 120;
@@ -103,9 +102,7 @@ const rankVoice = (voice: SpeechSynthesisVoice, preference: VoicePreference): nu
     name.includes("compact") ||
     name.includes("espeak") ||
     name.includes("whisper") ||
-    name.includes("zarvox") ||
-    name.includes("trinoids") ||
-    name.includes("cellos")
+    name.includes("zarvox")
   ) {
     score -= 200;
   }
@@ -119,16 +116,11 @@ const rankVoice = (voice: SpeechSynthesisVoice, preference: VoicePreference): nu
       name.includes("samantha") ||
       name.includes("serena") ||
       name.includes("karen") ||
-      name.includes("moira") ||
-      name.includes("tessa") ||
-      name.includes("victoria") ||
-      name.includes("ava")
+      name.includes("moira")
     ) {
       score += 70;
     }
-    if (name.includes("male") && !name.includes("female")) {
-      score -= 100;
-    }
+    if (name.includes("male") && !name.includes("female")) score -= 100;
   }
 
   if (preference === "male") {
@@ -138,16 +130,11 @@ const rankVoice = (voice: SpeechSynthesisVoice, preference: VoicePreference): nu
       name.includes("guy") ||
       name.includes("ryan") ||
       name.includes("daniel") ||
-      name.includes("oliver") ||
-      name.includes("alex") ||
-      name.includes("david") ||
-      name.includes("mark")
+      name.includes("david")
     ) {
       score += 70;
     }
-    if (name.includes("female") || name.includes("woman")) {
-      score -= 100;
-    }
+    if (name.includes("female") || name.includes("woman")) score -= 100;
   }
 
   return score;
@@ -196,6 +183,7 @@ export default function AiRehearsalStudio() {
   const silenceTimerRef = useRef<number | null>(null);
   const aiTimerRef = useRef<number | null>(null);
   const aiPreparingRef = useRef(false);
+  const currentProcessingTurnRef = useRef<number | null>(null);
   const audioPlayerRef = useRef<HTMLAudioElement | null>(null);
   const lastTranscriptRef = useRef("");
   const lastSentTranscriptRef = useRef("");
@@ -206,27 +194,10 @@ export default function AiRehearsalStudio() {
   const activeTurnRef = useRef<any | null>(null);
   const micBlockedRef = useRef(false);
 
-  const trace = (message: string, payload?: Record<string, unknown>) => {
-    console.debug(`[DramaRehearsal] ${message}`, payload || "");
-  };
-
   const applySessionState = (nextSession: any) => {
     sessionRef.current = nextSession;
     activeTurnRef.current = nextSession?.currentTurn || null;
-    setSession((previous: any) => {
-      const isNewSession = previous?.session_id && nextSession?.session_id && previous.session_id !== nextSession.session_id;
-      if (previous?.session_id === nextSession?.session_id && nextSession?.current_turn < previous.current_turn) {
-        trace("IGNORED STALE SESSION RESPONSE", {
-          previousTurn: previous.current_turn,
-          nextTurn: nextSession.current_turn,
-        });
-        return previous;
-      }
-      if (!isNewSession && previous?.scene_status === "complete" && nextSession?.scene_status !== "complete") {
-        return previous;
-      }
-      return nextSession;
-    });
+    setSession(nextSession);
   };
 
   const clearRehearsalState = () => {
@@ -241,6 +212,7 @@ export default function AiRehearsalStudio() {
       aiTimerRef.current = null;
     }
     aiPreparingRef.current = false;
+    currentProcessingTurnRef.current = null;
     lastTranscriptRef.current = "";
     lastSentTranscriptRef.current = "";
     lastSentAtRef.current = 0;
@@ -273,9 +245,7 @@ export default function AiRehearsalStudio() {
     const email = activeUser?.email || "";
     if (!email) {
       setAllScripts([]);
-      if (!scriptId) {
-        setActiveScript(null);
-      }
+      if (!scriptId) setActiveScript(null);
       return;
     }
     if (!scriptId) {
@@ -370,7 +340,8 @@ export default function AiRehearsalStudio() {
   const startSession = async () => {
     setError("");
     setSessionStartedAt(Date.now());
-    setAudioStatus("Initializing Roleplay");
+    setAudioStatus("Starting Scene...");
+    currentProcessingTurnRef.current = null;
     try {
       const payload = activeScript
         ? {
@@ -416,6 +387,7 @@ export default function AiRehearsalStudio() {
       audioPlayerRef.current = null;
     }
     window.speechSynthesis?.cancel();
+    currentProcessingTurnRef.current = null;
     try {
       await fetch(`${baseUrl}/api/rehearsal/roleplay/${session.session_id}/stop`, { method: "POST" });
     } catch (e) {
@@ -424,8 +396,19 @@ export default function AiRehearsalStudio() {
     setAudioStatus("Rehearsal Paused");
   };
 
+  // Deterministic Turn Progression Listener
   useEffect(() => {
-    if (!session) return;
+    if (!session || session.scene_status === "stopped") {
+      stopListening();
+      if (audioPlayerRef.current) {
+        audioPlayerRef.current.pause();
+        audioPlayerRef.current = null;
+      }
+      window.speechSynthesis?.cancel();
+      currentProcessingTurnRef.current = null;
+      return;
+    }
+
     if (session.scene_status === "complete") {
       stopListening();
       if (audioPlayerRef.current) {
@@ -434,17 +417,31 @@ export default function AiRehearsalStudio() {
       }
       window.speechSynthesis?.cancel();
       setAudioStatus("Scene Complete");
+      currentProcessingTurnRef.current = null;
       return;
     }
 
-    if (session.status === "HUMAN_TURN" && session.speaker_type === "human") {
+    const turnIndex = session.current_turn;
+    const isHuman = session.speaker_type === "human";
+    const isAi = session.speaker_type === "ai";
+
+    if (isHuman) {
+      currentProcessingTurnRef.current = null;
+      if (audioPlayerRef.current) {
+        audioPlayerRef.current.pause();
+        audioPlayerRef.current = null;
+      }
+      window.speechSynthesis?.cancel();
       setAudioStatus("Awaiting Actor Speech");
       startListening();
-    } else if (session.status === "PLAYING_AI_AUDIO" || session.speaker_type === "ai") {
+    } else if (isAi) {
       stopListening();
-      prepareAiTurn();
+      if (currentProcessingTurnRef.current !== turnIndex && session.status === "AI_TURN") {
+        currentProcessingTurnRef.current = turnIndex;
+        prepareAiTurn(turnIndex);
+      }
     }
-  }, [session?.current_turn, session?.status, session?.scene_status]);
+  }, [session?.current_turn, session?.status, session?.scene_status, session?.speaker_type]);
 
   const sendTranscript = async (text: string, isFinal: boolean, silenceMs = 0) => {
     const activeSession = sessionRef.current;
@@ -453,19 +450,12 @@ export default function AiRehearsalStudio() {
     const turnKey = `${activeSession.current_turn}-${activeTurn?.id || "turn"}`;
     const now = Date.now();
 
-    if (isFinal && finalSentTurnRef.current === turnKey) {
-      return;
-    }
-    if (isFinal) {
-      finalSentTurnRef.current = turnKey;
-    }
+    if (isFinal && finalSentTurnRef.current === turnKey) return;
+    if (isFinal) finalSentTurnRef.current = turnKey;
 
     const currentCount = transcriptRequestCountRef.current[turnKey] || 0;
     if (currentCount >= 20 && !isFinal) return;
-
-    if (!isFinal && text === lastSentTranscriptRef.current && now - lastSentAtRef.current < 250) {
-      return;
-    }
+    if (!isFinal && text === lastSentTranscriptRef.current && now - lastSentAtRef.current < 250) return;
 
     transcriptRequestCountRef.current[turnKey] = currentCount + 1;
     lastSentTranscriptRef.current = text;
@@ -494,12 +484,33 @@ export default function AiRehearsalStudio() {
     }
   };
 
+  const handleManualAdvanceCue = async () => {
+    if (!session?.session_id) return;
+    stopListening();
+    if (audioPlayerRef.current) {
+      audioPlayerRef.current.pause();
+      audioPlayerRef.current = null;
+    }
+    window.speechSynthesis?.cancel();
+    try {
+      const res = await fetch(`${baseUrl}/api/rehearsal/roleplay/${session.session_id}/advance`, {
+        method: "POST",
+      });
+      const data = await res.json();
+      if (res.ok && data.session) {
+        applySessionState(data.session);
+      }
+    } catch (e) {
+      console.warn("Manual advance cue error:", e);
+    }
+  };
+
   const startListening = () => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) {
       setSpeechSupported(false);
       micBlockedRef.current = true;
-      setError("Browser speech recognition unavailable. Use Chrome, Edge, or click 'Advance Cue'.");
+      setError("Microphone recognition unavailable in this browser. Click 'Advance Cue' to progress.");
       setAudioStatus("Microphone unavailable");
       return;
     }
@@ -512,7 +523,7 @@ export default function AiRehearsalStudio() {
 
     recognition.onstart = () => {
       setListening(true);
-      setAudioStatus("Listening for speech");
+      setAudioStatus("Listening for actor speech...");
     };
     recognition.onerror = (event: any) => {
       setListening(false);
@@ -586,19 +597,22 @@ export default function AiRehearsalStudio() {
     setListening(false);
   };
 
-  const prepareAiTurn = async () => {
+  const prepareAiTurn = async (turnIndex: number) => {
     if (!session?.session_id || aiPreparingRef.current) return;
     aiPreparingRef.current = true;
+    setAudioStatus("Generating Studio Voice...");
     try {
-      const res = await fetch(`${baseUrl}/api/rehearsal/roleplay/${session.session_id}/ai-turn`, { method: "POST" });
+      const res = await fetch(`${baseUrl}/api/rehearsal/roleplay/${session.session_id}/ai-turn`, {
+        method: "POST",
+      });
       const data = await res.json();
       aiPreparingRef.current = false;
-      if (!res.ok) {
+      if (!res.ok || !data.session) {
         setError(data.error || "AI turn generation failed.");
         return;
       }
       applySessionState(data.session);
-      speakAiTurn(data.session);
+      speakAiTurn(data.session, turnIndex);
     } catch (e) {
       aiPreparingRef.current = false;
       console.warn("AI Turn error:", e);
@@ -607,8 +621,7 @@ export default function AiRehearsalStudio() {
 
   const fallbackBrowserSpeak = (nextSession: any, payload: any, words: any[]) => {
     if (!("speechSynthesis" in window)) {
-      setError("Audio synthesis unavailable. Advancing cue automatically.");
-      window.setTimeout(() => completeAiTurn(nextSession.session_id), 1400);
+      completeAiTurn(nextSession.session_id);
       return;
     }
 
@@ -631,22 +644,19 @@ export default function AiRehearsalStudio() {
 
     const voices = window.speechSynthesis.getVoices();
     const voice = selectBrowserVoice(voices, pref);
-    if (voice) {
-      utterance.voice = voice;
-    }
+    if (voice) utterance.voice = voice;
 
     const startedAt = performance.now();
     if (aiTimerRef.current) window.clearInterval(aiTimerRef.current);
     aiTimerRef.current = window.setInterval(() => {
       const elapsed = (performance.now() - startedAt) / 1000;
-      const idx = words.findIndex((word: any) => elapsed >= word.start && elapsed <= word.end);
-      if (idx >= 0) {
-        setAiWordIndex(idx);
-      } else {
-        const lastSpoken = words.findLastIndex((word: any) => elapsed > word.end);
+      const idx = words.findIndex((w: any) => elapsed >= w.start && elapsed <= w.end);
+      if (idx >= 0) setAiWordIndex(idx);
+      else {
+        const lastSpoken = words.findLastIndex((w: any) => elapsed > w.end);
         if (lastSpoken >= 0) setAiWordIndex(lastSpoken);
       }
-    }, 60);
+    }, 50);
 
     utterance.onend = () => {
       if (aiTimerRef.current) window.clearInterval(aiTimerRef.current);
@@ -656,14 +666,12 @@ export default function AiRehearsalStudio() {
     };
     utterance.onerror = () => {
       if (aiTimerRef.current) window.clearInterval(aiTimerRef.current);
-      setAudioStatus("AI Audio Advance");
       completeAiTurn(nextSession.session_id);
     };
     window.speechSynthesis.speak(utterance);
   };
 
-  // High-fidelity neural voice synthesizer with Edge-TTS studio audio stream
-  const speakAiTurn = (nextSession: any) => {
+  const speakAiTurn = (nextSession: any, forTurnIndex: number) => {
     const payload = nextSession.ai_payload;
     if (!payload?.text) {
       completeAiTurn(nextSession.session_id);
@@ -676,11 +684,11 @@ export default function AiRehearsalStudio() {
     }
     window.speechSynthesis?.cancel();
     setAiWordIndex(-1);
-    setAudioStatus("AI Partner Speaking");
+    setAudioStatus("AI Partner Speaking...");
 
     const words = payload.words || [];
 
-    // 1. Play Studio-Grade Edge-TTS Neural Audio Stream
+    // 1. Play Studio Neural Audio Stream (Edge-TTS)
     if (payload.audio_url) {
       try {
         const audio = new Audio(payload.audio_url);
@@ -690,14 +698,13 @@ export default function AiRehearsalStudio() {
         if (aiTimerRef.current) window.clearInterval(aiTimerRef.current);
         aiTimerRef.current = window.setInterval(() => {
           const elapsed = (performance.now() - startedAt) / 1000;
-          const idx = words.findIndex((word: any) => elapsed >= word.start && elapsed <= word.end);
-          if (idx >= 0) {
-            setAiWordIndex(idx);
-          } else {
-            const lastSpoken = words.findLastIndex((word: any) => elapsed > word.end);
+          const idx = words.findIndex((w: any) => elapsed >= w.start && elapsed <= w.end);
+          if (idx >= 0) setAiWordIndex(idx);
+          else {
+            const lastSpoken = words.findLastIndex((w: any) => elapsed > w.end);
             if (lastSpoken >= 0) setAiWordIndex(lastSpoken);
           }
-        }, 60);
+        }, 50);
 
         audio.onended = () => {
           if (aiTimerRef.current) window.clearInterval(aiTimerRef.current);
@@ -708,7 +715,7 @@ export default function AiRehearsalStudio() {
         };
 
         audio.onerror = (e) => {
-          console.warn("Edge-TTS audio stream error, falling back to browser speech", e);
+          console.warn("Audio playback error, falling back to speech synth:", e);
           if (aiTimerRef.current) window.clearInterval(aiTimerRef.current);
           fallbackBrowserSpeak(nextSession, payload, words);
         };
@@ -719,18 +726,26 @@ export default function AiRehearsalStudio() {
         });
         return;
       } catch (err) {
-        console.warn("Audio initialization error:", err);
+        console.warn("Audio setup error:", err);
       }
     }
 
-    // 2. Fallback to Browser Speech Synthesis if edge-tts not returned
+    // 2. Fallback to Browser Speech Synthesis
     fallbackBrowserSpeak(nextSession, payload, words);
   };
 
   const completeAiTurn = async (sessionId: string) => {
-    const res = await fetch(`${baseUrl}/api/rehearsal/roleplay/${sessionId}/ai-complete`, { method: "POST" });
-    const data = await res.json();
-    if (res.ok) applySessionState(data.session);
+    try {
+      const res = await fetch(`${baseUrl}/api/rehearsal/roleplay/${sessionId}/ai-complete`, {
+        method: "POST",
+      });
+      const data = await res.json();
+      if (res.ok && data.session) {
+        applySessionState(data.session);
+      }
+    } catch (e) {
+      console.warn("AI complete turn error:", e);
+    }
   };
 
   const togglePinScript = (id: number, event: React.MouseEvent) => {
@@ -741,8 +756,8 @@ export default function AiRehearsalStudio() {
   const displayScene = session?.scene || scene;
   const activeTurn = session?.currentTurn || displayScene?.turns?.[0] || null;
   const currentTitle = activeScript?.title || displayScene?.title || inlineTitle;
-  const isHumanTurn = session?.speaker_type === "human";
-  const isAiTurn = session?.speaker_type === "ai";
+  const isHumanTurn = session ? session.speaker_type === "human" : assignments[activeTurn?.character] === "human";
+  const isAiTurn = session ? session.speaker_type === "ai" : assignments[activeTurn?.character] === "ai";
   const progressPercent = session?.scene?.turns?.length
     ? Math.round(((session.current_turn + 1) / session.scene.turns.length) * 100)
     : 0;
@@ -836,7 +851,7 @@ export default function AiRehearsalStudio() {
                 {isHumanTurn ? (
                   <div className="space-y-3 max-w-md mx-auto">
                     <p className="font-serif italic text-sm text-[#5C3B37] bg-[#F5EAE6] px-4 py-2.5 rounded-2xl border border-[#DCBAB2]/70 min-h-[42px] flex items-center justify-center">
-                      "{transcript || "Speak line into microphone..."}"
+                      "{transcript || "Speak line into microphone or click Advance Cue..."}"
                     </p>
                     <div className="flex items-center justify-center gap-2">
                       <button
@@ -848,7 +863,7 @@ export default function AiRehearsalStudio() {
                       </button>
 
                       <button
-                        onClick={() => sendTranscript(activeTurn.text, true, 1200)}
+                        onClick={handleManualAdvanceCue}
                         className="px-3.5 py-1.5 rounded-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors cursor-pointer border border-[#A6352F] shadow-xs"
                       >
                         <Check className="w-3.5 h-3.5 text-[#FFD0CC]" />
