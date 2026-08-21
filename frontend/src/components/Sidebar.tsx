@@ -121,18 +121,6 @@ export default function Sidebar({
           );
         })}
       </nav>
-
-      {/* Footer / Info (Only when expanded) */}
-      {!collapsed && (
-        <div className="p-6 border-t border-[#D5C9BE]/30 mt-auto">
-          <div className="bg-[#E7DDD3]/40 rounded-xl p-4 border border-[#D5C9BE]/50">
-            <p className="text-[9px] font-mono uppercase tracking-widest text-[#666361] font-bold mb-1">Session Active</p>
-            <p className="text-xs text-[#353535] font-serif leading-snug">
-              Connection encrypted and secured for Matinee Club Members.
-            </p>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
