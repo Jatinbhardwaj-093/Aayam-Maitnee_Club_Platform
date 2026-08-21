@@ -70,7 +70,7 @@ interface ProposalItem {
   };
 }
 
-// Rich Fallback Upcoming Events (Only upcoming productions, workshops, meetups)
+// Rich Fallback Upcoming Events (3 Society Open Events taking Donations + 2 Accepted Sponsor Events)
 const fallbackUpcomingEvents: EventItem[] = [
   {
     id: "play-1",
@@ -82,12 +82,11 @@ const fallbackUpcomingEvents: EventItem[] = [
     timeRange: "18:00 - 20:30",
     status: "Upcoming Premiere",
     is_past: false,
-    is_sponsored: true,
-    sponsor_name: "Red Bull India",
-    sponsor_amount: "₹1,50,000",
-    patronage_open: false,
-    donations_collected: "₹0",
-    description: "Girish Karnad's legendary mythic drama on identity and desire, presented in dual-language Hindi/English translation with live percussion.",
+    is_sponsored: false,
+    patronage_open: true,
+    donations_collected: "₹45,000",
+    target_budget: "₹65,000",
+    description: "Girish Karnad's legendary mythic drama on identity and desire, presented in dual-language Hindi/English translation with live Yakshagana folk percussion.",
     playwright: "Girish Karnad",
     director: "Utkarsh (Yuuhi)",
     cast: "Devadatta (Lead Actor), Kapila (Lead Actor), Padmini (Lead Actress), Hayavadana (Chorus Lead)",
@@ -111,11 +110,10 @@ const fallbackUpcomingEvents: EventItem[] = [
     timeRange: "18:30 - 21:00",
     status: "Upcoming Premiere",
     is_past: false,
-    is_sponsored: true,
-    sponsor_name: "FabIndia Handlooms",
-    sponsor_amount: "₹85,000",
-    patronage_open: false,
-    donations_collected: "₹0",
+    is_sponsored: false,
+    patronage_open: true,
+    donations_collected: "₹32,000",
+    target_budget: "₹50,000",
     description: "Mohan Rakesh's poetic masterpiece portraying Kalidasa's emotional dilemmas in the misty Himalayan valley of Ujjayini.",
     playwright: "Mohan Rakesh",
     director: "Abay Nandhiga",
@@ -142,8 +140,8 @@ const fallbackUpcomingEvents: EventItem[] = [
     is_past: false,
     is_sponsored: false,
     patronage_open: true,
-    donations_collected: "₹18,500",
-    target_budget: "₹35,000",
+    donations_collected: "₹28,500",
+    target_budget: "₹40,000",
     description: "Habib Tanvir's folk satire about an honest thief caught between four vows, staged in open-air Nacha folk theatre style with dholak and singing choruses.",
     playwright: "Habib Tanvir",
     director: "Samarth Shrivastava",
@@ -159,135 +157,86 @@ const fallbackUpcomingEvents: EventItem[] = [
     volunteerCount: 6
   },
   {
-    id: "evt-1",
-    title: "Navarasa Monologue Intensive & Emotional Subtext Masterclass",
-    category: "Workshops",
-    date: "Sep 15, 2026",
-    venue: "Aayam Black Box Studio, SAC",
-    timeRange: "17:00 - 20:00",
-    status: "Scheduled",
-    is_past: false,
-    is_sponsored: false,
-    patronage_open: true,
-    donations_collected: "₹12,000",
-    target_budget: "₹20,000",
-    description: "A 4-day intensive acting laboratory exploring classical Rasa Abhinaya (Bhayanaka, Shringara, Raudra, Karuna) and vocal resonance control led by Aditi Sharma.",
-    playwright: "Aditi Sharma (Directorial Pitch)",
-    director: "Aditi Sharma",
-    genre: "Acting Masterclass",
-    language: "Hindi / English",
-    acts: "4 Practical Sessions",
-    price: "Free Entry / Registered",
-    image: "/aayam_assets/samatvam_user_4.jpg",
-    auditionCount: 0,
-    applicantCount: 0,
-    volunteerCount: 3
-  },
-  {
-    id: "evt-2",
-    title: "Stage Lighting & DMX Rigging Masterclass",
-    category: "Workshops",
-    date: "Aug 27, 2026",
-    venue: "CLT Tech Booth, IIT Madras",
-    timeRange: "16:00 - 18:30",
-    status: "Scheduled",
+    id: "evt-sponsor-1",
+    title: "FabIndia Natya Utsav: Traditional Handloom Costume & Folk Staging Showcase",
+    category: "Sponsor Showcase",
+    date: "Oct 04, 2026",
+    venue: "Open Air Theatre (OAT), IIT Madras",
+    timeRange: "17:00 - 21:00",
+    status: "Scheduled Premiere",
     is_past: false,
     is_sponsored: true,
-    sponsor_name: "AudioCraft Proscenium",
-    sponsor_amount: "₹1,20,000",
+    sponsor_name: "FabIndia Handlooms",
+    sponsor_amount: "₹1,80,000 Funded Deal",
     patronage_open: false,
     donations_collected: "₹0",
-    description: "Hands-on technical crew training on digital lighting consoles, dimmer packs, spotlights, and cue sync for live theatrical proscenium productions.",
-    playwright: "Aayam Technical Crew",
+    description: "A grand cultural showcase sponsored by FabIndia presenting authentic handloom period costumes, classical Sanskrit verse adaptations, and textile craft exhibitions on proscenium stage.",
+    playwright: "Curated by FabIndia Cultural Trust",
+    director: "Aditi Sharma",
+    genre: "Costume & Classical Sanskrit Showcase",
+    language: "Sanskrit & Hindi",
+    acts: "2 Showcase Acts",
+    price: "Free Pass with Registration",
+    image: "/aayam_assets/samatvam_user_4.jpg",
+    auditionCount: 2,
+    applicantCount: 5,
+    volunteerCount: 6
+  },
+  {
+    id: "evt-sponsor-2",
+    title: "Red Bull Street Monologue & Acoustic Percussion Slam",
+    category: "Sponsor Showcase",
+    date: "Sep 24, 2026",
+    venue: "SAC Amphitheatre & CLT Steps, IIT Madras",
+    timeRange: "16:30 - 20:00",
+    status: "Scheduled Premiere",
+    is_past: false,
+    is_sponsored: true,
+    sponsor_name: "Red Bull India",
+    sponsor_amount: "₹1,50,000 Funded Deal",
+    patronage_open: false,
+    donations_collected: "₹0",
+    description: "High-intensity open-air competitive dramatic monologue slam with live folk dholak percussion rhythms, artist hospitality lounge, and brand sampling kiosks.",
+    playwright: "Aayam Street Theatre Wing",
     director: "Harsh Aryan",
-    genre: "Technical Stagecraft",
-    language: "English / Hindi",
-    acts: "1 Masterclass",
+    genre: "Competitive Monologue Slam",
+    language: "Multilingual",
+    acts: "3 Slam Rounds",
     price: "Free Entry",
     image: "/aayam_assets/dddj_user_2.jpg",
-    auditionCount: 0,
-    applicantCount: 0,
-    volunteerCount: 2
-  },
-  {
-    id: "evt-3",
-    title: "Physical Movement & Navarasa Mime Workshop",
-    category: "Workshops",
-    date: "Sep 05, 2026",
-    venue: "Rehearsal Hall B - Studio 2",
-    timeRange: "17:30 - 20:00",
-    status: "Scheduled",
-    is_past: false,
-    is_sponsored: false,
-    patronage_open: true,
-    donations_collected: "₹15,000",
-    target_budget: "₹35,000",
-    description: "Physical theatre workshop focusing on Angika Abhinaya (body gestures), spine alignment, and spatial geometry on bare proscenium stages.",
-    playwright: "Samarth Shrivastava",
-    director: "Samarth Shrivastava",
-    genre: "Movement & Mime",
-    language: "Non-verbal & Hindi",
-    acts: "1 Intensive",
-    price: "Free Entry",
-    image: "/aayam_assets/tamashbin_user_2.jpg",
-    auditionCount: 0,
-    applicantCount: 0,
-    volunteerCount: 3
-  },
-  {
-    id: "evt-4",
-    title: "Monologue Jamming & Chai Meetup",
-    category: "Meetups",
-    date: "Aug 30, 2026",
-    venue: "OAT Amphitheatre Lawns, IIT Madras",
-    timeRange: "16:30 - 18:30",
-    status: "Scheduled",
-    is_past: false,
-    is_sponsored: false,
-    patronage_open: true,
-    donations_collected: "₹5,000",
-    target_budget: "₹10,000",
-    description: "Relaxed weekend meetup for ensemble actors to perform short 2-minute monologues, receive dramaturgy feedback, and network over evening chai.",
-    playwright: "Aayam Ensemble",
-    director: "Utkarsh (Yuuhi)",
-    genre: "Community Reading Circle",
-    language: "Hindi & English",
-    acts: "Open Mic Format",
-    price: "Free Entry",
-    image: "/aayam_assets/kky_user_2.jpg",
-    auditionCount: 0,
-    applicantCount: 0,
-    volunteerCount: 2
+    auditionCount: 2,
+    applicantCount: 7,
+    volunteerCount: 4
   }
 ];
 
-// Rich Fallback Pitches
+// Rich Fallback Pitches (1 Pending Sponsor Pitch + 3 Member Pitches)
 const fallbackPitches: ProposalItem[] = [
   {
-    id: 1,
-    name: "Navarasa Monologue Intensive & Emotional Subtext Masterclass",
-    description: "A 4-day intensive acting laboratory exploring classical Rasa Abhinaya (Bhayanaka, Shringara, Raudra, Karuna) and vocal resonance control for collegiate actors preparing for Autumn 2026 mainstage productions.",
-    date: "Sep 15, 2026",
-    venue: "Aayam Black Box Studio, SAC",
-    budget: "₹20,000",
-    proposalType: "Member Workshop Pitch",
-    sourceType: "Member",
+    id: 101,
+    name: "AudioCraft Pro Spatial Acoustics & Live Stagecraft Masterclass",
+    description: "Commercial audio-engineering workshop and masterclass offering 100% sound console equipment sponsorship and ₹1,20,000 event budget in exchange for Aayam stage banner placement and live product showcase.",
+    date: "Oct 18, 2026",
+    venue: "CLT Tech Booth & Acoustic Studio 1",
+    budget: "₹1,20,000 (Funded Sponsorship)",
+    proposalType: "Sponsor Ad Proposal",
+    sourceType: "Sponsor",
     status: "Pending",
-    contact_email: "aditi.sharma@study.iitm.ac.in",
-    contact_phone: "+91 98450 12345",
+    contact_email: "partner.relations@audiocraft.in",
+    contact_phone: "+91 98402 77112",
     submitter: {
-      name: "Aditi Sharma",
-      initials: "AS",
-      email: "aditi.sharma@study.iitm.ac.in",
-      phone: "+91 98450 12345"
+      name: "AudioCraft Pro Systems (Pvt Ltd)",
+      initials: "AC",
+      email: "partner.relations@audiocraft.in",
+      phone: "+91 98402 77112"
     }
   },
   {
-    id: 2,
-    name: "Campus Monologue Competition & Dramatic Open Mic",
-    description: "A pan-campus dramatic monologue competition featuring student-written pieces and classical Hindi/English dramatic adaptations evaluated by alumni directors.",
+    id: 102,
+    name: "The Glass Menagerie — Aayam Intimate Blackbox Staging",
+    description: "An intimate memory play exploring psychological vulnerability and southern poetic realism, proposed for a 4-show weekend run inside SAC Blackbox with minimalist lighting design.",
     date: "Sep 22, 2026",
-    venue: "OAT Amphitheatre Steps",
+    venue: "SAC Intimate Blackbox Studio",
     budget: "₹30,000",
     proposalType: "Member Event Pitch",
     sourceType: "Member",
@@ -302,7 +251,7 @@ const fallbackPitches: ProposalItem[] = [
     }
   },
   {
-    id: 3,
+    id: 103,
     name: "Acoustic Folk Jam & Vocal Modulations",
     description: "An intimate evening blending vocal breathing exercises, Hindustani folk chanting, and acoustic musical cues with Akord music society.",
     date: "Sep 10, 2026",
@@ -321,7 +270,7 @@ const fallbackPitches: ProposalItem[] = [
     }
   },
   {
-    id: 4,
+    id: 104,
     name: "Physical Movement & Navarasa Mime Masterclass",
     description: "A 3-hour movement masterclass focusing on body language, character silhouette, and non-verbal physical theatre techniques led by senior choreographers.",
     date: "Sep 05, 2026",
@@ -337,101 +286,6 @@ const fallbackPitches: ProposalItem[] = [
       initials: "SS",
       email: "samarth.s@study.iitm.ac.in",
       phone: "+91 98712 33445"
-    }
-  },
-  {
-    id: 5,
-    name: "Street Play Rhythms & Dholak Synchronization Masterclass",
-    description: "High-tempo workshop covering traditional dholak percussion patterns, rhythmic slogans, and circular crowd-gathering techniques for Nukkad Natak festivals.",
-    date: "Sep 12, 2026",
-    venue: "OAT Courtyard, IIT Madras",
-    budget: "₹18,000",
-    proposalType: "Member Workshop Pitch",
-    sourceType: "Member",
-    status: "Approved",
-    contact_email: "utkarsh123@study.iitm.ac.in",
-    contact_phone: "+91 98102 99887",
-    submitter: {
-      name: "Utkarsh (Yuuhi)",
-      initials: "UY",
-      email: "utkarsh123@study.iitm.ac.in",
-      phone: "+91 98102 99887"
-    }
-  },
-  {
-    id: 6,
-    name: "Red Bull Campus Drama Lounge & Stage Energy Partner",
-    description: "Exclusive Energy Drink & Artist Hospitality Partner for Autumn 2026 providing branded green rooms, foyer sampling kiosks, and playbill back-cover ad placement across all Autumn 2026 productions.",
-    date: "Sep 18, 2026",
-    venue: "CLT Main Foyer & Green Room",
-    budget: "₹1,50,000",
-    proposalType: "Sponsor Ad Proposal",
-    sourceType: "Sponsor",
-    status: "Pending",
-    contact_email: "partnerships@redbull.in",
-    contact_phone: "+91 98110 44321",
-    submitter: {
-      name: "Rohan Sharma (Red Bull India)",
-      initials: "RB",
-      email: "partnerships@redbull.in",
-      phone: "+91 98110 44321"
-    }
-  },
-  {
-    id: 7,
-    name: "FabIndia Ethnic Wardrobe & Stage Handloom Sponsorship",
-    description: "Stage Wardrobe Craft & Handloom Partner providing authentic handloom drapes and period costumes for classical productions in exchange for playbill inserts and foyer exhibits.",
-    date: "Sep 25, 2026",
-    venue: "CLT Main Stage",
-    budget: "₹85,000",
-    proposalType: "Sponsor Ad Proposal",
-    sourceType: "Sponsor",
-    status: "Approved",
-    contact_email: "campus@fabindia.net",
-    contact_phone: "+91 98201 88765",
-    submitter: {
-      name: "Ananya Deshmukh (FabIndia)",
-      initials: "FD",
-      email: "campus@fabindia.net",
-      phone: "+91 98201 88765"
-    }
-  },
-  {
-    id: 8,
-    name: "AudioCraft Proscenium Sound & Wireless Consoles",
-    description: "Proscenium Sound & Hardware Partner providing wireless UHF microphones, stage monitors, and digital audio mixing consoles for all major Darpan 2026 festival performances.",
-    date: "Oct 02, 2026",
-    venue: "Tech Booth CLT, IIT Madras",
-    budget: "₹1,20,000",
-    proposalType: "Sponsor Ad Proposal",
-    sourceType: "Sponsor",
-    status: "Pending",
-    contact_email: "support@audiocraft.in",
-    contact_phone: "+91 98402 77112",
-    submitter: {
-      name: "Vikram Malhotra (AudioCraft)",
-      initials: "AC",
-      email: "support@audiocraft.in",
-      phone: "+91 98402 77112"
-    }
-  },
-  {
-    id: 9,
-    name: "Zebronics Acoustic Audio Experience Sponsor",
-    description: "Acoustic stage sound monitors and rehearsal room soundbar systems for student production rehearsals in exchange for digital social media co-branding and tickets giveaway.",
-    date: "Oct 15, 2026",
-    venue: "SAC Amphitheatre & CLT",
-    budget: "₹60,000",
-    proposalType: "Sponsor Ad Proposal",
-    sourceType: "Sponsor",
-    status: "Pending",
-    contact_email: "campus.alliances@zebronics.com",
-    contact_phone: "+91 98901 33221",
-    submitter: {
-      name: "Pooja Hegde (Zebronics)",
-      initials: "ZB",
-      email: "campus.alliances@zebronics.com",
-      phone: "+91 98901 33221"
     }
   }
 ];
@@ -1087,7 +941,7 @@ export default function EventsManagement() {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
               {filteredEvents.map(ev => {
                 const eventPositions = getEventPositions(ev.title);
                 const eventApps = getEventApplications(ev.title);
@@ -1096,78 +950,87 @@ export default function EventsManagement() {
                 return (
                   <div 
                     key={ev.id} 
-                    className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-3xl p-6 sm:p-7 hover:border-[#B32D25]/50 hover:shadow-md transition-all flex flex-col justify-between group space-y-5 shadow-xs"
+                    className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-[2.5rem] p-7 sm:p-8 md:p-9 hover:border-[#B32D25]/50 hover:shadow-xl transition-all flex flex-col justify-between group space-y-6 shadow-xs"
                   >
-                    <div className="space-y-3.5">
+                    <div className="space-y-4">
                       {/* Top Category & Status Header */}
-                      <div className="flex items-center justify-between gap-2 border-b border-[#DCBAB2]/50 pb-3">
-                        <span className="text-[11px] font-mono text-[#8C5A54] uppercase tracking-wider font-semibold truncate">
+                      <div className="flex items-center justify-between gap-3 border-b border-[#DCBAB2]/50 pb-3.5">
+                        <span className="text-xs font-mono text-[#8C5A54] uppercase tracking-wider font-bold truncate">
                           {ev.category} • {ev.date}
                         </span>
 
                         {ev.is_sponsored ? (
-                          <span className="inline-block px-2.5 py-0.5 bg-amber-700/15 text-amber-950 border border-amber-700/30 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider shrink-0">
+                          <span className="inline-block px-3 py-1 bg-amber-700/15 text-amber-950 border border-amber-700/30 rounded-full text-xs font-mono font-bold uppercase tracking-wider shrink-0">
                             Sponsored: {ev.sponsor_name || "Partner"}
                           </span>
                         ) : (
-                          <span className="inline-block px-2.5 py-0.5 bg-emerald-700/15 text-emerald-950 border border-emerald-700/30 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider shrink-0">
-                            Society Run
+                          <span className="inline-block px-3 py-1 bg-emerald-700/15 text-emerald-950 border border-emerald-700/30 rounded-full text-xs font-mono font-bold uppercase tracking-wider shrink-0">
+                            Society Open Event
                           </span>
                         )}
                       </div>
 
                       {/* Event Title */}
-                      <h3 className="font-serif text-2xl text-[#2A1816] leading-snug font-normal group-hover:text-[#8C241E] transition-colors break-words">
+                      <h3 className="font-serif text-2xl sm:text-3xl text-[#2A1816] leading-snug font-normal group-hover:text-[#8C241E] transition-colors break-words">
                         {ev.title}
                       </h3>
 
                       {/* Description */}
                       {ev.description && (
-                        <p className="text-xs text-[#5C3B37] font-light leading-relaxed line-clamp-2">
+                        <p className="text-xs sm:text-sm text-[#5C3B37] font-light leading-relaxed line-clamp-3">
                           {ev.description}
                         </p>
                       )}
 
                       {/* Unified Calm Editorial Specifications Panel */}
-                      <div className="bg-[#F5EAE6] p-3.5 rounded-2xl border border-[#DEBEB7] space-y-2 text-xs font-mono text-[#5C3B37]">
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="text-[#8C5A54] text-[10px] uppercase font-bold">Venue</span>
-                          <span className="text-[#2A1816] font-medium truncate">{ev.venue}</span>
+                      <div className="bg-[#F5EAE6] p-4 sm:p-5 rounded-2xl border border-[#DEBEB7] space-y-3 text-xs sm:text-sm font-mono text-[#5C3B37]">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <span className="text-[#8C5A54] text-xs uppercase font-bold flex items-center gap-1.5">
+                            <MapPin className="w-3.5 h-3.5 text-[#8C241E] shrink-0" />
+                            <span>Venue & Time</span>
+                          </span>
+                          <span className="text-[#2A1816] font-medium truncate">
+                            {ev.venue} • {ev.timeRange || "Evening Call"}
+                          </span>
                         </div>
 
-                        <div className="flex items-center justify-between gap-2 pt-1 border-t border-[#DCBAB2]/40">
-                          <span className="text-[#8C5A54] text-[10px] uppercase font-bold">
-                            {ev.is_sponsored ? "Sponsorship" : "Patronage"}
+                        <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-[#DCBAB2]/40">
+                          <span className="text-[#8C5A54] text-xs uppercase font-bold flex items-center gap-1.5">
+                            <DollarSign className="w-3.5 h-3.5 text-[#8C241E] shrink-0" />
+                            <span>{ev.is_sponsored ? "Sponsorship Backing" : "Patronage Donations"}</span>
                           </span>
                           {ev.is_sponsored ? (
                             <span className="font-bold text-amber-950">{ev.sponsor_amount || "Fully Funded"}</span>
                           ) : (
-                            <div className="flex items-center gap-2">
-                              <span className="font-bold text-emerald-950">{ev.donations_collected || "₹0"} / {ev.target_budget || "₹25,000"}</span>
+                            <div className="flex items-center gap-2.5">
+                              <span className="font-bold text-emerald-950">{ev.donations_collected || "₹0"} / {ev.target_budget || "₹50,000"}</span>
                               <button
                                 onClick={() => setSelectedEventForDonation(ev)}
-                                className="text-[10px] font-bold text-[#8C241E] underline hover:text-[#731B16] cursor-pointer"
+                                className="text-xs font-bold text-[#8C241E] underline hover:text-[#731B16] cursor-pointer"
                               >
-                                Donate
+                                Donate / Fund
                               </button>
                             </div>
                           )}
                         </div>
 
-                        <div className="flex items-center justify-between gap-2 pt-1 border-t border-[#DCBAB2]/40 text-[11px]">
-                          <span className="text-[#8C5A54] text-[10px] uppercase font-bold">Roster</span>
-                          <span className="text-[#2A1816]">
-                            {eventPositions.length} Roles ({eventApps.length} Applicants) • {eventVols.length} Crew
+                        <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-[#DCBAB2]/40">
+                          <span className="text-[#8C5A54] text-xs uppercase font-bold flex items-center gap-1.5">
+                            <Users className="w-3.5 h-3.5 text-[#8C241E] shrink-0" />
+                            <span>Production Roster</span>
+                          </span>
+                          <span className="text-[#2A1816] font-medium">
+                            {eventPositions.length} Roles ({eventApps.length} Applicants) • {eventVols.length} Backstage Crew
                           </span>
                         </div>
                       </div>
                     </div>
 
                     {/* ACTION BUTTONS - ALL IN ONE CLEAN SINGLE LINE WITH NO ICONS */}
-                    <div className="pt-3.5 border-t border-[#DCBAB2]/60 flex items-center gap-1.5 w-full flex-nowrap">
+                    <div className="pt-4 border-t border-[#DCBAB2]/60 flex items-center gap-2 w-full flex-nowrap">
                       <button
                         onClick={() => setSelectedEventForAuditions(ev)}
-                        className="flex-1 py-2 px-1 rounded-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] text-[10px] font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer shadow-xs border border-[#A6352F] truncate"
+                        className="flex-1 py-2.5 px-2 rounded-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer shadow-xs border border-[#A6352F] truncate"
                         title="View open auditions & candidate reels"
                       >
                         Auditions ({eventApps.length})
@@ -1175,7 +1038,7 @@ export default function EventsManagement() {
 
                       <button
                         onClick={() => setSelectedEventForVolunteers(ev)}
-                        className="flex-1 py-2 px-1 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] hover:text-[#2A1816] text-[10px] font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer shadow-xs truncate"
+                        className="flex-1 py-2.5 px-2 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] hover:text-[#2A1816] text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer shadow-xs truncate"
                         title="View backstage crew applications"
                       >
                         Crew ({eventVols.length})
@@ -1183,7 +1046,7 @@ export default function EventsManagement() {
 
                       <button
                         onClick={() => handleOpenScriptPreview(ev)}
-                        className="flex-1 py-2 px-1 rounded-full border border-[#D5AAA2] bg-[#F5EAE6] hover:bg-[#EEDBD5] text-[#8C241E] text-[10px] font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer shadow-xs truncate"
+                        className="flex-1 py-2.5 px-2 rounded-full border border-[#D5AAA2] bg-[#F5EAE6] hover:bg-[#EEDBD5] text-[#8C241E] text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer shadow-xs truncate"
                         title="Preview Society Playbook Script"
                       >
                         Script
@@ -1191,18 +1054,18 @@ export default function EventsManagement() {
 
                       <button
                         onClick={() => handleOpenDetails(ev)}
-                        className="flex-1 py-2 px-1 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] hover:text-[#2A1816] text-[10px] font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer shadow-xs truncate"
+                        className="flex-1 py-2.5 px-2 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] hover:text-[#2A1816] text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer shadow-xs truncate"
                         title="View detailed production dossier"
                       >
-                        Details
+                        Full Details
                       </button>
 
                       <button
                         onClick={() => handleOpenEdit(ev)}
-                        className="flex-1 py-2 px-1 rounded-full border border-[#D5AAA2] bg-[#EEDBD5] hover:bg-[#E3CEC6] text-[#2A1816] hover:text-[#8C241E] text-[10px] font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer shadow-xs truncate"
+                        className="flex-1 py-2.5 px-2 rounded-full border border-[#D5AAA2] bg-[#EEDBD5] hover:bg-[#E3CEC6] text-[#2A1816] hover:text-[#8C241E] text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer shadow-xs truncate"
                         title="Edit upcoming production metadata & details"
                       >
-                        Edit
+                        Edit Event
                       </button>
                     </div>
                   </div>
@@ -1291,7 +1154,7 @@ export default function EventsManagement() {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
               {filteredPitches.map(pitch => {
                 const isMember = (pitch.proposalType || "").toLowerCase().includes("member") || pitch.sourceType === "Member";
                 const isApproved = (pitch.status || "").toLowerCase() === "approved";
@@ -1300,35 +1163,35 @@ export default function EventsManagement() {
                 return (
                   <div
                     key={pitch.id}
-                    className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-3xl p-6 sm:p-7 hover:border-[#B32D25]/50 hover:shadow-md transition-all flex flex-col justify-between space-y-5 shadow-xs group"
+                    className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-[2.5rem] p-7 sm:p-8 md:p-9 hover:border-[#B32D25]/50 hover:shadow-xl transition-all flex flex-col justify-between space-y-6 shadow-xs group"
                   >
-                    <div className="space-y-3.5">
+                    <div className="space-y-4">
                       {/* Top Header: Submitter & Type Tag */}
-                      <div className="flex items-center justify-between gap-3 border-b border-[#DCBAB2]/50 pb-3">
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          <div className="w-8 h-8 rounded-full bg-[#EEDBD5] border border-[#D5AAA2] text-[#8C241E] font-mono text-xs font-bold flex items-center justify-center shrink-0">
+                      <div className="flex items-center justify-between gap-3 border-b border-[#DCBAB2]/50 pb-3.5">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-9 h-9 rounded-full bg-[#EEDBD5] border border-[#D5AAA2] text-[#8C241E] font-mono text-xs font-bold flex items-center justify-center shrink-0 shadow-xs">
                             {pitch.submitter?.initials || (isMember ? "M" : "SP")}
                           </div>
                           <div className="min-w-0">
-                            <h4 className="font-serif text-sm text-[#2A1816] font-normal truncate">
+                            <h4 className="font-serif text-base text-[#2A1816] font-normal truncate">
                               {pitch.submitter?.name || "Ensemble Member"}
                             </h4>
-                            <p className="text-[10px] font-mono text-[#8C5A54] truncate">
+                            <p className="text-xs font-mono text-[#8C5A54] truncate">
                               {pitch.contact_email || pitch.submitter?.email || ""}
                             </p>
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-1.5 shrink-0">
-                          <span className={`text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${
+                        <div className="flex items-center gap-2 shrink-0">
+                          <span className={`text-xs font-mono font-bold uppercase tracking-wider px-3 py-1 rounded-full border ${
                             isMember 
                               ? "bg-[#EEDBD5] text-[#8C241E] border-[#D5AAA2]"
                               : "bg-amber-700/15 text-amber-950 border-amber-700/30"
                           }`}>
-                            {isMember ? "Member Pitch" : "Sponsor Pitch"}
+                            {isMember ? "Member Pitch" : "Sponsor Proposal"}
                           </span>
 
-                          <span className={`text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${
+                          <span className={`text-xs font-mono font-bold uppercase tracking-wider px-3 py-1 rounded-full border ${
                             isApproved
                               ? "bg-emerald-700/15 text-emerald-950 border-emerald-700/30"
                               : isRejected
@@ -1341,33 +1204,43 @@ export default function EventsManagement() {
                       </div>
 
                       {/* Pitch Title */}
-                      <h3 className="font-serif text-2xl text-[#2A1816] leading-snug font-normal group-hover:text-[#8C241E] transition-colors">
+                      <h3 className="font-serif text-2xl sm:text-3xl text-[#2A1816] leading-snug font-normal group-hover:text-[#8C241E] transition-colors break-words">
                         {pitch.name || pitch.title}
                       </h3>
 
                       {/* Description */}
-                      <p className="text-xs text-[#5C3B37] font-light leading-relaxed line-clamp-2">
+                      <p className="text-xs sm:text-sm text-[#5C3B37] font-light leading-relaxed line-clamp-3">
                         {pitch.description}
                       </p>
 
                       {/* Specifications Panel */}
-                      <div className="bg-[#F5EAE6] p-3.5 rounded-2xl border border-[#DEBEB7] space-y-2 text-xs font-mono text-[#5C3B37]">
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="text-[#8C5A54] text-[10px] uppercase font-bold">Venue</span>
-                          <span className="text-[#2A1816] font-medium truncate">{pitch.venue || pitch.location_or_link || "SAC Rehearsal Studio"}</span>
+                      <div className="bg-[#F5EAE6] p-4 sm:p-5 rounded-2xl border border-[#DEBEB7] space-y-3 text-xs sm:text-sm font-mono text-[#5C3B37]">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <span className="text-[#8C5A54] text-xs uppercase font-bold flex items-center gap-1.5">
+                            <MapPin className="w-3.5 h-3.5 text-[#8C241E] shrink-0" />
+                            <span>Target Venue & Date</span>
+                          </span>
+                          <span className="text-[#2A1816] font-medium truncate">
+                            {pitch.venue || pitch.location_or_link || "SAC Rehearsal Studio"} • {pitch.date || "Autumn 2026"}
+                          </span>
                         </div>
-                        <div className="flex items-center justify-between gap-2 pt-1 border-t border-[#DCBAB2]/40">
-                          <span className="text-[#8C5A54] text-[10px] uppercase font-bold">Budget & Terms</span>
-                          <span className="text-[#2A1816] font-bold text-emerald-950">{pitch.budget || "₹25,000"}</span>
+                        <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-[#DCBAB2]/40">
+                          <span className="text-[#8C5A54] text-xs uppercase font-bold flex items-center gap-1.5">
+                            <DollarSign className="w-3.5 h-3.5 text-[#8C241E] shrink-0" />
+                            <span>Financial Terms</span>
+                          </span>
+                          <span className="text-[#2A1816] font-bold text-emerald-950">
+                            {pitch.budget || "₹25,000"}
+                          </span>
                         </div>
                       </div>
                     </div>
 
                     {/* Bottom Action Controls in Single Line */}
-                    <div className="pt-3.5 border-t border-[#DCBAB2]/60 flex items-center gap-2 w-full flex-nowrap">
+                    <div className="pt-4 border-t border-[#DCBAB2]/60 flex items-center gap-2 w-full flex-nowrap">
                       <button
                         onClick={() => handleOpenEditPitch(pitch)}
-                        className="flex-1 py-2 px-2 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] hover:text-[#2A1816] text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer shadow-xs truncate"
+                        className="flex-1 py-2.5 px-3 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] hover:text-[#2A1816] text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer shadow-xs truncate"
                         title="Review pitch details, adjust date/venue/budget, and approve to upcoming events"
                       >
                         Review & Edit
@@ -1376,7 +1249,7 @@ export default function EventsManagement() {
                       {!isApproved && (
                         <button
                           onClick={() => handleQuickApprove(pitch)}
-                          className="flex-1 py-2 px-2 rounded-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer shadow-xs border border-[#A6352F] truncate"
+                          className="flex-1 py-2.5 px-3 rounded-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer shadow-xs border border-[#A6352F] truncate"
                           title="Quick approve and schedule to upcoming events"
                         >
                           Approve
@@ -1386,7 +1259,7 @@ export default function EventsManagement() {
                       {!isApproved && !isRejected && (
                         <button
                           onClick={() => handleRejectPitch(pitch.id)}
-                          className="py-2 px-3 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-stone-200 text-stone-600 hover:text-stone-900 text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer shadow-xs truncate"
+                          className="py-2.5 px-4 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-stone-200 text-stone-600 hover:text-stone-900 text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer shadow-xs truncate"
                           title="Decline proposal"
                         >
                           Decline
