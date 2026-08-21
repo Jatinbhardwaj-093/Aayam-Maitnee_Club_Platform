@@ -13,6 +13,7 @@ import {
   Headphones,
   Layers,
   Loader2,
+  LogOut,
   Mic,
   Pin,
   Play,
@@ -263,10 +264,62 @@ export default function AiRehearsalStudio() {
     setIsSceneFinished(false);
   };
 
-  const returnToStudio = () => {
+  // Gracefully stop everything and navigate back to rehearsal catalog
+  const handleExitRehearsal = async () => {
+    stopListening();
+    if (audioPlayerRef.current) {
+      audioPlayerRef.current.pause();
+      audioPlayerRef.current.src = "";
+    }
+    window.speechSynthesis?.cancel();
+    if (aiTimerRef.current) {
+      window.clearInterval(aiTimerRef.current);
+      aiTimerRef.current = null;
+    }
+    currentProcessingTurnRef.current = null;
+
+    if (sessionRef.current?.session_id) {
+      try {
+        await fetch(`${baseUrl}/api/rehearsal/roleplay/${sessionRef.current.session_id}/stop`, {
+          method: "POST",
+        });
+      } catch (e) {
+        console.warn("Stop session error:", e);
+      }
+    }
+
     clearRehearsalState();
     navigate("/ai-rehearsal", { replace: false });
     window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  };
+
+  // Stop rehearsal and show performance report immediately
+  const handleEndAndShowReport = async () => {
+    stopListening();
+    if (audioPlayerRef.current) {
+      audioPlayerRef.current.pause();
+      audioPlayerRef.current.src = "";
+    }
+    window.speechSynthesis?.cancel();
+    if (aiTimerRef.current) {
+      window.clearInterval(aiTimerRef.current);
+      aiTimerRef.current = null;
+    }
+    currentProcessingTurnRef.current = null;
+
+    if (sessionRef.current?.session_id) {
+      try {
+        await fetch(`${baseUrl}/api/rehearsal/roleplay/${sessionRef.current.session_id}/stop`, {
+          method: "POST",
+        });
+      } catch (e) {
+        console.warn("Stop session error:", e);
+      }
+    }
+
+    setAudioStatus("Rehearsal Concluded");
+    setIsSceneFinished(true);
+    window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
   };
 
   useEffect(() => {
@@ -548,7 +601,6 @@ export default function AiRehearsalStudio() {
 
     // Record turn report before advancing
     if (activeTurn) {
-      const currentReport = turnReports[activeSession.current_turn];
       const isHuman = activeSession.speaker_type === "human";
       const totalWords = (activeTurn.words || []).length || 1;
       const matches = spokenIndices || [];
@@ -907,11 +959,11 @@ export default function AiRehearsalStudio() {
         {/* TOP BAR */}
         <header className="flex items-center justify-between gap-4 px-2 pt-2">
           <button
-            onClick={returnToStudio}
+            onClick={handleExitRehearsal}
             className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider text-[#8C5A54] hover:text-[#8C241E] transition-colors cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>Repertoire</span>
+            <span>Back to Repertoire</span>
           </button>
           <span className="text-[11px] font-mono font-bold uppercase tracking-widest text-[#8C5A54]">
             Rehearsal Debrief
@@ -1087,11 +1139,11 @@ export default function AiRehearsalStudio() {
             </button>
 
             <button
-              onClick={returnToStudio}
+              onClick={handleExitRehearsal}
               className="px-6 py-3.5 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-2 transition-colors cursor-pointer"
             >
               <BookOpen className="w-4 h-4 text-[#8C241E]" />
-              <span>Return to Repertoire</span>
+              <span>Back to Repertoire</span>
             </button>
           </div>
 
@@ -1111,11 +1163,12 @@ export default function AiRehearsalStudio() {
         {/* MINIMALIST TOP NAV & SCENE HEADER */}
         <header className="flex items-center justify-between gap-4 px-2 pt-2">
           <button
-            onClick={returnToStudio}
+            onClick={handleExitRehearsal}
             className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider text-[#8C5A54] hover:text-[#8C241E] transition-colors cursor-pointer"
+            title="Stop rehearsal and return to repertoire"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>Repertoire</span>
+            <span>Back to Repertoire</span>
           </button>
 
           <div className="text-right flex items-center gap-3">
@@ -1254,7 +1307,7 @@ export default function AiRehearsalStudio() {
               </div>
               <h2 className="font-serif text-2xl font-normal text-[#2A1816]">Scene Concluded</h2>
               <button
-                onClick={() => setIsSceneFinished(true)}
+                onClick={handleEndAndShowReport}
                 className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-6 py-2.5 rounded-full font-mono text-xs font-bold uppercase tracking-wider inline-flex items-center gap-2 border border-[#A6352F] cursor-pointer"
               >
                 <Award className="w-4 h-4 text-[#FFD0CC]" /> View Performance Report
@@ -1273,18 +1326,28 @@ export default function AiRehearsalStudio() {
         {/* FLOATING THEATRE CONTROLS DOCK */}
         <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
           {!session || session.scene_status !== "active" ? (
-            <button
-              onClick={startSession}
-              className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-8 py-3.5 rounded-full font-mono text-xs font-bold uppercase tracking-widest border border-[#A6352F] shadow-md shadow-[#8C241E]/20 flex items-center gap-2 cursor-pointer transition-transform hover:scale-102"
-            >
-              <Play className="w-4 h-4 fill-current text-[#FFD0CC]" />
-              <span>Start Live Rehearsal</span>
-            </button>
+            <>
+              <button
+                onClick={startSession}
+                className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-8 py-3.5 rounded-full font-mono text-xs font-bold uppercase tracking-widest border border-[#A6352F] shadow-md shadow-[#8C241E]/20 flex items-center gap-2 cursor-pointer transition-transform hover:scale-102"
+              >
+                <Play className="w-4 h-4 fill-current text-[#FFD0CC]" />
+                <span>Start Live Rehearsal</span>
+              </button>
+
+              <button
+                onClick={handleExitRehearsal}
+                className="px-5 py-3.5 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
+              >
+                <ArrowLeft className="w-3.5 h-3.5 text-[#8C241E]" />
+                <span>Back to Repertoire</span>
+              </button>
+            </>
           ) : (
             <>
               <button
                 onClick={stopSession}
-                className="bg-rose-900 hover:bg-rose-950 text-[#FDF8F7] px-7 py-3.5 rounded-full font-mono text-xs font-bold uppercase tracking-widest border border-rose-950 shadow-md flex items-center gap-2 cursor-pointer transition-transform hover:scale-102"
+                className="bg-rose-900 hover:bg-rose-950 text-[#FDF8F7] px-6 py-3.5 rounded-full font-mono text-xs font-bold uppercase tracking-widest border border-rose-950 shadow-md flex items-center gap-2 cursor-pointer transition-transform hover:scale-102"
               >
                 <Square className="w-4 h-4 fill-current" />
                 <span>Pause</span>
@@ -1292,18 +1355,27 @@ export default function AiRehearsalStudio() {
 
               <button
                 onClick={() => handleSkipOrAdvanceCue(true)}
-                className="px-6 py-3.5 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-2 transition-colors cursor-pointer shadow-2xs"
+                className="px-5 py-3.5 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-2 transition-colors cursor-pointer shadow-2xs"
               >
                 <FastForward className="w-4 h-4 text-[#8C241E]" />
                 <span>Skip Line</span>
               </button>
 
               <button
-                onClick={() => setIsSceneFinished(true)}
+                onClick={handleEndAndShowReport}
                 className="px-5 py-3.5 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
               >
                 <Award className="w-3.5 h-3.5 text-[#8C241E]" />
                 <span>End & View Report</span>
+              </button>
+
+              <button
+                onClick={handleExitRehearsal}
+                className="px-5 py-3.5 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
+                title="Stop rehearsal and return to repertoire"
+              >
+                <LogOut className="w-3.5 h-3.5 text-[#8C241E]" />
+                <span>Exit Stage</span>
               </button>
             </>
           )}
@@ -1383,11 +1455,11 @@ export default function AiRehearsalStudio() {
                     </div>
 
                     {!isHuman && (
-                      <div className="grid grid-cols-2 gap-1 p-0.5 bg-[#FAF2EE] rounded-lg border border-[#DCBAB2]/70">
+                      <div className="grid grid-cols-2 gap-1 p-0.5 bg-[#FAF2EE] rounded-lg border border-[#DCBAB2]/60">
                         <button
                           type="button"
                           onClick={() => setVoicePreferences({ ...voicePreferences, [character.name]: "female" })}
-                          className={`py-0.5 px-1.5 rounded text-[9px] font-mono font-bold uppercase transition-colors cursor-pointer ${
+                          className={`py-0.5 px-1.5 rounded text-[9px] font-mono font-bold uppercase transition-all cursor-pointer ${
                             currentVoice === "female" ? "bg-[#5C3B37] text-[#FAF2EE]" : "text-[#8C5A54] hover:text-[#2A1816]"
                           }`}
                         >
@@ -1396,7 +1468,7 @@ export default function AiRehearsalStudio() {
                         <button
                           type="button"
                           onClick={() => setVoicePreferences({ ...voicePreferences, [character.name]: "male" })}
-                          className={`py-0.5 px-1.5 rounded text-[9px] font-mono font-bold uppercase transition-colors cursor-pointer ${
+                          className={`py-0.5 px-1.5 rounded text-[9px] font-mono font-bold uppercase transition-all cursor-pointer ${
                             currentVoice === "male" ? "bg-[#5C3B37] text-[#FAF2EE]" : "text-[#8C5A54] hover:text-[#2A1816]"
                           }`}
                         >
