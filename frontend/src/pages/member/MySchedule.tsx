@@ -1,9 +1,22 @@
-import { useState, useEffect } from "react";
+// @ts-nocheck
+import React, { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
-import { Clock, MapPin, Check, X, Calendar as CalendarIcon, ChevronLeft, ChevronRight, History, BellRing, Sparkles } from "lucide-react";
+import {
+  Clock,
+  MapPin,
+  Check,
+  X,
+  Calendar as CalendarIcon,
+  ChevronLeft,
+  ChevronRight,
+  History,
+  BellRing,
+  Sparkles,
+  Layers,
+  ArrowRight
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 interface Event {
   id: string;
@@ -28,19 +41,23 @@ export default function MySchedule() {
   // Normalized "Today" for drama season reference (August 20, 2026 or current clock)
   const now = new Date();
   const currentSeasonDate = new Date(2026, 7, 20);
-  const referenceToday = now.getFullYear() >= 2026 ? new Date(now.getFullYear(), now.getMonth(), now.getDate()) : currentSeasonDate;
+  const referenceToday =
+    now.getFullYear() >= 2026 ? new Date(now.getFullYear(), now.getMonth(), now.getDate()) : currentSeasonDate;
 
   useEffect(() => {
     const fetchEvents = async () => {
       if (!activeUser?.email) return;
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005"}/api/my-schedule?email=${activeUser.email}`);
+        const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005";
+        const response = await fetch(`${baseUrl}/api/my-schedule?email=${encodeURIComponent(activeUser.email)}`);
         if (response.ok) {
           const data = await response.json();
           const formatted = data.map((e: any) => {
             const parsedDate = new Date(e.date);
             const isInvalidDate = isNaN(parsedDate.getTime());
-            const eventDay = isInvalidDate ? new Date() : new Date(parsedDate.getFullYear(), parsedDate.getMonth(), parsedDate.getDate());
+            const eventDay = isInvalidDate
+              ? new Date()
+              : new Date(parsedDate.getFullYear(), parsedDate.getMonth(), parsedDate.getDate());
             const isPast = eventDay.getTime() < referenceToday.getTime();
 
             return {
@@ -54,7 +71,7 @@ export default function MySchedule() {
               roleRequired: e.category,
               directorNotes: e.description,
               rawDate: eventDay,
-              isPast: isPast
+              isPast: isPast,
             };
           });
           setEvents(formatted);
@@ -67,11 +84,13 @@ export default function MySchedule() {
   }, [activeUser]);
 
   useEffect(() => {
-    const accepted = events.filter(e => e.status === "Accepted");
+    const accepted = events.filter((e) => e.status === "Accepted");
     if (accepted.length > 0) {
-      const upcomingAccepted = accepted.filter(e => !e.isPast);
+      const upcomingAccepted = accepted.filter((e) => !e.isPast);
       const targetList = upcomingAccepted.length > 0 ? upcomingAccepted : accepted;
-      const earliest = [...targetList].sort((a, b) => (a.rawDate?.getTime() || 0) - (b.rawDate?.getTime() || 0))[0];
+      const earliest = [...targetList].sort(
+        (a, b) => (a.rawDate?.getTime() || 0) - (b.rawDate?.getTime() || 0)
+      )[0];
       if (earliest && earliest.rawDate) {
         setCalendarDate(new Date(earliest.rawDate.getFullYear(), earliest.rawDate.getMonth(), 1));
       }
@@ -79,114 +98,170 @@ export default function MySchedule() {
   }, [events]);
 
   const handleStatusChange = async (id: string, newStatus: "Accepted" | "Declined") => {
-    const event = events.find(e => e.id === id);
+    const event = events.find((e) => e.id === id);
     if (!event) return;
-    
-    setEvents(prev => prev.map(e => e.id === id ? { ...e, status: newStatus } : e));
-    
+
+    setEvents((prev) => prev.map((e) => (e.id === id ? { ...e, status: newStatus } : e)));
+
     try {
-      await fetch(`${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005"}/api/my-schedule/update`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ participation_id: event.participation_id, status: newStatus })
+      const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005";
+      await fetch(`${baseUrl}/api/my-schedule/update`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ participation_id: event.participation_id, status: newStatus }),
       });
-    } catch(e) {}
+    } catch (e) {
+      console.warn(e);
+    }
   };
 
-  const acceptedEvents = events.filter(e => e.status === "Accepted");
-  const upcomingEvents = events.filter(e => !e.isPast);
-  const pastEvents = events.filter(e => e.isPast);
+  const acceptedEvents = events.filter((e) => e.status === "Accepted");
+  const upcomingEvents = events.filter((e) => !e.isPast);
+  const pastEvents = events.filter((e) => e.isPast);
 
   // Calendar logic
   const displayMonth = calendarDate.getMonth();
   const displayYear = calendarDate.getFullYear();
-  const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-  
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
   const handlePrevMonth = () => setCalendarDate(new Date(displayYear, displayMonth - 1, 1));
   const handleNextMonth = () => setCalendarDate(new Date(displayYear, displayMonth + 1, 1));
 
   const daysInMonth = new Date(displayYear, displayMonth + 1, 0).getDate();
   const firstDayOfMonth = new Date(displayYear, displayMonth, 1).getDay();
   const calendarEmptyDays = Array(firstDayOfMonth).fill(null);
-  const calendarDays = Array.from({length: daysInMonth}, (_, i) => new Date(displayYear, displayMonth, i + 1));
+  const calendarDays = Array.from(
+    { length: daysInMonth },
+    (_, i) => new Date(displayYear, displayMonth, i + 1)
+  );
 
   const currentDisplayList = scheduleView === "upcoming" ? upcomingEvents : pastEvents;
 
   return (
-    <div className="space-y-10 font-sans text-[#2C2A28] max-w-7xl mx-auto w-full pb-20">
+    <div className="space-y-8 font-sans text-[#5C3B37] max-w-6xl mx-auto w-full pb-20">
       
-      {/* Calendar View for Accepted Events */}
-      <section className="bg-[#F7F5F0] border border-[#D5C9BE]/70 rounded-[2rem] p-8 shadow-sm">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+      {/* 1. CALENDAR VIEW FOR ACCEPTED EVENTS */}
+      <section className="bg-[#F2E5E0] border border-[#DCBAB2] rounded-[2.5rem] p-6 md:p-8 shadow-xs space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#E85F57]/10 flex items-center justify-center text-[#E85F57]">
+            <div className="w-10 h-10 rounded-full bg-[#EEDBD5] border border-[#D5AAA2] flex items-center justify-center text-[#8C241E] shadow-2xs">
               <CalendarIcon className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-bold text-xl text-[#2C2A28] font-serif">Accepted Call Calendar</h3>
-              <p className="text-xs text-[#666361]">Confirmed rehearsals, stage sessions, and live showcases</p>
+              <div className="text-[10px] font-mono uppercase font-bold tracking-widest text-[#8C5A54]">
+                Confirmed Production Roster
+              </div>
+              <h2 className="font-serif text-2xl font-normal text-[#2A1816] tracking-tight">
+                Accepted Call Calendar
+              </h2>
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="font-serif font-bold text-lg text-[#2C2A28]">
+
+          <div className="flex items-center gap-3">
+            <span className="font-serif text-lg text-[#2A1816]">
               {monthNames[displayMonth]} {displayYear}
-            </div>
+            </span>
             <div className="flex gap-1.5">
-              <Button variant="outline" size="sm" onClick={handlePrevMonth} className="h-9 w-9 p-0 border-[#D5C9BE]/70 text-[#666361] hover:bg-[#E7DDD3]/50 rounded-lg">
+              <button
+                onClick={handlePrevMonth}
+                className="w-8 h-8 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] flex items-center justify-center transition-all cursor-pointer shadow-2xs"
+                title="Previous Month"
+              >
                 <ChevronLeft className="w-4 h-4" />
-              </Button>
-              <Button variant="outline" size="sm" onClick={handleNextMonth} className="h-9 w-9 p-0 border-[#D5C9BE]/70 text-[#666361] hover:bg-[#E7DDD3]/50 rounded-lg">
+              </button>
+              <button
+                onClick={handleNextMonth}
+                className="w-8 h-8 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] flex items-center justify-center transition-all cursor-pointer shadow-2xs"
+                title="Next Month"
+              >
                 <ChevronRight className="w-4 h-4" />
-              </Button>
+              </button>
             </div>
           </div>
         </div>
-        
-        <div className="grid grid-cols-7 gap-1 border-t border-l border-[#D5C9BE]/40 rounded-2xl overflow-hidden shadow-inner">
-          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => (
-            <div key={d} className="text-center text-[10px] font-mono font-bold uppercase tracking-wider text-[#666361] py-2.5 bg-[#E7DDD3]/40 border-r border-b border-[#D5C9BE]/40">{d}</div>
+
+        {/* Themed Calendar Grid */}
+        <div className="grid grid-cols-7 gap-1.5 bg-[#DCBAB2]/50 p-1.5 rounded-[1.8rem] border border-[#DCBAB2]">
+          {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
+            <div
+              key={d}
+              className="text-center text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54] py-2 bg-[#FAF2EE] rounded-xl"
+            >
+              {d}
+            </div>
           ))}
-          {calendarEmptyDays.map((_, i) => <div key={`empty-${i}`} className="p-2 border-r border-b border-[#D5C9BE]/40 bg-[#E7DDD3]/10 min-h-[105px]" />)}
-          {calendarDays.map(day => {
-            const dayEvents = acceptedEvents.filter(e => {
+
+          {calendarEmptyDays.map((_, i) => (
+            <div
+              key={`empty-${i}`}
+              className="p-2 bg-[#FAF2EE]/40 rounded-xl min-h-[95px] border border-[#DCBAB2]/30"
+            />
+          ))}
+
+          {calendarDays.map((day) => {
+            const dayEvents = acceptedEvents.filter((e) => {
               const d = new Date(e.date);
-              return !isNaN(d.getTime()) && d.getFullYear() === day.getFullYear() && d.getMonth() === day.getMonth() && d.getDate() === day.getDate();
+              return (
+                !isNaN(d.getTime()) &&
+                d.getFullYear() === day.getFullYear() &&
+                d.getMonth() === day.getMonth() &&
+                d.getDate() === day.getDate()
+              );
             });
-            
-            const isToday = day.getFullYear() === referenceToday.getFullYear() && day.getMonth() === referenceToday.getMonth() && day.getDate() === referenceToday.getDate();
-            
+
+            const isToday =
+              day.getFullYear() === referenceToday.getFullYear() &&
+              day.getMonth() === referenceToday.getMonth() &&
+              day.getDate() === referenceToday.getDate();
+
             return (
-              <div key={day.toISOString()} className={`min-h-[105px] p-2 border-r border-b border-[#D5C9BE]/40 relative transition-colors ${isToday ? 'bg-[#E85F57]/5' : 'bg-[#F7F5F0]'}`}>
-                <div className="flex items-center justify-between mb-1.5">
-                  {isToday && (
-                    <span className="text-[9px] font-mono font-bold text-[#E85F57] uppercase tracking-wider bg-[#E85F57]/15 px-1.5 py-0.5 rounded">Today</span>
-                  )}
-                  <span className={`text-xs font-mono font-bold ml-auto ${isToday ? 'text-[#E85F57]' : 'text-[#666361]'}`}>
+              <div
+                key={day.toISOString()}
+                className={`min-h-[95px] p-2 rounded-xl border transition-all flex flex-col justify-between ${
+                  isToday
+                    ? "bg-[#F5EAE6] border-[#8C241E] shadow-2xs ring-1 ring-[#8C241E]/40"
+                    : "bg-[#FAF2EE] border-[#DCBAB2]"
+                }`}
+              >
+                <div className="flex items-center justify-between mb-1">
+                  {isToday ? (
+                    <span className="text-[9px] font-mono font-bold text-[#8C241E] uppercase tracking-wider bg-[#EEDBD5] px-1.5 py-0.2 rounded border border-[#D5AAA2]">
+                      Today
+                    </span>
+                  ) : <span />}
+                  <span
+                    className={`text-xs font-mono font-bold ${
+                      isToday ? "text-[#8C241E]" : "text-[#8C5A54]"
+                    }`}
+                  >
                     {day.getDate()}
                   </span>
                 </div>
-                <div className="space-y-1.5">
-                  {dayEvents.map(e => (
-                    <div key={e.id} className="relative group">
-                      <div className="bg-[#E85F57]/15 hover:bg-[#E85F57]/25 text-[#2C2A28] text-[11px] font-medium px-2 py-1 rounded-md truncate cursor-pointer border border-[#E85F57]/30 transition-all shadow-xs">
-                        <span className="font-bold text-[#E85F57]">{e.time.split(' - ')[0]}</span> {e.title}
-                      </div>
-                      {/* Hover Popover */}
-                      <div className="absolute z-50 hidden group-hover:block bottom-full mb-2 left-1/2 -translate-x-1/2 w-[280px] bg-[#F7F5F0] border border-[#D5C9BE]/70 rounded-2xl p-4 shadow-2xl pointer-events-none">
-                        <div className="font-serif font-bold text-base text-[#2C2A28] mb-1 leading-snug">{e.title}</div>
-                        <div className="text-xs font-mono font-bold uppercase tracking-wider text-[#E85F57] mb-2">{e.roleRequired}</div>
-                        <div className="space-y-1 text-xs text-[#666361]">
-                          <div className="flex items-center gap-1.5">
-                            <CalendarIcon className="w-3.5 h-3.5 text-[#E85F57]" /> <span>{e.date}</span>
-                          </div>
-                          <div className="flex items-center gap-1.5">
-                            <Clock className="w-3.5 h-3.5 text-[#E85F57]" /> <span>{e.time}</span>
-                          </div>
-                          <div className="flex items-center gap-1.5">
-                            <MapPin className="w-3.5 h-3.5 text-[#E85F57]" /> <span className="truncate">{e.location}</span>
-                          </div>
-                        </div>
-                      </div>
+
+                <div className="space-y-1">
+                  {dayEvents.map((e) => (
+                    <div
+                      key={e.id}
+                      className="bg-[#EEDBD5] hover:bg-[#E3CEC6] text-[#2A1816] text-[10px] font-mono font-medium px-2 py-1 rounded-lg truncate border border-[#D5AAA2] transition-colors shadow-2xs"
+                      title={`${e.title} (${e.time}) - ${e.location}`}
+                    >
+                      <span className="font-bold text-[#8C241E] mr-1">
+                        {e.time.split(" - ")[0]}
+                      </span>
+                      {e.title}
                     </div>
                   ))}
                 </div>
@@ -196,157 +271,200 @@ export default function MySchedule() {
         </div>
       </section>
 
-      {/* Main Schedule Panel with Time Awareness */}
-      <section className="bg-[#F7F5F0] border border-[#D5C9BE]/70 rounded-[2rem] overflow-hidden shadow-sm">
-        <div className="px-8 py-6 border-b border-[#D5C9BE]/70 bg-[#F7F5F0] flex flex-col md:flex-row md:items-center justify-between gap-4">
+      {/* 2. PRODUCTION CALL ATTENDANCE - NON-SCROLLABLE THEATRICAL ROSTER */}
+      <section className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-[2.5rem] p-7 md:p-8 shadow-xs space-y-6">
+        
+        {/* Header with Switcher */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#DCBAB2]/70 pb-5">
           <div>
-            <div className="inline-flex items-center gap-2 text-[10px] font-mono font-bold uppercase tracking-widest text-[#E85F57] mb-1">
+            <div className="inline-flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase tracking-widest text-[#8C241E] mb-1">
               <Sparkles className="w-3.5 h-3.5" />
               <span>Callboard Action Center</span>
             </div>
-            <h3 className="font-bold text-2xl text-[#2C2A28] font-serif">Production Call Attendance</h3>
-            <p className="text-xs text-[#666361] mt-0.5">Confirm attendance for upcoming calls. Past dates are automatically archived.</p>
+            <h2 className="font-serif text-2xl md:text-3xl font-normal text-[#2A1816] tracking-tight">
+              Production Call Attendance
+            </h2>
+            <p className="text-xs text-[#6E4742] mt-0.5 font-light">
+              Review assigned rehearsal sessions, crew calls, and live showcases.
+            </p>
           </div>
 
-          {/* Time View Switcher */}
-          <div className="flex items-center bg-[#E7DDD3]/50 p-1 rounded-full border border-[#D5C9BE]/60 self-start md:self-auto">
+          {/* Pill View Switcher */}
+          <div className="flex items-center bg-[#E8D6CF]/70 p-1 rounded-full border border-[#D5AAA2] self-start sm:self-auto shadow-2xs">
             <button
               onClick={() => setScheduleView("upcoming")}
-              className={`flex items-center gap-2 px-5 py-2 rounded-full text-xs font-mono font-bold uppercase tracking-wider transition-all ${
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer ${
                 scheduleView === "upcoming"
-                  ? "bg-[#2C2A28] text-white shadow-md"
-                  : "text-[#666361] hover:text-[#2C2A28]"
+                  ? "bg-[#8C241E] text-[#FDF8F7] shadow-xs"
+                  : "text-[#5C3B37] hover:text-[#2A1816]"
               }`}
             >
               <BellRing className="w-3.5 h-3.5" />
               <span>Upcoming Calls ({upcomingEvents.length})</span>
             </button>
+
             <button
               onClick={() => setScheduleView("past")}
-              className={`flex items-center gap-2 px-5 py-2 rounded-full text-xs font-mono font-bold uppercase tracking-wider transition-all ${
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer ${
                 scheduleView === "past"
-                  ? "bg-[#2C2A28] text-white shadow-md"
-                  : "text-[#666361] hover:text-[#2C2A28]"
+                  ? "bg-[#8C241E] text-[#FDF8F7] shadow-xs"
+                  : "text-[#5C3B37] hover:text-[#2A1816]"
               }`}
             >
               <History className="w-3.5 h-3.5" />
-              <span>Past History ({pastEvents.length})</span>
+              <span>Past Archive ({pastEvents.length})</span>
             </button>
           </div>
         </div>
 
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow className="border-b border-[#D5C9BE]/70 bg-[#E7DDD3]/20 hover:bg-transparent">
-                <TableHead className="text-[#2C2A28] font-mono text-[10px] font-bold uppercase tracking-wider w-[280px] md:w-[32%] py-4 pl-8">Event & Directorial Details</TableHead>
-                <TableHead className="text-[#2C2A28] font-mono text-[10px] font-bold uppercase tracking-wider">Date & Time</TableHead>
-                <TableHead className="text-[#2C2A28] font-mono text-[10px] font-bold uppercase tracking-wider">Venue / Location</TableHead>
-                <TableHead className="text-[#2C2A28] font-mono text-[10px] font-bold uppercase tracking-wider">Call State</TableHead>
-                <TableHead className="text-[#2C2A28] font-mono text-[10px] font-bold uppercase tracking-wider text-right pr-8">
-                  {scheduleView === "upcoming" ? "Your Confirmation" : "Record Status"}
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {[...currentDisplayList]
-                .sort((a, b) => {
-                  if (scheduleView === "upcoming") {
-                    if (a.status === "Pending" && b.status !== "Pending") return -1;
-                    if (a.status !== "Pending" && b.status === "Pending") return 1;
-                    return (a.rawDate?.getTime() || 0) - (b.rawDate?.getTime() || 0);
-                  } else {
-                    return (b.rawDate?.getTime() || 0) - (a.rawDate?.getTime() || 0);
-                  }
-                })
-                .map((event) => (
-                <TableRow key={event.id} className="border-b border-[#D5C9BE]/40 hover:bg-[#E7DDD3]/30 transition-colors">
-                  <TableCell className="font-medium text-[#2C2A28] py-5 pl-8 w-[280px] md:w-[32%] align-top">
-                    <div className="flex flex-col">
-                      <span className="font-serif font-bold text-base text-[#2C2A28] leading-snug">{event.title}</span>
-                      <span className="text-xs font-mono font-bold text-[#E85F57] uppercase tracking-wider mt-1">{event.roleRequired}</span>
-                      {event.directorNotes && (
-                        <p className="text-xs text-[#666361] mt-1.5 leading-relaxed">
-                          <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#8C5A54] mr-1.5">Note:</span>
-                          {event.directorNotes}
-                        </p>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell className="py-5 align-top">
-                    <div className="flex flex-col text-xs text-[#2C2A28]">
-                      <span className="font-bold">{event.date}</span>
-                      <span className="text-[#666361] flex items-center gap-1.5 mt-1 font-mono text-[11px]">
-                        <Clock className="w-3.5 h-3.5 text-[#E85F57]" /> {event.time}
+        {/* NON-SCROLLABLE ROSTER GRID (100% CONTAINER FIT WITH NO HORIZONTAL SCROLL) */}
+        <div className="w-full space-y-3">
+          
+          {/* Table Header Row */}
+          <div className="hidden lg:grid grid-cols-[1.5fr_1fr_1fr_0.8fr_1.1fr] gap-4 px-5 py-2.5 bg-[#F2E5E0] rounded-2xl border border-[#DCBAB2] text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
+            <div>Production & Details</div>
+            <div>Date & Time</div>
+            <div>Venue / Hall</div>
+            <div>Call State</div>
+            <div className="text-right">
+              {scheduleView === "upcoming" ? "Your Confirmation" : "Record State"}
+            </div>
+          </div>
+
+          {/* Roster Items */}
+          {[...currentDisplayList]
+            .sort((a, b) => {
+              if (scheduleView === "upcoming") {
+                if (a.status === "Pending" && b.status !== "Pending") return -1;
+                if (a.status !== "Pending" && b.status === "Pending") return 1;
+                return (a.rawDate?.getTime() || 0) - (b.rawDate?.getTime() || 0);
+              } else {
+                return (b.rawDate?.getTime() || 0) - (a.rawDate?.getTime() || 0);
+              }
+            })
+            .map((event) => (
+              <div
+                key={event.id}
+                className="w-full bg-[#FAF2EE] hover:bg-[#F5EAE6] border border-[#DCBAB2] hover:border-[#8C241E]/40 rounded-2xl p-4 sm:p-5 transition-all shadow-2xs flex flex-col lg:grid lg:grid-cols-[1.5fr_1fr_1fr_0.8fr_1.1fr] gap-3 lg:gap-4 lg:items-center"
+              >
+                {/* 1. Production Details */}
+                <div className="space-y-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-[9px] font-mono font-bold uppercase text-[#8C241E] bg-[#EEDBD5] px-2 py-0.5 rounded-full border border-[#D5AAA2]">
+                      {event.roleRequired || "Cast / Crew Call"}
+                    </span>
+                  </div>
+                  <h3 className="font-serif font-bold text-base text-[#2A1816] leading-snug">
+                    {event.title}
+                  </h3>
+                  {event.directorNotes && (
+                    <p className="text-xs text-[#6E4742] leading-relaxed">
+                      <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#8C5A54] mr-1">
+                        Note:
                       </span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="py-5 align-top">
-                    <div className="flex items-center gap-1.5 text-xs text-[#666361]">
-                      <MapPin className="w-3.5 h-3.5 text-[#E85F57] shrink-0" />
-                      <span className="font-medium">{event.location}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="py-5 align-top">
-                    <Badge className={`rounded-md text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 ${
-                      event.status === "Accepted" ? "bg-emerald-600/10 text-emerald-700 border border-emerald-600/20" :
-                      event.status === "Declined" ? "bg-red-600/10 text-red-700 border border-red-600/20" :
-                      event.isPast ? "bg-stone-500/10 text-stone-600 border border-stone-400/20" :
-                      "bg-amber-600/10 text-amber-700 border border-amber-600/20"
-                    }`}>
-                      {event.isPast && event.status === "Pending" ? "Unanswered" : event.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="py-5 align-top text-right pr-8">
-                    {event.isPast ? (
-                      <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#666361]/60">
-                        {event.status === "Accepted" ? "Attended / Concluded" : event.status === "Declined" ? "Declined Record" : "Call Expired"}
-                      </span>
-                    ) : event.status === "Pending" ? (
-                      <div className="flex justify-end gap-2">
-                        <button
-                          className="bg-emerald-600 hover:bg-emerald-700 text-white h-9 px-4 rounded-xl text-xs font-mono font-bold uppercase tracking-wider transition-all shadow-xs flex items-center gap-1.5"
-                          onClick={() => handleStatusChange(event.id, "Accepted")}
-                        >
-                          <Check className="w-4 h-4" /> Accept
-                        </button>
-                        <button
-                          className="border border-red-300 text-red-600 hover:bg-red-50 h-9 px-3 rounded-xl text-xs font-mono font-bold uppercase tracking-wider transition-all flex items-center gap-1.5"
-                          onClick={() => handleStatusChange(event.id, "Declined")}
-                        >
-                          <X className="w-4 h-4" /> Decline
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="inline-flex items-center gap-2">
-                        <span className="text-xs font-mono text-[#666361] italic">
-                          {event.status === "Accepted" ? "Confirmed Attending" : "Declined"}
-                        </span>
-                        <button
-                          onClick={() => handleStatusChange(event.id, event.status === "Accepted" ? "Declined" : "Accepted")}
-                          className="text-[10px] font-mono text-[#E85F57] hover:underline uppercase tracking-wider font-bold ml-2"
-                        >
-                          Change
-                        </button>
-                      </div>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-              {currentDisplayList.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={5} className="py-12 text-center text-[#666361] font-sans">
-                    <CalendarIcon className="w-8 h-8 text-[#D5C9BE] mx-auto mb-2 opacity-70" />
-                    <p className="text-sm font-medium">
-                      {scheduleView === "upcoming" ? "No upcoming calls scheduled at this moment." : "No past schedule history found."}
+                      {event.directorNotes}
                     </p>
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+                  )}
+                </div>
+
+                {/* 2. Date & Time */}
+                <div className="space-y-0.5 text-xs text-[#2A1816]">
+                  <span className="font-serif font-semibold text-sm block">
+                    {event.date}
+                  </span>
+                  <span className="text-[#6E4742] flex items-center gap-1.5 font-mono text-[11px]">
+                    <Clock className="w-3.5 h-3.5 text-[#8C241E]" />
+                    <span>{event.time}</span>
+                  </span>
+                </div>
+
+                {/* 3. Venue / Hall */}
+                <div className="flex items-center gap-1.5 text-xs text-[#5C3B37] min-w-0">
+                  <MapPin className="w-3.5 h-3.5 text-[#8C241E] shrink-0" />
+                  <span className="font-medium truncate">{event.location}</span>
+                </div>
+
+                {/* 4. Call State Badge */}
+                <div>
+                  <span
+                    className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider border ${
+                      event.status === "Accepted"
+                        ? "bg-emerald-700/15 text-emerald-950 border-emerald-700/30"
+                        : event.status === "Declined"
+                          ? "bg-rose-700/15 text-rose-950 border-rose-700/30"
+                          : event.isPast
+                            ? "bg-[#EEDBD5] text-[#8C5A54] border-[#D5AAA2]"
+                            : "bg-amber-700/15 text-amber-950 border-amber-700/30"
+                    }`}
+                  >
+                    {event.isPast && event.status === "Pending" ? "Unanswered" : event.status}
+                  </span>
+                </div>
+
+                {/* 5. Confirmation Action Buttons */}
+                <div className="flex items-center justify-start lg:justify-end gap-2 pt-2 lg:pt-0 border-t border-[#DCBAB2]/50 lg:border-t-0">
+                  {event.isPast ? (
+                    <span className="text-[11px] font-mono font-medium text-[#8C5A54]">
+                      {event.status === "Accepted"
+                        ? "Attended / Concluded"
+                        : event.status === "Declined"
+                          ? "Declined Record"
+                          : "Call Concluded"}
+                    </span>
+                  ) : event.status === "Pending" ? (
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleStatusChange(event.id, "Accepted")}
+                        className="bg-emerald-800 hover:bg-emerald-900 text-[#FDF8F7] px-3.5 py-1.5 rounded-full text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1 transition-all cursor-pointer shadow-xs border border-emerald-900"
+                      >
+                        <Check className="w-3.5 h-3.5 text-emerald-200" />
+                        <span>Accept</span>
+                      </button>
+
+                      <button
+                        onClick={() => handleStatusChange(event.id, "Declined")}
+                        className="bg-[#FAF2EE] hover:bg-rose-50 text-rose-800 hover:text-rose-900 px-3 py-1.5 rounded-full text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1 transition-all cursor-pointer border border-rose-300 shadow-2xs"
+                      >
+                        <X className="w-3.5 h-3.5 text-rose-700" />
+                        <span>Decline</span>
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-mono text-[#6E4742] italic">
+                        {event.status === "Accepted" ? "Confirmed" : "Declined"}
+                      </span>
+                      <button
+                        onClick={() =>
+                          handleStatusChange(
+                            event.id,
+                            event.status === "Accepted" ? "Declined" : "Accepted"
+                          )
+                        }
+                        className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C241E] hover:text-[#731B16] bg-[#EEDBD5] hover:bg-[#E3CEC6] px-2.5 py-1 rounded-full border border-[#D5AAA2] transition-colors cursor-pointer"
+                      >
+                        Change
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+
+          {/* Empty State */}
+          {currentDisplayList.length === 0 && (
+            <div className="py-12 text-center text-xs font-mono text-[#8C5A54] bg-[#F5EAE6] rounded-2xl border border-dashed border-[#DCBAB2] space-y-2">
+              <CalendarIcon className="w-8 h-8 text-[#8C5A54]/60 mx-auto" />
+              <p>
+                {scheduleView === "upcoming"
+                  ? "No upcoming production calls scheduled at this moment."
+                  : "No past call history found in archive."}
+              </p>
+            </div>
+          )}
         </div>
       </section>
+
     </div>
   );
 }
