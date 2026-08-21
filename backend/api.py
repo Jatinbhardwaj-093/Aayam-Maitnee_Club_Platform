@@ -1315,9 +1315,15 @@ def submit_volunteer_application():
 def get_volunteers():
     from models import Volunteer
     play_id = request.args.get('play_id')
+    play_title = request.args.get('play_title')
     query = Volunteer.query
     if play_id:
-        query = query.filter_by(play_id=int(play_id))
+        try:
+            query = query.filter_by(play_id=int(play_id))
+        except Exception:
+            pass
+    if play_title:
+        query = query.filter(Volunteer.play_title.ilike(f"%{play_title}%"))
     vols = query.order_by(Volunteer.created_at.desc()).all()
     return jsonify([v.to_dict() for v in vols])
 

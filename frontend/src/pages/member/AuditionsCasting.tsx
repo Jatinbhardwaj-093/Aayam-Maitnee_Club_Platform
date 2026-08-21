@@ -506,67 +506,69 @@ export default function AuditionsCasting() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredPositions.map((pos, idx) => {
             const hasApplied = applications.some(a => String(a.position_id) === String(pos.id) || a.role_name === (pos.role_name || pos.title));
-            
-            const prodImg = (pos.production_name || "").toLowerCase().includes("hayavadana")
-              ? "/aayam_assets/hayavadana.jpg"
-              : (pos.production_name || "").toLowerCase().includes("ashadh")
-              ? "/aayam_assets/ashadh_ka_ek_din.jpg"
-              : (pos.production_name || "").toLowerCase().includes("charandas")
-              ? "/aayam_assets/charandas_chor.jpg"
-              : "/aayam_assets/samatvam_user_1.jpg";
 
             return (
               <div
                 key={pos.id || idx}
-                className="bg-[#FAF2EE] text-[#2A1816] rounded-[2rem] border border-[#DCBAB2] overflow-hidden shadow-md hover:border-[#B32D25]/50 hover:shadow-xl transition-all duration-300 flex flex-col justify-between group"
+                className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-[2rem] p-7 md:p-8 hover:border-[#B32D25]/50 hover:shadow-md transition-all flex flex-col justify-between space-y-6 shadow-xs group"
               >
-                <div>
-                  {/* Visual Card Image Header */}
-                  <div className="relative aspect-[16/9] overflow-hidden bg-[#E8D6CF]">
-                    <img
-                      src={prodImg}
-                      alt={pos.role_name || pos.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 filter brightness-95 contrast-105"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#2A1816]/80 via-transparent to-transparent" />
-                    
-                    <div className="absolute top-4 right-4">
-                      <span className="inline-flex items-center gap-1 px-3 py-1 text-[9px] font-mono font-bold rounded-full uppercase tracking-wider bg-[#FAF2EE]/90 text-[#8C241E] border border-[#D5AAA2] shadow-sm backdrop-blur-md">
-                        {pos.slots_available ? `${pos.slots_available} Slot${pos.slots_available > 1 ? "s" : ""}` : "Open"}
+                <div className="space-y-4">
+                  {/* Production & Category Header */}
+                  <div className="flex items-start justify-between gap-3 border-b border-[#DCBAB2]/50 pb-3">
+                    <div className="space-y-0.5">
+                      <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C241E] block">
+                        {pos.production_name || "Upcoming Production"}
+                      </span>
+                      <span className="text-[11px] font-mono text-[#8C5A54] uppercase tracking-wider font-semibold">
+                        {pos.role_category || pos.category || "Casting Role"}
                       </span>
                     </div>
-
-                    <div className="absolute bottom-3 left-5 text-xs font-mono font-bold text-[#FAF2EE] drop-shadow-sm">
-                      {pos.production_name || "Upcoming Premiere"}
-                    </div>
+                    <span className="inline-flex items-center gap-1 px-3 py-1 text-[10px] font-mono font-bold rounded-full uppercase tracking-wider bg-[#EEDBD5] text-[#8C241E] border border-[#D5AAA2] shrink-0">
+                      {pos.slots_available ? `${pos.slots_available} Slot${pos.slots_available > 1 ? "s" : ""}` : "Open"}
+                    </span>
                   </div>
 
-                  {/* Card Body */}
-                  <div className="p-6 sm:p-7 space-y-4">
-                    <div className="space-y-1">
-                      <span className="text-[10px] font-mono uppercase font-bold text-[#8C241E]">
-                        {pos.role_category || pos.category || "Role Calling"}
-                      </span>
-                      <h3 className="font-serif text-2xl font-normal text-[#2A1816] group-hover:text-[#8C241E] transition-colors leading-snug">
-                        {pos.role_name || pos.title}
-                      </h3>
-                    </div>
+                  {/* Role Title */}
+                  <div className="space-y-1">
+                    <h3 className="text-2xl font-serif text-[#2A1816] tracking-tight font-normal group-hover:text-[#8C241E] transition-colors leading-snug">
+                      {pos.role_name || pos.title}
+                    </h3>
+                  </div>
 
-                    <p className="text-xs text-[#5C3B37] leading-relaxed font-light line-clamp-2">
-                      {pos.character_description || pos.description}
-                    </p>
+                  {/* Character Description */}
+                  <p className="text-xs text-[#5C3B37] leading-relaxed font-light">
+                    {pos.character_description || pos.description}
+                  </p>
 
+                  {/* Requirements Box */}
+                  {pos.requirements && (
                     <div className="bg-[#F5EAE6] p-3.5 rounded-xl border border-[#DEBEB7] text-xs text-[#5C3B37] space-y-1">
-                      <div className="truncate"><strong>Department:</strong> {pos.role_category || pos.category}</div>
-                      <div className="truncate text-[#6E4742]"><strong>Requires:</strong> {pos.requirements || "Audition slate & role readiness"}</div>
+                      <p className="text-xs text-[#6E4742] leading-relaxed">
+                        <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#8C5A54] mr-1.5">
+                          Requires:
+                        </span>
+                        {pos.requirements}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Timeline Bar */}
+                  <div className="pt-2 border-t border-[#DCBAB2]/40 flex flex-wrap items-center justify-between gap-2 text-xs font-mono text-[#6E4742]">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[#8C5A54] uppercase text-[10px] font-bold">Opened:</span>
+                      <span className="text-[#2A1816]">{pos.opened_date || "Aug 20, 2026"}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[#8C241E] uppercase text-[10px] font-bold">Closes:</span>
+                      <span className="text-[#8C241E] font-bold">{pos.deadline || "Sep 25, 2026"}</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Card Actions */}
-                <div className="p-6 sm:p-7 pt-0 flex items-center justify-between border-t border-[#DCBAB2]/60 text-xs font-mono pt-4">
-                  <span className="text-[10px] font-mono text-[#8C5A54]">
-                    Due: {pos.deadline || "Sep 25, 2026"}
+                <div className="pt-4 border-t border-[#DCBAB2]/60 flex items-center justify-between text-xs font-mono">
+                  <span className="text-[10px] font-mono text-[#8C5A54] uppercase tracking-wider">
+                    {pos.status || "Open Calling"}
                   </span>
 
                   {hasApplied ? (
@@ -576,9 +578,9 @@ export default function AuditionsCasting() {
                   ) : (
                     <button
                       onClick={() => handleApplyClick(pos)}
-                      className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-4 py-2 rounded-full text-xs font-mono font-bold uppercase tracking-wider shadow-sm flex items-center gap-1 transition-all cursor-pointer border border-[#A6352F]"
+                      className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-5 py-2.5 rounded-full text-xs font-mono font-bold uppercase tracking-wider shadow-sm flex items-center gap-1.5 transition-all cursor-pointer border border-[#A6352F]"
                     >
-                      <span>Apply</span>
+                      <span>Apply for Role</span>
                       <ChevronRight className="w-3.5 h-3.5" />
                     </button>
                   )}
