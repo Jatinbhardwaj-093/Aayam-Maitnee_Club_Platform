@@ -109,7 +109,7 @@ export default function ViewProfile() {
                 )}
               </div>
               <div className="absolute bottom-2 right-2 w-8 h-8 bg-[#E85F57] rounded-full border-4 border-[#2C2A28] flex items-center justify-center">
-                <div className="w-2.5 h-2.5 bg-white rounded-full"></div>
+                <div className="w-2.5 h-2.5 bg-[#FAF2EE] rounded-full"></div>
               </div>
             </div>
             
@@ -127,7 +127,7 @@ export default function ViewProfile() {
                 </span>
                 
                 {/* ID Tag */}
-                <span className="bg-white/10 text-white/60 font-mono px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider border border-white/5 flex items-center gap-2">
+                <span className="bg-[#FAF2EE]/10 text-white/60 font-mono px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider border border-white/5 flex items-center gap-2">
                   <Shield className="w-3 h-3 text-[#E85F57]" /> ID: {profile.member_id || "AAY-PEND"}
                 </span>
 
@@ -157,7 +157,7 @@ export default function ViewProfile() {
           <div className="lg:col-span-5 space-y-8">
             
             {/* Contact Card */}
-            <div className="bg-white/60 rounded-[2.5rem] p-8 md:p-10 border border-[#D5C9BE]/60 shadow-sm backdrop-blur-sm">
+            <div className="bg-[#FAF2EE]/60 rounded-[2.5rem] p-8 md:p-10 border border-[#D5C9BE]/60 shadow-sm backdrop-blur-sm">
               <h2 className="text-[#2C2A28] font-serif text-2xl font-bold mb-6 border-b border-[#D5C9BE] pb-4">Demographics</h2>
               <div className="space-y-5">
                 <div className="flex flex-col">
@@ -176,7 +176,7 @@ export default function ViewProfile() {
             </div>
 
             {/* Address Card */}
-            <div className="bg-white/60 rounded-[2.5rem] p-8 md:p-10 border border-[#D5C9BE]/60 shadow-sm backdrop-blur-sm">
+            <div className="bg-[#FAF2EE]/60 rounded-[2.5rem] p-8 md:p-10 border border-[#D5C9BE]/60 shadow-sm backdrop-blur-sm">
               <h2 className="text-[#2C2A28] font-serif text-2xl font-bold mb-6 border-b border-[#D5C9BE] pb-4">Location</h2>
               <div className="space-y-5">
                 <div className="flex flex-col">
@@ -208,7 +208,7 @@ export default function ViewProfile() {
                 </div>
                 <div className="flex flex-col">
                   <span className="text-[10px] text-[#666361] uppercase font-mono tracking-widest font-bold mb-1">Emergency Phone</span>
-                  <span className="text-sm text-[#353535] font-mono bg-white/50 px-3 py-1.5 rounded-lg inline-block w-fit mt-1">{profile.emergency_contact_phone || "Not specified"}</span>
+                  <span className="text-sm text-[#353535] font-mono bg-[#FAF2EE]/50 px-3 py-1.5 rounded-lg inline-block w-fit mt-1">{profile.emergency_contact_phone || "Not specified"}</span>
                 </div>
               </div>
             </div>
@@ -219,7 +219,7 @@ export default function ViewProfile() {
           <div className="lg:col-span-7 space-y-8">
             
             {/* Bio Card */}
-            <div className="bg-white/60 rounded-[2.5rem] p-8 md:p-10 border border-[#D5C9BE]/60 shadow-sm backdrop-blur-sm h-full">
+            <div className="bg-[#FAF2EE]/60 rounded-[2.5rem] p-8 md:p-10 border border-[#D5C9BE]/60 shadow-sm backdrop-blur-sm h-full">
               <h2 className="text-[#2C2A28] font-serif text-3xl font-bold mb-6 border-b border-[#D5C9BE] pb-6 flex items-center gap-3">
                 <FileText className="w-6 h-6 text-[#E85F57]" /> Biography & Background
               </h2>

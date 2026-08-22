@@ -544,7 +544,7 @@ END:VCALENDAR`;
               <button
                 type="button"
                 onClick={() => setIsRequestModalOpen(false)}
-                className="px-6 py-2.5 rounded-full border border-white/20 text-white hover:bg-white/10 text-xs font-bold font-mono uppercase transition-all cursor-pointer"
+                className="px-6 py-2.5 rounded-full border border-white/20 text-white hover:bg-[#FAF2EE]/10 text-xs font-bold font-mono uppercase transition-all cursor-pointer"
               >
                 ← Back to Diary
               </button>
@@ -610,21 +610,21 @@ END:VCALENDAR`;
                   <button
                     type="button"
                     onClick={() => setAiRawText("Workshop Proposal: Navarasa Monologue Intensive & Emotional Subtext Masterclass. A 4-day intensive acting laboratory exploring classical Rasa Abhinaya (Bhayanaka, Shringara, Raudra, Karuna) and vocal resonance control for collegiate actors preparing for Autumn 2026 mainstage productions. Venue: Aayam Black Box Studio, SAC. Submitter: Aditi Sharma (aditi.sharma@study.iitm.ac.in, +91 98450 12345). Budget: ₹20,000.")}
-                    className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white/80 text-[11px] font-mono transition-all cursor-pointer"
+                    className="px-2.5 py-1 rounded-lg bg-[#FAF2EE]/10 hover:bg-[#FAF2EE]/20 text-white/80 text-[11px] font-mono transition-all cursor-pointer"
                   >
                     Navarasa Masterclass (Aditi)
                   </button>
                   <button
                     type="button"
                     onClick={() => setAiRawText("Sponsor Proposal: Red Bull Campus Drama Lounge & Stage Energy Partner. Exclusive Energy Drink & Artist Hospitality Partner for Autumn 2026. Includes dedicated Red Bull Green Room lounge, logo on 5,000 playbills, and intermission sampling kiosk at CLT Main Foyer. Contact: Rohan Sharma (partnerships@redbull.in, +91 98110 44321). Deal Budget: ₹1,50,000.")}
-                    className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white/80 text-[11px] font-mono transition-all cursor-pointer"
+                    className="px-2.5 py-1 rounded-lg bg-[#FAF2EE]/10 hover:bg-[#FAF2EE]/20 text-white/80 text-[11px] font-mono transition-all cursor-pointer"
                   >
                     Red Bull Lounge (Sponsor)
                   </button>
                   <button
                     type="button"
                     onClick={() => setAiRawText("Event Pitch: Acoustic Folk Jam & Vocal Modulations. An intimate evening blending vocal breathing exercises, Hindustani folk chanting, and acoustic musical cues with Akord music society. Venue: SAC Acoustic Room. Submitter: Sneha Das (sneha.das@study.iitm.ac.in, +91 98301 77654). Budget: ₹25,000.")}
-                    className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white/80 text-[11px] font-mono transition-all cursor-pointer"
+                    className="px-2.5 py-1 rounded-lg bg-[#FAF2EE]/10 hover:bg-[#FAF2EE]/20 text-white/80 text-[11px] font-mono transition-all cursor-pointer"
                   >
                     Folk Jam (Sneha)
                   </button>
@@ -796,7 +796,7 @@ END:VCALENDAR`;
                   <button
                     type="button"
                     onClick={() => setIsRequestModalOpen(false)}
-                    className="px-6 py-3 rounded-full border border-white/20 text-white hover:bg-white/10 text-xs font-mono font-bold uppercase transition-all cursor-pointer"
+                    className="px-6 py-3 rounded-full border border-white/20 text-white hover:bg-[#FAF2EE]/10 text-xs font-mono font-bold uppercase transition-all cursor-pointer"
                   >
                     Cancel
                   </button>
@@ -870,7 +870,7 @@ END:VCALENDAR`;
                       className={`px-5 py-2 rounded-full text-xs font-mono font-bold uppercase tracking-wider transition-all ${
                         filter === cat
                           ? "bg-[#2C2A28] text-white shadow-md"
-                          : "bg-white/70 text-[#666361] hover:bg-white border border-[#D5C9BE]/60"
+                          : "bg-[#FAF2EE]/70 text-[#666361] hover:bg-[#FAF2EE] border border-[#D5C9BE]/60"
                       }`}
                     >
                       {cat}
@@ -886,7 +886,7 @@ END:VCALENDAR`;
                       className={`px-4 py-1.5 rounded-full text-xs font-mono transition-all font-semibold ${
                         statusFilter === statusOpt
                           ? "bg-[#E85F57] text-white shadow-sm"
-                          : "text-[#666361] hover:text-[#2C2A28] bg-white/40 border border-[#D5C9BE]/40"
+                          : "text-[#666361] hover:text-[#2C2A28] bg-[#FAF2EE]/40 border border-[#D5C9BE]/40"
                       }`}
                     >
                       {statusOpt}
@@ -997,7 +997,7 @@ END:VCALENDAR`;
                   <span className="px-3 py-1 rounded-full bg-[#E85F57] text-white text-[10px] font-mono font-bold uppercase tracking-wider">
                     {selectedEventModal.category}
                   </span>
-                  <span className="px-3 py-1 rounded-full bg-white/10 text-white/80 border border-white/10 text-[10px] font-mono uppercase">
+                  <span className="px-3 py-1 rounded-full bg-[#FAF2EE]/10 text-white/80 border border-white/10 text-[10px] font-mono uppercase">
                     Event Ref #AYM-2026-{selectedEventModal.id}
                   </span>
                   <span className="text-[10px] font-mono text-[#E85F57] uppercase font-bold">
@@ -1013,7 +1013,7 @@ END:VCALENDAR`;
               <button 
                 type="button" 
                 onClick={() => setSelectedEventModal(null)}
-                className="text-white/60 hover:text-white bg-white/10 hover:bg-[#E85F57] w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-all"
+                className="text-white/60 hover:text-white bg-[#FAF2EE]/10 hover:bg-[#E85F57] w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-all"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1094,14 +1094,14 @@ END:VCALENDAR`;
                 <button
                   type="button"
                   onClick={() => handleShareEvent(selectedEventModal)}
-                  className="px-4 py-2.5 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-mono font-semibold uppercase flex items-center gap-1.5 transition-all"
+                  className="px-4 py-2.5 rounded-full bg-[#FAF2EE]/10 hover:bg-[#FAF2EE]/20 text-white text-xs font-mono font-semibold uppercase flex items-center gap-1.5 transition-all"
                 >
                   <Share2 className="w-3.5 h-3.5" /> Share
                 </button>
                 <button
                   type="button"
                   onClick={() => handleDownloadCalendarIcs(selectedEventModal)}
-                  className="px-4 py-2.5 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-mono font-semibold uppercase flex items-center gap-1.5 transition-all"
+                  className="px-4 py-2.5 rounded-full bg-[#FAF2EE]/10 hover:bg-[#FAF2EE]/20 text-white text-xs font-mono font-semibold uppercase flex items-center gap-1.5 transition-all"
                 >
                   <CalendarIcon className="w-3.5 h-3.5" /> .ICS
                 </button>
@@ -1111,7 +1111,7 @@ END:VCALENDAR`;
                 <button
                   type="button"
                   onClick={() => setSelectedEventModal(null)}
-                  className="px-6 py-2.5 rounded-full border border-white/20 text-white hover:bg-white/10 text-xs font-mono font-bold uppercase transition-all"
+                  className="px-6 py-2.5 rounded-full border border-white/20 text-white hover:bg-[#FAF2EE]/10 text-xs font-mono font-bold uppercase transition-all"
                 >
                   Close
                 </button>

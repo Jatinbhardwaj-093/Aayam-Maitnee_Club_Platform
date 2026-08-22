@@ -44,13 +44,13 @@ const CustomDropdown = ({ value, options, onChange }: { value: string, options: 
             <button
                 type="button"
                 onClick={() => setOpen(!open)}
-                className="w-full bg-[#FDF8F7] border border-[#DCBAB2] rounded-xl px-4 py-2.5 text-xs text-[#2A1816] font-bold text-left flex justify-between items-center hover:bg-[#FAF2EE] transition-colors focus:outline-none focus:ring-2 focus:ring-[#B32D25]/30"
+                className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl px-4 py-2.5 text-xs text-[#2A1816] font-bold text-left flex justify-between items-center hover:bg-[#FAF2EE] transition-colors focus:outline-none focus:ring-2 focus:ring-[#B32D25]/30"
             >
                 {value}
                 <svg className={`w-4 h-4 text-[#8C5A54] transition-transform ${open ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
             </button>
             {open && (
-                <div className="absolute top-full mt-1.5 left-0 w-full bg-[#FDF8F7] border border-[#DCBAB2] rounded-xl shadow-xl z-50 overflow-hidden">
+                <div className="absolute top-full mt-1.5 left-0 w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl shadow-xl z-50 overflow-hidden">
                     {options.map((opt) => (
                         <button
                             key={opt}
@@ -465,7 +465,7 @@ export default function MediaModeration() {
                                 placeholder="e.g. Climax Monologue Stage Lighting"
                                 value={newMedia.title}
                                 onChange={(e) => setNewMedia({ ...newMedia, title: e.target.value })}
-                                className="border-[#DCBAB2] bg-[#FDF8F7] h-10 text-xs rounded-xl font-semibold text-[#2A1816] focus:border-[#B32D25] shadow-sm hover:bg-[#FAF2EE] transition-colors"
+                                className="border-[#DCBAB2] bg-[#FAF2EE] h-10 text-xs rounded-xl font-semibold text-[#2A1816] focus:border-[#B32D25] shadow-sm hover:bg-[#FAF2EE] transition-colors"
                             />
                         </div>
 
@@ -537,7 +537,7 @@ export default function MediaModeration() {
                                 placeholder="e.g. Backstage dress run before opening night"
                                 value={newMedia.caption}
                                 onChange={(e) => setNewMedia({ ...newMedia, caption: e.target.value })}
-                                className="border-[#DCBAB2] bg-[#FDF8F7] h-10 text-xs rounded-xl font-semibold text-[#2A1816] focus:border-[#B32D25] shadow-sm hover:bg-[#FAF2EE] transition-colors"
+                                className="border-[#DCBAB2] bg-[#FAF2EE] h-10 text-xs rounded-xl font-semibold text-[#2A1816] focus:border-[#B32D25] shadow-sm hover:bg-[#FAF2EE] transition-colors"
                             />
                         </div>
 
@@ -545,7 +545,7 @@ export default function MediaModeration() {
                             <button
                                 type="button"
                                 onClick={() => setIsAddModalOpen(false)}
-                                className="border border-[#DCBAB2] text-[#6E4742] bg-[#FDF8F7] hover:bg-[#FAF2EE] hover:text-[#2A1816] rounded-full text-xs font-mono font-bold uppercase tracking-wider flex-1 py-3 transition-colors cursor-pointer text-center"
+                                className="border border-[#DCBAB2] text-[#6E4742] bg-[#FAF2EE] hover:bg-[#FAF2EE] hover:text-[#2A1816] rounded-full text-xs font-mono font-bold uppercase tracking-wider flex-1 py-3 transition-colors cursor-pointer text-center"
                             >
                                 Cancel
                             </button>

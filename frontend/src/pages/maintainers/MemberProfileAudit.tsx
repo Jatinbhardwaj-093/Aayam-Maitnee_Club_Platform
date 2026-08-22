@@ -143,12 +143,12 @@ export default function MemberProfileAudit() {
                   <div className="relative">
                     <button 
                       onClick={() => setShowLabelDropdown(!showLabelDropdown)}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-[#FDF8F7] border border-[#DCBAB2] text-[#8C5A54] hover:text-[#8C241E] hover:border-[#8C5A54] transition-all shadow-sm cursor-pointer"
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-[#FAF2EE] border border-[#DCBAB2] text-[#8C5A54] hover:text-[#8C241E] hover:border-[#8C5A54] transition-all shadow-sm cursor-pointer"
                     >
                       <Plus className="w-3 h-3" /> Add Label
                     </button>
                     {showLabelDropdown && (
-                      <div className="absolute top-full mt-2 left-0 w-48 bg-[#FDF8F7] rounded-xl shadow-xl border border-[#DCBAB2] p-2 z-50 flex flex-col gap-1 max-h-48 overflow-y-auto custom-scrollbar">
+                      <div className="absolute top-full mt-2 left-0 w-48 bg-[#FAF2EE] rounded-xl shadow-xl border border-[#DCBAB2] p-2 z-50 flex flex-col gap-1 max-h-48 overflow-y-auto custom-scrollbar">
                         <div className="text-[10px] font-mono font-bold text-[#8C5A54] uppercase tracking-wider px-2 py-1 mb-1 border-b border-[#DCBAB2]/50">Assign Label</div>
                         {allLabels.filter(l => !profile.labels?.find((pl: any) => pl.id === l.id)).map(label => (
                           <button key={label.id} onClick={() => handleAssignLabel(label.id)} className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-[#FAF2EE] text-left text-xs font-semibold cursor-pointer" style={{color: label.color}}>
@@ -165,7 +165,7 @@ export default function MemberProfileAudit() {
                 </div>
               </div>
             </div>
-            <div className="bg-[#FDF8F7] border border-[#DCBAB2] px-5 py-3 rounded-2xl shadow-sm text-center">
+            <div className="bg-[#FAF2EE] border border-[#DCBAB2] px-5 py-3 rounded-2xl shadow-sm text-center">
               <p className="text-[9px] uppercase font-mono font-bold text-[#8C5A54] tracking-wider mb-0.5">Member ID</p>
               <p className="text-sm font-bold font-mono text-[#2A1816]">{profile.member_id || "AAY-PEND"}</p>
             </div>
@@ -181,15 +181,15 @@ export default function MemberProfileAudit() {
                   <Phone className="w-4 h-4 text-[#8C241E]" /> Contact Info
                 </h2>
                 <div className="space-y-3 text-sm text-[#5C3B37]">
-                  <div className="flex justify-between items-center bg-[#FDF8F7] p-3 rounded-xl border border-[#DCBAB2]/50">
+                  <div className="flex justify-between items-center bg-[#FAF2EE] p-3 rounded-xl border border-[#DCBAB2]/50">
                     <span className="text-[10px] font-mono uppercase font-bold tracking-wider text-[#8C5A54]">Phone</span>
                     <span className="font-medium">{profile.phone || "Not specified"}</span>
                   </div>
-                  <div className="flex justify-between items-center bg-[#FDF8F7] p-3 rounded-xl border border-[#DCBAB2]/50">
+                  <div className="flex justify-between items-center bg-[#FAF2EE] p-3 rounded-xl border border-[#DCBAB2]/50">
                     <span className="text-[10px] font-mono uppercase font-bold tracking-wider text-[#8C5A54]">Pronouns</span>
                     <span className="font-medium">{profile.pronouns || "Not specified"}</span>
                   </div>
-                  <div className="flex justify-between items-center bg-[#FDF8F7] p-3 rounded-xl border border-[#DCBAB2]/50">
+                  <div className="flex justify-between items-center bg-[#FAF2EE] p-3 rounded-xl border border-[#DCBAB2]/50">
                     <span className="text-[10px] font-mono uppercase font-bold tracking-wider text-[#8C5A54]">Age</span>
                     <span className="font-medium">{profile.age || "Not specified"}</span>
                   </div>
@@ -200,7 +200,7 @@ export default function MemberProfileAudit() {
                 <h2 className="text-[11px] font-mono font-bold uppercase tracking-widest text-[#8C5A54] flex items-center gap-2 border-b border-[#DCBAB2]/60 pb-2">
                   <MapPin className="w-4 h-4 text-[#8C241E]" /> Address
                 </h2>
-                <div className="space-y-2 text-sm text-[#5C3B37] bg-[#FDF8F7] p-4 rounded-xl border border-[#DCBAB2]/50">
+                <div className="space-y-2 text-sm text-[#5C3B37] bg-[#FAF2EE] p-4 rounded-xl border border-[#DCBAB2]/50">
                   <p><strong className="font-mono text-[10px] uppercase tracking-wider text-[#8C5A54]">Street:</strong> {profile.address || "Not specified"}</p>
                   <p><strong className="font-mono text-[10px] uppercase tracking-wider text-[#8C5A54]">City:</strong> {profile.city || "Not specified"}</p>
                   <p><strong className="font-mono text-[10px] uppercase tracking-wider text-[#8C5A54]">State:</strong> {profile.state || "Not specified"}</p>
@@ -244,11 +244,11 @@ export default function MemberProfileAudit() {
                     <Award className="w-4 h-4 text-[#8C241E]" /> Theatrical Profile
                   </h3>
                   <div className="space-y-3 text-sm text-[#5C3B37]">
-                    <div className="bg-[#FDF8F7] p-3.5 rounded-xl border border-[#DCBAB2]/50 flex flex-col gap-1">
+                    <div className="bg-[#FAF2EE] p-3.5 rounded-xl border border-[#DCBAB2]/50 flex flex-col gap-1">
                       <span className="text-[10px] font-mono uppercase font-bold tracking-wider text-[#8C5A54]">Primary Interest</span>
                       <span className="font-medium leading-relaxed">{profile.interest || "Acting"}</span>
                     </div>
-                    <div className="bg-[#FDF8F7] p-3.5 rounded-xl border border-[#DCBAB2]/50 flex flex-col gap-1">
+                    <div className="bg-[#FAF2EE] p-3.5 rounded-xl border border-[#DCBAB2]/50 flex flex-col gap-1">
                       <span className="text-[10px] font-mono uppercase font-bold tracking-wider text-[#8C5A54]">Availability</span>
                       <span className="font-medium">{profile.availability || "Weekends"}</span>
                     </div>
@@ -259,7 +259,7 @@ export default function MemberProfileAudit() {
                   <h3 className="text-[11px] font-mono font-bold uppercase tracking-widest text-[#8C5A54] flex items-center gap-2 border-b border-[#DCBAB2]/60 pb-2">
                     <Globe className="w-4 h-4 text-[#8C241E]" /> Portfolio
                   </h3>
-                  <div className="bg-[#FDF8F7] p-3.5 rounded-xl border border-[#DCBAB2]/50 flex flex-col gap-1">
+                  <div className="bg-[#FAF2EE] p-3.5 rounded-xl border border-[#DCBAB2]/50 flex flex-col gap-1">
                     <span className="text-[10px] font-mono uppercase font-bold tracking-wider text-[#8C5A54]">External Link</span>
                     {profile.portfolio ? (
                       <a href={profile.portfolio} target="_blank" rel="noreferrer" className="font-medium text-[#8C241E] hover:underline flex items-center gap-1.5 break-all">

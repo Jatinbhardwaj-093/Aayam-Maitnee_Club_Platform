@@ -2331,14 +2331,40 @@ def suggest_character():
         return jsonify({"error": f"Live LLM call failed: {str(e)}"}), 500
 
 
-@api_bp.route('/auto-extract', methods=['POST'])
-def auto_extract():
-    data = request.json or {}
-    text = data.get("text", "")
-    script_id = data.get("script_id")
+@api_bp.route('/extract-script', methods=['POST'])
+def extract_script_route():
+    text = ""
+    script_id = None
     
+    if request.is_json:
+        data = request.json or {}
+        text = data.get("text", "")
+        script_id = data.get("script_id")
+    else:
+        # Handle file upload
+        file = request.files.get('file')
+        script_id = request.form.get("script_id")
+        text = request.form.get("text", "")
+        
+        if file and file.filename:
+            if file.filename.lower().endswith('.pdf'):
+                try:
+                    import PyPDF2
+                    pdf_reader = PyPDF2.PdfReader(file)
+                    extracted = []
+                    for page in pdf_reader.pages:
+                        extracted.append(page.extract_text() or "")
+                    text = "\n".join(extracted)
+                except Exception as e:
+                    return jsonify({"error": f"Failed to parse PDF: {str(e)}"}), 400
+            else:
+                try:
+                    text = file.read().decode('utf-8')
+                except Exception as e:
+                    return jsonify({"error": f"Failed to read text file: {str(e)}"}), 400
+                    
     if not text.strip():
-        return jsonify({"error": "Text is required"}), 400
+        return jsonify({"error": "Text or file is required"}), 400
         
     try:
         system_instruction = """

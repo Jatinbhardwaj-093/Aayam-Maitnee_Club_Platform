@@ -25,7 +25,45 @@ import ProductionDetailModal from "@/components/ProductionDetailModal";
 import type { ProductionDetailData } from "@/components/ProductionDetailModal";
 import { getPlaybookForTitle } from "@/data/playbooksData";
 import type { Playbook } from "@/data/playbooksData";
-import { Info } from "lucide-react";
+import { Info, Plus, Gift, CreditCard, ChevronDown } from "lucide-react";
+
+const CustomSelect = ({ value, onChange, options, placeholder = "Select..." }: { value: string, onChange: (val: string) => void, options: {value: string, label: string}[], placeholder?: string }) => {
+  const [open, setOpen] = useState(false);
+  
+  return (
+    <div className="relative w-full">
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="w-full bg-[#E8D6CF]/70 border border-[#D5AAA2] rounded-xl px-4 py-2.5 text-xs text-[#2A1816] font-semibold flex items-center justify-between focus:outline-none"
+      >
+        <span className="truncate">{options.find(o => o.value === value)?.label || placeholder}</span>
+        <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
+      </button>
+      {open && (
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+          <div className="absolute top-full left-0 mt-1 w-full bg-[#F5EAE6] border border-[#DEBEB7] rounded-2xl p-2 shadow-2xl z-50 max-h-60 overflow-y-auto custom-scrollbar">
+            {options.map(opt => (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => { onChange(opt.value); setOpen(false); }}
+                className={`w-full text-left rounded-xl p-2.5 text-xs font-mono font-medium flex items-center gap-2 transition-colors ${
+                  value === opt.value
+                    ? "bg-[#8C241E] text-[#FDF8F7] font-bold shadow-xs"
+                    : "hover:bg-[#EEDBD5] text-[#2A1816]"
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
 
 interface PlayItem {
   id: number;
@@ -63,6 +101,15 @@ export default function Plays() {
   
   // Production Detail Modal State
   const [selectedDetailPlay, setSelectedDetailPlay] = useState<ProductionDetailData | null>(null);
+
+  // Donation Modal State
+  const [donationOpen, setDonationOpen] = useState(false);
+  const [selectedPlayForDonation, setSelectedPlayForDonation] = useState<PlayItem | null>(null);
+  const [donationName, setDonationName] = useState("");
+  const [donationEmail, setDonationEmail] = useState("");
+  const [donationNumber, setDonationNumber] = useState("");
+  const [donationUpi, setDonationUpi] = useState("");
+  const [paymentStatus, setPaymentStatus] = useState<"idle" | "processing" | "success">("idle");
 
   // Volunteer Modal State
   const [volunteerOpen, setVolunteerOpen] = useState(false);
@@ -345,44 +392,71 @@ export default function Plays() {
                     </div>
                   </div>
 
-                  {/* Card Actions - CLEAN SINGLE LINE WITHOUT ICONS */}
-                  <div className="p-4 sm:p-5 pt-0 border-t border-white/10 pt-3.5 flex items-center gap-2 w-full flex-nowrap">
-                    <button
-                      onClick={() => handleOpenDetails(play)}
-                      className="flex-1 py-2 px-2 rounded-full border border-white/20 hover:bg-white/10 text-white text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer truncate"
-                      title="View full production dossier"
-                    >
-                      Details
-                    </button>
-
-                    <button
-                      onClick={() => handleOpenScriptPreview(play)}
-                      className="flex-1 py-2 px-2 rounded-full border border-white/20 hover:bg-white/10 text-[#E85F57] text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer truncate"
-                      title="Preview Script & Playbook"
-                    >
-                      Script
-                    </button>
-
+                  {/* Card Actions */}
+                  <div className="p-4 sm:p-5 pt-0 border-t border-white/10 pt-3.5 flex flex-col gap-2 w-full">
                     {!isPastPlay(play) ? (
                       <>
-                        <button
-                          onClick={() => handleReservePass(play.title)}
-                          className="flex-1 py-2 px-2 rounded-full bg-[#E85F57] hover:bg-[#D94538] text-white text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer shadow-md truncate"
-                        >
-                          Reserve
-                        </button>
-                        <button
-                          onClick={() => handleOpenVolunteer(play)}
-                          className="flex-1 py-2 px-2 rounded-full border border-white/20 hover:bg-white/10 text-white text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer truncate"
-                          title="Volunteer for Backstage Crew"
-                        >
-                          Crew
-                        </button>
+                        <div className="flex gap-2 w-full">
+                          <button
+                            onClick={() => handleReservePass(play.title)}
+                            className="flex-1 py-2.5 px-3 rounded-full bg-[#E85F57] hover:bg-[#D94538] text-white text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer shadow-md flex items-center justify-center gap-1.5"
+                          >
+                            <Ticket className="w-3.5 h-3.5" />
+                            <span className="truncate">Reserve</span>
+                          </button>
+                          <button
+                            onClick={() => {
+                              setSelectedPlayForDonation(play);
+                              setDonationOpen(true);
+                              setPaymentStatus("idle");
+                            }}
+                            className="flex-1 py-2.5 px-3 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer shadow-md flex items-center justify-center gap-1.5"
+                          >
+                            <Gift className="w-3.5 h-3.5" />
+                            <span className="truncate">Donate</span>
+                          </button>
+                        </div>
+                        <div className="flex gap-2 w-full">
+                          <button
+                            onClick={() => handleOpenDetails(play)}
+                            className="flex-1 py-2 px-2 rounded-full border border-white/20 hover:bg-[#FAF2EE]/10 text-white text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer truncate"
+                            title="View full production dossier"
+                          >
+                            Details
+                          </button>
+                          <button
+                            onClick={() => handleOpenScriptPreview(play)}
+                            className="flex-1 py-2 px-2 rounded-full border border-white/20 hover:bg-[#FAF2EE]/10 text-[#E85F57] text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer truncate"
+                            title="Preview Script & Playbook"
+                          >
+                            Script
+                          </button>
+                          <button
+                            onClick={() => handleOpenVolunteer(play)}
+                            className="flex-1 py-2 px-2 rounded-full border border-white/20 hover:bg-[#FAF2EE]/10 text-white text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer truncate"
+                            title="Volunteer for Backstage Crew"
+                          >
+                            Volunteer
+                          </button>
+                        </div>
                       </>
                     ) : (
-                      <span className="flex-1 py-2 px-2 rounded-full bg-white/10 border border-white/10 text-white/60 text-xs font-mono font-bold uppercase tracking-wider text-center truncate">
-                        Archived
-                      </span>
+                      <div className="flex gap-2 w-full">
+                        <button
+                          onClick={() => handleOpenDetails(play)}
+                          className="flex-1 py-2 px-2 rounded-full border border-white/20 hover:bg-[#FAF2EE]/10 text-white text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer truncate"
+                          title="View full production dossier"
+                        >
+                          Details
+                        </button>
+                        <button
+                          onClick={() => handleOpenScriptPreview(play)}
+                          className="flex-1 py-2 px-2 rounded-full border border-white/20 hover:bg-[#FAF2EE]/10 text-[#E85F57] text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer truncate"
+                          title="Preview Script & Playbook"
+                        >
+                          Script
+                        </button>
+                      </div>
                     )}
                   </div>
                 </div>
@@ -475,18 +549,18 @@ export default function Plays() {
                         <label className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#8C5A54] block">
                           Preferred Department
                         </label>
-                        <select
+                        <CustomSelect
                           value={volDepartment}
-                          onChange={e => setVolDepartment(e.target.value)}
-                          className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl px-3.5 py-2.5 text-xs text-[#2A1816] focus:outline-hidden focus:border-[#8C241E]"
-                        >
-                          <option value="Stage Management & Props">Stage Management & Props</option>
-                          <option value="Lighting Console & DMX Cues">Lighting Console & DMX Cues</option>
-                          <option value="Prosthetics, Mask Craft & SFX">Prosthetics, Mask Craft & SFX</option>
-                          <option value="Wardrobe & Period Costumes">Wardrobe & Period Costumes</option>
-                          <option value="Live Soundscape & Acoustic Audio">Live Soundscape & Acoustic Audio</option>
-                          <option value="Front of House & Ticketing">Front of House & Ticketing</option>
-                        </select>
+                          onChange={(val) => setVolDepartment(val)}
+                          options={[
+                            { value: "Stage Management & Props", label: "Stage Management & Props" },
+                            { value: "Lighting Console & DMX Cues", label: "Lighting Console & DMX Cues" },
+                            { value: "Prosthetics, Mask Craft & SFX", label: "Prosthetics, Mask Craft & SFX" },
+                            { value: "Wardrobe & Period Costumes", label: "Wardrobe & Period Costumes" },
+                            { value: "Live Soundscape & Acoustic Audio", label: "Live Soundscape & Acoustic Audio" },
+                            { value: "Front of House & Ticketing", label: "Front of House & Ticketing" }
+                          ]}
+                        />
                       </div>
                     </div>
 
@@ -494,16 +568,16 @@ export default function Plays() {
                       <label className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#8C5A54] block">
                         Weekly Availability
                       </label>
-                      <select
+                      <CustomSelect
                         value={volAvailability}
-                        onChange={e => setVolAvailability(e.target.value)}
-                        className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl px-3.5 py-2.5 text-xs text-[#2A1816] focus:outline-hidden focus:border-[#8C241E]"
-                      >
-                        <option value="2-4 Hours / Week (Light Support)">2-4 Hours / Week (Light Support)</option>
-                        <option value="4-6 Hours / Week (Regular Rehearsals)">4-6 Hours / Week (Regular Rehearsals)</option>
-                        <option value="8+ Hours / Week (Intensive Production Crew)">8+ Hours / Week (Intensive Production Crew)</option>
-                        <option value="Weekends Only">Weekends Only</option>
-                      </select>
+                        onChange={(val) => setVolAvailability(val)}
+                        options={[
+                          { value: "2-4 Hours / Week (Light Support)", label: "2-4 Hours / Week (Light Support)" },
+                          { value: "4-6 Hours / Week (Regular Rehearsals)", label: "4-6 Hours / Week (Regular Rehearsals)" },
+                          { value: "8+ Hours / Week (Intensive Production Crew)", label: "8+ Hours / Week (Intensive Production Crew)" },
+                          { value: "Weekends Only", label: "Weekends Only" }
+                        ]}
+                      />
                     </div>
 
                     <div className="space-y-1">
@@ -524,17 +598,138 @@ export default function Plays() {
                       <button
                         type="button"
                         onClick={() => setVolunteerOpen(false)}
-                        className="px-5 py-2.5 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer"
+                        className="px-5 py-3 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer shadow-xs"
                       >
-                        Cancel
+                        <X className="w-4 h-4 text-[#8C241E]" />
+                        <span>Cancel</span>
                       </button>
                       <button
                         type="submit"
                         disabled={volSubmitting}
-                        className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-6 py-2.5 rounded-full text-xs font-mono font-bold uppercase tracking-widest shadow-sm flex items-center gap-2 transition-all cursor-pointer border border-[#A6352F] disabled:opacity-50"
+                        className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-6 py-3 rounded-full text-xs font-mono font-bold uppercase tracking-widest shadow-lg shadow-[#8C241E]/20 flex items-center gap-2 transition-all cursor-pointer border border-[#A6352F] disabled:opacity-50"
                       >
-                        <Check className="w-4 h-4" />
-                        <span>{volSubmitting ? "Submitting..." : "Submit Volunteer Request"}</span>
+                        <Plus className="w-4 h-4 text-[#FFD0CC]" />
+                        <span>{volSubmitting ? "Submitting..." : "Submit Request"}</span>
+                      </button>
+                    </div>
+                  </form>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* DONATION MODAL */}
+        {donationOpen && selectedPlayForDonation && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
+            <div className="bg-[#F5EAE6] border border-[#DEBEB7] text-[#2A1816] rounded-[2.5rem] p-6 sm:p-8 max-w-lg w-full shadow-2xl relative">
+              {/* Close button */}
+              <button
+                type="button"
+                onClick={() => setDonationOpen(false)}
+                className="absolute top-6 right-6 w-9 h-9 rounded-full bg-[#EEDBD5] hover:bg-[#E3CEC6] text-[#5C3B37] hover:text-[#2A1816] flex items-center justify-center transition-all cursor-pointer border border-[#D5AAA2] shadow-xs group z-20"
+              >
+                <X className="w-4 h-4 group-hover:rotate-90 transition-transform duration-200" />
+              </button>
+
+              <div className="space-y-6">
+                <div className="space-y-1.5 pr-8">
+                  <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-700/15 px-3 py-1 rounded-full border border-emerald-700/30 inline-block">
+                    Support Theatre
+                  </span>
+                  <h2 className="text-2xl font-serif text-[#2A1816] tracking-tight font-normal">
+                    Donate to {selectedPlayForDonation.title}
+                  </h2>
+                  <p className="text-xs text-[#5C3B37] font-light leading-relaxed">
+                    Help Aayam continue producing high-quality theatre by contributing to our production fund.
+                  </p>
+                </div>
+
+                {paymentStatus === "success" ? (
+                  <div className="p-5 rounded-2xl bg-emerald-700/15 border border-emerald-700/30 text-emerald-950 flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-800 shrink-0 mt-0.5" />
+                    <div className="text-xs space-y-1">
+                      <p className="font-bold font-mono uppercase tracking-wider">Donation Successful!</p>
+                      <p>Thank you for your generous support. Your contribution directly funds our artistic vision.</p>
+                    </div>
+                  </div>
+                ) : (
+                  <form onSubmit={(e) => {
+                    e.preventDefault();
+                    setPaymentStatus("processing");
+                    setTimeout(() => setPaymentStatus("success"), 1500);
+                  }} className="space-y-4">
+                    <div className="space-y-1">
+                      <label className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#8C5A54] block">
+                        Full Name *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={donationName}
+                        onChange={e => setDonationName(e.target.value)}
+                        placeholder="Your Name"
+                        className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl px-3.5 py-2.5 text-xs text-[#2A1816] focus:outline-hidden focus:border-[#8C241E]"
+                      />
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-1">
+                        <label className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#8C5A54] block">
+                          Email Address *
+                        </label>
+                        <input
+                          type="email"
+                          required
+                          value={donationEmail}
+                          onChange={e => setDonationEmail(e.target.value)}
+                          placeholder="your.email@example.com"
+                          className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl px-3.5 py-2.5 text-xs text-[#2A1816] focus:outline-hidden focus:border-[#8C241E]"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#8C5A54] block">
+                          Phone Number *
+                        </label>
+                        <input
+                          type="tel"
+                          required
+                          value={donationNumber}
+                          onChange={e => setDonationNumber(e.target.value)}
+                          placeholder="+91 98765 43210"
+                          className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl px-3.5 py-2.5 text-xs text-[#2A1816] focus:outline-hidden focus:border-[#8C241E]"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <label className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#8C5A54] block">
+                        UPI ID *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={donationUpi}
+                        onChange={e => setDonationUpi(e.target.value)}
+                        placeholder="username@bank"
+                        className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl px-3.5 py-2.5 text-xs text-[#2A1816] focus:outline-hidden focus:border-[#8C241E]"
+                      />
+                    </div>
+                    
+                    <div className="pt-2 flex items-center justify-end gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setDonationOpen(false)}
+                        className="px-5 py-3 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer shadow-xs"
+                      >
+                        <X className="w-4 h-4 text-[#8C241E]" />
+                        <span>Cancel</span>
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={paymentStatus === "processing"}
+                        className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-6 py-3 rounded-full text-xs font-mono font-bold uppercase tracking-widest shadow-lg shadow-[#8C241E]/20 flex items-center gap-2 transition-all cursor-pointer border border-[#A6352F] disabled:opacity-50 active:scale-95"
+                      >
+                        <CreditCard className={`w-4 h-4 text-[#FFD0CC] ${paymentStatus === "processing" ? "animate-pulse" : ""}`} />
+                        <span>{paymentStatus === "processing" ? "Processing..." : "Make Payment"}</span>
                       </button>
                     </div>
                   </form>

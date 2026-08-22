@@ -13,6 +13,7 @@ import ScriptPreviewModal from "@/components/ScriptPreviewModal";
 import ProductionDetailModal from "@/components/ProductionDetailModal";
 import type { ProductionDetailData } from "@/components/ProductionDetailModal";
 import ProductionEditModal from "@/components/ProductionEditModal";
+import { CustomSelect } from "@/components/CustomSelect";
 import { getPlaybookForTitle } from "@/data/playbooksData";
 import type { Playbook } from "@/data/playbooksData";
 
@@ -304,6 +305,29 @@ export default function EventsManagement() {
   const [statusDropdownOpen, setStatusDropdownOpen] = useState<boolean>(false);
   const statusDropdownRef = useRef<HTMLDivElement>(null);
 
+  // AI Feature State
+  const [extractedKeywords, setExtractedKeywords] = useState<Record<number, string[]>>({});
+  const [analyzingPitchId, setAnalyzingPitchId] = useState<number | null>(null);
+
+  const handleExtractKeywords = async (pitchId: number, description: string) => {
+    setAnalyzingPitchId(pitchId);
+    // Simulate AI delay
+    await new Promise(resolve => setTimeout(resolve, 800));
+
+    // Mock extraction by getting 3 meaningful words from description
+    const words = description
+      .split(' ')
+      .map(w => w.replace(/[^a-zA-Z]/g, ''))
+      .filter(w => w.length > 4)
+      .slice(0, 3);
+      
+    // If no long words found, provide some fallbacks
+    const finalWords = words.length > 0 ? words : ["THEATRE", "EVENT", "PITCH"];
+    
+    setExtractedKeywords(prev => ({ ...prev, [pitchId]: finalWords }));
+    setAnalyzingPitchId(null);
+  };
+
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (statusDropdownRef.current && !statusDropdownRef.current.contains(event.target as Node)) {
@@ -335,6 +359,43 @@ export default function EventsManagement() {
   // Patronage / Donation Modal
   const [selectedEventForDonation, setSelectedEventForDonation] = useState<EventItem | null>(null);
   const [donorPledgeAmount, setDonorPledgeAmount] = useState<string>("₹2,000");
+  
+  // Create Event State
+  const [createEventOpen, setCreateEventOpen] = useState(false);
+  const [newEventForm, setNewEventForm] = useState({ title: "", category: "Plays", date: "", venue: "", timeRange: "", description: "" });
+  
+  const handleCreateEventSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newEventForm.title) return;
+    
+    const newEvt: EventItem = {
+      id: `evt-manual-${Date.now()}`,
+      title: newEventForm.title,
+      category: newEventForm.category,
+      date: newEventForm.date,
+      venue: newEventForm.venue,
+      timeRange: newEventForm.timeRange,
+      status: "Scheduled",
+      is_past: false,
+      description: newEventForm.description,
+      is_sponsored: false,
+      sponsor_name: "",
+      sponsor_amount: "",
+      patronage_open: true,
+      donations_collected: "₹0",
+      target_budget: "₹25,000",
+      auditionCount: 0,
+      applicantCount: 0,
+      volunteerCount: 0
+    };
+    
+    setEventsList(prev => [newEvt, ...prev]);
+    setActionSuccessMsg(`Event '${newEventForm.title}' successfully scheduled!`);
+    setTimeout(() => setActionSuccessMsg(null), 4000);
+    setCreateEventOpen(false);
+    setNewEventForm({ title: "", category: "Plays", date: "", venue: "", timeRange: "", description: "" });
+  };
+
   const [donorName, setDonorName] = useState<string>("Society Patron / Alum");
 
   // Review & Edit Pitch Modal (Before Approving to Events)
@@ -861,21 +922,23 @@ export default function EventsManagement() {
 
       {/* Editorial Header */}
       <section className="bg-[#F2E5E0] border border-[#DCBAB2] rounded-[2.5rem] p-8 md:p-10 shadow-xs space-y-6">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 text-[10px] font-mono font-bold uppercase tracking-widest text-[#8C5A54]">
-              <Calendar className="w-3.5 h-3.5 text-[#8C241E]" />
-              <span>SOCIETY REPERTOIRE & OPERATIONAL DESK</span>
+        <div className="space-y-6">
+          <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+            <div className="space-y-2">
+              <div className="inline-flex items-center gap-2 text-[10px] font-mono font-bold uppercase tracking-widest text-[#8C5A54]">
+                <Calendar className="w-3.5 h-3.5 text-[#8C241E]" />
+                <span>SOCIETY REPERTOIRE & OPERATIONAL DESK</span>
+              </div>
+              <h1 className="font-serif text-3xl sm:text-5xl text-[#2A1816] font-normal tracking-tight">
+                Events & Season Management
+              </h1>
+              <p className="text-xs sm:text-sm text-[#6E4742] max-w-2xl font-serif italic">
+                Oversee upcoming productions, manage member event pitches and funded sponsor partnerships, assign budgets, and open society donation patronage.
+              </p>
             </div>
-            <h1 className="font-serif text-3xl sm:text-5xl text-[#2A1816] font-normal tracking-tight">
-              Events & Season Management
-            </h1>
-            <p className="text-xs sm:text-sm text-[#6E4742] max-w-2xl font-serif italic">
-              Oversee upcoming productions, manage member event pitches and funded sponsor partnerships, assign budgets, and open society donation patronage.
-            </p>
           </div>
           
-          <div className="flex items-center gap-2 bg-[#FAF2EE] p-1.5 rounded-full border border-[#DCBAB2] shadow-xs shrink-0 self-start md:self-auto">
+          <div className="flex items-center gap-2 bg-[#FAF2EE] p-1.5 rounded-full border border-[#DCBAB2] shadow-xs shrink-0 self-start w-fit">
             <button 
               onClick={() => setActiveTab("calendar")}
               className={`px-5 py-2.5 rounded-full text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer ${
@@ -1266,9 +1329,36 @@ export default function EventsManagement() {
                       </h3>
 
                       {/* Description */}
-                      <p className="text-xs sm:text-sm text-[#5C3B37] font-light leading-relaxed line-clamp-3">
-                        {pitch.description}
-                      </p>
+                      <div className="space-y-3">
+                        <p className="text-xs sm:text-sm text-[#5C3B37] font-light leading-relaxed line-clamp-3">
+                          {pitch.description}
+                        </p>
+                        
+                        {/* AI Keyword Filter */}
+                        <div className="flex items-center gap-2 flex-wrap">
+                          {!extractedKeywords[pitch.id] && (
+                            <button
+                              type="button"
+                              onClick={() => handleExtractKeywords(pitch.id, pitch.description)}
+                              disabled={analyzingPitchId === pitch.id}
+                              className="px-3 py-1.5 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] hover:text-[#2A1816] text-[10px] font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer shadow-xs disabled:opacity-50"
+                            >
+                              <Sparkles className="w-3 h-3 text-[#8C241E]" />
+                              <span>{analyzingPitchId === pitch.id ? "Analyzing..." : "AI Keyword Filter"}</span>
+                            </button>
+                          )}
+                          {extractedKeywords[pitch.id] && (
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <Sparkles className="w-3.5 h-3.5 text-[#8C241E]" />
+                              {extractedKeywords[pitch.id].map((kw, idx) => (
+                                <span key={idx} className="bg-[#EEDBD5] text-[#8C241E] border border-[#D5AAA2] rounded-full px-2.5 py-1 text-[10px] font-mono font-bold uppercase tracking-wider shadow-xs">
+                                  {kw}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
 
                       {/* Specifications Panel */}
                       <div className="bg-[#F5EAE6] p-4 sm:p-5 rounded-2xl border border-[#DEBEB7] space-y-3 text-xs sm:text-sm font-mono text-[#5C3B37]">
@@ -1376,16 +1466,17 @@ export default function EventsManagement() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div className="space-y-1.5">
                     <label className="font-bold text-[#8C5A54] uppercase tracking-wider block">Category</label>
-                    <select
-                      value={editFormData.category}
-                      onChange={(e) => setEditFormData({ ...editFormData, category: e.target.value })}
-                      className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl px-4 py-2.5 text-xs text-[#2A1816] focus:outline-hidden focus:border-[#8C241E] cursor-pointer shadow-xs"
-                    >
-                      <option value="Workshops">Workshops & Masterclasses</option>
-                      <option value="Meetups">Meetups & Script Readings</option>
-                      <option value="Plays">Stage Production Preview</option>
-                      <option value="Sponsor Showcase">Sponsor Showcase</option>
-                    </select>
+                    <CustomSelect
+                      value={editFormData.category || "Workshops"}
+                      onChange={(val) => setEditFormData({ ...editFormData, category: val })}
+                      options={[
+                        {value: "Workshops", label: "Workshops & Masterclasses"},
+                        {value: "Meetups", label: "Meetups & Script Readings"},
+                        {value: "Plays", label: "Stage Production Preview"},
+                        {value: "Sponsor Showcase", label: "Sponsor Showcase"}
+                      ]}
+                      placeholder="Select Category"
+                    />
                   </div>
 
                   <div className="space-y-1.5">
@@ -1483,7 +1574,32 @@ export default function EventsManagement() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="font-bold text-[#8C5A54] uppercase tracking-wider block">Description & Dramaturgy Agenda</label>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <label className="font-bold text-[#8C5A54] uppercase tracking-wider block">Description & Dramaturgy Agenda</label>
+                    <div className="flex items-center gap-2">
+                      {editingPitch && extractedKeywords[editingPitch.id] && (
+                        <div className="flex items-center gap-1.5">
+                          <Sparkles className="w-3 h-3 text-[#8C241E]" />
+                          {extractedKeywords[editingPitch.id].map((kw, idx) => (
+                            <span key={idx} className="bg-[#EEDBD5] text-[#8C241E] border border-[#D5AAA2] rounded-full px-2 py-0.5 text-[9px] font-mono font-bold uppercase tracking-wider shadow-xs">
+                              {kw}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                      {editingPitch && !extractedKeywords[editingPitch.id] && (
+                        <button
+                          type="button"
+                          onClick={() => handleExtractKeywords(editingPitch.id, editFormData.description)}
+                          disabled={analyzingPitchId === editingPitch.id}
+                          className="px-2.5 py-1 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] hover:text-[#2A1816] text-[9px] font-mono font-bold uppercase tracking-wider flex items-center gap-1 transition-all cursor-pointer shadow-xs disabled:opacity-50"
+                        >
+                          <Sparkles className="w-2.5 h-2.5 text-[#8C241E]" />
+                          <span>{analyzingPitchId === editingPitch.id ? "Analyzing..." : "AI Filter"}</span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
                   <textarea
                     rows={4}
                     required
@@ -1719,17 +1835,18 @@ export default function EventsManagement() {
 
                           {/* Status update controls */}
                           <div className="flex items-center gap-2">
-                            <select
+                            <CustomSelect
                               value={app.status || "Under Review"}
-                              onChange={(e) => handleUpdateAppStatus(app.id, e.target.value)}
-                              className="bg-[#F5EAE6] border border-[#D5AAA2] rounded-xl px-3 py-1.5 text-xs font-mono text-[#2A1816] font-semibold focus:outline-hidden focus:border-[#8C241E] cursor-pointer"
-                            >
-                              <option value="Under Review">Under Review</option>
-                              <option value="Audition Scheduled">Audition Scheduled</option>
-                              <option value="Selected">Selected</option>
-                              <option value="Waitlisted">Waitlisted</option>
-                              <option value="Declined">Declined</option>
-                            </select>
+                              onChange={(val) => handleUpdateAppStatus(app.id, val)}
+                              options={[
+                                {value: "Under Review", label: "Under Review"},
+                                {value: "Audition Scheduled", label: "Audition Scheduled"},
+                                {value: "Selected", label: "Selected"},
+                                {value: "Waitlisted", label: "Waitlisted"},
+                                {value: "Declined", label: "Declined"}
+                              ]}
+                              placeholder="Update Status"
+                            />
                           </div>
                         </div>
 
@@ -1898,6 +2015,8 @@ export default function EventsManagement() {
         production={selectedEditProd}
         onSuccess={handleProductionEditSuccess}
       />
+
+      
     </div>
   );
 }

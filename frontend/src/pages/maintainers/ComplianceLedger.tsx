@@ -13,9 +13,10 @@ import {
     Filter,
     FileWarning,
     ChevronLeft,
-    ChevronRight
+    ChevronRight,
+    ChevronDown,
+    Activity
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 interface Transaction {
     id: string;
@@ -37,18 +38,54 @@ interface Anomaly {
     rule: string;
 }
 
+const CustomSelect = ({ value, onChange, options, icon: Icon, label }: any) => {
+    const [open, setOpen] = useState(false);
+    return (
+        <div className="relative min-w-[180px]">
+            <label className="block font-mono text-[10px] font-bold mb-1.5 uppercase tracking-wider text-[#8C5A54]">{label}</label>
+            <div
+                onClick={() => setOpen(!open)}
+                className="bg-[#E8D6CF]/70 border border-[#D5AAA2] rounded-xl px-4 py-2.5 text-xs text-[#2A1816] font-semibold flex items-center justify-between cursor-pointer hover:bg-[#E8D6CF] transition-colors"
+            >
+                <div className="flex items-center gap-2">
+                    {Icon && <Icon className="w-4 h-4 text-[#8C5A54]" />}
+                    <span className="font-mono">{value}</span>
+                </div>
+                <ChevronDown className="w-4 h-4 text-[#8C5A54]" />
+            </div>
+            {open && (
+                <>
+                    <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+                    <div className="absolute top-full left-0 mt-2 w-full bg-[#F5EAE6] border border-[#DEBEB7] rounded-2xl p-2 shadow-2xl z-50">
+                        {options.map((opt: string) => (
+                            <button
+                                key={opt}
+                                onClick={() => { onChange(opt); setOpen(false); }}
+                                className={`w-full text-left rounded-xl p-2.5 text-[11px] font-mono font-medium flex items-center gap-2 transition-colors ${value === opt
+                                        ? "bg-[#8C241E] text-[#FDF8F7] font-bold shadow-xs"
+                                        : "hover:bg-[#EEDBD5] text-[#2A1816]"
+                                    }`}
+                            >
+                                {opt}
+                            </button>
+                        ))}
+                    </div>
+                </>
+            )}
+        </div>
+    )
+}
+
 export default function ComplianceLedger() {
-    // Master ledger items matching comp.html database
     const [transactions, setTransactions] = useState<Transaction[]>([
-        { id: "#TRX-9901", date: "Oct 24, 2023", event: "Spring Musical", member: "Sarah Jenkins", type: "Reimbursement", amount: -450.00, status: "Cleared" },
-        { id: "#TRX-9902", date: "Oct 23, 2023", event: "General Fund", member: "Marcus Thorne", type: "Deposit", amount: 1200.00, status: "Cleared" },
-        { id: "#TRX-9903", date: "Oct 22, 2023", event: "Fall Play", member: "Elena Rostova", type: "Reimbursement", amount: -85.50, status: "Pending Audit" },
-        { id: "#TRX-9904", date: "Oct 20, 2023", event: "Gala Fundraiser", member: "David Chen", type: "Vendor Payout", amount: -3500.00, status: "Cleared" },
-        { id: "#TRX-9905", date: "Oct 19, 2023", event: "Gala Fundraiser", member: "Anonymous", type: "Donation", amount: 5000.00, status: "Cleared" },
-        { id: "#TRX-9906", date: "Oct 18, 2023", event: "Set Design", member: "Home Depot", type: "Purchase", amount: -342.12, status: "Cleared" }
+        { id: "#TRX-9901", date: "Oct 24, 2026", event: "Spring Musical", member: "Sarah Jenkins", type: "Reimbursement", amount: -450.00, status: "Cleared" },
+        { id: "#TRX-9902", date: "Oct 23, 2026", event: "General Fund", member: "Marcus Thorne", type: "Deposit", amount: 1200.00, status: "Cleared" },
+        { id: "#TRX-9903", date: "Oct 22, 2026", event: "Fall Play", member: "Elena Rostova", type: "Reimbursement", amount: -85.50, status: "Pending Audit" },
+        { id: "#TRX-9904", date: "Oct 20, 2026", event: "Gala Fundraiser", member: "David Chen", type: "Vendor Payout", amount: -3500.00, status: "Cleared" },
+        { id: "#TRX-9905", date: "Oct 19, 2026", event: "Gala Fundraiser", member: "Anonymous", type: "Donation", amount: 5000.00, status: "Cleared" },
+        { id: "#TRX-9906", date: "Oct 18, 2026", event: "Set Design", member: "Home Depot", type: "Purchase", amount: -342.12, status: "Cleared" }
     ]);
 
-    // Active anomalies list from comp.html
     const [anomalies, setAnomalies] = useState<Anomaly[]>([
         {
             id: "anom-1",
@@ -57,12 +94,12 @@ export default function ComplianceLedger() {
             trxId: "#TRX-9903",
             icon: Receipt,
             severity: "High",
-            rule: "Rule 14: Reimbursements exceeding $50 require valid receipts."
+            rule: "Rule 14: Reimbursements exceeding ₹50 require valid receipts."
         },
         {
             id: "anom-2",
             title: "Duplicate Entry Warning",
-            description: "Identical amounts ($342.12) posted twice on Oct 18 for 'Home Depot'.",
+            description: "Identical amounts (₹342.12) posted twice on Oct 18 for 'Home Depot'.",
             trxId: "#TRX-9906",
             icon: Copy,
             severity: "Medium",
@@ -71,7 +108,7 @@ export default function ComplianceLedger() {
         {
             id: "anom-3",
             title: "Unusual Deposit Size",
-            description: "Donation of $5,000.00 exceeds standard deviation for anonymous gifts.",
+            description: "Donation of ₹5,000.00 exceeds standard deviation for anonymous gifts.",
             trxId: "#TRX-9905",
             icon: ShieldAlert,
             severity: "Low",
@@ -79,7 +116,6 @@ export default function ComplianceLedger() {
         }
     ]);
 
-    // Filter selectors
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedCategory, setSelectedCategory] = useState("All Events");
     const [selectedMember, setSelectedMember] = useState("All Members");
@@ -88,11 +124,9 @@ export default function ComplianceLedger() {
     const [isScanning, setIsScanning] = useState(false);
     const [showScanComplete, setShowScanComplete] = useState(false);
     const [scanText, setScanText] = useState("");
-
     const [activeAnomalyDetail, setActiveAnomalyDetail] = useState<Anomaly | null>(null);
     const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-    // Compute interactive filtered list
     const filteredTransactions = transactions.filter(t => {
         const matchesQuery = searchQuery === "" ||
             t.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -110,15 +144,8 @@ export default function ComplianceLedger() {
     const triggerAuditScan = () => {
         setIsScanning(true);
         setScanText("Initializing compliance database link...");
-
-        setTimeout(() => {
-            setScanText("Ingesting transaction receipt attachments...");
-        }, 500);
-
-        setTimeout(() => {
-            setScanText("Evaluating compliance rules against 248 records...");
-        }, 1000);
-
+        setTimeout(() => setScanText("Ingesting transaction receipt attachments..."), 500);
+        setTimeout(() => setScanText("Evaluating compliance rules against 248 records..."), 1000);
         setTimeout(() => {
             setIsScanning(false);
             setShowScanComplete(true);
@@ -128,31 +155,23 @@ export default function ComplianceLedger() {
 
     const triggerToast = (msg: string) => {
         setToastMessage(msg);
-        setTimeout(() => {
-            setToastMessage(null);
-        }, 3000);
+        setTimeout(() => setToastMessage(null), 3000);
     };
 
     const handleResolveAnomaly = (anomaly: Anomaly, action: 'upload' | 'request' | 'dismiss' | 'merge') => {
         setAnomalies(prev => prev.filter(a => a.id !== anomaly.id));
         setActiveAnomalyDetail(null);
 
-        // If TRX-9903 missing receipt is processed, update in-memory status
         if (anomaly.trxId === "#TRX-9903") {
             setTransactions(prev => prev.map(t =>
                 t.id === "#TRX-9903" ? { ...t, status: "Cleared" } : t
             ));
         }
 
-        if (action === 'upload') {
-            triggerToast(`Document uploaded. ${anomaly.trxId} has been successfully Cleared.`);
-        } else if (action === 'request') {
-            triggerToast(`Receipt receipt request successfully dispatched to member.`);
-        } else if (action === 'dismiss') {
-            triggerToast(`Compliance flag dismissed. Transaction cleared manually.`);
-        } else if (action === 'merge') {
-            triggerToast(`Duplicate entries combined successfully. Ledger updated.`);
-        }
+        if (action === 'upload') triggerToast(`Document uploaded. ${anomaly.trxId} Cleared.`);
+        else if (action === 'request') triggerToast(`Receipt request dispatched to member.`);
+        else if (action === 'dismiss') triggerToast(`Compliance flag dismissed.`);
+        else if (action === 'merge') triggerToast(`Duplicate entries combined successfully.`);
     };
 
     const handleRowStatusPillClick = (trx: Transaction) => {
@@ -177,388 +196,359 @@ export default function ComplianceLedger() {
     };
 
     return (
-        <div className="compliance-ledger w-full space-y-8 relative">
-            {/* Ambient Background Effect */}
-            <div className="absolute inset-0 z-0 pointer-events-none opacity-30" style={{
-                background: "radial-gradient(circle at 75% 15%, #c9e7fa 0%, transparent 45%), radial-gradient(circle at 15% 75%, #fff9d2 0%, transparent 45%)"
-            }}></div>
+        <div className="bg-[#E7DDD3] min-h-screen font-sans p-6 md:p-10 text-[#5C3B37]">
+            <div className="max-w-7xl mx-auto space-y-10">
 
-            {/* Anomalies Panel Block - matching comp.html styling closely */}
-            {anomalies.length > 0 && (
-                <section className="relative z-10 w-full mb-8">
-                    <div className="bg-[#FFF9D2] rounded-xl border-2 border-[#ba1a1a]/30 p-6 shadow-sm">
-                        <div className="flex items-center gap-3 mb-4">
-                            <span className="text-[#ba1a1a] text-xl font-bold flex items-center justify-center">
-                                <ShieldAlert className="w-6 h-6 text-[#ba1a1a]" />
-                            </span>
-                            <h3 className="font-serif text-[24px] leading-tight text-on-surface font-bold">Critical Compliance Anomalies</h3>
+                {/* Header Section */}
+                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-[#DCBAB2] pb-8">
+                    <div className="space-y-3">
+                        <div className="font-mono text-xs uppercase font-bold tracking-widest text-[#8C5A54] flex items-center gap-2">
+                            <Activity className="w-4 h-4 text-[#8C241E]" />
+                            <span>Maintainer Operations</span>
                         </div>
-                        <p className="font-sans text-base md:text-lg text-on-surface-variant/90 mb-6 pb-4 border-b border-outline-variant">
-                            The following automated compliance flags require immediate administrator review before the monthly close.
+                        <h1 className="font-serif text-4xl sm:text-5xl text-[#2A1816] font-normal tracking-tight">
+                            Compliance Ledger
+                        </h1>
+                        <p className="text-sm text-[#6E4742] max-w-2xl font-light leading-relaxed">
+                            Secured financial audit logs and automated transaction flags. Mandatory review required before closing the monthly theatrical ledger.
                         </p>
-
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            {anomalies.map(anom => {
-                                const AnomIcon = anom.icon;
-                                return (
-                                    <div
-                                        key={anom.id}
-                                        className="bg-[#ffdad6]/20 rounded-lg p-4 border border-[#ba1a1a]/20 flex gap-3 items-start hover:bg-[#ffdad6]/30 transition-colors cursor-pointer group"
-                                    >
-                                        <span className="text-[#ba1a1a] mt-0.5 flex-shrink-0">
-                                            <AnomIcon className="w-5 h-5" />
-                                        </span>
-                                        <div>
-                                            <h4 className="font-sans text-sm text-on-surface mb-1 font-bold">{anom.title}</h4>
-                                            <p className="font-sans text-sm text-on-surface-variant mb-2 leading-relaxed">{anom.description}</p>
-                                            <button
-                                                onClick={() => setActiveAnomalyDetail(anom)}
-                                                className="font-sans text-xs text-primary font-bold flex items-center gap-1 hover:underline"
-                                            >
-                                                Review Detail
-                                                <ArrowRight className="w-3.5 h-3.5 text-xs font-bold" />
-                                            </button>
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-
-                        <div className="mt-6 flex justify-end">
-                            <button
-                                onClick={triggerAuditScan}
-                                className="bg-[#353535] text-white rounded-lg py-2 px-6 font-sans text-xs font-semibold hover:opacity-90 transition-opacity"
-                            >
-                                Run Full Audit Scan
-                            </button>
-                        </div>
-                    </div>
-                </section>
-            )}
-
-            {/* Audit Ledger List Main area */}
-            <div className="relative z-10 w-full flex flex-col">
-                <div className="mb-8 select-none animate-fade-in-up">
-                    <h2 className="font-serif text-3xl md:text-4xl text-on-surface mb-2 font-bold">Audit Ledger</h2>
-                    <p className="font-sans text-base md:text-lg text-on-surface-variant/90">View-only compliance records and transaction history.</p>
-                </div>
-
-                {/* Filters & Control bar matching comp.html exactly */}
-                <div className="bg-surface-container-lowest p-4 rounded-lg mb-6 border border-surface-variant ambient-shadow flex flex-wrap gap-4 items-center justify-between">
-                    <div className="flex flex-wrap gap-4 items-center flex-1">
-
-                        {/* Selector 1: Date Range */}
-                        <div className="relative min-w-[200px]">
-                            <label className="block font-sans text-[11px] font-bold mb-1 uppercase tracking-wider text-on-surface/90">Date Range</label>
-                            <div className="flex items-center bg-[#F8F9FA] border-b border-outline-variant rounded-t-sm px-3 py-2">
-                                <Calendar className="w-4 h-4 text-[#7a776c] mr-2 flex-shrink-0" />
-                                <select
-                                    className="bg-transparent border-none p-0 focus:ring-0 text-sm font-semibold text-on-surface w-full appearance-none cursor-pointer outline-none"
-                                    value={selectedPeriod}
-                                    onChange={(e) => setSelectedPeriod(e.target.value)}
-                                >
-                                    <option>Last 30 Days</option>
-                                    <option>Q1 2024</option>
-                                    <option>Fiscal Year 2023</option>
-                                    <option>Custom Range...</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        {/* Selector 2: Event Category */}
-                        <div className="relative min-w-[180px]">
-                            <label className="block font-sans text-[11px] font-bold mb-1 uppercase tracking-wider text-on-surface/90">Event Category</label>
-                            <div className="flex items-center bg-[#F8F9FA] border-b border-outline-variant rounded-t-sm px-3 py-2">
-                                <Filter className="w-4 h-4 text-[#7a776c] mr-2 flex-shrink-0" />
-                                <select
-                                    className="bg-transparent border-none p-0 focus:ring-0 text-sm font-semibold text-on-surface w-full appearance-none cursor-pointer outline-none"
-                                    value={selectedCategory}
-                                    onChange={(e) => setSelectedCategory(e.target.value)}
-                                >
-                                    <option>All Events</option>
-                                    <option>Spring Musical</option>
-                                    <option>Fall Play</option>
-                                    <option>Gala Fundraiser</option>
-                                    <option>General Fund</option>
-                                    <option>Set Design</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        {/* Selector 3: Member */}
-                        <div className="relative min-w-[180px]">
-                            <label className="block font-sans text-[11px] font-bold mb-1 uppercase tracking-wider text-on-surface/90">Member</label>
-                            <div className="flex items-center bg-[#F8F9FA] border-b border-outline-variant rounded-t-sm px-3 py-2">
-                                <User className="w-4 h-4 text-[#7a776c] mr-2 flex-shrink-0" />
-                                <select
-                                    className="bg-transparent border-none p-0 focus:ring-0 text-sm font-semibold text-on-surface w-full appearance-none cursor-pointer outline-none"
-                                    value={selectedMember}
-                                    onChange={(e) => setSelectedMember(e.target.value)}
-                                >
-                                    <option>All Members</option>
-                                    <option>Sarah Jenkins</option>
-                                    <option>Marcus Thorne</option>
-                                    <option>Elena Rostova</option>
-                                    <option>David Chen</option>
-                                    <option>Anonymous</option>
-                                    <option>Home Depot</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        {/* Clear Selected Filters */}
-                        {(selectedCategory !== "All Events" || selectedMember !== "All Members" || searchQuery !== "" || selectedPeriod !== "Last 30 Days") && (
-                            <button
-                                onClick={() => {
-                                    setSelectedCategory("All Events");
-                                    setSelectedMember("All Members");
-                                    setSelectedPeriod("Last 30 Days");
-                                    setSearchQuery("");
-                                }}
-                                className="text-xs text-red-650 hover:underline font-bold self-end mb-2 flex items-center gap-1"
-                            >
-                                <X className="w-3.5 h-3.5" /> Clear filters
-                            </button>
-                        )}
-                    </div>
-
-                    {/* Table Specific Search Input */}
-                    <div className="relative w-full sm:w-64">
-                        <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant/80" />
-                        <input
-                            className="w-full bg-[#F8F9FA] border-0 border-b border-outline-variant focus:border-primary focus:ring-0 pl-10 pr-4 py-2 font-sans text-sm rounded-t-sm transition-colors placeholder:text-outline text-on-surface"
-                            placeholder="Filter by ID or Amount..."
-                            type="text"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                        />
                     </div>
                 </div>
 
-                {/* Data Table block */}
-                <div className="bg-surface-container-lowest rounded-xl border border-surface-variant overflow-hidden flex flex-col ambient-shadow">
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left border-collapse">
-                            <thead>
-                                <tr className="bg-surface-container-low border-b border-surface-variant font-sans text-sm font-semibold uppercase text-on-surface tracking-wider">
-                                    <th className="py-4 px-6 font-semibold">Transaction ID</th>
-                                    <th className="py-4 px-6 font-semibold">Date</th>
-                                    <th className="py-4 px-6 font-semibold">Event</th>
-                                    <th className="py-4 px-6 font-semibold">Member</th>
-                                    <th className="py-4 px-6 font-semibold">Type</th>
-                                    <th className="py-4 px-6 font-semibold text-right">Amount</th>
-                                    <th className="py-4 px-6 font-semibold text-center">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody className="font-sans text-sm text-on-surface">
-                                {filteredTransactions.length > 0 ? (
-                                    filteredTransactions.map((trx) => {
-                                        const isFlagged = trx.status === "Pending Audit";
-                                        return (
-                                            <tr
-                                                key={trx.id}
-                                                className={`table-matte-row ${isFlagged ? "bg-error-container/20 hover:bg-error-container/30" : ""}`}
-                                            >
-                                                <td className="py-4 px-6 font-mono text-sm text-outline">{trx.id}</td>
-                                                <td className="py-4 px-6 text-on-surface-variant">{trx.date}</td>
-                                                <td className="py-4 px-6 font-semibold text-primary">{trx.event}</td>
-                                                <td className="py-4 px-6 font-medium">{trx.member}</td>
-                                                <td className="py-4 px-6 text-on-surface-variant">{trx.type}</td>
-                                                <td className={`py-4 px-6 text-right font-medium ${trx.amount < 0 ? "text-[#ba1a1a]" : "text-[#353535]"}`}>
-                                                    {trx.amount < 0 ? "-" : "+"}${Math.abs(trx.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                                                </td>
-                                                <td className="py-4 px-6 text-center">
-                                                    <button
-                                                        onClick={() => handleRowStatusPillClick(trx)}
-                                                        className={`inline-flex items-center justify-center px-2 py-1 rounded font-sans text-[11px] font-semibold uppercase tracking-wider transition-opacity hover:opacity-85 ${isFlagged
-                                                            ? "bg-[#FFEBCC] text-[#4a482c] border border-amber-300"
-                                                            : "bg-[#BFDDF0] text-[#001e2c] border border-blue-200"
-                                                            }`}
-                                                    >
-                                                        {trx.status}
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        );
-                                    })
-                                ) : (
-                                    <tr>
-                                        <td colSpan={7} className="py-10 text-center text-on-surface-variant font-medium">
-                                            No logs correspond to chosen filters.
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-
-                    {/* Pagination */}
-                    <div className="mt-auto border-t border-surface-variant p-4 flex items-center justify-between bg-surface-container-lowest text-on-surface-variant">
-                        <span className="text-sm font-semibold">Showing {filteredTransactions.length} of {transactions.length} records</span>
-                        <div className="flex items-center gap-2">
-                            <button disabled className="p-1 rounded hover:bg-surface-container disabled:opacity-50 text-[#7a776c] flex items-center justify-center">
-                                <ChevronLeft className="w-4 h-4" />
-                            </button>
-                            <button className="w-8 h-8 rounded bg-primary-container text-on-primary-container font-sans text-xs font-bold flex items-center justify-center">1</button>
-                            <button className="w-8 h-8 rounded hover:bg-surface-container font-sans text-xs font-semibold flex items-center justify-center text-on-surface">2</button>
-                            <button className="w-8 h-8 rounded hover:bg-surface-container font-sans text-xs font-semibold flex items-center justify-center text-on-surface">3</button>
-                            <span className="px-2 text-xs font-semibold text-outline">...</span>
-                            <button className="w-8 h-8 rounded hover:bg-surface-container font-sans text-xs font-semibold flex items-center justify-center text-on-surface">42</button>
-                            <button className="p-1 rounded hover:bg-surface-container text-[#2C2A28] flex items-center justify-center">
-                                <ChevronRight className="w-4 h-4" />
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Scan Simulation Dialog Frame */}
-            {isScanning && (
-                <div className="fixed inset-0 bg-[#31302d]/45 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <div className="bg-[#E7DDD3] border border-[#D5C9BE]/60 rounded-xl p-8 max-w-sm w-full shadow-2xl flex flex-col items-center justify-center text-center">
-                        <Loader2 className="w-10 h-10 text-[#353535] animate-spin mb-4" />
-                        <h3 className="font-serif font-bold text-base text-[#353535]">Run Compliance Audit Scan</h3>
-                        <p className="text-xs text-[#666361]/80 mt-2 h-6 animate-pulse font-mono">{scanText}</p>
-                        <div className="w-full bg-[#D5C9BE]/30 h-1 rounded-full mt-4 overflow-hidden">
-                            <div className="h-full bg-[#353535] rounded-full animate-loading-bar" style={{ width: '100%' }}></div>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Scan Completed Success Dialogue */}
-            {showScanComplete && (
-                <div className="fixed inset-0 bg-[#31302d]/45 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <div className="bg-[#E7DDD3] border border-[#D5C9BE]/60 rounded-xl p-6 max-w-sm w-full shadow-2xl flex flex-col items-center">
-                        <div className="w-10 h-10 rounded-full bg-emerald-50 border border-emerald-250 text-emerald-600 flex items-center justify-center mb-3">
-                            <CheckCircle2 className="w-5 h-5 text-emerald-650" />
-                        </div>
-                        <h3 className="font-serif font-bold text-base text-emerald-800 text-center">Scan Assessment Complete</h3>
-                        <p className="text-xs text-[#666361]/90 text-center mt-2 leading-relaxed">
-                            Audit check performed across 248 transaction items. All compliance checkpoints matched successfully.
-                        </p>
-                        <Button
-                            onClick={() => setShowScanComplete(false)}
-                            className="bg-[#353535] hover:bg-[#353535]/90 text-white font-bold text-xs w-full py-2.5 mt-5 rounded-lg border border-amber-900/10"
-                        >
-                            Back To Ledger Dashboard
-                        </Button>
-                    </div>
-                </div>
-            )}
-
-            {/* Anomaly Details Inspect Modal */}
-            {activeAnomalyDetail && (
-                <div className="fixed inset-0 bg-[#31302d]/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <div className="bg-white border border-[#D5C9BE]/60 rounded-xl max-w-md w-full shadow-2xl overflow-hidden flex flex-col">
-
-                        {/* Title Bar */}
-                        <div className="bg-[#EFE8E1] px-6 py-4 border-b border-[#D5C9BE]/40 flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <FileWarning className="w-4 h-4 text-[#ba1a1a]" />
-                                <h3 className="font-serif font-bold text-xs uppercase tracking-wider text-[#666361]">Compliance Audit Verification</h3>
-                            </div>
-                            <button
-                                onClick={() => setActiveAnomalyDetail(null)}
-                                className="p-1 hover:bg-[#D5C9BE]/20 rounded-full transition-colors"
-                            >
-                                <X className="w-4 h-4 text-[#666361]" />
-                            </button>
-                        </div>
-
-                        {/* Content Body */}
-                        <div className="p-6 flex-1 space-y-4">
-                            <div>
-                                <span className={`text-[10px] px-2 py-0.5 rounded font-bold uppercase ${activeAnomalyDetail.severity === 'High' ? 'bg-red-100 text-red-800' :
-                                    activeAnomalyDetail.severity === 'Medium' ? 'bg-amber-100 text-amber-800' :
-                                        'bg-cyan-100 text-cyan-800'
-                                    }`}>
-                                    Severity: {activeAnomalyDetail.severity}
-                                </span>
-                                <h4 className="font-serif text-base font-bold text-[#2C2A28] mt-2">{activeAnomalyDetail.title}</h4>
-                                <p className="text-xs text-[#666361] mt-1 leading-relaxed">{activeAnomalyDetail.description}</p>
-                            </div>
-
-                            {/* Metadata */}
-                            <div className="bg-[#fcf9f5] border border-[#D5C9BE]/30 rounded-lg p-3 text-xs space-y-2">
-                                <div className="flex justify-between">
-                                    <span className="text-[#7a776c] font-semibold">Flagged Item:</span>
-                                    <span className="font-mono font-bold text-[#2C2A28]">{activeAnomalyDetail.trxId}</span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span className="text-[#7a776c] font-semibold">Trigger Rule:</span>
-                                    <span className="text-[#666361] text-right font-medium max-w-[200px]">{activeAnomalyDetail.rule}</span>
-                                </div>
-                                <div className="flex justify-between border-t border-[#D5C9BE]/15 pt-2">
-                                    <span className="text-[#7a776c] font-semibold">Matched Account:</span>
-                                    <span className="font-semibold text-primary">
-                                        {transactions.find(t => t.id === activeAnomalyDetail.trxId)?.member || "System Account"}
+                {/* Anomalies Panel Block */}
+                {anomalies.length > 0 && (
+                    <section className="bg-[#F2E5E0] border border-[#DCBAB2] rounded-[2.5rem] p-8 md:p-10 shadow-sm animate-in fade-in duration-500 relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-[#8C241E]/5 to-transparent rounded-bl-full pointer-events-none"></div>
+                        <div className="relative z-10">
+                            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-6 border-b border-[#DCBAB2]/60">
+                                <div className="space-y-1">
+                                    <span className="font-mono text-[10px] uppercase font-bold tracking-widest text-[#8C241E] flex items-center gap-2">
+                                        <ShieldAlert className="w-3.5 h-3.5" /> Action Required
                                     </span>
+                                    <h3 className="font-serif text-2xl text-[#2A1816] tracking-tight">Critical Compliance Anomalies</h3>
                                 </div>
-                                <div className="flex justify-between">
-                                    <span className="text-[#7a776c] font-semibold">Amount Impacted:</span>
-                                    <span className="font-bold text-amber-900">
-                                        ${Math.abs(transactions.find(t => t.id === activeAnomalyDetail.trxId)?.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div className="text-[10px] text-amber-700 leading-normal flex items-start gap-1">
-                                <span className="material-symbols-outlined text-[12px] mt-0.5">info</span>
-                                Resolving this flag manually will update the ledger entry to 'Cleared' and record your administrator hash in compliance records.
-                            </div>
-                        </div>
-
-                        {/* Actions buttons */}
-                        <div className="bg-[#fcf9f5] border-t border-[#D5C9BE]/25 p-4 flex gap-3">
-                            <button
-                                onClick={() => setActiveAnomalyDetail(null)}
-                                className="flex-grow border border-[#D5C9BE] text-xs font-semibold py-2 px-3 hover:bg-[#DDD8CE]/40 rounded-lg transition-colors text-[#2C2A28]"
-                            >
-                                Cancel
-                            </button>
-                            {activeAnomalyDetail.title === "Missing Receipt" ? (
-                                <>
-                                    <button
-                                        onClick={() => handleResolveAnomaly(activeAnomalyDetail, 'request')}
-                                        className="bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs py-2 px-3 rounded-lg transition-colors"
-                                    >
-                                        Request doc
-                                    </button>
-                                    <button
-                                        onClick={() => handleResolveAnomaly(activeAnomalyDetail, 'upload')}
-                                        className="bg-[#353535] hover:bg-[#353535]/90 text-white font-bold text-xs py-2 px-3 rounded-lg transition-colors"
-                                    >
-                                        Upload Receipt
-                                    </button>
-                                </>
-                            ) : activeAnomalyDetail.title === "Duplicate Entry Warning" ? (
                                 <button
-                                    onClick={() => handleResolveAnomaly(activeAnomalyDetail, 'merge')}
-                                    className="flex-grow bg-[#353535] hover:bg-[#353535]/90 text-white font-bold text-xs py-2 px-3 rounded-lg transition-colors"
+                                    onClick={triggerAuditScan}
+                                    className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-6 py-2.5 rounded-full text-xs font-mono font-bold uppercase tracking-widest shadow-lg shadow-[#8C241E]/20 transition-all cursor-pointer border border-[#A6352F] whitespace-nowrap"
                                 >
-                                    Merge Items
+                                    Run Audit Scan
                                 </button>
-                            ) : (
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+                                {anomalies.map(anom => {
+                                    const AnomIcon = anom.icon;
+                                    return (
+                                        <div
+                                            key={anom.id}
+                                            className="bg-[#FAF2EE] rounded-[1.5rem] p-6 border border-[#DCBAB2] flex flex-col gap-4 hover:border-[#B32D25]/50 hover:shadow-md transition-all cursor-pointer group"
+                                            onClick={() => setActiveAnomalyDetail(anom)}
+                                        >
+                                            <div className="flex items-start justify-between">
+                                                <div className="w-10 h-10 rounded-full bg-[#EEDBD5] border border-[#D5AAA2] flex items-center justify-center text-[#8C241E] group-hover:bg-[#8C241E] group-hover:text-[#FDF8F7] transition-colors">
+                                                    <AnomIcon className="w-5 h-5" />
+                                                </div>
+                                                <span className={`font-mono text-[10px] uppercase font-bold tracking-wider px-2.5 py-1 rounded-full border ${anom.severity === 'High' ? 'bg-[#FDECEB] text-[#B32D25] border-[#FDECEB]' : 'bg-[#EEDBD5] text-[#8C5A54] border-[#D5AAA2]'}`}>
+                                                    {anom.severity}
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <h4 className="font-serif text-lg text-[#2A1816] tracking-tight mb-1">{anom.title}</h4>
+                                                <p className="font-sans text-xs text-[#6E4742] leading-relaxed">{anom.description}</p>
+                                            </div>
+                                            <div className="mt-auto pt-4 border-t border-[#DCBAB2]/50 flex items-center gap-1.5 text-xs font-mono font-bold text-[#8C241E] uppercase tracking-wider group-hover:text-[#B32D25]">
+                                                Review Detail <ArrowRight className="w-3.5 h-3.5" />
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    </section>
+                )}
+
+                {/* Audit Ledger List Main area */}
+                <div className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-[2.5rem] p-8 md:p-10 shadow-sm flex flex-col gap-6">
+                    <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-6 border-b border-[#DCBAB2]/60">
+                        <div className="space-y-1">
+                            <span className="font-mono text-[10px] uppercase font-bold tracking-widest text-[#8C5A54]">Database</span>
+                            <h2 className="font-serif text-3xl text-[#2A1816] tracking-tight">Audit Ledger</h2>
+                        </div>
+                    </div>
+
+                    {/* Custom Filter Controls */}
+                    <div className="flex flex-wrap gap-4 items-end justify-between bg-[#F5EAE6] p-4 rounded-2xl border border-[#DEBEB7]">
+                        <div className="flex flex-wrap gap-4 items-center flex-1">
+                            <CustomSelect
+                                label="Date Range"
+                                icon={Calendar}
+                                value={selectedPeriod}
+                                onChange={setSelectedPeriod}
+                                options={["Last 30 Days", "Q1 2026", "Fiscal Year 2025", "Custom Range..."]}
+                            />
+                            <CustomSelect
+                                label="Event Category"
+                                icon={Filter}
+                                value={selectedCategory}
+                                onChange={setSelectedCategory}
+                                options={["All Events", "Spring Musical", "Fall Play", "Gala Fundraiser", "General Fund", "Set Design"]}
+                            />
+                            <CustomSelect
+                                label="Member Entity"
+                                icon={User}
+                                value={selectedMember}
+                                onChange={setSelectedMember}
+                                options={["All Members", "Sarah Jenkins", "Marcus Thorne", "Elena Rostova", "David Chen", "Anonymous", "Home Depot"]}
+                            />
+
+                            {(selectedCategory !== "All Events" || selectedMember !== "All Members" || searchQuery !== "" || selectedPeriod !== "Last 30 Days") && (
                                 <button
-                                    onClick={() => handleResolveAnomaly(activeAnomalyDetail, 'dismiss')}
-                                    className="flex-grow bg-[#353535] hover:bg-[#353535]/90 text-white font-bold text-xs py-2 px-3 rounded-lg transition-colors"
+                                    onClick={() => {
+                                        setSelectedCategory("All Events");
+                                        setSelectedMember("All Members");
+                                        setSelectedPeriod("Last 30 Days");
+                                        setSearchQuery("");
+                                    }}
+                                    className="text-[10px] font-mono text-[#8C241E] hover:underline font-bold flex items-center gap-1 mb-2.5 ml-2 uppercase tracking-wider"
                                 >
-                                    Dismiss Flag
+                                    <X className="w-3.5 h-3.5" /> Clear Filters
                                 </button>
                             )}
                         </div>
+
+                        <div className="relative w-full sm:w-64">
+                            <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-[#8C5A54]" />
+                            <input
+                                className="w-full bg-[#E8D6CF]/70 border border-[#D5AAA2] focus:border-[#8C241E] focus:bg-[#FAF2EE] focus:ring-0 pl-11 pr-4 py-2.5 font-sans text-xs rounded-xl transition-colors placeholder:text-[#8C5A54] text-[#2A1816] font-medium outline-none"
+                                placeholder="Search by ID or amount..."
+                                type="text"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Data Table block */}
+                    <div className="overflow-hidden border border-[#DCBAB2] rounded-2xl">
+                        <div className="overflow-x-auto custom-scrollbar">
+                            <table className="w-full text-left border-collapse min-w-[800px]">
+                                <thead>
+                                    <tr className="bg-[#EEDBD5] border-b border-[#DCBAB2] font-mono text-[10px] font-bold uppercase text-[#8C5A54] tracking-widest">
+                                        <th className="py-4 px-6">Transaction ID</th>
+                                        <th className="py-4 px-6">Date</th>
+                                        <th className="py-4 px-6">Event Context</th>
+                                        <th className="py-4 px-6">Member/Entity</th>
+                                        <th className="py-4 px-6">Record Type</th>
+                                        <th className="py-4 px-6 text-right">Amount</th>
+                                        <th className="py-4 px-6 text-center">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="font-sans text-xs text-[#5C3B37]">
+                                    {filteredTransactions.length > 0 ? (
+                                        filteredTransactions.map((trx) => {
+                                            const isFlagged = trx.status === "Pending Audit";
+                                            return (
+                                                <tr
+                                                    key={trx.id}
+                                                    className={`border-b border-[#DCBAB2]/40 transition-colors ${isFlagged ? "bg-[#FDECEB]/50 hover:bg-[#FDECEB]" : "bg-[#FAF2EE] hover:bg-[#EEDBD5]/40"}`}
+                                                >
+                                                    <td className="py-4 px-6 font-mono font-medium">{trx.id}</td>
+                                                    <td className="py-4 px-6 font-mono text-[#8C5A54]">{trx.date}</td>
+                                                    <td className="py-4 px-6 font-semibold text-[#2A1816]">{trx.event}</td>
+                                                    <td className="py-4 px-6 font-medium text-[#2A1816]">{trx.member}</td>
+                                                    <td className="py-4 px-6 text-[#8C5A54]">{trx.type}</td>
+                                                    <td className={`py-4 px-6 text-right font-mono font-bold ${trx.amount < 0 ? "text-[#B32D25]" : "text-emerald-700"}`}>
+                                                        {trx.amount < 0 ? "-" : "+"}₹{Math.abs(trx.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                                    </td>
+                                                    <td className="py-4 px-6 text-center">
+                                                        <button
+                                                            onClick={() => handleRowStatusPillClick(trx)}
+                                                            className={`inline-flex items-center justify-center px-3 py-1 rounded-full font-mono text-[10px] font-bold uppercase tracking-widest transition-all ${isFlagged
+                                                                    ? "bg-amber-700/15 text-amber-950 border border-amber-700/30 hover:bg-amber-700/25 cursor-pointer"
+                                                                    : "bg-emerald-700/15 text-emerald-900 border border-emerald-700/30 cursor-default"
+                                                                }`}
+                                                        >
+                                                            {trx.status}
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })
+                                    ) : (
+                                        <tr>
+                                            <td colSpan={7} className="py-12 text-center text-[#8C5A54] font-medium font-sans text-sm">
+                                                No ledger records match the current filters.
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* Pagination */}
+                        <div className="border-t border-[#DCBAB2] p-4 flex items-center justify-between bg-[#F5EAE6] text-[#8C5A54]">
+                            <span className="font-mono text-[10px] font-bold uppercase tracking-wider">Showing {filteredTransactions.length} of {transactions.length} records</span>
+                            <div className="flex items-center gap-1.5">
+                                <button disabled className="p-1.5 rounded-lg hover:bg-[#EEDBD5] disabled:opacity-40 text-[#5C3B37] transition-colors">
+                                    <ChevronLeft className="w-4 h-4" />
+                                </button>
+                                <button className="w-8 h-8 rounded-lg bg-[#8C241E] text-[#FDF8F7] font-mono text-[10px] font-bold flex items-center justify-center shadow-xs">1</button>
+                                <button className="w-8 h-8 rounded-lg hover:bg-[#EEDBD5] font-mono text-[10px] font-bold flex items-center justify-center text-[#5C3B37] transition-colors">2</button>
+                                <button className="w-8 h-8 rounded-lg hover:bg-[#EEDBD5] font-mono text-[10px] font-bold flex items-center justify-center text-[#5C3B37] transition-colors">3</button>
+                                <span className="px-1 text-xs font-bold text-[#8C5A54]">...</span>
+                                <button className="w-8 h-8 rounded-lg hover:bg-[#EEDBD5] font-mono text-[10px] font-bold flex items-center justify-center text-[#5C3B37] transition-colors">42</button>
+                                <button className="p-1.5 rounded-lg hover:bg-[#EEDBD5] text-[#5C3B37] transition-colors">
+                                    <ChevronRight className="w-4 h-4" />
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            )}
 
-            {/* Dynamic bottom toast block */}
-            {toastMessage && (
-                <div className="fixed bottom-6 right-6 bg-[#31302d] text-white border border-[#D5C9BE]/30 rounded-xl px-5 py-3.5 shadow-2xl z-50 flex items-center gap-3 animate-slide-in max-w-sm">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0" />
-                    <span className="text-[11px] font-semibold leading-normal">{toastMessage}</span>
-                </div>
-            )}
+                {/* Scan Simulation Dialog Frame */}
+                {isScanning && (
+                    <div className="fixed inset-0 bg-[#2A1816]/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                        <div className="bg-[#F5EAE6] border border-[#DEBEB7] rounded-[2.5rem] p-10 max-w-sm w-full shadow-2xl flex flex-col items-center justify-center text-center">
+                            <Loader2 className="w-10 h-10 text-[#8C241E] animate-spin mb-6" />
+                            <h3 className="font-serif text-xl font-bold text-[#2A1816] tracking-tight">Run Compliance Audit Scan</h3>
+                            <p className="text-xs text-[#8C5A54] mt-3 h-6 font-mono uppercase tracking-wider font-semibold">{scanText}</p>
+                            <div className="w-full bg-[#EEDBD5] h-1.5 rounded-full mt-6 overflow-hidden">
+                                <div className="h-full bg-[#8C241E] rounded-full animate-loading-bar" style={{ width: '100%', animation: 'loading-bar 1.6s ease-in-out' }}></div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Scan Completed Success Dialogue */}
+                {showScanComplete && (
+                    <div className="fixed inset-0 bg-[#2A1816]/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                        <div className="bg-[#F5EAE6] border border-[#DEBEB7] rounded-[2.5rem] p-10 max-w-sm w-full shadow-2xl flex flex-col items-center">
+                            <div className="w-14 h-14 rounded-full bg-emerald-700/15 border border-emerald-700/30 text-emerald-700 flex items-center justify-center mb-5">
+                                <CheckCircle2 className="w-7 h-7" />
+                            </div>
+                            <h3 className="font-serif text-xl font-bold text-[#2A1816] tracking-tight text-center">Scan Assessment Complete</h3>
+                            <p className="text-xs text-[#6E4742] text-center mt-3 leading-relaxed font-medium">
+                                Audit check performed across 248 transaction items. All compliance checkpoints matched successfully.
+                            </p>
+                            <button
+                                onClick={() => setShowScanComplete(false)}
+                                className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-6 py-3 w-full rounded-full text-xs font-mono font-bold uppercase tracking-widest shadow-lg shadow-[#8C241E]/20 mt-8 transition-all cursor-pointer border border-[#A6352F]"
+                            >
+                                Back To Ledger Dashboard
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {/* Anomaly Details Inspect Modal */}
+                {activeAnomalyDetail && (
+                    <div className="fixed inset-0 bg-[#2A1816]/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                        <div className="bg-[#F5EAE6] border border-[#DEBEB7] rounded-[2.5rem] max-w-md w-full shadow-2xl overflow-hidden flex flex-col">
+
+                            <div className="bg-[#EEDBD5] px-8 py-5 border-b border-[#DEBEB7] flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <FileWarning className="w-4 h-4 text-[#8C241E]" />
+                                    <h3 className="font-mono font-bold text-[10px] uppercase tracking-widest text-[#8C241E]">Compliance Verification</h3>
+                                </div>
+                                <button
+                                    onClick={() => setActiveAnomalyDetail(null)}
+                                    className="p-1.5 hover:bg-[#D5AAA2]/40 rounded-full transition-colors group cursor-pointer"
+                                >
+                                    <X className="w-4 h-4 text-[#8C5A54] group-hover:text-[#2A1816]" />
+                                </button>
+                            </div>
+
+                            <div className="p-8 flex-1 space-y-6">
+                                <div>
+                                    <span className={`font-mono text-[10px] uppercase font-bold tracking-wider px-2.5 py-1 rounded-full border ${activeAnomalyDetail.severity === 'High' ? 'bg-[#FDECEB] text-[#B32D25] border-[#FDECEB]' :
+                                            activeAnomalyDetail.severity === 'Medium' ? 'bg-amber-100 text-amber-800 border-amber-200' :
+                                                'bg-[#EEDBD5] text-[#8C5A54] border-[#D5AAA2]'
+                                        }`}>
+                                        Severity: {activeAnomalyDetail.severity}
+                                    </span>
+                                    <h4 className="font-serif text-2xl font-bold text-[#2A1816] mt-4 tracking-tight">{activeAnomalyDetail.title}</h4>
+                                    <p className="text-sm text-[#6E4742] mt-2 leading-relaxed font-medium">{activeAnomalyDetail.description}</p>
+                                </div>
+
+                                <div className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-2xl p-4 text-xs space-y-3 font-sans">
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-[#8C5A54] font-bold">Flagged Item</span>
+                                        <span className="font-mono font-bold text-[#2A1816] bg-[#EEDBD5] px-2 py-0.5 rounded">{activeAnomalyDetail.trxId}</span>
+                                    </div>
+                                    <div className="flex justify-between items-start gap-4">
+                                        <span className="text-[#8C5A54] font-bold whitespace-nowrap">Trigger Rule</span>
+                                        <span className="text-[#5C3B37] text-right font-medium">{activeAnomalyDetail.rule}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center border-t border-[#DCBAB2]/50 pt-3">
+                                        <span className="text-[#8C5A54] font-bold">Matched Entity</span>
+                                        <span className="font-bold text-[#2A1816]">
+                                            {transactions.find(t => t.id === activeAnomalyDetail.trxId)?.member || "System Account"}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-[#8C5A54] font-bold">Amount Impacted</span>
+                                        <span className="font-mono font-bold text-[#B32D25]">
+                                            ₹{Math.abs(transactions.find(t => t.id === activeAnomalyDetail.trxId)?.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div className="text-[11px] text-[#8C5A54] leading-relaxed flex items-start gap-2 bg-[#EEDBD5]/50 p-3 rounded-xl">
+                                    <ShieldAlert className="w-3.5 h-3.5 text-[#8C241E] shrink-0 mt-0.5" />
+                                    <span>Resolving this flag manually will update the ledger entry to 'Cleared' and record your administrator hash in compliance records.</span>
+                                </div>
+                            </div>
+
+                            <div className="bg-[#FAF2EE] border-t border-[#DCBAB2] p-6 flex gap-3">
+                                <button
+                                    onClick={() => setActiveAnomalyDetail(null)}
+                                    className="px-5 py-3 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer shadow-xs"
+                                >
+                                    Cancel
+                                </button>
+                                {activeAnomalyDetail.title === "Missing Receipt" ? (
+                                    <>
+                                        <button
+                                            onClick={() => handleResolveAnomaly(activeAnomalyDetail, 'request')}
+                                            className="px-5 py-3 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer shadow-xs flex-grow text-center justify-center flex"
+                                        >
+                                            Request Doc
+                                        </button>
+                                        <button
+                                            onClick={() => handleResolveAnomaly(activeAnomalyDetail, 'upload')}
+                                            className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-5 py-3 rounded-full text-xs font-mono font-bold uppercase tracking-widest shadow-lg shadow-[#8C241E]/20 transition-all cursor-pointer border border-[#A6352F] flex-grow text-center justify-center flex"
+                                        >
+                                            Upload
+                                        </button>
+                                    </>
+                                ) : activeAnomalyDetail.title === "Duplicate Entry Warning" ? (
+                                    <button
+                                        onClick={() => handleResolveAnomaly(activeAnomalyDetail, 'merge')}
+                                        className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-6 py-3 rounded-full text-xs font-mono font-bold uppercase tracking-widest shadow-lg shadow-[#8C241E]/20 transition-all cursor-pointer border border-[#A6352F] flex-grow text-center justify-center flex"
+                                    >
+                                        Merge Items
+                                    </button>
+                                ) : (
+                                    <button
+                                        onClick={() => handleResolveAnomaly(activeAnomalyDetail, 'dismiss')}
+                                        className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-6 py-3 rounded-full text-xs font-mono font-bold uppercase tracking-widest shadow-lg shadow-[#8C241E]/20 transition-all cursor-pointer border border-[#A6352F] flex-grow text-center justify-center flex"
+                                    >
+                                        Dismiss Flag
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Dynamic bottom toast block */}
+                {toastMessage && (
+                    <div className="fixed bottom-8 right-8 bg-[#2A1816] text-[#FDF8F7] border border-[#8C5A54] rounded-2xl px-5 py-3.5 shadow-2xl z-50 flex items-center gap-3 animate-in slide-in-from-bottom-8 fade-in duration-300 max-w-sm">
+                        <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0" />
+                        <span className="text-[11px] font-sans font-medium leading-relaxed">{toastMessage}</span>
+                    </div>
+                )}
+            </div>
         </div>
     );
 }

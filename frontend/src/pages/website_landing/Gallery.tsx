@@ -168,7 +168,7 @@ export default function Gallery() {
                   className={`px-5 py-2 text-xs font-mono font-bold rounded-full transition-all uppercase tracking-wider ${
                     selectedCategory === cat
                       ? "bg-[#2C2A28] text-white shadow-md"
-                      : "bg-white/70 text-[#666361] hover:bg-white border border-[#D5C9BE]/60"
+                      : "bg-[#FAF2EE]/70 text-[#666361] hover:bg-[#FAF2EE] border border-[#D5C9BE]/60"
                   }`}
                 >
                   {cat === "KKY" ? "Karn Ki Yachika" : cat}
@@ -270,7 +270,7 @@ export default function Gallery() {
           <button 
             type="button" 
             onClick={() => setActiveLightboxIndex(null)}
-            className="absolute top-6 right-6 z-50 text-white/70 hover:text-white bg-white/10 hover:bg-[#E85F57] w-11 h-11 rounded-full flex items-center justify-center backdrop-blur-md border border-white/20 transition-all shadow-xl"
+            className="absolute top-6 right-6 z-50 text-white/70 hover:text-white bg-[#FAF2EE]/10 hover:bg-[#E85F57] w-11 h-11 rounded-full flex items-center justify-center backdrop-blur-md border border-white/20 transition-all shadow-xl"
           >
             <X className="w-5 h-5" />
           </button>
@@ -279,7 +279,7 @@ export default function Gallery() {
           <button 
             type="button" 
             onClick={handlePrev}
-            className="absolute left-4 md:left-8 z-50 text-white/70 hover:text-white bg-white/10 hover:bg-[#E85F57] w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-md border border-white/20 transition-all shadow-xl"
+            className="absolute left-4 md:left-8 z-50 text-white/70 hover:text-white bg-[#FAF2EE]/10 hover:bg-[#E85F57] w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-md border border-white/20 transition-all shadow-xl"
           >
             <ChevronLeft className="w-6 h-6" />
           </button>
@@ -288,7 +288,7 @@ export default function Gallery() {
           <button 
             type="button" 
             onClick={handleNext}
-            className="absolute right-4 md:right-8 z-50 text-white/70 hover:text-white bg-white/10 hover:bg-[#E85F57] w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-md border border-white/20 transition-all shadow-xl"
+            className="absolute right-4 md:right-8 z-50 text-white/70 hover:text-white bg-[#FAF2EE]/10 hover:bg-[#E85F57] w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-md border border-white/20 transition-all shadow-xl"
           >
             <ChevronRight className="w-6 h-6" />
           </button>

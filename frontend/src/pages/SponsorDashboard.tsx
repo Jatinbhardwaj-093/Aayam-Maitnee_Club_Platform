@@ -62,7 +62,7 @@ export default function SponsorDashboard() {
       </div>
 
       {/* Bookings & Reservations */}
-      <section className="bg-white border border-[#DDD8CE] rounded-[8px] p-[24px] space-y-[24px]">
+      <section className="bg-[#FAF2EE] border border-[#DDD8CE] rounded-[8px] p-[24px] space-y-[24px]">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-[#DDD8CE]/80 pb-4">
           <div>
             <h3 className="font-bold text-[18px] text-[#353535] font-serif">My Lounge &amp; Ticket Bookings</h3>

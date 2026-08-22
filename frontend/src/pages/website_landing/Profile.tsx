@@ -234,7 +234,7 @@ export default function Profile() {
                     <span>Contact Artist</span>
                   </a>
                 )}
-                <div className="text-xs font-mono text-white/50 flex items-center gap-2 py-3 px-4 rounded-full bg-white/5 border border-white/5">
+                <div className="text-xs font-mono text-white/50 flex items-center gap-2 py-3 px-4 rounded-full bg-[#FAF2EE]/5 border border-white/5">
                   <Calendar className="w-3.5 h-3.5 text-[#E85F57]" />
                   <span>Ensemble Member Since {profile.activeSince}</span>
                 </div>

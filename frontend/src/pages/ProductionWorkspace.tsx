@@ -100,7 +100,7 @@ export default function ProductionWorkspace() {
       </div>
 
       {/* Asset Tracking Section */}
-      <section className="bg-white border border-[#DDD8CE] rounded-[8px] overflow-hidden shadow-sm space-y-4">
+      <section className="bg-[#FAF2EE] border border-[#DDD8CE] rounded-[8px] overflow-hidden shadow-sm space-y-4">
         <div className="px-[24px] py-[20px] border-b border-[#DDD8CE] bg-[#EFE8E1]/30 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h3 className="font-bold text-[18px] text-[#353535] font-serif flex items-center gap-2">
@@ -192,7 +192,7 @@ export default function ProductionWorkspace() {
       </section>
 
       {/* Expense Tracker Section */}
-      <section className="bg-white border border-[#DDD8CE] rounded-[8px] overflow-hidden shadow-sm space-y-4">
+      <section className="bg-[#FAF2EE] border border-[#DDD8CE] rounded-[8px] overflow-hidden shadow-sm space-y-4">
         <div className="px-[24px] py-[20px] border-b border-[#DDD8CE] bg-[#EFE8E1]/30 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h3 className="font-bold text-[18px] text-[#353535] font-serif flex items-center gap-2">

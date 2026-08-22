@@ -33,6 +33,7 @@ import {
   RotateCcw,
   VenetianMask, Mic, Settings, Wrench, Clapperboard, Paintbrush, Scissors, Shirt, Palette,
 } from "lucide-react";
+import { CustomSelect } from "@/components/CustomSelect";
 import {
   Dialog,
   DialogContent,
@@ -56,38 +57,6 @@ export const getRoleCategoryIcon = (category, className = "w-4 h-4") => {
   return <Users className={className} />;
 };
 
-const CustomSelect = ({ value, options, onChange }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  return (
-    <div className="relative">
-      <button 
-        type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full bg-[#FFF9F6] border border-[#DCBAB2] shadow-inner text-[#5C3B37] rounded-xl p-3 font-sans outline-none text-xs font-medium text-left flex justify-between items-center transition-colors hover:bg-[#FAF2EE]"
-      >
-        <span className="truncate">{value}</span>
-        <ChevronRight className={`w-4 h-4 text-[#8C5A54] transition-transform ${isOpen ? 'rotate-90' : ''}`} />
-      </button>
-      {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-1 z-[60] bg-[#F5EAE6] border border-[#DEBEB7] rounded-xl shadow-xl max-h-48 overflow-y-auto custom-scrollbar">
-          {options.map(opt => (
-            <div 
-              key={opt}
-              className={`p-3 text-xs cursor-pointer hover:bg-[#EEDBD5] transition-colors ${value === opt ? 'bg-[#EEDBD5] font-bold text-[#8C241E]' : 'text-[#5C3B37]'}`}
-              onClick={() => { onChange(opt); setIsOpen(false); }}
-            >
-              {opt}
-            </div>
-          ))}
-        </div>
-      )}
-      {/* Click outside backdrop */}
-      {isOpen && (
-        <div className="fixed inset-0 z-[50]" onClick={() => setIsOpen(false)}></div>
-      )}
-    </div>
-  );
-};
 
 interface AuditionPosition {
   id: number;
@@ -96,6 +65,9 @@ interface AuditionPosition {
   role_category: string;
   character_description: string;
   requirements: string;
+  require_portfolio?: boolean;
+  require_video?: boolean;
+  require_audio?: boolean;
   slots_available: number;
   status: string;
   applicant_count?: number;
@@ -278,6 +250,8 @@ export default function AuditionsManagement() {
   // AI Evaluation State
   const [aiScanning, setAiScanning] = useState(false);
   const [aiScanResult, setAiScanResult] = useState<any | null>(null);
+  const [aiReportModalOpen, setAiReportModalOpen] = useState(false);
+  const [fullAiScanResult, setFullAiScanResult] = useState<any | null>(null);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -362,7 +336,10 @@ export default function AuditionsManagement() {
           character_description: "",
           requirements: "",
           slots_available: 1,
-          status: "Open Calling"
+          status: "Open Calling",
+          require_portfolio: false,
+          require_video: false,
+          require_audio: false
         });
         await fetchPositions();
       } else {
@@ -467,6 +444,37 @@ export default function AuditionsManagement() {
   };
 
   // Run AI Audition Screening
+  
+  const handleFullAiScan = (app: AuditionApplication) => {
+    setAiScanning(true);
+    setFullAiScanResult(null);
+    setAiReportModalOpen(true);
+    
+    // Simulate AI system "reviewdozer"
+    setTimeout(() => {
+      setFullAiScanResult({
+        candidate: app.applicant_name,
+        role: app.role_name,
+        skills_matched: ["Classical Monologue", "Diction Control", "Stage Presence"],
+        missing_skills: ["Acrobatics"],
+        audio_quality: {
+          status: "Pass",
+          clarity: "High",
+          noise_level: "Low",
+          notes: "Voice modulation is clear and audible."
+        },
+        video_quality: {
+          status: "Pass",
+          face_present: true,
+          lighting: "Adequate",
+          framing: "Center",
+          notes: "Candidate is well-lit and expressions are visible."
+        }
+      });
+      setAiScanning(false);
+    }, 1500);
+  };
+
   const handleRunAiScan = async (app: AuditionApplication) => {
     setAiScanning(true);
     setAiScanResult(null);
@@ -581,17 +589,27 @@ export default function AuditionsManagement() {
       {/* Main Section Header Banner */}
       <section className="bg-[#F2E5E0] border border-[#DCBAB2] rounded-[2.5rem] p-8 md:p-10 shadow-xs space-y-6">
         <div className="space-y-6">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 text-[10px] font-mono font-bold uppercase tracking-widest text-[#8C5A54]">
-              <Activity className="w-3.5 h-3.5 text-[#8C241E]" />
-              <span>DIRECTOR & MAINTAINER CASTING DESK</span>
+          <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+            <div className="space-y-2">
+              <div className="inline-flex items-center gap-2 text-[10px] font-mono font-bold uppercase tracking-widest text-[#8C5A54]">
+                <Activity className="w-3.5 h-3.5 text-[#8C241E]" />
+                <span>DIRECTOR & MAINTAINER CASTING DESK</span>
+              </div>
+              <h1 className="font-serif text-3xl sm:text-5xl text-[#2A1816] font-normal tracking-tight">
+                Auditions & Casting Management
+              </h1>
+              <p className="text-xs sm:text-sm text-[#6E4742] max-w-2xl font-serif italic">
+                Publish production role callings, screen audition slates with AI evaluation, and curate the official Aayam ensemble cast.
+              </p>
             </div>
-            <h1 className="font-serif text-3xl sm:text-5xl text-[#2A1816] font-normal tracking-tight">
-              Auditions & Casting Management
-            </h1>
-            <p className="text-xs sm:text-sm text-[#6E4742] max-w-2xl font-serif italic">
-              Publish production role callings, screen audition slates with AI evaluation, and curate the official Aayam ensemble cast.
-            </p>
+            
+            <button
+              onClick={() => setCreatePosOpen(true)}
+              className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-8 py-3.5 rounded-full text-sm font-mono font-bold uppercase tracking-widest shadow-xl shadow-[#8C241E]/20 flex items-center justify-center gap-2.5 transition-all cursor-pointer border border-[#A6352F] shrink-0 hover:scale-105 active:scale-95"
+            >
+              <Plus className="w-5 h-5 text-[#FFD0CC]" />
+              <span>New Calling</span>
+            </button>
           </div>
 
           {/* Stepper / Tab Toggle Bar */}
@@ -752,14 +770,6 @@ export default function AuditionsManagement() {
                     {(selectedProdFilter !== "All" ? 1 : 0) + (selectedCategory !== "All" ? 1 : 0)}
                   </span>
                 )}
-              </button>
-
-              <button
-                onClick={() => setCreatePosOpen(true)}
-                className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-4 py-2 rounded-xl text-xs font-mono font-bold uppercase tracking-wider shadow-xs flex items-center gap-1.5 transition-all cursor-pointer border border-[#A6352F]"
-              >
-                <Plus className="w-3.5 h-3.5 text-[#FFD0CC]" />
-                <span>New Calling</span>
               </button>
             </div>
           </div>
@@ -1169,7 +1179,7 @@ export default function AuditionsManagement() {
             <div className="overflow-x-auto custom-scrollbar">
               <table className="w-full text-left border-collapse min-w-[700px]">
                 <thead>
-                  <tr className="border-b border-[#DCBAB2] bg-[#F5EAE6]">
+                  <tr className="bg-[#F5EAE6] rounded-xl overflow-hidden">
                     <th className="px-6 py-4 text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
                       Candidate Profile
                     </th>
@@ -1198,7 +1208,7 @@ export default function AuditionsManagement() {
                     </tr>
                   ) : (
                     filteredApplications.map((app) => (
-                      <tr key={app.id} className="hover:bg-[#F5EAE6]/60 transition-colors">
+                      <tr key={app.id} className="bg-[#FAF2EE] hover:bg-[#F5EAE6] transition-colors shadow-xs">
                         {/* Candidate info */}
                         <td className="px-6 py-4.5 align-top">
                           <div className="space-y-1">
@@ -1269,8 +1279,20 @@ export default function AuditionsManagement() {
 
                         {/* Actions */}
                         <td className="px-6 py-4.5 align-top text-right">
-                          <div className="flex items-center justify-end gap-2">
-                            {/* View Dossier & AI Evaluation */}
+                          <div className="flex flex-col items-end gap-2.5">
+                            <div className="flex items-center justify-end gap-2">
+                            {/* AI Scan Report Button */}
+
+                            <button
+                                onClick={() => handleFullAiScan(app)}
+                                className="px-3 py-1.5 rounded-full bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#2A1816] text-[10px] font-mono font-bold uppercase tracking-wider border border-[#DCBAB2] flex items-center gap-1.5 transition-all shadow-xs mr-2"
+                                title="Run Reviewdozer AI Scan"
+                              >
+                                <Sparkle className="w-3.5 h-3.5 text-[#8C241E]" />
+                                AI Scan
+                            </button>
+
+{/* View Dossier & AI Evaluation */}
                             <button
                               onClick={() => {
                                 setSelectedApp(app);
@@ -1281,14 +1303,15 @@ export default function AuditionsManagement() {
                               title="Review candidate dossier"
                             >
                               <Eye className="w-3.5 h-3.5 text-[#8C241E]" />
-                              <span>Review Dossier</span>
+                              <span>Dossier</span>
                             </button>
 
+                            </div>
                             {/* Quick Status Dropdown / Buttons */}
                             {app.status.includes("Pending") && (
                               <button
                                 onClick={() => handleUpdateApplicationStatus(app.id, "Shortlisted")}
-                                className="px-3 py-1.5 rounded-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] text-xs font-mono font-bold uppercase tracking-wider border border-[#A6352F] transition-all cursor-pointer shadow-xs"
+                                className="w-full flex items-center justify-center px-3 py-1.5 rounded-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] text-xs font-mono font-bold uppercase tracking-wider border border-[#A6352F] transition-all cursor-pointer shadow-xs"
                                 title="Shortlist candidate"
                               >
                                 Shortlist
@@ -1298,7 +1321,7 @@ export default function AuditionsManagement() {
                             {app.status === "Shortlisted" && (
                               <button
                                 onClick={() => handleUpdateApplicationStatus(app.id, "Selected")}
-                                className="px-3 py-1.5 rounded-full bg-emerald-800 hover:bg-emerald-900 text-[#FDF8F7] text-xs font-mono font-bold uppercase tracking-wider border border-emerald-900 transition-all cursor-pointer shadow-xs"
+                                className="w-full flex items-center justify-center px-3 py-1.5 rounded-full bg-emerald-800 hover:bg-emerald-900 text-[#FDF8F7] text-xs font-mono font-bold uppercase tracking-wider border border-emerald-900 transition-all cursor-pointer shadow-xs"
                                 title="Select for Cast"
                               >
                                 Cast Role
@@ -1345,7 +1368,7 @@ export default function AuditionsManagement() {
             <div className="overflow-x-auto custom-scrollbar">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-[#DCBAB2] bg-[#F5EAE6]">
+                  <tr className="bg-[#F5EAE6] rounded-xl overflow-hidden">
                     <th className="px-3 py-3 text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54] w-[18%]">
                       Volunteer Member
                     </th>
@@ -1377,7 +1400,7 @@ export default function AuditionsManagement() {
                     </tr>
                   ) : (
                     volunteers.map((vol) => (
-                      <tr key={vol.id} className="hover:bg-[#F5EAE6]/60 transition-colors">
+                      <tr key={vol.id} className="bg-[#FAF2EE] hover:bg-[#F5EAE6] transition-colors shadow-xs">
                         <td className="px-3 py-4 align-top">
                           <div className="space-y-0.5">
                             <span className="font-serif text-[15px] leading-tight font-medium text-[#2A1816] block">{vol.applicant_name}</span>
@@ -1491,7 +1514,7 @@ export default function AuditionsManagement() {
                     value={newPosForm.production_name}
                     onChange={(e) => setNewPosForm({ ...newPosForm, production_name: e.target.value })}
                     placeholder="e.g. Karn Ki Yachika"
-                    className="w-full bg-[#FDF8F7] border border-[#DCBAB2] rounded-xl px-4 py-2.5 text-sm text-[#2A1816] font-medium focus:border-[#B32D25] focus:outline-none transition-colors shadow-sm"
+                    className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl px-4 py-2.5 text-sm text-[#2A1816] font-medium focus:border-[#B32D25] focus:outline-none transition-colors shadow-sm"
                   />
                 </div>
 
@@ -1505,7 +1528,7 @@ export default function AuditionsManagement() {
                     value={newPosForm.role_name}
                     onChange={(e) => setNewPosForm({ ...newPosForm, role_name: e.target.value })}
                     placeholder="e.g. Sultan Muhammad bin Tughlaq (Lead)"
-                    className="w-full bg-[#FDF8F7] border border-[#DCBAB2] rounded-xl px-4 py-2.5 text-sm text-[#2A1816] font-medium focus:border-[#B32D25] focus:outline-none transition-colors shadow-sm"
+                    className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl px-4 py-2.5 text-sm text-[#2A1816] font-medium focus:border-[#B32D25] focus:outline-none transition-colors shadow-sm"
                   />
                 </div>
               </div>
@@ -1517,7 +1540,7 @@ export default function AuditionsManagement() {
                   </label>
                   <CustomSelect
                     value={newPosForm.role_category}
-                    options={["Character Role", "Performer", "Technical Crew", "Backstage Technical", "Director", "Makeup & Hair", "Costume"]}
+                    options={[{value: "Character Role", label: "Character Role"}, {value: "Performer", label: "Performer"}, {value: "Technical Crew", label: "Technical Crew"}, {value: "Backstage Technical", label: "Backstage Technical"}, {value: "Director", label: "Director"}, {value: "Makeup & Hair", label: "Makeup & Hair"}, {value: "Costume", label: "Costume"}]}
                     onChange={(val) => setNewPosForm({ ...newPosForm, role_category: val })}
                   />
                 </div>
@@ -1532,7 +1555,7 @@ export default function AuditionsManagement() {
                     max="20"
                     value={newPosForm.slots_available}
                     onChange={(e) => setNewPosForm({ ...newPosForm, slots_available: parseInt(e.target.value) || 1 })}
-                    className="w-full bg-[#FDF8F7] border border-[#DCBAB2] rounded-xl px-4 py-2.5 text-sm text-[#2A1816] font-medium focus:border-[#B32D25] focus:outline-none transition-colors shadow-sm"
+                    className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl px-4 py-2.5 text-sm text-[#2A1816] font-medium focus:border-[#B32D25] focus:outline-none transition-colors shadow-sm"
                   />
                 </div>
               </div>
@@ -1546,7 +1569,7 @@ export default function AuditionsManagement() {
                   value={newPosForm.character_description}
                   onChange={(e) => setNewPosForm({ ...newPosForm, character_description: e.target.value })}
                   placeholder="Describe character motivations, vocal weight, stage presence, and key emotional arcs..."
-                  className="w-full bg-[#FDF8F7] border border-[#DCBAB2] rounded-xl p-4 text-sm font-serif leading-relaxed text-[#2A1816] focus:border-[#B32D25] focus:outline-none shadow-sm transition-colors"
+                  className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl p-4 text-sm font-serif leading-relaxed text-[#2A1816] focus:border-[#B32D25] focus:outline-none shadow-sm transition-colors"
                 />
               </div>
 
@@ -1559,7 +1582,7 @@ export default function AuditionsManagement() {
                   value={newPosForm.requirements}
                   onChange={(e) => setNewPosForm({ ...newPosForm, requirements: e.target.value })}
                   placeholder="e.g. 2-minute video monologue tape, classical diction, or technical portfolio summary"
-                  className="w-full bg-[#FDF8F7] border border-[#DCBAB2] rounded-xl p-4 text-sm font-serif leading-relaxed text-[#2A1816] focus:border-[#B32D25] focus:outline-none shadow-sm transition-colors"
+                  className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl p-4 text-sm font-serif leading-relaxed text-[#2A1816] focus:border-[#B32D25] focus:outline-none shadow-sm transition-colors"
                 />
               </div>
 
@@ -1568,37 +1591,46 @@ export default function AuditionsManagement() {
                   Required Submissions
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <label className="flex items-center gap-3 bg-[#FDF8F7] border border-[#DCBAB2] p-3 rounded-xl cursor-pointer hover:bg-[#FAF2EE] transition-colors shadow-sm">
+                  <label className="flex items-center gap-3 bg-[#FAF2EE] border border-[#DCBAB2] p-3 rounded-xl cursor-pointer hover:bg-[#FAF2EE] transition-colors shadow-sm relative">
                     <input 
                       type="checkbox" 
                       checked={newPosForm.require_portfolio || false}
                       onChange={(e) => setNewPosForm({...newPosForm, require_portfolio: e.target.checked})}
-                      className="w-4 h-4 text-[#8C241E] bg-[#F5EAE6] border-[#DCBAB2] rounded focus:ring-[#8C241E] focus:ring-2"
+                      className="absolute opacity-0 w-0 h-0"
                     />
+                    <div className={`w-4 h-4 shrink-0 rounded flex items-center justify-center transition-colors ${newPosForm.require_portfolio ? 'bg-[#8C241E] border border-[#8C241E]' : 'bg-[#F5EAE6] border border-[#DCBAB2]'}`}>
+                      {newPosForm.require_portfolio && <Check className="w-3 h-3 text-[#FDF8F7]" />}
+                    </div>
                     <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#5C3B37] flex items-center gap-1.5">
                       <FileText className="w-3.5 h-3.5 text-[#8C5A54]" /> Portfolio
                     </span>
                   </label>
                   
-                  <label className="flex items-center gap-3 bg-[#FDF8F7] border border-[#DCBAB2] p-3 rounded-xl cursor-pointer hover:bg-[#FAF2EE] transition-colors shadow-sm">
+                  <label className="flex items-center gap-3 bg-[#FAF2EE] border border-[#DCBAB2] p-3 rounded-xl cursor-pointer hover:bg-[#FAF2EE] transition-colors shadow-sm relative">
                     <input 
                       type="checkbox" 
                       checked={newPosForm.require_video || false}
                       onChange={(e) => setNewPosForm({...newPosForm, require_video: e.target.checked})}
-                      className="w-4 h-4 text-[#8C241E] bg-[#F5EAE6] border-[#DCBAB2] rounded focus:ring-[#8C241E] focus:ring-2"
+                      className="absolute opacity-0 w-0 h-0"
                     />
+                    <div className={`w-4 h-4 shrink-0 rounded flex items-center justify-center transition-colors ${newPosForm.require_video ? 'bg-[#8C241E] border border-[#8C241E]' : 'bg-[#F5EAE6] border border-[#DCBAB2]'}`}>
+                      {newPosForm.require_video && <Check className="w-3 h-3 text-[#FDF8F7]" />}
+                    </div>
                     <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#5C3B37] flex items-center gap-1.5">
                       <Video className="w-3.5 h-3.5 text-[#8C5A54]" /> Video
                     </span>
                   </label>
                   
-                  <label className="flex items-center gap-3 bg-[#FDF8F7] border border-[#DCBAB2] p-3 rounded-xl cursor-pointer hover:bg-[#FAF2EE] transition-colors shadow-sm">
+                  <label className="flex items-center gap-3 bg-[#FAF2EE] border border-[#DCBAB2] p-3 rounded-xl cursor-pointer hover:bg-[#FAF2EE] transition-colors shadow-sm relative">
                     <input 
                       type="checkbox" 
                       checked={newPosForm.require_audio || false}
                       onChange={(e) => setNewPosForm({...newPosForm, require_audio: e.target.checked})}
-                      className="w-4 h-4 text-[#8C241E] bg-[#F5EAE6] border-[#DCBAB2] rounded focus:ring-[#8C241E] focus:ring-2"
+                      className="absolute opacity-0 w-0 h-0"
                     />
+                    <div className={`w-4 h-4 shrink-0 rounded flex items-center justify-center transition-colors ${newPosForm.require_audio ? 'bg-[#8C241E] border border-[#8C241E]' : 'bg-[#F5EAE6] border border-[#DCBAB2]'}`}>
+                      {newPosForm.require_audio && <Check className="w-3 h-3 text-[#FDF8F7]" />}
+                    </div>
                     <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#5C3B37] flex items-center gap-1.5">
                       <Mic className="w-3.5 h-3.5 text-[#8C5A54]" /> Audio
                     </span>
@@ -1663,7 +1695,7 @@ export default function AuditionsManagement() {
                       required
                       value={selectedPosForEdit.production_name}
                       onChange={(e) => setSelectedPosForEdit({ ...selectedPosForEdit, production_name: e.target.value })}
-                      className="w-full bg-[#FDF8F7] border border-[#DCBAB2] rounded-xl px-4 py-2.5 text-sm text-[#2A1816] font-medium focus:border-[#B32D25] focus:outline-none transition-colors shadow-sm"
+                      className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl px-4 py-2.5 text-sm text-[#2A1816] font-medium focus:border-[#B32D25] focus:outline-none transition-colors shadow-sm"
                     />
                   </div>
 
@@ -1676,7 +1708,7 @@ export default function AuditionsManagement() {
                       required
                       value={selectedPosForEdit.role_name}
                       onChange={(e) => setSelectedPosForEdit({ ...selectedPosForEdit, role_name: e.target.value })}
-                      className="w-full bg-[#FDF8F7] border border-[#DCBAB2] rounded-xl px-4 py-2.5 text-sm text-[#2A1816] font-medium focus:border-[#B32D25] focus:outline-none transition-colors shadow-sm"
+                      className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl px-4 py-2.5 text-sm text-[#2A1816] font-medium focus:border-[#B32D25] focus:outline-none transition-colors shadow-sm"
                     />
                   </div>
                 </div>
@@ -1688,7 +1720,7 @@ export default function AuditionsManagement() {
                     </label>
                     <CustomSelect
                       value={selectedPosForEdit.role_category}
-                      options={["Character Role", "Performer", "Technical Crew", "Backstage Technical", "Director", "Makeup & Hair", "Costume"]}
+                      options={[{value: "Character Role", label: "Character Role"}, {value: "Performer", label: "Performer"}, {value: "Technical Crew", label: "Technical Crew"}, {value: "Backstage Technical", label: "Backstage Technical"}, {value: "Director", label: "Director"}, {value: "Makeup & Hair", label: "Makeup & Hair"}, {value: "Costume", label: "Costume"}]}
                       onChange={(val) => setSelectedPosForEdit({ ...selectedPosForEdit, role_category: val })}
                     />
                   </div>
@@ -1703,7 +1735,7 @@ export default function AuditionsManagement() {
                       max="20"
                       value={selectedPosForEdit.slots_available}
                       onChange={(e) => setSelectedPosForEdit({ ...selectedPosForEdit, slots_available: parseInt(e.target.value) || 1 })}
-                      className="w-full bg-[#FDF8F7] border border-[#DCBAB2] rounded-xl px-4 py-2.5 text-sm text-[#2A1816] font-medium focus:border-[#B32D25] focus:outline-none transition-colors shadow-sm"
+                      className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl px-4 py-2.5 text-sm text-[#2A1816] font-medium focus:border-[#B32D25] focus:outline-none transition-colors shadow-sm"
                     />
                   </div>
                 </div>
@@ -1716,7 +1748,7 @@ export default function AuditionsManagement() {
                     rows={3}
                     value={selectedPosForEdit.character_description}
                     onChange={(e) => setSelectedPosForEdit({ ...selectedPosForEdit, character_description: e.target.value })}
-                    className="w-full bg-[#FDF8F7] border border-[#DCBAB2] rounded-xl p-4 text-sm font-serif leading-relaxed text-[#2A1816] focus:border-[#B32D25] focus:outline-none shadow-sm transition-colors"
+                    className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl p-4 text-sm font-serif leading-relaxed text-[#2A1816] focus:border-[#B32D25] focus:outline-none shadow-sm transition-colors"
                   />
                 </div>
 
@@ -1728,7 +1760,7 @@ export default function AuditionsManagement() {
                     rows={3}
                     value={selectedPosForEdit.requirements}
                     onChange={(e) => setSelectedPosForEdit({ ...selectedPosForEdit, requirements: e.target.value })}
-                    className="w-full bg-[#FDF8F7] border border-[#DCBAB2] rounded-xl p-4 text-sm font-serif leading-relaxed text-[#2A1816] focus:border-[#B32D25] focus:outline-none shadow-sm transition-colors"
+                    className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl p-4 text-sm font-serif leading-relaxed text-[#2A1816] focus:border-[#B32D25] focus:outline-none shadow-sm transition-colors"
                   />
                 </div>
 
@@ -1737,37 +1769,46 @@ export default function AuditionsManagement() {
                     Required Submissions
                   </label>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <label className="flex items-center gap-3 bg-[#FDF8F7] border border-[#DCBAB2] p-3 rounded-xl cursor-pointer hover:bg-[#FAF2EE] transition-colors shadow-sm">
+                    <label className="flex items-center gap-3 bg-[#FAF2EE] border border-[#DCBAB2] p-3 rounded-xl cursor-pointer hover:bg-[#FAF2EE] transition-colors shadow-sm relative">
                       <input 
                         type="checkbox" 
                         checked={selectedPosForEdit.require_portfolio || false}
                         onChange={(e) => setSelectedPosForEdit({...selectedPosForEdit, require_portfolio: e.target.checked})}
-                        className="w-4 h-4 text-[#8C241E] bg-[#F5EAE6] border-[#DCBAB2] rounded focus:ring-[#8C241E] focus:ring-2"
+                        className="absolute opacity-0 w-0 h-0"
                       />
+                      <div className={`w-4 h-4 shrink-0 rounded flex items-center justify-center transition-colors ${selectedPosForEdit.require_portfolio ? 'bg-[#8C241E] border border-[#8C241E]' : 'bg-[#F5EAE6] border border-[#DCBAB2]'}`}>
+                        {selectedPosForEdit.require_portfolio && <Check className="w-3 h-3 text-[#FDF8F7]" />}
+                      </div>
                       <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#5C3B37] flex items-center gap-1.5">
                         <FileText className="w-3.5 h-3.5 text-[#8C5A54]" /> Portfolio
                       </span>
                     </label>
                     
-                    <label className="flex items-center gap-3 bg-[#FDF8F7] border border-[#DCBAB2] p-3 rounded-xl cursor-pointer hover:bg-[#FAF2EE] transition-colors shadow-sm">
+                    <label className="flex items-center gap-3 bg-[#FAF2EE] border border-[#DCBAB2] p-3 rounded-xl cursor-pointer hover:bg-[#FAF2EE] transition-colors shadow-sm relative">
                       <input 
                         type="checkbox" 
                         checked={selectedPosForEdit.require_video || false}
                         onChange={(e) => setSelectedPosForEdit({...selectedPosForEdit, require_video: e.target.checked})}
-                        className="w-4 h-4 text-[#8C241E] bg-[#F5EAE6] border-[#DCBAB2] rounded focus:ring-[#8C241E] focus:ring-2"
+                        className="absolute opacity-0 w-0 h-0"
                       />
+                      <div className={`w-4 h-4 shrink-0 rounded flex items-center justify-center transition-colors ${selectedPosForEdit.require_video ? 'bg-[#8C241E] border border-[#8C241E]' : 'bg-[#F5EAE6] border border-[#DCBAB2]'}`}>
+                        {selectedPosForEdit.require_video && <Check className="w-3 h-3 text-[#FDF8F7]" />}
+                      </div>
                       <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#5C3B37] flex items-center gap-1.5">
                         <Video className="w-3.5 h-3.5 text-[#8C5A54]" /> Video
                       </span>
                     </label>
                     
-                    <label className="flex items-center gap-3 bg-[#FDF8F7] border border-[#DCBAB2] p-3 rounded-xl cursor-pointer hover:bg-[#FAF2EE] transition-colors shadow-sm">
+                    <label className="flex items-center gap-3 bg-[#FAF2EE] border border-[#DCBAB2] p-3 rounded-xl cursor-pointer hover:bg-[#FAF2EE] transition-colors shadow-sm relative">
                       <input 
                         type="checkbox" 
                         checked={selectedPosForEdit.require_audio || false}
                         onChange={(e) => setSelectedPosForEdit({...selectedPosForEdit, require_audio: e.target.checked})}
-                        className="w-4 h-4 text-[#8C241E] bg-[#F5EAE6] border-[#DCBAB2] rounded focus:ring-[#8C241E] focus:ring-2"
+                        className="absolute opacity-0 w-0 h-0"
                       />
+                      <div className={`w-4 h-4 shrink-0 rounded flex items-center justify-center transition-colors ${selectedPosForEdit.require_audio ? 'bg-[#8C241E] border border-[#8C241E]' : 'bg-[#F5EAE6] border border-[#DCBAB2]'}`}>
+                        {selectedPosForEdit.require_audio && <Check className="w-3 h-3 text-[#FDF8F7]" />}
+                      </div>
                       <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#5C3B37] flex items-center gap-1.5">
                         <Mic className="w-3.5 h-3.5 text-[#8C5A54]" /> Audio
                       </span>
@@ -1979,6 +2020,77 @@ export default function AuditionsManagement() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* REVIEWDOZER AI SCAN REPORT MODAL */}
+      <Dialog open={aiReportModalOpen} onOpenChange={setAiReportModalOpen}>
+        <DialogContent showCloseButton={false} className="w-full sm:max-w-2xl bg-[#F5EAE6] border border-[#DEBEB7] text-[#2A1816] rounded-[2.5rem] p-0 shadow-2xl overflow-hidden flex flex-col">
+          <button
+            onClick={() => setAiReportModalOpen(false)}
+            className="absolute top-6 right-6 w-9 h-9 rounded-full bg-[#EEDBD5] hover:bg-[#E3CEC6] text-[#5C3B37] hover:text-[#2A1816] flex items-center justify-center transition-all border border-[#D5AAA2] z-30"
+          >
+            <X className="w-4 h-4" />
+          </button>
+          
+          <div className="p-8 sm:p-10 space-y-6">
+            <DialogHeader className="border-b border-[#DCBAB2]/70 pb-4">
+              <div className="flex items-center gap-2 mb-1">
+                <Sparkle className="w-4 h-4 text-[#8C241E]" />
+                <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#8C5A54]">
+                  Reviewdozer AI Report
+                </span>
+              </div>
+              <DialogTitle className="text-2xl font-serif text-[#2A1816]">
+                Comprehensive AI Scan
+              </DialogTitle>
+            </DialogHeader>
+
+            {aiScanning ? (
+              <div className="py-12 flex flex-col items-center justify-center space-y-4">
+                <Loader2 className="w-8 h-8 animate-spin text-[#8C241E]" />
+                <p className="text-xs font-mono text-[#8C5A54] uppercase tracking-wider">Analyzing Audio/Video & Matching Skills...</p>
+              </div>
+            ) : fullAiScanResult ? (
+              <div className="space-y-6 text-sm font-sans text-[#5C3B37]">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-[#FFF9F6] p-4 rounded-xl border border-[#DCBAB2]">
+                    <span className="text-[10px] font-mono font-bold uppercase text-[#8C5A54] block mb-1">Portfolio Skills Matched</span>
+                    <ul className="list-disc list-inside text-xs">
+                      {fullAiScanResult.skills_matched.map((s: string) => <li key={s} className="text-[#2A1816]">{s}</li>)}
+                    </ul>
+                  </div>
+                  <div className="bg-[#FFF9F6] p-4 rounded-xl border border-[#DCBAB2]">
+                    <span className="text-[10px] font-mono font-bold uppercase text-[#8C5A54] block mb-1">Missing Skills</span>
+                    <ul className="list-disc list-inside text-xs">
+                      {fullAiScanResult.missing_skills.map((s: string) => <li key={s} className="text-rose-700">{s}</li>)}
+                    </ul>
+                  </div>
+                </div>
+
+                <div className="bg-[#FFF9F6] p-4 rounded-xl border border-[#DCBAB2]">
+                  <span className="text-[10px] font-mono font-bold uppercase text-[#8C5A54] block mb-2 flex items-center gap-1"><Mic className="w-3.5 h-3.5"/> Audio Quality Scan</span>
+                  <div className="grid grid-cols-3 gap-2 text-xs">
+                    <div><strong>Status:</strong> {fullAiScanResult.audio_quality.status}</div>
+                    <div><strong>Clarity:</strong> {fullAiScanResult.audio_quality.clarity}</div>
+                    <div><strong>Noise:</strong> {fullAiScanResult.audio_quality.noise_level}</div>
+                  </div>
+                  <p className="text-xs mt-2 italic text-[#8C5A54]">{fullAiScanResult.audio_quality.notes}</p>
+                </div>
+
+                <div className="bg-[#FFF9F6] p-4 rounded-xl border border-[#DCBAB2]">
+                  <span className="text-[10px] font-mono font-bold uppercase text-[#8C5A54] block mb-2 flex items-center gap-1"><Video className="w-3.5 h-3.5"/> Video Quality Scan</span>
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div><strong>Face Present:</strong> {fullAiScanResult.video_quality.face_present ? "Yes" : "No"}</div>
+                    <div><strong>Lighting:</strong> {fullAiScanResult.video_quality.lighting}</div>
+                    <div><strong>Framing:</strong> {fullAiScanResult.video_quality.framing}</div>
+                  </div>
+                  <p className="text-xs mt-2 italic text-[#8C5A54]">{fullAiScanResult.video_quality.notes}</p>
+                </div>
+              </div>
+            ) : null}
+          </div>
+        </DialogContent>
+      </Dialog>
+
     </div>
   );
 }

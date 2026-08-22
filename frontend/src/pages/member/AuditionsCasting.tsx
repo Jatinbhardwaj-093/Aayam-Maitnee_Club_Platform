@@ -1,5 +1,6 @@
 // @ts-nocheck
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { CustomSelect } from "@/components/CustomSelect";
 import { useOutletContext, Link } from "react-router-dom";
 import { 
   Search, 
@@ -32,6 +33,9 @@ interface OpenPosition {
   character_description?: string;
   description: string;
   requirements: string;
+  require_portfolio?: boolean;
+  require_video?: boolean;
+  require_audio?: boolean;
   deadline: string;
   status?: string;
   slots_available?: number;
@@ -78,6 +82,10 @@ export default function AuditionsCasting() {
   const [coverNote, setCoverNote] = useState("");
   const [submittingApp, setSubmittingApp] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
+  const [portfolioFile, setPortfolioFile] = useState<File | null>(null);
+  const [audioFile, setAudioFile] = useState<File | null>(null);
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [fileErrors, setFileErrors] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
     if (activeUser) {
@@ -137,6 +145,11 @@ export default function AuditionsCasting() {
   const handleSubmitApplication = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!activePosition) return;
+    if (activePosition.require_portfolio && !portfolioFile) { alert("Portfolio is required."); return; }
+    if (activePosition.require_audio && !audioFile) { alert("Audio slate is required."); return; }
+    if (activePosition.require_video && !videoFile) { alert("Video tape is required."); return; }
+    if (Object.values(fileErrors).some(err => err)) { alert("Please fix file size errors."); return; }
+
     setSubmittingApp(true);
 
     const payload = {
@@ -205,7 +218,7 @@ export default function AuditionsCasting() {
   return (
     <div className="space-y-8 font-sans">
       {/* Header Banner */}
-      <div className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-[2rem] p-6 sm:p-8 md:p-10 shadow-xs flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+      <div className="bg-[#F2E5E0] border border-[#DCBAB2] rounded-[2.5rem] p-8 md:p-10 shadow-xs flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div className="space-y-2 flex-1">
           <div className="flex items-center gap-2">
             <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#8C5A54] bg-[#EEDBD5] px-3 py-1 rounded-full border border-[#D5AAA2]">
@@ -313,6 +326,26 @@ export default function AuditionsCasting() {
           </div>
         </div>
       )}
+
+      
+      {/* Progress Phases Timeline */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-[#F2E5E0] p-6 rounded-[2rem] border border-[#DCBAB2] shadow-xs">
+        <div className="bg-[#FAF2EE] p-4 rounded-xl border border-[#DCBAB2] flex flex-col">
+          <span className="text-[10px] font-mono text-[#8C5A54] uppercase tracking-wider font-bold">Phase 1</span>
+          <span className="text-lg font-serif text-[#2A1816] mt-1">Application Pending</span>
+          <span className="text-xs font-mono text-[#6E4742] mt-2 flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> Closes: Aug 30, 2026</span>
+        </div>
+        <div className="bg-[#F5EAE6] p-4 rounded-xl border border-[#DEBEB7] flex flex-col">
+          <span className="text-[10px] font-mono text-[#8C5A54] uppercase tracking-wider font-bold">Phase 2</span>
+          <span className="text-lg font-serif text-[#2A1816] mt-1">Directorial Review</span>
+          <span className="text-xs font-mono text-[#6E4742] mt-2 flex items-center gap-1"><Search className="w-3.5 h-3.5" /> Est: Sep 5-10, 2026</span>
+        </div>
+        <div className="bg-[#FAF2EE] p-4 rounded-xl border border-[#DCBAB2] flex flex-col">
+          <span className="text-[10px] font-mono text-[#8C5A54] uppercase tracking-wider font-bold">Phase 3</span>
+          <span className="text-lg font-serif text-[#2A1816] mt-1">Selected / Callback</span>
+          <span className="text-xs font-mono text-[#6E4742] mt-2 flex items-center gap-1"><Award className="w-3.5 h-3.5" /> Live: Sep 15, 2026</span>
+        </div>
+      </div>
 
       {/* TONED-DOWN EDITORIAL FILTER BAR */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-[#FAF2EE] border border-[#DCBAB2] rounded-2xl p-2.5 sm:p-3 shadow-xs">
@@ -672,31 +705,81 @@ export default function AuditionsCasting() {
                       <label className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#8C5A54] block">
                         Experience Level
                       </label>
-                      <select
+                      <CustomSelect
+                        label=""
+                        options={[
+                          { value: "Ensemble Member (1-2 Years)", label: "Ensemble Member (1-2 Years)" },
+                          { value: "Ensemble Senior (3-5 Years)", label: "Ensemble Senior (3-5 Years)" },
+                          { value: "Lead Theatrical Artist (5+ Years)", label: "Lead Theatrical Artist (5+ Years)" },
+                          { value: "Technical Crew Specialist", label: "Technical Crew Specialist" }
+                        ]}
                         value={experienceLevel}
-                        onChange={e => setExperienceLevel(e.target.value)}
-                        className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl px-3.5 py-2.5 text-xs text-[#2A1816] focus:outline-hidden focus:border-[#8C241E]"
-                      >
-                        <option value="Ensemble Member (1-2 Years)">Ensemble Member (1-2 Years)</option>
-                        <option value="Ensemble Senior (3-5 Years)">Ensemble Senior (3-5 Years)</option>
-                        <option value="Lead Theatrical Artist (5+ Years)">Lead Theatrical Artist (5+ Years)</option>
-                        <option value="Technical Crew Specialist">Technical Crew Specialist</option>
-                      </select>
+                        onChange={setExperienceLevel}
+                      />
                     </div>
                   </div>
 
-                  <div className="space-y-1">
-                    <label className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#8C5A54] block">
-                      Audition Video / Portfolio Reel Link
-                    </label>
-                    <input
-                      type="url"
-                      value={portfolioLink}
-                      onChange={e => setPortfolioLink(e.target.value)}
-                      placeholder="https://youtube.com/watch?v=... or https://drive.google.com/..."
-                      className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl px-3.5 py-2.5 text-xs text-[#2A1816] focus:outline-hidden focus:border-[#8C241E]"
-                    />
-                  </div>
+                  
+                  {activePosition?.require_portfolio && (
+                    <div className="space-y-1">
+                      <label className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#8C5A54] block">
+                        Portfolio Document (PDF &lt; 10MB) *
+                      </label>
+                      <div className="border-2 border-dashed border-[#DCBAB2] bg-[#FAF2EE] rounded-xl p-4 text-center hover:border-[#8C241E] transition-colors cursor-pointer relative">
+                        <input type="file" accept=".pdf,.doc,.docx" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file && file.size > 10 * 1024 * 1024) setFileErrors(prev => ({...prev, portfolio: "Portfolio exceeds 10MB limit."}));
+                          else { setPortfolioFile(file || null); setFileErrors(prev => ({...prev, portfolio: ""})); }
+                        }} />
+                        <span className="text-xs text-[#5C3B37] font-mono flex items-center justify-center gap-2">
+                          <FileText className="w-4 h-4 text-[#8C241E]" /> 
+                          {portfolioFile ? portfolioFile.name : "Drag & Drop Portfolio or Click to Upload"}
+                        </span>
+                      </div>
+                      {fileErrors.portfolio && <span className="text-[10px] text-rose-600 font-mono">{fileErrors.portfolio}</span>}
+                    </div>
+                  )}
+
+                  {activePosition?.require_audio && (
+                    <div className="space-y-1">
+                      <label className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#8C5A54] block">
+                        Audio Slate / Voice Reel (Audio &lt; 10MB) *
+                      </label>
+                      <div className="border-2 border-dashed border-[#DCBAB2] bg-[#FAF2EE] rounded-xl p-4 text-center hover:border-[#8C241E] transition-colors cursor-pointer relative">
+                        <input type="file" accept="audio/*" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file && file.size > 10 * 1024 * 1024) setFileErrors(prev => ({...prev, audio: "Audio exceeds 10MB limit."}));
+                          else { setAudioFile(file || null); setFileErrors(prev => ({...prev, audio: ""})); }
+                        }} />
+                        <span className="text-xs text-[#5C3B37] font-mono flex items-center justify-center gap-2">
+                          <Mic className="w-4 h-4 text-[#8C241E]" /> 
+                          {audioFile ? audioFile.name : "Drag & Drop Audio File or Click to Upload"}
+                        </span>
+                      </div>
+                      {fileErrors.audio && <span className="text-[10px] text-rose-600 font-mono">{fileErrors.audio}</span>}
+                    </div>
+                  )}
+
+                  {activePosition?.require_video && (
+                    <div className="space-y-1">
+                      <label className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#8C5A54] block">
+                        Audition Video Tape (Video &lt; 50MB) *
+                      </label>
+                      <div className="border-2 border-dashed border-[#DCBAB2] bg-[#FAF2EE] rounded-xl p-4 text-center hover:border-[#8C241E] transition-colors cursor-pointer relative">
+                        <input type="file" accept="video/*" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file && file.size > 50 * 1024 * 1024) setFileErrors(prev => ({...prev, video: "Video exceeds 50MB limit."}));
+                          else { setVideoFile(file || null); setFileErrors(prev => ({...prev, video: ""})); }
+                        }} />
+                        <span className="text-xs text-[#5C3B37] font-mono flex items-center justify-center gap-2">
+                          <Video className="w-4 h-4 text-[#8C241E]" /> 
+                          {videoFile ? videoFile.name : "Drag & Drop Video Tape or Click to Upload"}
+                        </span>
+                      </div>
+                      {fileErrors.video && <span className="text-[10px] text-rose-600 font-mono">{fileErrors.video}</span>}
+                    </div>
+                  )}
+
 
                   <div className="space-y-1">
                     <label className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#8C5A54] block">
@@ -723,7 +806,7 @@ export default function AuditionsCasting() {
                     <button
                       type="submit"
                       disabled={submittingApp}
-                      className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-6 py-2.5 rounded-full text-xs font-mono font-bold uppercase tracking-widest shadow-sm flex items-center gap-2 transition-all cursor-pointer border border-[#A6352F] disabled:opacity-50"
+                      className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-6 py-3 rounded-full text-xs font-mono font-bold uppercase tracking-widest shadow-lg shadow-[#8C241E]/20 flex items-center gap-2 transition-all cursor-pointer border border-[#A6352F] disabled:opacity-50"
                     >
                       <Check className="w-4 h-4" />
                       <span>{submittingApp ? "Submitting..." : "Submit Audition"}</span>

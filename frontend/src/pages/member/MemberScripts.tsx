@@ -660,65 +660,33 @@ export default function MemberScripts() {
                   {publicScripts.map((item) => (
                     <div
                       key={item.id}
-                      className="bg-[#FAF2EE] border border-[#DCBAB2] hover:border-[#8C241E]/60 rounded-[2.2rem] p-7 md:p-8 hover:shadow-xl transition-all duration-300 flex flex-col justify-between space-y-6 shadow-xs group relative overflow-hidden text-left"
+                      className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-[2rem] p-7 md:p-8 hover:border-[#B32D25]/50 hover:shadow-md transition-all flex flex-col justify-between space-y-6 shadow-xs group text-left"
                     >
-                      {/* Theatrical subtle accent edge */}
-                      <div className="absolute top-0 left-8 right-8 h-[2px] bg-gradient-to-r from-transparent via-[#8C241E]/30 to-transparent group-hover:via-[#8C241E] transition-all" />
-
-                      <div className="space-y-4">
-                        {/* Editorial Header Ribbon */}
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="flex flex-wrap items-center gap-2">
-                            <span className="bg-[#EEDBD5] text-[#8C241E] px-3 py-1 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider border border-[#D5AAA2] flex items-center gap-1.5 shadow-2xs">
-                              <BookOpen className="w-3 h-3 text-[#8C241E]" />
-                              <span>{item.genre || "Drama"}</span>
-                            </span>
-                            {item.language && (
-                              <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-[#8C5A54] bg-[#F5EAE6] px-2.5 py-1 rounded-full border border-[#DCBAB2]">
-                                {item.language}
-                              </span>
-                            )}
+                      <div className="space-y-3.5">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="space-y-1">
+                            <div className="text-[11px] font-mono text-[#8C5A54] uppercase tracking-wider font-semibold flex items-center gap-2">
+                              {item.genre || "Drama"} {item.language ? `• ${item.language}` : ""}
+                              {isMaintainer && (
+                                <span className="w-2 h-2 rounded-full bg-emerald-600 shrink-0" title="Verified Repertoire Script" />
+                              )}
+                            </div>
+                            <h3 className="text-2xl font-serif text-[#2A1816] tracking-tight font-normal group-hover:text-[#8C241E] transition-colors leading-snug">
+                              {item.title}
+                            </h3>
+                            <p className="text-xs text-[#6E4742] font-serif italic">
+                              by {item.playwright}
+                            </p>
                           </div>
-
-                          <div className="flex items-center gap-1.5 shrink-0">
-                            <span className="text-[10px] font-mono font-bold text-[#8C5A54] bg-[#F5EAE6] px-3 py-1 rounded-full border border-[#DCBAB2]">
-                              {item.created_at || "2026"}
-                            </span>
-                            {isMaintainer && (
-                              <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 border-2 border-[#FAF2EE] shrink-0" title="Verified Repertoire Script" />
-                            )}
-                          </div>
+                          <span className="text-[10px] font-mono text-[#8C5A54] shrink-0">{item.created_at || "2026"}</span>
+                        </div>
+                        
+                        <div className="flex flex-wrap items-center gap-2 text-xs font-mono text-[#6E4742]">
+                          <span>{item.pages} Pages</span> • <span>{item.acts}</span> • <span>{item.rolesCount}</span>
                         </div>
 
-                        {/* Title & Playwright */}
-                        <div className="space-y-1">
-                          <h3 className="text-2xl md:text-[1.65rem] font-serif text-[#2A1816] tracking-tight group-hover:text-[#8C241E] transition-colors leading-snug font-normal">
-                            {item.title}
-                          </h3>
-                          <p className="text-xs sm:text-sm text-[#6E4742] font-serif italic">
-                            by {item.playwright}
-                          </p>
-                        </div>
-
-                        {/* Manuscript Specification Pills with Icons */}
-                        <div className="flex flex-wrap items-center gap-2 pt-1">
-                          <span className="inline-flex items-center gap-1.5 bg-[#F5EAE6] border border-[#DCBAB2] px-2.5 py-1 rounded-xl text-[11px] font-mono font-bold text-[#2A1816]">
-                            <FileText className="w-3 h-3 text-[#8C241E]" />
-                            <span>{item.pages} Pages</span>
-                          </span>
-                          <span className="inline-flex items-center gap-1.5 bg-[#F5EAE6] border border-[#DCBAB2] px-2.5 py-1 rounded-xl text-[11px] font-mono font-medium text-[#5C3B37]">
-                            <Layers className="w-3 h-3 text-[#8C241E]" />
-                            <span>{item.acts}</span>
-                          </span>
-                          <span className="inline-flex items-center gap-1.5 bg-[#F5EAE6] border border-[#DCBAB2] px-2.5 py-1 rounded-xl text-[11px] font-mono font-medium text-[#5C3B37]">
-                            <Users className="w-3 h-3 text-[#8C241E]" />
-                            <span>{item.rolesCount}</span>
-                          </span>
-                        </div>
-
-                        {/* Theatrical Excerpt / Premise Box */}
                         {item.excerpt && (
-                          <blockquote className="text-xs text-[#5C3B37] font-serif italic line-clamp-2 leading-relaxed bg-[#F5EAE6]/90 border border-[#DCBAB2]/80 border-l-[3px] border-l-[#8C241E] p-3.5 rounded-2xl">
+                          <blockquote className="text-xs text-[#5C3B37] font-serif italic line-clamp-2 leading-relaxed mt-2 border-l-[3px] border-[#8C241E]/30 pl-3">
                             "{item.excerpt}"
                           </blockquote>
                         )}
@@ -804,65 +772,44 @@ export default function MemberScripts() {
                   {myDrafts.map((item) => (
                     <div
                       key={item.id}
-                      className="bg-[#FAF2EE] border border-[#DCBAB2] hover:border-[#8C241E]/60 rounded-[2.2rem] p-7 md:p-8 hover:shadow-xl transition-all duration-300 flex flex-col justify-between space-y-6 shadow-xs group relative overflow-hidden text-left"
+                      className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-[2rem] p-7 md:p-8 hover:border-[#B32D25]/50 hover:shadow-md transition-all flex flex-col justify-between space-y-6 shadow-xs group text-left"
                     >
-                      <div className="absolute top-0 left-8 right-8 h-[2px] bg-gradient-to-r from-transparent via-[#8C241E]/30 to-transparent group-hover:via-[#8C241E] transition-all" />
-
-                      <div className="space-y-4">
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="flex flex-wrap items-center gap-2">
-                            <span className="bg-[#EEDBD5] text-[#8C241E] px-3 py-1 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider border border-[#D5AAA2] flex items-center gap-1.5 shadow-2xs">
-                              <BookOpen className="w-3 h-3 text-[#8C241E]" />
-                              <span>{item.genre || "Draft"}</span>
-                            </span>
-                            <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-[#8C5A54] bg-[#F5EAE6] px-2.5 py-1 rounded-full border border-[#DCBAB2]">
-                              {item.created_at || "2026"}
-                            </span>
+                      <div className="space-y-3.5">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="space-y-1">
+                            <div className="text-[11px] font-mono text-[#8C5A54] uppercase tracking-wider font-semibold flex items-center gap-2">
+                              {item.genre || "Draft"}
+                              <span className={`px-2 py-0.5 rounded-full text-[9px] font-mono font-bold uppercase border flex items-center gap-1 ${
+                                item.status === "Pending" || item.status === "Pending Approval"
+                                  ? "bg-amber-700/15 text-amber-950 border-amber-700/30"
+                                  : "bg-[#EEDBD5] text-[#8C241E] border-[#D5AAA2]"
+                              }`}>
+                                {item.status === "Pending" || item.status === "Pending Approval" ? (
+                                  <>
+                                    <Clock className="w-2.5 h-2.5 text-amber-900" />
+                                    <span>Pending</span>
+                                  </>
+                                ) : (
+                                  <span>Draft</span>
+                                )}
+                              </span>
+                            </div>
+                            <h3 className="text-2xl font-serif text-[#2A1816] tracking-tight font-normal group-hover:text-[#8C241E] transition-colors leading-snug">
+                              {item.title}
+                            </h3>
+                            <p className="text-xs text-[#6E4742] font-serif italic">
+                              by {item.playwright}
+                            </p>
                           </div>
-
-                          <span className={`px-3 py-1 rounded-full text-[9px] font-mono font-bold uppercase border shrink-0 flex items-center gap-1 ${
-                            item.status === "Pending" || item.status === "Pending Approval"
-                              ? "bg-amber-700/15 text-amber-950 border-amber-700/30"
-                              : "bg-[#EEDBD5] text-[#8C241E] border-[#D5AAA2]"
-                          }`}>
-                            {item.status === "Pending" || item.status === "Pending Approval" ? (
-                              <>
-                                <Clock className="w-2.5 h-2.5 text-amber-900" />
-                                <span>Pending Review</span>
-                              </>
-                            ) : (
-                              <span>Private Draft</span>
-                            )}
-                          </span>
+                          <span className="text-[10px] font-mono text-[#8C5A54] shrink-0">{item.created_at || "2026"}</span>
                         </div>
 
-                        <div className="space-y-1">
-                          <h3 className="text-2xl md:text-[1.65rem] font-serif text-[#2A1816] tracking-tight group-hover:text-[#8C241E] transition-colors leading-snug font-normal">
-                            {item.title}
-                          </h3>
-                          <p className="text-xs sm:text-sm text-[#6E4742] font-serif italic">
-                            by {item.playwright}
-                          </p>
-                        </div>
-
-                        {/* Specs */}
-                        <div className="flex flex-wrap items-center gap-2 pt-1">
-                          <span className="inline-flex items-center gap-1.5 bg-[#F5EAE6] border border-[#DCBAB2] px-2.5 py-1 rounded-xl text-[11px] font-mono font-bold text-[#2A1816]">
-                            <FileText className="w-3 h-3 text-[#8C241E]" />
-                            <span>{item.pages} Pages</span>
-                          </span>
-                          <span className="inline-flex items-center gap-1.5 bg-[#F5EAE6] border border-[#DCBAB2] px-2.5 py-1 rounded-xl text-[11px] font-mono font-medium text-[#5C3B37]">
-                            <Layers className="w-3 h-3 text-[#8C241E]" />
-                            <span>{item.acts}</span>
-                          </span>
-                          <span className="inline-flex items-center gap-1.5 bg-[#F5EAE6] border border-[#DCBAB2] px-2.5 py-1 rounded-xl text-[11px] font-mono font-medium text-[#5C3B37]">
-                            <Users className="w-3 h-3 text-[#8C241E]" />
-                            <span>{item.rolesCount}</span>
-                          </span>
+                        <div className="flex flex-wrap items-center gap-2 text-xs font-mono text-[#6E4742]">
+                          <span>{item.pages} Pages</span> • <span>{item.acts}</span> • <span>{item.rolesCount}</span>
                         </div>
 
                         {item.excerpt && (
-                          <blockquote className="text-xs text-[#5C3B37] font-serif italic line-clamp-2 leading-relaxed bg-[#F5EAE6]/90 border border-[#DCBAB2]/80 border-l-[3px] border-l-[#8C241E] p-3.5 rounded-2xl">
+                          <blockquote className="text-xs text-[#5C3B37] font-serif italic line-clamp-2 leading-relaxed mt-2 border-l-[3px] border-[#8C241E]/30 pl-3">
                             "{item.excerpt}"
                           </blockquote>
                         )}
@@ -953,22 +900,29 @@ export default function MemberScripts() {
                   {pendingScripts.map((item) => (
                     <div
                       key={item.id}
-                      className="bg-[#FAF2EE] border border-amber-300 hover:border-amber-400 rounded-[2.2rem] p-7 md:p-8 shadow-xs space-y-5 text-left"
+                      className="bg-[#FAF2EE] border border-amber-300 hover:border-amber-400 rounded-[2rem] p-7 md:p-8 hover:shadow-md transition-all flex flex-col justify-between space-y-6 shadow-xs group text-left"
                     >
-                      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                        <div className="space-y-1.5">
-                          <span className="text-[10px] font-mono font-bold text-amber-950 uppercase tracking-widest bg-amber-100 px-3 py-1 rounded-full border border-amber-300 inline-flex items-center gap-1.5">
-                            <Clock className="w-3 h-3 text-amber-900" /> Publication Request
-                          </span>
-                          <h3 className="text-2xl font-serif text-[#2A1816] tracking-tight font-normal">
-                            {item.title}
-                          </h3>
-                          <p className="text-xs text-[#5C3B37] font-medium font-serif">
-                            Submitted by <strong>{item.author_name}</strong> ({item.author_email}) • {item.genre || "Drama"}
-                          </p>
+                      <div className="space-y-3.5">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="space-y-1">
+                            <div className="text-[11px] font-mono text-amber-950 uppercase tracking-wider font-semibold flex items-center gap-2">
+                              {item.genre || "Drama"}
+                              <span className="px-2 py-0.5 rounded-full text-[9px] font-mono font-bold uppercase border border-amber-300 bg-amber-100 text-amber-900 flex items-center gap-1">
+                                <Clock className="w-2.5 h-2.5" /> Publication Request
+                              </span>
+                            </div>
+                            <h3 className="text-2xl font-serif text-[#2A1816] tracking-tight font-normal group-hover:text-amber-950 transition-colors leading-snug">
+                              {item.title}
+                            </h3>
+                            <p className="text-xs text-[#6E4742] font-serif italic">
+                              Submitted by {item.author_name} ({item.author_email})
+                            </p>
+                          </div>
+                          <span className="text-[10px] font-mono text-[#8C5A54] shrink-0">{item.created_at || "2026"}</span>
                         </div>
-
-                        <div className="flex items-center gap-2 flex-wrap">
+                      </div>
+                      
+                      <div className="pt-4 border-t border-[#DCBAB2]/70 flex flex-wrap items-center justify-between gap-3">
                           <button
                             onClick={() => openViewModal(item)}
                             className="px-4 py-2 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase cursor-pointer shadow-xs"
@@ -995,7 +949,6 @@ export default function MemberScripts() {
                           </button>
                         </div>
                       </div>
-                    </div>
                   ))}
                 </div>
               )}

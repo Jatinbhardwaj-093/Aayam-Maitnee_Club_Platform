@@ -216,7 +216,7 @@ export default function Directory() {
             <div className="relative w-full lg:max-w-md">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#E85F57] w-4 h-4" />
               <input 
-                className="w-full pl-11 pr-4 py-3 bg-white/80 border border-[#D5C9BE] rounded-full focus:outline-none focus:border-[#E85F57] text-xs font-mono text-[#2C2A28] placeholder-[#666361]/60 shadow-xs transition-all" 
+                className="w-full pl-11 pr-4 py-3 bg-[#FAF2EE]/80 border border-[#D5C9BE] rounded-full focus:outline-none focus:border-[#E85F57] text-xs font-mono text-[#2C2A28] placeholder-[#666361]/60 shadow-xs transition-all" 
                 placeholder="Search artists by name, role, or craft..." 
                 type="text"
                 value={searchTerm}
@@ -233,7 +233,7 @@ export default function Directory() {
                   className={`px-5 py-2.5 text-xs font-mono font-bold rounded-full transition-all uppercase tracking-wider ${
                     filter === role 
                       ? "bg-[#2C2A28] text-white shadow-md" 
-                      : "bg-white/60 text-[#666361] hover:bg-white border border-[#D5C9BE]/60"
+                      : "bg-[#FAF2EE]/60 text-[#666361] hover:bg-[#FAF2EE] border border-[#D5C9BE]/60"
                   }`}
                 >
                   {role}

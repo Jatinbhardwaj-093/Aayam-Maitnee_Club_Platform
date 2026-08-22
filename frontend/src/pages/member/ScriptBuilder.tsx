@@ -106,6 +106,7 @@ export default function ScriptBuilder() {
   // Script Auto-Extractor Modal State
   const [importOpen, setImportOpen] = useState(false);
   const [rawScriptText, setRawScriptText] = useState("");
+  const [uploadFile, setUploadFile] = useState<File | null>(null);
 
   const [saving, setSaving] = useState(false);
   const [extracting, setExtracting] = useState(false);
@@ -473,17 +474,31 @@ export default function ScriptBuilder() {
 
   // Auto-Extract Script
   const handleAutoExtractScript = async () => {
-    if (!rawScriptText.trim()) return;
+    if (!rawScriptText.trim() && !uploadFile) return;
     setExtracting(true);
     try {
-      const response = await fetch(`${baseUrl}/api/extract-script`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          text: rawScriptText,
-          script_id: scriptId
-        })
-      });
+      let response;
+      if (uploadFile) {
+        const formData = new FormData();
+        formData.append("file", uploadFile);
+        if (scriptId) formData.append("script_id", scriptId);
+        if (rawScriptText.trim()) formData.append("text", rawScriptText);
+
+        response = await fetch(`${baseUrl}/api/extract-script`, {
+          method: "POST",
+          body: formData
+        });
+      } else {
+        response = await fetch(`${baseUrl}/api/extract-script`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            text: rawScriptText,
+            script_id: scriptId
+          })
+        });
+      }
+
       if (response.ok) {
         const data = await response.json();
         if (data.dialogue_script) {
@@ -1472,17 +1487,58 @@ export default function ScriptBuilder() {
               </DialogDescription>
             </DialogHeader>
 
-            <div className="space-y-2 py-2 text-left">
-              <label className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
-                Raw Script Text *
-              </label>
-              <textarea
-                rows={8}
-                value={rawScriptText}
-                onChange={(e) => setRawScriptText(e.target.value)}
-                placeholder={`Example:\n\nKARN: Ruk gaye na mere pahiye bhi, Keshav?\n[Pacing across stage beside sunken wheel]\nKRISHNA: Pahiya mitti mein nahi phasa Radheya, ahankaar mein phasa hai.`}
-                className="w-full bg-[#FAF2EE] border border-[#DCBAB2] p-4 text-xs font-serif leading-relaxed rounded-2xl focus:outline-none focus:border-[#B32D25] focus:ring-1 focus:ring-[#8C241E]/30 transition-all text-[#2A1816]"
-              />
+            <div className="space-y-5 py-2 text-left">
+              <div
+                className="w-full bg-[#FAF2EE] border-2 border-dashed border-[#DCBAB2] hover:border-[#8C241E]/50 rounded-2xl p-6 flex flex-col items-center justify-center gap-3 transition-all cursor-pointer relative"
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                    setUploadFile(e.dataTransfer.files[0]);
+                  }
+                }}
+              >
+                <input 
+                  type="file" 
+                  accept=".pdf,.txt" 
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files[0]) {
+                      setUploadFile(e.target.files[0]);
+                    }
+                  }}
+                />
+                <div className="w-10 h-10 rounded-full bg-[#EEDBD5] flex items-center justify-center">
+                  <FileText className="w-5 h-5 text-[#8C241E]" />
+                </div>
+                <div className="text-center space-y-1 pointer-events-none">
+                  <p className="text-sm font-serif font-medium text-[#2A1816]">
+                    {uploadFile ? uploadFile.name : "Upload PDF or Text File"}
+                  </p>
+                  <p className="text-xs text-[#8C5A54] font-mono">
+                    {uploadFile ? "Click or drag to replace" : "Drag & drop your script here, or click to browse"}
+                  </p>
+                </div>
+              </div>
+
+              <div className="relative flex items-center gap-4">
+                <div className="flex-1 border-t border-[#DCBAB2]/70"></div>
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54] bg-[#F5EAE6] px-2">OR</span>
+                <div className="flex-1 border-t border-[#DCBAB2]/70"></div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
+                  Paste Raw Script Text
+                </label>
+                <textarea
+                  rows={6}
+                  value={rawScriptText}
+                  onChange={(e) => setRawScriptText(e.target.value)}
+                  placeholder={`Example:\n\nKARN: Ruk gaye na mere pahiye bhi, Keshav?\n[Pacing across stage beside sunken wheel]\nKRISHNA: Pahiya mitti mein nahi phasa Radheya, ahankaar mein phasa hai.`}
+                  className="w-full bg-[#FAF2EE] border border-[#DCBAB2] p-4 text-xs font-serif leading-relaxed rounded-2xl focus:outline-none focus:border-[#B32D25] focus:ring-1 focus:ring-[#8C241E]/30 transition-all text-[#2A1816]"
+                />
+              </div>
             </div>
 
             <DialogFooter className="pt-3 flex justify-between items-center gap-3 border-t border-[#DCBAB2]/70">
