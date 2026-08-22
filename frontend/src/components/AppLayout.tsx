@@ -3,7 +3,7 @@ import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import {
   Home,
-  Users,
+
   ClipboardList,
   Bell,
   User,
@@ -44,7 +44,6 @@ const maintainerNavItems: NavItem[] = [
   { label: "Production Callboard", path: "/schedule-admin", icon: Calendar, description: "Rehearsal call sheets & attendance roster" },
   { label: "Events Management", path: "/events-admin", icon: Calendar, description: "Proposal curation & sponsor deals" },
   { label: "Auditions & Casting", path: "/auditions-admin", icon: ClipboardList, description: "Role callings & candidate requests" },
-  { label: "Members Directory", path: "/directory-admin", icon: Users, description: "Ensemble & crew directory" },
   { label: "Script Vault", path: "/member-scripts", icon: FileText, description: "Confidential play scripts & texts" },
   { label: "Rehearsal Studio", path: "/ai-rehearsal", icon: Bot, description: "Interactive voice script rehearsal" },
   { label: "Media Moderation", path: "/media-moderation", icon: HardDrive, description: "Review gallery content & storage" },
@@ -238,7 +237,7 @@ export default function AppLayout() {
   };
 
   const isMember = activeUser ? !isMaintainer : false;
-  const isAllowedPath = ["/", "/member", "/schedule", "/schedule-admin", "/auditions", "/auditions-admin", "/member-plays", "/member-scripts", "/script-builder", "/ai-rehearsal", "/plays", "/events", "/events-admin", "/directory-admin", "/maintainer", "/analytics", "/directory", "/gallery", "/public-gallery"].includes(location.pathname) || location.pathname.startsWith("/profile") || location.pathname.startsWith("/script-builder") || location.pathname.startsWith("/ai-rehearsal");
+  const isAllowedPath = ["/", "/member", "/schedule", "/schedule-admin", "/auditions", "/auditions-admin", "/member-plays", "/member-scripts", "/script-builder", "/ai-rehearsal", "/plays", "/events", "/events-admin", "/maintainer", "/analytics", "/directory", "/gallery", "/public-gallery"].includes(location.pathname) || location.pathname.startsWith("/profile") || location.pathname.startsWith("/script-builder") || location.pathname.startsWith("/ai-rehearsal");
   const showAccessDenied = activeUser && !isMaintainer && isMember && !isAllowedPath;
 
   const sidebarWidthClass = isCollapsed ? "w-[72px]" : "w-56 xl:w-64";

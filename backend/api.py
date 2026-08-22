@@ -766,57 +766,72 @@ def delete_maintainer_schedule():
 
 @api_bp.route('/my-auditions', methods=['GET'])
 def get_my_auditions():
+    from models import AuditionApplication, AuditionPosition, User
     email = request.args.get('email')
     user = User.query.filter_by(email=email).first()
     if not user:
-        return jsonify({'error': 'User not found'}), 404
-        
-    auditions = Audition.query.filter_by(user_id=user.id).all()
+        return jsonify([])
+    apps = AuditionApplication.query.filter_by(user_id=user.id).order_by(AuditionApplication.submitted_at.desc()).all()
     result = []
-    for a in auditions:
-        play = Play.query.get(a.play_id)
-        play_title = play.title if play else "Unknown Play"
-        
-        # map db status to UI status
+    for a in apps:
+        pos = AuditionPosition.query.get(a.position_id) if a.position_id else None
+        prod_name = pos.production_name if pos else ''
         status_map = {
-            'pending': 'Applied',
-            'reviewing': 'Reviewing',
-            'interview': 'Interview/Audition',
-            'decision': 'Casting Decision'
+            'Pending Review': 'submitted',
+            'Shortlisted': 'review',
+            'Selected': 'selected',
+            'Rejected': 'declined'
         }
-        ui_status = status_map.get(a.status.lower(), 'Applied')
-        
-        role_val = a.role_applied_for or "Ensemble"
+        progress = status_map.get(a.status, 'submitted')
         result.append({
-            'id': f"app{a.id}",
-            'positionId': f"{a.play_id}_{role_val}",
-            'positionTitle': f"{play_title} - {role_val}",
-            'category': role_val,
-            'submittedAt': a.submitted_at.strftime('%b %d, %Y') if a.submitted_at else '',
-            'status': ui_status,
-            'notes': "Application received and logged. Creative board is reviewing your materials.",
-            'files': ["application_details.pdf"]
+            'id': a.id,
+            'position_id': a.position_id,
+            'role_name': a.role_name,
+            'production_name': prod_name,
+            'category': pos.role_category if pos else 'Audition Role',
+            'status': a.status,
+            'progress': progress,
+            'audition_date': a.audition_date,
+            'submitted_at': a.submitted_at.strftime('%b %d, %Y') if a.submitted_at else '',
+            'notes': a.notes or '',
+            'portfolio_link': a.portfolio_link or '',
+            'portfolio_filename': a.portfolio_filename or None,
+            'video_filename': getattr(a, 'video_filename', None),
         })
     return jsonify(result)
 
 @api_bp.route('/audition/submit', methods=['POST'])
 def submit_audition():
+    from models import AuditionApplication, AuditionPosition, User, db
     data = request.json or {}
-    email = data.get('email')
-    user = User.query.filter_by(email=email).first()
-    if not user:
-        return jsonify({'error': 'User not found'}), 404
-        
-    play_id = data.get('play_id')
-    role = data.get('role') or data.get('category') or 'Ensemble'
-    notes = data.get('notes')
-    
-    a = Audition(user_id=user.id, play_id=play_id, role_applied_for=role, experience_notes=notes, status='pending')
-    db.session.add(a)
+    position_id = data.get('position_id')
+    role_name = data.get('role_name', 'Ensemble Role')
+    applicant_name = data.get('applicant_name', '')
+    applicant_email = data.get('applicant_email', '')
+    applicant_phone = data.get('applicant_phone', '')
+    experience_level = data.get('experience_level', 'Ensemble Member')
+    portfolio_link = data.get('portfolio_link', '')
+    notes = data.get('notes', '')
+    user = User.query.filter_by(email=applicant_email).first() if applicant_email else None
+    if user and position_id:
+        existing = AuditionApplication.query.filter_by(user_id=user.id, position_id=int(position_id)).first()
+        if existing:
+            return jsonify({'error': 'Already applied', 'existing_id': existing.id}), 409
+    app = AuditionApplication(
+        position_id=int(position_id) if position_id else None,
+        role_name=role_name,
+        applicant_name=applicant_name,
+        applicant_email=applicant_email,
+        applicant_phone=applicant_phone or '+91 98110 44321',
+        experience_level=experience_level,
+        portfolio_link=portfolio_link or '',
+        notes=notes,
+        user_id=user.id if user else None,
+        status='Pending Review'
+    )
+    db.session.add(app)
     db.session.commit()
-    
-    return jsonify({'success': True, 'id': a.id})
-
+    return jsonify({'success': True, 'id': app.id})
 
 @api_bp.route('/labels', methods=['GET'])
 def get_labels():
@@ -991,17 +1006,38 @@ def get_gallery():
 
 @api_bp.route('/gallery', methods=['POST'])
 def create_gallery_item():
+    import os
+    from werkzeug.utils import secure_filename
     from models import GalleryItem, db
-    data = request.json or {}
-    title = data.get('title') or 'Untitled Photo'
-    category = data.get('category') or 'Stage Plays'
-    image_url = data.get('imageUrl') or data.get('image_url')
-    caption = data.get('caption', '')
-    uploader_name = data.get('uploaderName') or 'Aayam Media Team'
-    status = data.get('status') or 'approved'
+    
+    if request.content_type and 'multipart/form-data' in request.content_type:
+        title = request.form.get('title') or 'Untitled Photo'
+        category = request.form.get('category') or 'Stage Plays'
+        caption = request.form.get('caption', '')
+        uploader_name = request.form.get('uploaderName') or 'Aayam Media Team'
+        status = request.form.get('status') or 'approved'
+        
+        file = request.files.get('file')
+        if not file:
+            return jsonify({'error': 'Image file is required'}), 400
+            
+        upload_dir = os.path.join(os.path.dirname(__file__), 'uploads', 'gallery')
+        os.makedirs(upload_dir, exist_ok=True)
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(upload_dir, filename))
+        
+        image_url = f"/uploads/gallery/{filename}"
+    else:
+        data = request.json or {}
+        title = data.get('title') or 'Untitled Photo'
+        category = data.get('category') or 'Stage Plays'
+        image_url = data.get('imageUrl') or data.get('image_url')
+        caption = data.get('caption', '')
+        uploader_name = data.get('uploaderName') or 'Aayam Media Team'
+        status = data.get('status') or 'approved'
 
-    if not image_url:
-        return jsonify({'error': 'Image URL is required'}), 400
+        if not image_url:
+            return jsonify({'error': 'Image URL is required'}), 400
 
     item = GalleryItem(
         title=title,
@@ -1269,6 +1305,7 @@ def get_audition_positions():
 @api_bp.route('/audition-positions/create', methods=['POST'])
 def create_audition_position():
     from models import AuditionPosition, db
+    from datetime import datetime
     data = request.json or {}
     new_pos = AuditionPosition(
         production_name=data.get('production_name', 'Mainstage Production'),
@@ -1286,6 +1323,7 @@ def create_audition_position():
 @api_bp.route('/audition-positions/<int:pos_id>', methods=['PUT', 'POST'])
 def update_audition_position(pos_id):
     from models import AuditionPosition, db
+    from datetime import datetime
     data = request.json or {}
     pos = AuditionPosition.query.get(pos_id)
     if not pos:
@@ -1305,6 +1343,12 @@ def update_audition_position(pos_id):
         pos.slots_available = int(data['slots_available'])
     if 'status' in data:
         pos.status = data['status']
+    if 'require_portfolio' in data:
+        pos.require_portfolio = data['require_portfolio']
+    if 'require_video' in data:
+        pos.require_video = data['require_video']
+    if 'require_audio' in data:
+        pos.require_audio = data['require_audio']
         
     db.session.commit()
     return jsonify({'status': 'success', 'position': pos.to_dict()})
@@ -2510,3 +2554,45 @@ Extract structured event proposal details. Return ONLY valid JSON matching this 
         }
         return jsonify({"status": "success", "data": fallback_data, "source": "fallback"}), 200
 
+
+@api_bp.route('/audition-applications/<int:app_id>/withdraw', methods=['POST'])
+def withdraw_audition_application(app_id):
+    from models import AuditionApplication, db
+    app_record = AuditionApplication.query.get(app_id)
+    if not app_record:
+        return jsonify({'error': 'Application not found'}), 404
+    if app_record.status not in ['Pending Review', 'Shortlisted']:
+        return jsonify({'error': 'Cannot withdraw in current status'}), 400
+    db.session.delete(app_record)
+    db.session.commit()
+    return jsonify({'success': True})
+
+@api_bp.route('/audition-applications/<int:app_id>/upload', methods=['POST'])
+def upload_application_file(app_id):
+    import os
+    from models import AuditionApplication, db
+    app_record = AuditionApplication.query.get(app_id)
+    if not app_record:
+        return jsonify({'error': 'Application not found'}), 404
+    upload_dir = os.path.join(os.path.dirname(__file__), 'uploads', 'auditions')
+    os.makedirs(upload_dir, exist_ok=True)
+    if 'portfolio' in request.files:
+        f = request.files['portfolio']
+        fname = f'portfolio_{app_id}_{f.filename}'
+        f.save(os.path.join(upload_dir, fname))
+        app_record.portfolio_filename = fname
+    if 'video' in request.files:
+        f = request.files['video']
+        fname = f'video_{app_id}_{f.filename}'
+        f.save(os.path.join(upload_dir, fname))
+        app_record.video_filename = fname
+    db.session.commit()
+    return jsonify({'success': True, 'portfolio_filename': getattr(app_record, 'portfolio_filename', None)})
+
+
+@api_bp.route('/uploads/<path:filename>', methods=['GET'])
+def serve_uploads(filename):
+    import os
+    from flask import send_from_directory
+    upload_dir = os.path.join(os.path.dirname(__file__), 'uploads')
+    return send_from_directory(upload_dir, filename)

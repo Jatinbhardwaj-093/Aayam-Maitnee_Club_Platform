@@ -20,7 +20,6 @@ import ProductionControlPanel from "./pages/maintainers/ProductionControlPanel";
 import MemberProfileAudit from "./pages/maintainers/MemberProfileAudit";
 import MediaModeration from "./pages/maintainers/MediaModeration";
 import EventsManagement from "./pages/maintainers/EventsManagement";
-import AllMembersDirectory from "./pages/maintainers/AllMembersDirectory";
 import AuditionsManagement from "./pages/maintainers/AuditionsManagement";
 import MaintainerSchedule from "./pages/maintainers/MaintainerSchedule";
 
@@ -80,7 +79,6 @@ export default function App() {
           <Route path="media-moderation" element={<MediaModeration />} />
           <Route path="events-admin" element={<EventsManagement />} />
           <Route path="auditions-admin" element={<AuditionsManagement />} />
-          <Route path="directory-admin" element={<AllMembersDirectory />} />
         </Route>
       </Routes>
     </BrowserRouter>

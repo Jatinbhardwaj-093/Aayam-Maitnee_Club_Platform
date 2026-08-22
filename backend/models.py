@@ -780,6 +780,15 @@ class AuditionPosition(db.Model):
     slots_available = db.Column(db.Integer, default=1)
     status = db.Column(db.String(50), default="Open Calling") # Open Calling, In Review, Casting Closed
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    event_id = db.Column(db.Integer, db.ForeignKey("event.id"), nullable=True)
+    skills = db.Column(db.Text, nullable=True)
+    application_open_date = db.Column(db.Date, nullable=True)
+    application_close_date = db.Column(db.Date, nullable=True)
+    require_portfolio = db.Column(db.Boolean, default=False)
+    require_video = db.Column(db.Boolean, default=False)
+    require_audio = db.Column(db.Boolean, default=False)
+    event = db.relationship("Event", backref=db.backref("audition_positions", lazy="dynamic"))
 
     def to_dict(self):
         title_str = f"{self.production_name} - {self.role_name}" if self.production_name else self.role_name
@@ -795,10 +804,32 @@ class AuditionPosition(db.Model):
             'description': self.character_description or '',
             'requirements': self.requirements or '',
             'slots_available': self.slots_available or 1,
+            'event_id': self.event_id,
+            'skills': self.skills or '',
+            'application_open_date': self.application_open_date.strftime('%b %d, %Y') if self.application_open_date else None,
+            'application_close_date': self.application_close_date.strftime('%b %d, %Y') if self.application_close_date else None,
+            'require_portfolio': self.require_portfolio,
+            'require_video': self.require_video,
+            'require_audio': self.require_audio,
+            'period_status': self._compute_period_status(),
+            'slots_available': self.slots_available or 1,
             'status': self.status or 'Open Calling',
-            'deadline': 'Sep 25, 2026',
+            'deadline': self.application_close_date.strftime('%b %d, %Y') if self.application_close_date else 'Sep 25, 2026',
             'created_at': self.created_at.strftime('%b %d, %Y') if self.created_at else 'Jul 20, 2026'
         }
+
+    def _compute_period_status(self):
+        from datetime import date as d
+        today = d.today()
+        if self.status in ('Casting Closed', 'Concluded'):
+            return 'concluded'
+        if self.status == 'In Review':
+            return 'review'
+        if self.application_open_date and self.application_open_date > today:
+            return 'upcoming'
+        if self.application_close_date and self.application_close_date < today:
+            return 'review'
+        return 'application' 
 
 
 class AuditionApplication(db.Model):
@@ -829,6 +860,8 @@ class AuditionApplication(db.Model):
     def to_dict(self):
         return {
             'id': self.id,
+            'user_id': self.user_id,
+            'portfolio_filename': self.portfolio_filename,
             'position_id': self.position_id,
             'role_name': self.role_name,
             'applicant_name': self.applicant_name,

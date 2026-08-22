@@ -41,6 +41,39 @@ import {
   DialogFooter
 } from "@/components/ui/dialog";
 
+const CustomSelect = ({ value, options, onChange }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <div className="relative">
+      <button 
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full bg-[#FFF9F6] border border-[#DCBAB2] shadow-inner text-[#5C3B37] rounded-xl p-3 font-sans outline-none text-xs font-medium text-left flex justify-between items-center transition-colors hover:bg-[#FAF2EE]"
+      >
+        <span className="truncate">{value}</span>
+        <ChevronRight className={`w-4 h-4 text-[#8C5A54] transition-transform ${isOpen ? 'rotate-90' : ''}`} />
+      </button>
+      {isOpen && (
+        <div className="absolute top-full left-0 right-0 mt-1 z-[60] bg-[#F5EAE6] border border-[#DEBEB7] rounded-xl shadow-xl max-h-48 overflow-y-auto custom-scrollbar">
+          {options.map(opt => (
+            <div 
+              key={opt}
+              className={`p-3 text-xs cursor-pointer hover:bg-[#EEDBD5] transition-colors ${value === opt ? 'bg-[#EEDBD5] font-bold text-[#8C241E]' : 'text-[#5C3B37]'}`}
+              onClick={() => { onChange(opt); setIsOpen(false); }}
+            >
+              {opt}
+            </div>
+          ))}
+        </div>
+      )}
+      {/* Click outside backdrop */}
+      {isOpen && (
+        <div className="fixed inset-0 z-[50]" onClick={() => setIsOpen(false)}></div>
+      )}
+    </div>
+  );
+};
+
 interface AuditionPosition {
   id: number;
   production_name: string;
@@ -529,7 +562,7 @@ export default function AuditionsManagement() {
 
       {/* Main Section Header Banner */}
       <section className="bg-[#F2E5E0] border border-[#DCBAB2] rounded-[2.5rem] p-8 md:p-10 shadow-xs space-y-6">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="space-y-6">
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 text-[10px] font-mono font-bold uppercase tracking-widest text-[#8C5A54]">
               <Activity className="w-3.5 h-3.5 text-[#8C241E]" />
@@ -544,38 +577,38 @@ export default function AuditionsManagement() {
           </div>
 
           {/* Stepper / Tab Toggle Bar */}
-          <div className="flex flex-wrap items-center gap-2 bg-[#FAF2EE] p-1.5 rounded-full border border-[#DCBAB2] shadow-xs">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full">
             <button
               onClick={() => setActiveTab("positions")}
-              className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-2 ${
+              className={`px-4 sm:px-5 py-3 rounded-2xl text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-2 ${
                 activeTab === "positions"
                   ? "bg-[#8C241E] text-[#FDF8F7] shadow-sm border border-[#A6352F]"
-                  : "text-[#5C3B37] hover:text-[#2A1816] hover:bg-[#EEDBD5]"
+                  : "bg-[#FAF2EE] border border-[#DCBAB2] text-[#5C3B37] hover:text-[#2A1816] hover:bg-[#EEDBD5] shadow-xs"
               }`}
             >
-              <Layers className="w-3.5 h-3.5" />
+              <Layers className="w-4 h-4" />
               <span>Role Callings ({positions.length})</span>
             </button>
             <button
               onClick={() => setActiveTab("applications")}
-              className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-2 ${
+              className={`px-4 sm:px-5 py-3 rounded-2xl text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-2 ${
                 activeTab === "applications"
                   ? "bg-[#8C241E] text-[#FDF8F7] shadow-sm border border-[#A6352F]"
-                  : "text-[#5C3B37] hover:text-[#2A1816] hover:bg-[#EEDBD5]"
+                  : "bg-[#FAF2EE] border border-[#DCBAB2] text-[#5C3B37] hover:text-[#2A1816] hover:bg-[#EEDBD5] shadow-xs"
               }`}
             >
-              <Users className="w-3.5 h-3.5" />
+              <Users className="w-4 h-4" />
               <span>Audition Candidates ({applications.length})</span>
             </button>
             <button
               onClick={() => setActiveTab("volunteers")}
-              className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-2 ${
+              className={`px-4 sm:px-5 py-3 rounded-2xl text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-2 ${
                 activeTab === "volunteers"
                   ? "bg-[#8C241E] text-[#FDF8F7] shadow-sm border border-[#A6352F]"
-                  : "text-[#5C3B37] hover:text-[#2A1816] hover:bg-[#EEDBD5]"
+                  : "bg-[#FAF2EE] border border-[#DCBAB2] text-[#5C3B37] hover:text-[#2A1816] hover:bg-[#EEDBD5] shadow-xs"
               }`}
             >
-              <HeartHandshake className="w-3.5 h-3.5" />
+              <HeartHandshake className="w-4 h-4" />
               <span>Crew Volunteers ({volunteers.length})</span>
             </button>
           </div>
@@ -717,7 +750,7 @@ export default function AuditionsManagement() {
           {filterPosModalOpen && (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs animate-in fade-in duration-200">
               <div className="bg-[#F5EAE6] border border-[#DEBEB7] text-[#2A1816] rounded-[2rem] p-6 sm:p-8 max-w-md w-full shadow-2xl relative space-y-6">
-                <div className="flex items-center justify-between border-b border-[#DCBAB2]/70 pb-3 pr-8">
+                <div className="flex items-start justify-between border-b border-[#DCBAB2]/70 pb-3">
                   <div className="space-y-0.5">
                     <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
                       Management Filter
@@ -756,7 +789,10 @@ export default function AuditionsManagement() {
                               : "bg-[#FAF2EE] text-[#5C3B37] hover:bg-[#EEDBD5] border border-[#DCBAB2]"
                           }`}
                         >
-                          <span>{opt.label}</span>
+                          <div className="flex items-center gap-1.5">
+                            {getRoleCategoryIcon(opt.label, "w-3.5 h-3.5")}
+                            <span>{opt.label}</span>
+                          </div>
                           {selectedProdFilter === opt.id && <Check className="w-3.5 h-3.5 text-[#FDF8F7]" />}
                         </button>
                       ))}
@@ -785,7 +821,10 @@ export default function AuditionsManagement() {
                               : "bg-[#FAF2EE] text-[#5C3B37] hover:bg-[#EEDBD5] border border-[#DCBAB2]"
                           }`}
                         >
-                          <span>{opt.label}</span>
+                          <div className="flex items-center gap-1.5">
+                            {getRoleCategoryIcon(opt.label, "w-3.5 h-3.5")}
+                            <span>{opt.label}</span>
+                          </div>
                           {selectedCategory === opt.id && <Check className="w-3 h-3 text-[#FDF8F7]" />}
                         </button>
                       ))}
@@ -831,8 +870,9 @@ export default function AuditionsManagement() {
                       <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C241E] block">
                         {pos.production_name}
                       </span>
-                      <span className="text-[11px] font-mono text-[#8C5A54] uppercase tracking-wider font-semibold">
-                        {pos.role_category}
+                      <span className="text-[11px] font-mono text-[#8C5A54] uppercase tracking-wider font-semibold flex items-center gap-1.5">
+                        {getRoleCategoryIcon(pos.role_category, "w-3 h-3")}
+                        <span>{pos.role_category}</span>
                       </span>
                     </div>
                     <span
@@ -1005,7 +1045,7 @@ export default function AuditionsManagement() {
           {filterAppModalOpen && (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs animate-in fade-in duration-200">
               <div className="bg-[#F5EAE6] border border-[#DEBEB7] text-[#2A1816] rounded-[2rem] p-6 sm:p-8 max-w-md w-full shadow-2xl relative space-y-6">
-                <div className="flex items-center justify-between border-b border-[#DCBAB2]/70 pb-3 pr-8">
+                <div className="flex items-start justify-between border-b border-[#DCBAB2]/70 pb-3">
                   <div className="space-y-0.5">
                     <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
                       Casting Preferences
@@ -1285,26 +1325,26 @@ export default function AuditionsManagement() {
             </div>
 
             <div className="overflow-x-auto custom-scrollbar">
-              <table className="w-full text-left border-collapse min-w-[750px]">
+              <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="border-b border-[#DCBAB2] bg-[#F5EAE6]">
-                    <th className="px-6 py-4 text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
+                    <th className="px-3 py-3 text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54] w-[18%]">
                       Volunteer Member
                     </th>
-                    <th className="px-6 py-4 text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
+                    <th className="px-3 py-3 text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54] w-[15%]">
                       Target Production
                     </th>
-                    <th className="px-6 py-4 text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
+                    <th className="px-3 py-3 text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54] w-[20%]">
                       Department & Availability
                     </th>
-                    <th className="px-6 py-4 text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
+                    <th className="px-3 py-3 text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54] w-[18%]">
                       Motivation & Notes
                     </th>
-                    <th className="px-6 py-4 text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
+                    <th className="px-3 py-3 text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54] w-[14%]">
                       Status
                     </th>
-                    <th className="px-6 py-4 text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54] text-right">
-                      Directorial Action
+                    <th className="px-3 py-3 text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54] text-right w-[15%]">
+                      Action
                     </th>
                   </tr>
                 </thead>
@@ -1320,41 +1360,41 @@ export default function AuditionsManagement() {
                   ) : (
                     volunteers.map((vol) => (
                       <tr key={vol.id} className="hover:bg-[#F5EAE6]/60 transition-colors">
-                        <td className="px-6 py-4.5 align-top">
+                        <td className="px-3 py-4 align-top">
                           <div className="space-y-0.5">
-                            <span className="font-serif text-base font-medium text-[#2A1816] block">{vol.applicant_name}</span>
-                            <span className="font-mono text-[11px] text-[#8C5A54] block">{vol.applicant_email}</span>
+                            <span className="font-serif text-[15px] leading-tight font-medium text-[#2A1816] block">{vol.applicant_name}</span>
+                            <span className="font-mono text-[10px] text-[#8C5A54] block break-all">{vol.applicant_email}</span>
                             {vol.applicant_phone && (
                               <span className="font-mono text-[10px] text-[#8C5A54] block">{vol.applicant_phone}</span>
                             )}
                           </div>
                         </td>
 
-                        <td className="px-6 py-4.5 align-top">
-                          <span className="font-serif text-sm font-medium text-[#2A1816] block">{vol.production_title}</span>
-                          <span className="font-mono text-[10px] text-[#8C5A54]">Applied: {vol.created_at}</span>
+                        <td className="px-3 py-4 align-top">
+                          <span className="font-serif text-sm font-medium text-[#2A1816] block leading-tight mb-1">{vol.production_title}</span>
+                          <span className="font-mono text-[9px] text-[#8C5A54] block">Applied: {vol.created_at}</span>
                         </td>
 
-                        <td className="px-6 py-4.5 align-top">
-                          <div className="space-y-1">
-                            <span className="inline-block font-mono text-[11px] font-bold uppercase tracking-wider bg-[#EEDBD5] text-[#8C241E] px-2.5 py-0.5 rounded-full border border-[#D5AAA2]">
+                        <td className="px-3 py-4 align-top">
+                          <div className="space-y-1.5">
+                            <span className="inline-block font-mono text-[10px] font-bold uppercase tracking-wider bg-[#EEDBD5] text-[#8C241E] px-2 py-0.5 rounded-md border border-[#D5AAA2] leading-tight">
                               {vol.department}
                             </span>
-                            <span className="font-mono text-[10px] text-[#5C3B37] block">
+                            <span className="font-mono text-[9px] text-[#5C3B37] block leading-tight">
                               Commitment: {vol.availability}
                             </span>
                           </div>
                         </td>
 
-                        <td className="px-6 py-4.5 align-top max-w-xs">
-                          <p className="text-xs text-[#5C3B37] font-light leading-relaxed italic">
+                        <td className="px-3 py-4 align-top">
+                          <p className="text-[11px] text-[#5C3B37] font-light leading-snug italic line-clamp-3">
                             "{vol.notes || "Ready to assist the backstage production team."}"
                           </p>
                         </td>
 
-                        <td className="px-6 py-4.5 align-top">
+                        <td className="px-3 py-4 align-top">
                           <span
-                            className={`inline-block px-3 py-1 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider border ${
+                            className={`inline-flex px-2 py-1 rounded-md text-[9px] font-mono font-bold uppercase tracking-wider border leading-tight text-center ${
                               vol.status === "Approved & Assigned"
                                 ? "bg-emerald-700/15 text-emerald-950 border-emerald-700/30"
                                 : vol.status === "Declined"
@@ -1366,20 +1406,20 @@ export default function AuditionsManagement() {
                           </span>
                         </td>
 
-                        <td className="px-6 py-4.5 align-top text-right">
-                          <div className="flex items-center justify-end gap-2">
+                        <td className="px-3 py-4 align-top text-right">
+                          <div className="flex flex-col items-end gap-1.5">
                             {vol.status !== "Approved & Assigned" && (
                               <button
                                 onClick={() => handleUpdateVolunteerStatus(vol.id, "Approved & Assigned")}
-                                className="px-3.5 py-1.5 rounded-full bg-emerald-800 hover:bg-emerald-900 text-[#FDF8F7] text-xs font-mono font-bold uppercase tracking-wider border border-emerald-900 transition-all cursor-pointer shadow-xs"
+                                className="w-full max-w-[90px] px-2 py-1.5 rounded-md bg-emerald-800 hover:bg-emerald-900 text-[#FDF8F7] text-[10px] font-mono font-bold uppercase tracking-wider border border-emerald-900 transition-all cursor-pointer shadow-xs text-center"
                               >
-                                Approve & Assign
+                                Approve
                               </button>
                             )}
                             {vol.status !== "Declined" && (
                               <button
                                 onClick={() => handleUpdateVolunteerStatus(vol.id, "Declined")}
-                                className="px-3 py-1.5 rounded-full bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#8C5A54] hover:text-[#2A1816] text-xs font-mono font-bold uppercase tracking-wider border border-[#DCBAB2] transition-all cursor-pointer shadow-2xs"
+                                className="w-full max-w-[90px] px-2 py-1.5 rounded-md bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#8C5A54] hover:text-[#2A1816] text-[10px] font-mono font-bold uppercase tracking-wider border border-[#DCBAB2] transition-all cursor-pointer shadow-2xs text-center"
                               >
                                 Decline
                               </button>
@@ -1398,7 +1438,7 @@ export default function AuditionsManagement() {
 
       {/* MODAL 1: CREATE NEW ROLE CALLING */}
       <Dialog open={createPosOpen} onOpenChange={setCreatePosOpen}>
-        <DialogContent showCloseButton={false} className="max-w-2xl bg-[#F5EAE6] border border-[#DEBEB7] text-[#2A1816] rounded-[2.5rem] p-0 shadow-2xl relative max-h-[90vh] overflow-hidden flex flex-col">
+        <DialogContent showCloseButton={false} className="w-full sm:max-w-2xl md:max-w-3xl bg-[#F5EAE6] border border-[#DEBEB7] text-[#2A1816] rounded-[2.5rem] p-0 shadow-2xl relative max-h-[90vh] overflow-hidden flex flex-col">
           <button
             type="button"
             onClick={() => setCreatePosOpen(false)}
@@ -1653,7 +1693,7 @@ export default function AuditionsManagement() {
 
       {/* MODAL 2: EDIT ROLE CALLING */}
       <Dialog open={editPosOpen} onOpenChange={setEditPosOpen}>
-        <DialogContent showCloseButton={false} className="max-w-2xl bg-[#F5EAE6] border border-[#DEBEB7] text-[#2A1816] rounded-[2.5rem] p-0 shadow-2xl relative max-h-[90vh] overflow-hidden flex flex-col">
+        <DialogContent showCloseButton={false} className="w-full sm:max-w-2xl md:max-w-3xl bg-[#F5EAE6] border border-[#DEBEB7] text-[#2A1816] rounded-[2.5rem] p-0 shadow-2xl relative max-h-[90vh] overflow-hidden flex flex-col">
           <button
             type="button"
             onClick={() => setEditPosOpen(false)}
@@ -1729,6 +1769,37 @@ export default function AuditionsManagement() {
                   />
                 </div>
 
+                <div className="space-y-2 pt-2 pb-1 border-b border-[#DCBAB2]/40">
+                  <label className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#8C5A54] block mb-2">
+                    Mandatory Submissions
+                  </label>
+                  <div className="flex flex-wrap gap-4">
+                    <label className="flex items-center gap-2 cursor-pointer group">
+                      <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-colors ${selectedPosForEdit.require_portfolio ? 'bg-[#8C241E] border-[#8C241E]' : 'bg-[#FFF9F6] border-[#DCBAB2] group-hover:border-[#8C241E]'}`}>
+                        {selectedPosForEdit.require_portfolio && <Check className="w-3 h-3 text-[#FDF8F7]" />}
+                      </div>
+                      <span className="text-xs font-mono font-medium text-[#2A1816]">Portfolio</span>
+                      <input type="checkbox" className="hidden" checked={selectedPosForEdit.require_portfolio} onChange={(e) => setSelectedPosForEdit({ ...selectedPosForEdit, require_portfolio: e.target.checked })} />
+                    </label>
+                    
+                    <label className="flex items-center gap-2 cursor-pointer group">
+                      <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-colors ${selectedPosForEdit.require_video ? 'bg-[#8C241E] border-[#8C241E]' : 'bg-[#FFF9F6] border-[#DCBAB2] group-hover:border-[#8C241E]'}`}>
+                        {selectedPosForEdit.require_video && <Check className="w-3 h-3 text-[#FDF8F7]" />}
+                      </div>
+                      <span className="text-xs font-mono font-medium text-[#2A1816]">Video Reel</span>
+                      <input type="checkbox" className="hidden" checked={selectedPosForEdit.require_video} onChange={(e) => setSelectedPosForEdit({ ...selectedPosForEdit, require_video: e.target.checked })} />
+                    </label>
+
+                    <label className="flex items-center gap-2 cursor-pointer group">
+                      <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-colors ${selectedPosForEdit.require_audio ? 'bg-[#8C241E] border-[#8C241E]' : 'bg-[#FFF9F6] border-[#DCBAB2] group-hover:border-[#8C241E]'}`}>
+                        {selectedPosForEdit.require_audio && <Check className="w-3 h-3 text-[#FDF8F7]" />}
+                      </div>
+                      <span className="text-xs font-mono font-medium text-[#2A1816]">Audio Reel</span>
+                      <input type="checkbox" className="hidden" checked={selectedPosForEdit.require_audio} onChange={(e) => setSelectedPosForEdit({ ...selectedPosForEdit, require_audio: e.target.checked })} />
+                    </label>
+                  </div>
+                </div>
+
                 <DialogFooter className="pt-4 border-t border-[#DCBAB2]/70 flex justify-between items-center gap-3">
                   <button
                     type="button"
@@ -1752,7 +1823,7 @@ export default function AuditionsManagement() {
 
       {/* MODAL 3: CANDIDATE DOSSIER & AI SCREENING EVALUATION */}
       <Dialog open={viewAppOpen} onOpenChange={setViewAppOpen}>
-        <DialogContent showCloseButton={false} className="max-w-3xl bg-[#F5EAE6] border border-[#DEBEB7] text-[#2A1816] rounded-[2.5rem] p-0 shadow-2xl relative max-h-[90vh] overflow-hidden flex flex-col">
+        <DialogContent showCloseButton={false} className="w-full sm:max-w-2xl md:max-w-3xl bg-[#F5EAE6] border border-[#DEBEB7] text-[#2A1816] rounded-[2.5rem] p-0 shadow-2xl relative max-h-[90vh] overflow-hidden flex flex-col">
           <button
             type="button"
             onClick={() => setViewAppOpen(false)}
@@ -1783,7 +1854,7 @@ export default function AuditionsManagement() {
                     {selectedApp.status}
                   </span>
                 </div>
-                <DialogTitle className="text-3xl font-serif text-[#2A1816] font-normal">
+                <DialogTitle className="text-3xl sm:text-4xl font-serif text-[#2A1816] font-normal">
                   {selectedApp.applicant_name}
                 </DialogTitle>
                 <DialogDescription className="text-xs font-mono text-[#6E4742]">
@@ -1792,18 +1863,18 @@ export default function AuditionsManagement() {
               </DialogHeader>
 
               {/* Contact & Bio Spec Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-[#FAF2EE] p-4 rounded-2xl border border-[#DCBAB2]">
-                <div>
-                  <span className="text-[9px] font-mono uppercase font-bold text-[#8C5A54] block">Email Address</span>
-                  <span className="text-xs font-mono font-semibold text-[#2A1816]">{selectedApp.applicant_email}</span>
+              <div className="flex flex-col sm:flex-row flex-wrap gap-4 sm:gap-6 bg-[#FFF9F6] p-5 sm:p-6 rounded-2xl border border-[#DCBAB2] shadow-sm">
+                <div className="flex-1 min-w-[150px]">
+                  <span className="text-[9px] font-mono uppercase font-bold text-[#8C5A54] block mb-1">Email Address</span>
+                  <span className="text-[13px] font-mono font-bold text-[#2A1816] break-all">{selectedApp.applicant_email}</span>
                 </div>
-                <div>
-                  <span className="text-[9px] font-mono uppercase font-bold text-[#8C5A54] block">Phone / Contact</span>
-                  <span className="text-xs font-mono font-semibold text-[#2A1816]">{selectedApp.applicant_phone || "On File"}</span>
+                <div className="flex-1 min-w-[120px]">
+                  <span className="text-[9px] font-mono uppercase font-bold text-[#8C5A54] block mb-1">Phone / Contact</span>
+                  <span className="text-[13px] font-mono font-bold text-[#2A1816]">{selectedApp.applicant_phone || "On File"}</span>
                 </div>
-                <div>
-                  <span className="text-[9px] font-mono uppercase font-bold text-[#8C5A54] block">Experience Level</span>
-                  <span className="text-xs font-mono font-semibold text-[#2A1816]">{selectedApp.experience_level || "Ensemble"}</span>
+                <div className="flex-1 min-w-[150px]">
+                  <span className="text-[9px] font-mono uppercase font-bold text-[#8C5A54] block mb-1">Experience Level</span>
+                  <span className="text-[13px] font-mono font-bold text-[#2A1816]">{selectedApp.experience_level || "Ensemble"}</span>
                 </div>
               </div>
 
@@ -1812,7 +1883,7 @@ export default function AuditionsManagement() {
                 <h4 className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C241E]">
                   Audition Statement & Experience Notes
                 </h4>
-                <blockquote className="p-4 bg-[#FAF2EE] border-l-3 border-[#8C241E] rounded-r-2xl font-serif text-xs text-[#2A1816] leading-relaxed italic">
+                <blockquote className="p-5 bg-[#FFF9F6] border-l-4 border-[#8C241E] rounded-r-2xl font-serif text-sm text-[#2A1816] leading-relaxed italic shadow-sm">
                   "{selectedApp.notes || "No candidate notes provided."}"
                 </blockquote>
               </div>
@@ -1842,21 +1913,21 @@ export default function AuditionsManagement() {
               )}
 
               {/* AI Role-Fit Assessment Section */}
-              <div className="space-y-3 p-5 bg-[#FAF2EE] border border-[#DCBAB2] rounded-2xl">
+              <div className="space-y-4 p-6 bg-[#FFF9F6] border border-[#DCBAB2] rounded-3xl shadow-sm">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-[#8C241E]" />
-                    <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-[#2A1816]">
-                      AI Audition Screening & Role-Fit Evaluation
+                  <div className="flex items-center gap-2 pr-4">
+                    <Sparkles className="w-5 h-5 text-[#8C241E] shrink-0" />
+                    <h4 className="text-xs sm:text-sm font-mono font-bold uppercase tracking-wider text-[#2A1816]">
+                      AI Screening & Role-Fit Evaluation
                     </h4>
                   </div>
                   <button
                     onClick={() => handleRunAiScan(selectedApp)}
                     disabled={aiScanning}
-                    className="text-[10px] font-mono font-bold uppercase px-3.5 py-1.5 rounded-full bg-[#EEDBD5] hover:bg-[#E3CEC6] text-[#8C241E] border border-[#D5AAA2] flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
+                    className="shrink-0 text-[10px] font-mono font-bold uppercase px-4 py-2 rounded-full bg-[#EEDBD5] hover:bg-[#E3CEC6] text-[#8C241E] border border-[#D5AAA2] flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
                   >
-                    {aiScanning ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkle className="w-3 h-3" />}
-                    <span>{aiScanning ? "Evaluating..." : "Run AI Scan"}</span>
+                    {aiScanning ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
+                    <span>{aiScanning ? "Evaluating..." : "Run Scan"}</span>
                   </button>
                 </div>
 

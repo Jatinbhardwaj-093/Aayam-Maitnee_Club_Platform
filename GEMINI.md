@@ -68,9 +68,9 @@ scrollbar-color: #D5AAA2 transparent;
 }
 ```
 
-### B. Custom Themed Dropdown Menus
-* **Mandatory**: Never use raw, unstyled default browser `<select>` boxes for prominent dropdowns.
-* Always use a custom theatrical popover/dropdown matching the site theme:
+### B. Custom Themed Dropdown Menus (STRICT RULE)
+* **CRITICAL MANDATORY RULE**: NEVER EVER use native raw `<select>` HTML tags anywhere in the application.
+* Every single dropdown, filter, or select input feature MUST be a custom React component (like `CustomSelect`) simulating a dropdown menu matching the custom theme of the site. No exceptions.
   * Trigger: `bg-[#E8D6CF]/70 border border-[#D5AAA2] rounded-xl px-4 py-2.5 text-xs text-[#2A1816] font-semibold flex items-center justify-between`
   * Popover Surface: `bg-[#F5EAE6] border border-[#DEBEB7] rounded-2xl p-2 shadow-2xl z-50`
   * Menu Items: `hover:bg-[#EEDBD5] text-[#2A1816] rounded-xl p-2.5 text-xs font-mono font-medium flex items-center gap-2`
