@@ -1451,7 +1451,7 @@ export default function AuditionsManagement() {
         </section>
       )}
 
-      {/* MODAL 1: CREATE NEW ROLE CALLING */}
+            {/* MODAL 1: CREATE NEW ROLE CALLING */}
       <Dialog open={createPosOpen} onOpenChange={setCreatePosOpen}>
         <DialogContent showCloseButton={false} className="w-full sm:max-w-2xl md:max-w-3xl bg-[#F5EAE6] border border-[#DEBEB7] text-[#2A1816] rounded-[2.5rem] p-0 shadow-2xl relative max-h-[90vh] overflow-hidden flex flex-col">
           <button
@@ -1463,123 +1463,20 @@ export default function AuditionsManagement() {
           </button>
 
           <div className="flex-1 overflow-y-auto custom-scrollbar p-8 sm:p-10 text-left space-y-6">
-            <DialogHeader className="text-left space-y-1 border-b border-[#DCBAB2]/70 pb-4 pr-10">
+            <DialogHeader className="text-left space-y-1 border-b border-[#DCBAB2]/70 pb-4">
               <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#8C5A54]">
-                Executive Casting Desk
+                New Recruitment Drive
               </span>
-              <DialogTitle className="text-2xl sm:text-3xl font-serif text-[#2A1816] font-normal">
-                Create New Role Calling
+              <DialogTitle className="text-3xl font-serif text-[#2A1816] flex items-center gap-3">
+                <Sparkle className="w-6 h-6 text-[#8C241E]" />
+                Draft Role Calling
               </DialogTitle>
               <DialogDescription className="text-xs text-[#6E4742] font-serif">
-                Post an official audition position for upcoming productions and open it to society members.
+                Create a new open casting position or backstage crew requirement.
               </DialogDescription>
             </DialogHeader>
 
-            <form onSubmit={handleCreatePosition} className="space-y-4 text-left">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <label className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
-                  Production Title *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={newPosForm.production_name}
-                  onChange={(e) => setNewPosForm({ ...newPosForm, production_name: e.target.value })}
-                  placeholder="e.g. Karn Ki Yachika"
-                  className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl px-4 py-2.5 text-xs text-[#2A1816] font-medium focus:border-[#B32D25] focus:outline-none"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
-                  Role Title *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={newPosForm.role_name}
-                  onChange={(e) => setNewPosForm({ ...newPosForm, role_name: e.target.value })}
-                  placeholder="e.g. Sultan Muhammad bin Tughlaq (Lead)"
-                  className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl px-4 py-2.5 text-xs text-[#2A1816] font-medium focus:border-[#B32D25] focus:outline-none"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
-                  Category
-                </label>
-                <select
-                  value={newPosForm.role_category}
-                  onChange={(e) => setNewPosForm({ ...newPosForm, role_category: e.target.value })}
-                  className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl px-3 py-2 text-xs text-[#2A1816] font-medium focus:border-[#B32D25] focus:outline-none cursor-pointer"
-                >
-                  <option value="Character Role">Character Role</option>
-                  <option value="Performer">Performer</option>
-                  <option value="Technical Crew">Technical Crew</option>
-                  <option value="Backstage Technical">Backstage Technical</option>
-                  <option value="Director">Director</option>
-                  <option value="Makeup & Hair">Makeup & Hair</option>
-                  <option value="Costume">Costume</option>
-                </select>
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
-                  Slots Available
-                </label>
-                <input
-                  type="number"
-                  min="1"
-                  max="20"
-                  value={newPosForm.slots_available}
-                  onChange={(e) => setNewPosForm({ ...newPosForm, slots_available: parseInt(e.target.value) || 1 })}
-                  className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl px-3 py-2 text-xs text-[#2A1816] font-medium focus:border-[#B32D25] focus:outline-none"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
-                  Calling Status
-                </label>
-                <select
-                  value={newPosForm.status}
-                  onChange={(e) => setNewPosForm({ ...newPosForm, status: e.target.value })}
-                  className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl px-3 py-2 text-xs text-[#2A1816] font-medium focus:border-[#B32D25] focus:outline-none cursor-pointer"
-                >
-                  <option value="Open Calling">Open Calling</option>
-                  <option value="Closed">Closed</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
-                Character Description & Dramatic Stakes
-              </label>
-              <textarea
-                rows={3}
-                value={newPosForm.character_description}
-                onChange={(e) => setNewPosForm({ ...newPosForm, character_description: e.target.value })}
-                placeholder="Describe character motivations, vocal weight, stage presence, and key emotional arcs..."
-                className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl p-3.5 text-xs font-serif leading-relaxed text-[#2A1816] focus:border-[#B32D25] focus:outline-none"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
-                Audition Requirements & Submission Format
-              </label>
-              <textarea
-                rows={2}
-                value={newPosForm.requirements}
-                onChange={(e) => setNewPosForm({ ...newPosForm, requirements: e.target.value })}
-                placeholder="e.g. 2-minute video monologue tape, classical diction, or technical portfolio summary"
-                className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl p-3.5 text-xs font-serif leading-relaxed text-[#2A1816] focus:border-[#B32D25] focus:outline-none"
-              />
-            </div>
+            <form onSubmit={handleCreatePosition} className="space-y-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
@@ -1591,7 +1488,7 @@ export default function AuditionsManagement() {
                     value={newPosForm.production_name}
                     onChange={(e) => setNewPosForm({ ...newPosForm, production_name: e.target.value })}
                     placeholder="e.g. Karn Ki Yachika"
-                    className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl px-4 py-2.5 text-xs text-[#2A1816] font-medium focus:border-[#B32D25] focus:outline-none"
+                    className="w-full bg-[#FDF8F7] border border-[#DCBAB2] rounded-xl px-4 py-2.5 text-sm text-[#2A1816] font-medium focus:border-[#B32D25] focus:outline-none transition-colors shadow-sm"
                   />
                 </div>
 
@@ -1605,29 +1502,21 @@ export default function AuditionsManagement() {
                     value={newPosForm.role_name}
                     onChange={(e) => setNewPosForm({ ...newPosForm, role_name: e.target.value })}
                     placeholder="e.g. Sultan Muhammad bin Tughlaq (Lead)"
-                    className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl px-4 py-2.5 text-xs text-[#2A1816] font-medium focus:border-[#B32D25] focus:outline-none"
+                    className="w-full bg-[#FDF8F7] border border-[#DCBAB2] rounded-xl px-4 py-2.5 text-sm text-[#2A1816] font-medium focus:border-[#B32D25] focus:outline-none transition-colors shadow-sm"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="space-y-1.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5 relative z-20">
                   <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
                     Category
                   </label>
-                  <select
+                  <CustomSelect
                     value={newPosForm.role_category}
-                    onChange={(e) => setNewPosForm({ ...newPosForm, role_category: e.target.value })}
-                    className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl px-3 py-2 text-xs text-[#2A1816] font-medium focus:border-[#B32D25] focus:outline-none cursor-pointer"
-                  >
-                    <option value="Character Role">Character Role</option>
-                    <option value="Performer">Performer</option>
-                    <option value="Technical Crew">Technical Crew</option>
-                    <option value="Backstage Technical">Backstage Technical</option>
-                    <option value="Director">Director</option>
-                    <option value="Makeup & Hair">Makeup & Hair</option>
-                    <option value="Costume">Costume</option>
-                  </select>
+                    options={["Character Role", "Performer", "Technical Crew", "Backstage Technical", "Director", "Makeup & Hair", "Costume"]}
+                    onChange={(val) => setNewPosForm({ ...newPosForm, role_category: val })}
+                  />
                 </div>
 
                 <div className="space-y-1.5">
@@ -1640,22 +1529,8 @@ export default function AuditionsManagement() {
                     max="20"
                     value={newPosForm.slots_available}
                     onChange={(e) => setNewPosForm({ ...newPosForm, slots_available: parseInt(e.target.value) || 1 })}
-                    className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl px-3 py-2 text-xs text-[#2A1816] font-medium focus:border-[#B32D25] focus:outline-none"
+                    className="w-full bg-[#FDF8F7] border border-[#DCBAB2] rounded-xl px-4 py-2.5 text-sm text-[#2A1816] font-medium focus:border-[#B32D25] focus:outline-none transition-colors shadow-sm"
                   />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
-                    Calling Status
-                  </label>
-                  <select
-                    value={newPosForm.status}
-                    onChange={(e) => setNewPosForm({ ...newPosForm, status: e.target.value })}
-                    className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl px-3 py-2 text-xs text-[#2A1816] font-medium focus:border-[#B32D25] focus:outline-none cursor-pointer"
-                  >
-                    <option value="Open Calling">Open Calling</option>
-                    <option value="Closed">Closed</option>
-                  </select>
                 </div>
               </div>
 
@@ -1668,7 +1543,7 @@ export default function AuditionsManagement() {
                   value={newPosForm.character_description}
                   onChange={(e) => setNewPosForm({ ...newPosForm, character_description: e.target.value })}
                   placeholder="Describe character motivations, vocal weight, stage presence, and key emotional arcs..."
-                  className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl p-3.5 text-xs font-serif leading-relaxed text-[#2A1816] focus:border-[#B32D25] focus:outline-none"
+                  className="w-full bg-[#FDF8F7] border border-[#DCBAB2] rounded-xl p-4 text-sm font-serif leading-relaxed text-[#2A1816] focus:border-[#B32D25] focus:outline-none shadow-sm transition-colors"
                 />
               </div>
 
@@ -1677,25 +1552,25 @@ export default function AuditionsManagement() {
                   Audition Requirements & Submission Format
                 </label>
                 <textarea
-                  rows={2}
+                  rows={3}
                   value={newPosForm.requirements}
                   onChange={(e) => setNewPosForm({ ...newPosForm, requirements: e.target.value })}
                   placeholder="e.g. 2-minute video monologue tape, classical diction, or technical portfolio summary"
-                  className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl p-3.5 text-xs font-serif leading-relaxed text-[#2A1816] focus:border-[#B32D25] focus:outline-none"
+                  className="w-full bg-[#FDF8F7] border border-[#DCBAB2] rounded-xl p-4 text-sm font-serif leading-relaxed text-[#2A1816] focus:border-[#B32D25] focus:outline-none shadow-sm transition-colors"
                 />
               </div>
 
-              <DialogFooter className="pt-4 border-t border-[#DCBAB2]/70 flex justify-between items-center gap-3">
+              <DialogFooter className="pt-6 border-t border-[#DCBAB2]/70 flex flex-col sm:flex-row justify-end items-center gap-4">
                 <button
                   type="button"
                   onClick={() => setCreatePosOpen(false)}
-                  className="px-5 py-2.5 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer shadow-xs"
+                  className="w-full sm:w-auto px-6 py-3 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer text-center"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] font-mono text-xs font-bold uppercase tracking-wider px-7 py-3 rounded-full shadow-lg shadow-[#8C241E]/20 flex items-center gap-2 border border-[#A6352F] cursor-pointer transition-all"
+                  className="w-full sm:w-auto bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] font-mono text-xs font-bold uppercase tracking-wider px-8 py-3 rounded-full shadow-lg shadow-[#8C241E]/20 flex justify-center items-center gap-2 border border-[#A6352F] cursor-pointer transition-all"
                 >
                   <Plus className="w-4 h-4 text-[#FFD0CC]" />
                   <span>Publish Role Calling</span>
@@ -1722,7 +1597,7 @@ export default function AuditionsManagement() {
               <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#8C5A54]">
                 Edit Role Calling
               </span>
-              <DialogTitle className="text-2xl font-serif text-[#2A1816]">
+              <DialogTitle className="text-3xl font-serif text-[#2A1816]">
                 {selectedPosForEdit?.role_name}
               </DialogTitle>
               <DialogDescription className="text-xs text-[#6E4742] font-serif">
@@ -1731,8 +1606,47 @@ export default function AuditionsManagement() {
             </DialogHeader>
 
             {selectedPosForEdit && (
-              <form onSubmit={handleUpdatePosition} className="space-y-4 text-left">
+              <form onSubmit={handleEditPosition} className="space-y-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
+                      Production Title *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={selectedPosForEdit.production_name}
+                      onChange={(e) => setSelectedPosForEdit({ ...selectedPosForEdit, production_name: e.target.value })}
+                      className="w-full bg-[#FDF8F7] border border-[#DCBAB2] rounded-xl px-4 py-2.5 text-sm text-[#2A1816] font-medium focus:border-[#B32D25] focus:outline-none transition-colors shadow-sm"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
+                      Role Title *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={selectedPosForEdit.role_name}
+                      onChange={(e) => setSelectedPosForEdit({ ...selectedPosForEdit, role_name: e.target.value })}
+                      className="w-full bg-[#FDF8F7] border border-[#DCBAB2] rounded-xl px-4 py-2.5 text-sm text-[#2A1816] font-medium focus:border-[#B32D25] focus:outline-none transition-colors shadow-sm"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1.5 relative z-20">
+                    <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
+                      Category
+                    </label>
+                    <CustomSelect
+                      value={selectedPosForEdit.role_category}
+                      options={["Character Role", "Performer", "Technical Crew", "Backstage Technical", "Director", "Makeup & Hair", "Costume"]}
+                      onChange={(val) => setSelectedPosForEdit({ ...selectedPosForEdit, role_category: val })}
+                    />
+                  </div>
+
                   <div className="space-y-1.5">
                     <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
                       Slots Available
@@ -1740,94 +1654,52 @@ export default function AuditionsManagement() {
                     <input
                       type="number"
                       min="1"
+                      max="20"
                       value={selectedPosForEdit.slots_available}
                       onChange={(e) => setSelectedPosForEdit({ ...selectedPosForEdit, slots_available: parseInt(e.target.value) || 1 })}
-                      className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl px-3 py-2 text-xs text-[#2A1816] font-medium focus:border-[#B32D25] focus:outline-none"
+                      className="w-full bg-[#FDF8F7] border border-[#DCBAB2] rounded-xl px-4 py-2.5 text-sm text-[#2A1816] font-medium focus:border-[#B32D25] focus:outline-none transition-colors shadow-sm"
                     />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
-                      Calling Status
-                    </label>
-                    <select
-                      value={selectedPosForEdit.status}
-                      onChange={(e) => setSelectedPosForEdit({ ...selectedPosForEdit, status: e.target.value })}
-                      className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl px-3 py-2 text-xs text-[#2A1816] font-medium focus:border-[#B32D25] focus:outline-none cursor-pointer"
-                    >
-                      <option value="Open Calling">Open Calling</option>
-                      <option value="Closed">Closed</option>
-                    </select>
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
                   <label className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
-                    Character Description
+                    Character Description & Dramatic Stakes
                   </label>
                   <textarea
                     rows={3}
                     value={selectedPosForEdit.character_description}
                     onChange={(e) => setSelectedPosForEdit({ ...selectedPosForEdit, character_description: e.target.value })}
-                    className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl p-3 text-xs font-serif leading-relaxed text-[#2A1816] focus:border-[#B32D25] focus:outline-none"
+                    className="w-full bg-[#FDF8F7] border border-[#DCBAB2] rounded-xl p-4 text-sm font-serif leading-relaxed text-[#2A1816] focus:border-[#B32D25] focus:outline-none shadow-sm transition-colors"
                   />
                 </div>
 
                 <div className="space-y-1.5">
                   <label className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
-                    Requirements
+                    Audition Requirements & Submission Format
                   </label>
                   <textarea
-                    rows={2}
+                    rows={3}
                     value={selectedPosForEdit.requirements}
                     onChange={(e) => setSelectedPosForEdit({ ...selectedPosForEdit, requirements: e.target.value })}
-                    className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl p-3 text-xs font-serif leading-relaxed text-[#2A1816] focus:border-[#B32D25] focus:outline-none"
+                    className="w-full bg-[#FDF8F7] border border-[#DCBAB2] rounded-xl p-4 text-sm font-serif leading-relaxed text-[#2A1816] focus:border-[#B32D25] focus:outline-none shadow-sm transition-colors"
                   />
                 </div>
 
-                <div className="space-y-2 pt-2 pb-1 border-b border-[#DCBAB2]/40">
-                  <label className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#8C5A54] block mb-2">
-                    Mandatory Submissions
-                  </label>
-                  <div className="flex flex-wrap gap-4">
-                    <label className="flex items-center gap-2 cursor-pointer group">
-                      <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-colors ${selectedPosForEdit.require_portfolio ? 'bg-[#8C241E] border-[#8C241E]' : 'bg-[#FFF9F6] border-[#DCBAB2] group-hover:border-[#8C241E]'}`}>
-                        {selectedPosForEdit.require_portfolio && <Check className="w-3 h-3 text-[#FDF8F7]" />}
-                      </div>
-                      <span className="text-xs font-mono font-medium text-[#2A1816]">Portfolio</span>
-                      <input type="checkbox" className="hidden" checked={selectedPosForEdit.require_portfolio} onChange={(e) => setSelectedPosForEdit({ ...selectedPosForEdit, require_portfolio: e.target.checked })} />
-                    </label>
-                    
-                    <label className="flex items-center gap-2 cursor-pointer group">
-                      <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-colors ${selectedPosForEdit.require_video ? 'bg-[#8C241E] border-[#8C241E]' : 'bg-[#FFF9F6] border-[#DCBAB2] group-hover:border-[#8C241E]'}`}>
-                        {selectedPosForEdit.require_video && <Check className="w-3 h-3 text-[#FDF8F7]" />}
-                      </div>
-                      <span className="text-xs font-mono font-medium text-[#2A1816]">Video Reel</span>
-                      <input type="checkbox" className="hidden" checked={selectedPosForEdit.require_video} onChange={(e) => setSelectedPosForEdit({ ...selectedPosForEdit, require_video: e.target.checked })} />
-                    </label>
-
-                    <label className="flex items-center gap-2 cursor-pointer group">
-                      <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-colors ${selectedPosForEdit.require_audio ? 'bg-[#8C241E] border-[#8C241E]' : 'bg-[#FFF9F6] border-[#DCBAB2] group-hover:border-[#8C241E]'}`}>
-                        {selectedPosForEdit.require_audio && <Check className="w-3 h-3 text-[#FDF8F7]" />}
-                      </div>
-                      <span className="text-xs font-mono font-medium text-[#2A1816]">Audio Reel</span>
-                      <input type="checkbox" className="hidden" checked={selectedPosForEdit.require_audio} onChange={(e) => setSelectedPosForEdit({ ...selectedPosForEdit, require_audio: e.target.checked })} />
-                    </label>
-                  </div>
-                </div>
-
-                <DialogFooter className="pt-4 border-t border-[#DCBAB2]/70 flex justify-between items-center gap-3">
+                <DialogFooter className="pt-6 border-t border-[#DCBAB2]/70 flex flex-col sm:flex-row justify-end items-center gap-4">
                   <button
                     type="button"
                     onClick={() => setEditPosOpen(false)}
-                    className="px-5 py-2.5 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer shadow-xs"
+                    className="w-full sm:w-auto px-6 py-3 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer text-center"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] font-mono text-xs font-bold uppercase tracking-wider px-6 py-2.5 rounded-full shadow-lg shadow-[#8C241E]/20 flex items-center gap-2 border border-[#A6352F] cursor-pointer transition-all"
+                    className="w-full sm:w-auto bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] font-mono text-xs font-bold uppercase tracking-wider px-8 py-3 rounded-full shadow-lg shadow-[#8C241E]/20 flex justify-center items-center gap-2 border border-[#A6352F] cursor-pointer transition-all"
                   >
-                    Save Changes
+                    <CheckCircle2 className="w-4 h-4 text-[#FFD0CC]" />
+                    <span>Save Changes</span>
                   </button>
                 </DialogFooter>
               </form>
