@@ -269,7 +269,10 @@ export default function AuditionsManagement() {
     character_description: "",
     requirements: "",
     slots_available: 1,
-    status: "Open Calling"
+    status: "Open Calling",
+    require_portfolio: false,
+    require_video: false,
+    require_audio: false
   });
 
   // AI Evaluation State
@@ -1560,6 +1563,49 @@ export default function AuditionsManagement() {
                 />
               </div>
 
+              <div className="space-y-3 pt-2">
+                <label className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
+                  Required Submissions
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <label className="flex items-center gap-3 bg-[#FDF8F7] border border-[#DCBAB2] p-3 rounded-xl cursor-pointer hover:bg-[#FAF2EE] transition-colors shadow-sm">
+                    <input 
+                      type="checkbox" 
+                      checked={newPosForm.require_portfolio || false}
+                      onChange={(e) => setNewPosForm({...newPosForm, require_portfolio: e.target.checked})}
+                      className="w-4 h-4 text-[#8C241E] bg-[#F5EAE6] border-[#DCBAB2] rounded focus:ring-[#8C241E] focus:ring-2"
+                    />
+                    <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#5C3B37] flex items-center gap-1.5">
+                      <FileText className="w-3.5 h-3.5 text-[#8C5A54]" /> Portfolio
+                    </span>
+                  </label>
+                  
+                  <label className="flex items-center gap-3 bg-[#FDF8F7] border border-[#DCBAB2] p-3 rounded-xl cursor-pointer hover:bg-[#FAF2EE] transition-colors shadow-sm">
+                    <input 
+                      type="checkbox" 
+                      checked={newPosForm.require_video || false}
+                      onChange={(e) => setNewPosForm({...newPosForm, require_video: e.target.checked})}
+                      className="w-4 h-4 text-[#8C241E] bg-[#F5EAE6] border-[#DCBAB2] rounded focus:ring-[#8C241E] focus:ring-2"
+                    />
+                    <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#5C3B37] flex items-center gap-1.5">
+                      <Video className="w-3.5 h-3.5 text-[#8C5A54]" /> Video
+                    </span>
+                  </label>
+                  
+                  <label className="flex items-center gap-3 bg-[#FDF8F7] border border-[#DCBAB2] p-3 rounded-xl cursor-pointer hover:bg-[#FAF2EE] transition-colors shadow-sm">
+                    <input 
+                      type="checkbox" 
+                      checked={newPosForm.require_audio || false}
+                      onChange={(e) => setNewPosForm({...newPosForm, require_audio: e.target.checked})}
+                      className="w-4 h-4 text-[#8C241E] bg-[#F5EAE6] border-[#DCBAB2] rounded focus:ring-[#8C241E] focus:ring-2"
+                    />
+                    <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#5C3B37] flex items-center gap-1.5">
+                      <Mic className="w-3.5 h-3.5 text-[#8C5A54]" /> Audio
+                    </span>
+                  </label>
+                </div>
+              </div>
+
               <DialogFooter className="pt-6 border-t border-[#DCBAB2]/70 flex flex-col sm:flex-row justify-end items-center gap-4">
                 <button
                   type="button"
@@ -1684,6 +1730,49 @@ export default function AuditionsManagement() {
                     onChange={(e) => setSelectedPosForEdit({ ...selectedPosForEdit, requirements: e.target.value })}
                     className="w-full bg-[#FDF8F7] border border-[#DCBAB2] rounded-xl p-4 text-sm font-serif leading-relaxed text-[#2A1816] focus:border-[#B32D25] focus:outline-none shadow-sm transition-colors"
                   />
+                </div>
+
+                <div className="space-y-3 pt-2">
+                  <label className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
+                    Required Submissions
+                  </label>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <label className="flex items-center gap-3 bg-[#FDF8F7] border border-[#DCBAB2] p-3 rounded-xl cursor-pointer hover:bg-[#FAF2EE] transition-colors shadow-sm">
+                      <input 
+                        type="checkbox" 
+                        checked={selectedPosForEdit.require_portfolio || false}
+                        onChange={(e) => setSelectedPosForEdit({...selectedPosForEdit, require_portfolio: e.target.checked})}
+                        className="w-4 h-4 text-[#8C241E] bg-[#F5EAE6] border-[#DCBAB2] rounded focus:ring-[#8C241E] focus:ring-2"
+                      />
+                      <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#5C3B37] flex items-center gap-1.5">
+                        <FileText className="w-3.5 h-3.5 text-[#8C5A54]" /> Portfolio
+                      </span>
+                    </label>
+                    
+                    <label className="flex items-center gap-3 bg-[#FDF8F7] border border-[#DCBAB2] p-3 rounded-xl cursor-pointer hover:bg-[#FAF2EE] transition-colors shadow-sm">
+                      <input 
+                        type="checkbox" 
+                        checked={selectedPosForEdit.require_video || false}
+                        onChange={(e) => setSelectedPosForEdit({...selectedPosForEdit, require_video: e.target.checked})}
+                        className="w-4 h-4 text-[#8C241E] bg-[#F5EAE6] border-[#DCBAB2] rounded focus:ring-[#8C241E] focus:ring-2"
+                      />
+                      <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#5C3B37] flex items-center gap-1.5">
+                        <Video className="w-3.5 h-3.5 text-[#8C5A54]" /> Video
+                      </span>
+                    </label>
+                    
+                    <label className="flex items-center gap-3 bg-[#FDF8F7] border border-[#DCBAB2] p-3 rounded-xl cursor-pointer hover:bg-[#FAF2EE] transition-colors shadow-sm">
+                      <input 
+                        type="checkbox" 
+                        checked={selectedPosForEdit.require_audio || false}
+                        onChange={(e) => setSelectedPosForEdit({...selectedPosForEdit, require_audio: e.target.checked})}
+                        className="w-4 h-4 text-[#8C241E] bg-[#F5EAE6] border-[#DCBAB2] rounded focus:ring-[#8C241E] focus:ring-2"
+                      />
+                      <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#5C3B37] flex items-center gap-1.5">
+                        <Mic className="w-3.5 h-3.5 text-[#8C5A54]" /> Audio
+                      </span>
+                    </label>
+                  </div>
                 </div>
 
                 <DialogFooter className="pt-6 border-t border-[#DCBAB2]/70 flex flex-col sm:flex-row justify-end items-center gap-4">

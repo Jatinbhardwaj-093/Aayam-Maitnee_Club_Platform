@@ -1314,7 +1314,10 @@ def create_audition_position():
         character_description=data.get('character_description', ''),
         requirements=data.get('requirements', ''),
         slots_available=int(data.get('slots_available', 1)),
-        status=data.get('status', 'Open Calling')
+        status=data.get('status', 'Open Calling'),
+        require_portfolio=bool(data.get('require_portfolio', False)),
+        require_video=bool(data.get('require_video', False)),
+        require_audio=bool(data.get('require_audio', False))
     )
     db.session.add(new_pos)
     db.session.commit()
