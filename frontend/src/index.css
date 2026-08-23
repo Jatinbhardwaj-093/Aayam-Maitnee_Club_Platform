@@ -644,3 +644,53 @@ code {
 .members-directory .text-on-background {
   color: #2C2A28 !important;
 }
+
+/* Full-Page Theatrical Stage Light Beam & Confetti Animations */
+@keyframes stage-beam-sweep {
+  0% {
+    transform: rotate(-35deg) translateX(-20%);
+    opacity: 0.25;
+  }
+  50% {
+    transform: rotate(35deg) translateX(20%);
+    opacity: 0.7;
+  }
+  100% {
+    transform: rotate(-35deg) translateX(-20%);
+    opacity: 0.25;
+  }
+}
+
+@keyframes stage-pulse-aura {
+  0%, 100% {
+    transform: scale(0.95);
+    opacity: 0.4;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.85;
+  }
+}
+
+@keyframes stage-confetti-fall {
+  0% {
+    transform: translateY(-40px) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(105vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+.animate-stage-beam {
+  animation: stage-beam-sweep 6s ease-in-out infinite;
+}
+
+.animate-stage-pulse {
+  animation: stage-pulse-aura 3s ease-in-out infinite;
+}
+
+.animate-confetti {
+  animation: stage-confetti-fall linear infinite;
+}

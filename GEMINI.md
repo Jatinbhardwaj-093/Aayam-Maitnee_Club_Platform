@@ -1,34 +1,44 @@
 # Aayam Theatre Design System Guidelines
 
-This document specifies the official design rules for **Aayam - The Matinee Club (IIT Madras BS Drama Society)** frontend application. Every UI change, new feature, page redesign, and component must strictly adhere to these rules.
+This document specifies the official design rules for **Aayam - The Matinee Club (IIT Madras BS Drama Society)** frontend application.
+
+The project features a **two-tier design architecture**:
+1. **Public Landing Experience (`frontend/src/pages/website_landing/*`)**: Cinematic public-facing stage aesthetic with deep charcoal cards, glowing terracotta orange accents, and warm oatmeal canvas.
+2. **Member & Maintainer ERP (`frontend/src/pages/member/*` and `maintainers/*`)**: Archival editorial theatre paper aesthetic with warm oatmeal panels, dark walnut typography, and rich theatrical crimson accents.
 
 ---
 
 ## 1. Core Aesthetic & Philosophy
 
-* **Artistic Direction**: Editorial dramatic theatre with cinematic warmth, tactile cream paper surfaces, sophisticated serif typography, and rich theatrical crimson accents.
-* **No Stark White Rule**: NEVER use pure white (`bg-white`, `#FFFFFF`, or bright `#F7F5F0`) for cards, dialogs, toolbars, or table surfaces against the page background. Pure white clashes harshly with the warm oatmeal cream aesthetic.
+* **Artistic Direction**: Editorial dramatic theatre with cinematic warmth, tactile paper surfaces, sophisticated serif typography, and rich stage accents.
+* **No Stark White Rule**: NEVER use pure white (`bg-white` or `#FFFFFF`) for full card surfaces against the page canvas.
 * **Calm Editorial Layouts**: Avoid "pill overload" and punchy high-contrast boxes in every corner of content cards. Information hierarchy should rely on elegant typography, subtle metadata strings, and clean whitespace.
 
 ---
 
-## 2. Master Color Palette
+## 2. Color Palettes by Experience Area
 
+### Area A: Public Landing Website (`frontend/src/pages/website_landing/*`)
 | Token / Usage | Hex / Tailwind | Purpose |
 | :--- | :--- | :--- |
-| **Page Canvas Background** | `#E7DDD3` | App-wide canvas & background |
-| **Main Section Container** | `#F2E5E0` | Elevated container frame (border: `#DCBAB2`) |
-| **Inside Cards & Panels** | `#FAF2EE` | Rehearsal call sheets, script cards, member cards (border: `#DCBAB2`) |
-| **Metric Gradient Cards** | `from-[#F5EAE6] to-[#EEDBD5]` | Summary statistic cards (border: `#DEBEB7`) |
-| **Modal / Dialog Windows** | `#F5EAE6` | Dialog surfaces (border: `#DEBEB7`) |
-| **Primary Theatrical Crimson**| `#8C241E` (Hover: `#731B16`) | Primary CTA buttons, active pills, badges (border: `#A6352F`) |
-| **Crimson Accent / Links** | `#B32D25` | Icons, dates, highlights, key actions |
-| **Crimson Tint / Soft Badges**| `#EEDBD5` or `#E85F57`/15 | Secondary badge backgrounds (border: `#D5AAA2` / `#E85F57`/30) |
-| **Headings & High-Contrast Text**| `#2A1816` | Main titles, script names, member names |
+| **Page Canvas** | `#E7DDD3` | App-wide warm canvas |
+| **Primary Stage Cards** | `#2C2A28` (border: `#353535` or `#E85F57`/50) | Event cards, playbill showcases, live pass |
+| **Elevated Dark Panels** | `#353535` / `#1F1E1D` (border: `white/10`) | Steppers, inner details, presets, filters |
+| **Public Modal Windows** | `#2C2A28` (border: `2px solid #E85F57`) | Ticket passes, public tracking, propose modal |
+| **Terracotta Coral Accent**| `#E85F57` (Hover: `#D94538`) | Primary CTA buttons, badges, highlights |
+| **Public Dark Buttons** | `#2C2A28` (Hover: `#353535`, border: `white/20`) | Secondary actions, standard propose buttons |
+| **Card Text** | `#F7F5F0` (Headings) / `white/70` (Body) | High-contrast readable typography on dark |
+
+### Area B: Member & Maintainer ERP (`frontend/src/pages/member/*`, `maintainers/*`)
+| Token / Usage | Hex / Tailwind | Purpose |
+| :--- | :--- | :--- |
+| **Page Canvas Background** | `#E7DDD3` | Workspace canvas |
+| **Main Section Container** | `#F2E5E0` (border: `#DCBAB2`) | Elevated container frame |
+| **Inside Cards & Panels** | `#FAF2EE` (border: `#DCBAB2`) | Rehearsal sheets, script cards, member cards |
+| **ERP Dialog Windows** | `#F5EAE6` (border: `#DEBEB7`) | Internal modals & dossiers |
+| **Theatrical Crimson** | `#8C241E` (Hover: `#731B16`, border: `#A6352F`) | Primary CTA buttons, active pills, badges |
+| **Headings & High-Contrast**| `#2A1816` | Member names, script titles, production headers |
 | **Body & Supporting Text** | `#5C3B37` / `#6E4742` | Subtitles, descriptions, captions |
-| **Muted Meta / Timestamps** | `#8C5A54` | Labels, notes, email subtext |
-| **Success / Verified** | Emerald (`text-emerald-900`, `bg-emerald-700/15`, `border-emerald-700/30`) | Confirmed attendance, verified scripts |
-| **Pending Reply** | Amber (`text-amber-950`, `bg-amber-700/15`, `border-amber-700/30`) | Unconfirmed callouts, pending approval |
 
 ---
 

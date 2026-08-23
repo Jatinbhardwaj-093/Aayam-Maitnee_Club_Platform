@@ -915,7 +915,72 @@ def add_stage_booking():
     )
     db.session.add(new_booking)
     db.session.commit()
-    return jsonify({'status': 'success', 'id': f"B{new_booking.id}"}), 201
+@api_bp.route('/tickets/reserve', methods=['POST'])
+@api_bp.route('/reserve-ticket', methods=['POST'])
+def reserve_ticket():
+    from models import Booking, Event, User, db
+    import random
+    import string
+    from datetime import datetime
+
+    data = request.json or {}
+    name = data.get('name') or data.get('holder_name') or 'Patron'
+    email = data.get('email') or data.get('holder_email') or 'guest@aayam.org'
+    phone = data.get('phone') or data.get('holder_phone') or '+91 98402 12345'
+    play_title = data.get('play_title') or data.get('title') or 'Hayavadana'
+    seats_count = int(data.get('seats_count') or data.get('seats') or 1)
+    seat_tier = data.get('seat_tier') or 'General Free Admission'
+    venue = data.get('venue') or 'CLT Main Stage, IIT Madras'
+    event_date = data.get('date') or 'Sep 26 - 28, 2026'
+    time_slot = data.get('time') or '18:30 - 21:00'
+
+    rand_code = ''.join(random.choices(string.digits, k=4))
+    ticket_id = f"AYM-TKT-{rand_code}"
+    
+    rows = ['A', 'B', 'C', 'D', 'E', 'F']
+    selected_row = random.choice(rows)
+    start_seat = random.randint(1, 24)
+    if seats_count == 1:
+        seats_allocated = f"Row {selected_row} • Seat {start_seat:02d}"
+    else:
+        seats_allocated = f"Row {selected_row} • Seats {start_seat:02d}-{start_seat + seats_count - 1:02d}"
+
+    event = Event.query.filter(Event.title.ilike(f"%{play_title}%")).first()
+    user = User.query.filter_by(email=email).first()
+
+    if event:
+        new_booking = Booking(
+            user_id=user.id if user else None,
+            event_id=event.id,
+            booking_status="Confirmed"
+        )
+        db.session.add(new_booking)
+        try:
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+
+    ticket_data = {
+        'ticket_id': ticket_id,
+        'play_title': play_title,
+        'holder_name': name,
+        'holder_email': email,
+        'holder_phone': phone,
+        'seats_count': seats_count,
+        'seat_tier': seat_tier,
+        'seats_allocated': seats_allocated,
+        'venue': venue,
+        'date': event_date,
+        'time': time_slot,
+        'qr_data': f"AYM-PASS:{ticket_id}:{play_title}:{name}:{seats_count}",
+        'issued_at': datetime.utcnow().strftime('%b %d, %Y • %I:%M %p')
+    }
+
+    return jsonify({
+        'status': 'confirmed',
+        'message': f'Reservation confirmed! Ticket reference {ticket_id} created.',
+        'ticket': ticket_data
+    }), 201
 
 @api_bp.route('/revenue-metrics', methods=['GET'])
 def get_revenue_metrics():
@@ -1071,7 +1136,42 @@ def update_gallery_status(item_id):
     item.status = new_status
     db.session.commit()
     return jsonify({'status': 'updated', 'item': item.to_dict()})
-    return jsonify({'status': 'success', 'id': new_proposal.id}), 201
+@api_bp.route('/proposals/track', methods=['GET'])
+def track_proposal():
+    from models import SharedEvent
+    query = request.args.get('query', '').strip()
+    if not query:
+        return jsonify({'error': 'Tracking ID or email query parameter required'}), 400
+
+    clean_q = query.upper().replace("AYM-PITCH-", "").replace("AYM-PITCH", "").replace("PITCH-", "").replace("#", "").strip()
+    target_id = None
+    if clean_q.isdigit():
+        target_id = int(clean_q)
+
+    results = []
+    if target_id is not None:
+        p = SharedEvent.query.get(target_id)
+        if p:
+            results.append(p.to_dict())
+
+    # Also match email, submitter name, or title
+    matched = SharedEvent.query.filter(
+        (SharedEvent.contact_email.ilike(f"%{query}%")) |
+        (SharedEvent.submitter_name.ilike(f"%{query}%")) |
+        (SharedEvent.title.ilike(f"%{query}%"))
+    ).order_by(SharedEvent.created_at.desc()).all()
+    
+    for m in matched:
+        m_dict = m.to_dict()
+        if not any(r['id'] == m_dict['id'] for r in results):
+            results.append(m_dict)
+
+    return jsonify({
+        'status': 'success',
+        'query': query,
+        'count': len(results),
+        'proposals': results
+    }), 200
 
 @api_bp.route('/proposals', methods=['GET'])
 def get_proposals():

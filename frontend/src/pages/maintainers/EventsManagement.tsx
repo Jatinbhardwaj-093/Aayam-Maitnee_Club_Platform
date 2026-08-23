@@ -7,7 +7,7 @@ import {
   Sparkles, X, HeartHandshake, ClipboardList, Check, AlertCircle, Video, Star,
   SlidersHorizontal, ChevronRight, ChevronDown, RefreshCw, UserCheck, UserX, MessageSquare,
   BookOpen, Edit3, Send, CheckSquare, XCircle, ArrowUpRight, Info, Heart, Coins,
-  Lock, Unlock, Flame, Filter
+  Lock, Unlock, Flame, Filter, Eye, Copy, Mail, Phone, Layers
 } from "lucide-react";
 import ScriptPreviewModal from "@/components/ScriptPreviewModal";
 import ProductionDetailModal from "@/components/ProductionDetailModal";
@@ -407,6 +407,8 @@ export default function EventsManagement() {
 
   // Review & Edit Pitch Modal (Before Approving to Events)
   const [editingPitch, setEditingPitch] = useState<ProposalItem | null>(null);
+  const [viewingDossierPitch, setViewingDossierPitch] = useState<ProposalItem | null>(null);
+  const [copiedDossierRef, setCopiedDossierRef] = useState<boolean>(false);
   const [editFormData, setEditFormData] = useState({
     title: "",
     category: "Workshops",
@@ -1294,22 +1296,26 @@ export default function EventsManagement() {
                   >
                     <div className="space-y-4">
                       {/* Top Header: Submitter & Type Tag */}
-                      <div className="flex items-center justify-between gap-3 border-b border-[#DCBAB2]/50 pb-3.5">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#DCBAB2]/50 pb-3.5">
                         <div className="flex items-center gap-3 min-w-0">
                           <div className="w-9 h-9 rounded-full bg-[#EEDBD5] border border-[#D5AAA2] text-[#8C241E] font-mono text-xs font-bold flex items-center justify-center shrink-0 shadow-xs">
                             {pitch.submitter?.initials || (isMember ? "M" : "SP")}
                           </div>
                           <div className="min-w-0">
-                            <h4 className="font-serif text-base text-[#2A1816] font-normal truncate">
+                            <h4 className="font-serif text-base text-[#2A1816] font-normal">
                               {pitch.submitter?.name || "Ensemble Member"}
                             </h4>
-                            <p className="text-xs font-mono text-[#8C5A54] truncate">
+                            <p className="text-xs font-mono text-[#8C5A54] break-all select-all">
                               {pitch.contact_email || pitch.submitter?.email || ""}
                             </p>
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-2 shrink-0">
+                        <div className="flex items-center gap-2 shrink-0 flex-wrap">
+                          <span className="font-mono text-xs font-bold text-[#8C241E] bg-[#EEDBD5] px-2.5 py-0.5 rounded-full border border-[#D5AAA2] shadow-xs">
+                            {pitch.reference_id || `AYM-PITCH-${pitch.id.toString().padStart(4, '0')}`}
+                          </span>
+
                           <span className={`text-xs font-mono font-bold uppercase tracking-wider px-3 py-1 rounded-full border ${
                             isMember 
                               ? "bg-[#EEDBD5] text-[#8C241E] border-[#D5AAA2]"
@@ -1404,35 +1410,64 @@ export default function EventsManagement() {
                       </div>
                     </div>
 
-                    {/* Bottom Action Controls in Single Line */}
-                    <div className="pt-4 border-t border-[#DCBAB2]/60 flex items-center gap-2 w-full flex-nowrap">
-                      <button
-                        onClick={() => handleOpenEditPitch(pitch)}
-                        className="flex-1 py-2.5 px-3 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] hover:text-[#2A1816] text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer shadow-xs truncate"
-                        title="Review pitch details, adjust date/venue/budget, and approve to upcoming events"
-                      >
-                        Review & Edit
-                      </button>
-
-                      {!isApproved && (
+                    {/* Bottom Action Controls */}
+                    <div className="pt-4 border-t border-[#DCBAB2]/60 space-y-2.5">
+                      {/* Inspection Row: Full Dossier & Edit */}
+                      <div className="grid grid-cols-2 gap-2.5">
                         <button
-                          onClick={() => handleQuickApprove(pitch)}
-                          className="flex-1 py-2.5 px-3 rounded-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer shadow-xs border border-[#A6352F] truncate"
-                          title="Quick approve and schedule to upcoming events"
+                          type="button"
+                          onClick={() => setViewingDossierPitch(pitch)}
+                          className="py-2.5 px-3 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] hover:text-[#2A1816] text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-xs"
+                          title="View complete proposal dossier, submitter contact & full brief"
                         >
-                          Approve
+                          <Eye className="w-3.5 h-3.5 text-[#8C241E]" />
+                          <span>View Dossier</span>
                         </button>
-                      )}
 
-                      {!isApproved && !isRejected && (
                         <button
-                          onClick={() => handleRejectPitch(pitch.id)}
-                          className="py-2.5 px-4 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-stone-200 text-stone-600 hover:text-stone-900 text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer shadow-xs truncate"
-                          title="Decline proposal"
+                          type="button"
+                          onClick={() => handleOpenEditPitch(pitch)}
+                          className="py-2.5 px-3 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] hover:text-[#2A1816] text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-xs"
+                          title="Review pitch details, adjust date/venue/budget, and schedule"
                         >
-                          Decline
+                          <SlidersHorizontal className="w-3.5 h-3.5 text-[#8C241E]" />
+                          <span>Review & Edit</span>
                         </button>
-                      )}
+                      </div>
+
+                      {/* Decision Row */}
+                      <div className="flex items-center gap-2">
+                        {!isApproved ? (
+                          <>
+                            <button
+                              type="button"
+                              onClick={() => handleQuickApprove(pitch)}
+                              className="flex-1 py-2.5 px-4 rounded-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md shadow-[#8C241E]/15 border border-[#A6352F]"
+                              title="Quick approve and schedule to upcoming events"
+                            >
+                              <CheckCircle2 className="w-3.5 h-3.5 text-[#FFD0CC]" />
+                              <span>Approve</span>
+                            </button>
+
+                            {!isRejected && (
+                              <button
+                                type="button"
+                                onClick={() => handleRejectPitch(pitch.id)}
+                                className="py-2.5 px-4 rounded-full border border-stone-300 bg-[#FAF2EE] hover:bg-stone-200 text-stone-600 hover:text-stone-900 text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-xs"
+                                title="Decline proposal"
+                              >
+                                <X className="w-3.5 h-3.5" />
+                                <span>Decline</span>
+                              </button>
+                            )}
+                          </>
+                        ) : (
+                          <div className="w-full py-2 px-4 rounded-full bg-emerald-700/10 border border-emerald-700/30 text-emerald-950 text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-2">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-800" />
+                            <span>Approved & Staged to Diary</span>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 );
@@ -1449,9 +1484,14 @@ export default function EventsManagement() {
             {/* Modal Fixed Header */}
             <div className="px-7 sm:px-9 pt-7 pb-5 border-b border-[#DCBAB2]/70 flex items-start justify-between gap-4 shrink-0 bg-[#F5EAE6]">
               <div className="space-y-1.5 max-w-2xl">
-                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#8C241E] bg-[#EEDBD5] px-3 py-1 rounded-full border border-[#D5AAA2] inline-block shadow-xs">
-                  Directorial Proposal Review & Adjustment
-                </span>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#8C241E] bg-[#EEDBD5] px-3 py-1 rounded-full border border-[#D5AAA2] inline-block shadow-xs">
+                    Directorial Proposal Review & Adjustment
+                  </span>
+                  <span className="font-mono text-xs font-bold text-[#2A1816] bg-[#E8D6CF] px-2.5 py-0.5 rounded-md border border-[#D5AAA2] inline-flex items-center gap-1.5">
+                    <span>{editingPitch.reference_id || `AYM-PITCH-${editingPitch.id.toString().padStart(4, '0')}`}</span>
+                  </span>
+                </div>
                 <h2 className="text-2xl sm:text-3xl font-serif text-[#2A1816] tracking-tight font-normal">
                   Review & Edit Pitch Details
                 </h2>
@@ -1673,7 +1713,301 @@ export default function EventsManagement() {
         </div>
       )}
 
-      {/* MODAL: PATRONAGE & SOCIETY DONATION DESK */}
+      {/* MODAL: FULL PROPOSAL DOSSIER & SUBMITTER DETAILS */}
+      {viewingDossierPitch && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-[#F5EAE6] border border-[#DEBEB7] text-[#2A1816] rounded-3xl max-w-3xl w-full shadow-2xl relative max-h-[90vh] flex flex-col overflow-hidden">
+            {/* Modal Fixed Header */}
+            <div className="px-7 sm:px-9 pt-7 pb-5 border-b border-[#DCBAB2]/70 flex items-start justify-between gap-4 shrink-0 bg-[#F5EAE6]">
+              <div className="space-y-1.5 max-w-2xl">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#8C241E] bg-[#EEDBD5] px-3 py-1 rounded-full border border-[#D5AAA2] inline-block shadow-xs">
+                    Proposal Dossier & Callboard Record
+                  </span>
+                  <span className="font-mono text-xs font-bold text-[#2A1816] bg-[#E8D6CF] px-2.5 py-0.5 rounded-md border border-[#D5AAA2] inline-flex items-center gap-1.5">
+                    <span>AYM-PITCH-{viewingDossierPitch.id.toString().padStart(4, '0')}</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard?.writeText(`AYM-PITCH-${viewingDossierPitch.id.toString().padStart(4, '0')}`);
+                        setCopiedDossierRef(true);
+                        setTimeout(() => setCopiedDossierRef(false), 2000);
+                      }}
+                      className="hover:text-[#8C241E] transition-colors"
+                      title="Copy Reference ID"
+                    >
+                      <Copy className="w-3 h-3" />
+                    </button>
+                  </span>
+                  {copiedDossierRef && (
+                    <span className="text-[10px] font-mono text-emerald-800 font-bold">Copied!</span>
+                  )}
+                </div>
+                <h2 className="text-2xl sm:text-3xl font-serif text-[#2A1816] tracking-tight font-normal">
+                  {viewingDossierPitch.name || viewingDossierPitch.title}
+                </h2>
+                <p className="text-xs text-[#6E4742] font-mono">
+                  Category: <span className="font-bold text-[#2A1816]">{viewingDossierPitch.proposalType}</span> • Status: <span className="font-bold text-[#8C241E]">{viewingDossierPitch.status || "Pending Review"}</span>
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setViewingDossierPitch(null)}
+                className="w-9 h-9 rounded-full bg-[#EEDBD5] hover:bg-[#E3CEC6] text-[#5C3B37] hover:text-[#2A1816] flex items-center justify-center transition-all cursor-pointer border border-[#D5AAA2] shadow-xs group shrink-0"
+                title="Close"
+              >
+                <X className="w-4 h-4 group-hover:rotate-90 transition-transform duration-200" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-7 sm:p-9 overflow-y-auto flex-1 custom-scrollbar space-y-6 text-xs font-mono pr-5 sm:pr-7">
+              {/* Submitter Info Grid with Contact Actions */}
+              <div className="bg-[#FAF2EE] p-5 rounded-2xl border border-[#DCBAB2] space-y-3.5 shadow-xs">
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <span className="font-bold text-[#8C5A54] uppercase tracking-wider block text-[11px]">
+                    Submitter Contact & Credentials
+                  </span>
+                  <div className="flex items-center gap-2">
+                    {viewingDossierPitch.contact_email && (
+                      <a
+                        href={`mailto:${viewingDossierPitch.contact_email}?subject=Regarding your Aayam Pitch: ${encodeURIComponent(viewingDossierPitch.name || viewingDossierPitch.title || '')}`}
+                        className="px-3 py-1 rounded-full bg-[#EEDBD5] hover:bg-[#E3CEC6] text-[#8C241E] text-[10px] font-mono font-bold uppercase flex items-center gap-1.5 border border-[#D5AAA2] transition-colors"
+                      >
+                        <Mail className="w-3 h-3" />
+                        <span>Email Submitter</span>
+                      </a>
+                    )}
+                    {viewingDossierPitch.contact_phone && (
+                      <a
+                        href={`tel:${viewingDossierPitch.contact_phone}`}
+                        className="px-3 py-1 rounded-full bg-[#EEDBD5] hover:bg-[#E3CEC6] text-[#8C241E] text-[10px] font-mono font-bold uppercase flex items-center gap-1.5 border border-[#D5AAA2] transition-colors"
+                      >
+                        <Phone className="w-3 h-3" />
+                        <span>Call</span>
+                      </a>
+                    )}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
+                  <div className="space-y-0.5">
+                    <span className="text-[10px] text-[#8C5A54] uppercase">Full Name</span>
+                    <p className="font-serif text-sm text-[#2A1816] font-medium">{viewingDossierPitch.submitter?.name || "Ensemble Member"}</p>
+                  </div>
+                  <div className="space-y-0.5">
+                    <span className="text-[10px] text-[#8C5A54] uppercase">Email Address</span>
+                    <p className="text-xs text-[#2A1816] font-medium break-all select-all">{viewingDossierPitch.contact_email || viewingDossierPitch.submitter?.email || "N/A"}</p>
+                  </div>
+                  <div className="space-y-0.5">
+                    <span className="text-[10px] text-[#8C5A54] uppercase">Contact Phone</span>
+                    <p className="text-xs text-[#2A1816] font-medium">{viewingDossierPitch.contact_phone || viewingDossierPitch.submitter?.phone || "N/A"}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* 4-Stage Directorial Review Stepper */}
+              <div className="bg-[#FAF2EE] p-5 rounded-2xl border border-[#DCBAB2] space-y-3 shadow-xs">
+                <span className="font-bold text-[#8C5A54] uppercase tracking-wider block text-[11px]">
+                  Production Review Pipeline
+                </span>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  <div className="bg-[#F5EAE6] p-2.5 rounded-xl border border-emerald-700/30 space-y-1">
+                    <div className="flex items-center gap-1.5 text-emerald-800">
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      <span className="font-bold text-[10px] uppercase">1. Logged</span>
+                    </div>
+                    <p className="text-[10px] text-[#6E4742] leading-tight">Pitch verified on callboard</p>
+                  </div>
+
+                  <div className="bg-[#F5EAE6] p-2.5 rounded-xl border border-emerald-700/30 space-y-1">
+                    <div className="flex items-center gap-1.5 text-emerald-800">
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      <span className="font-bold text-[10px] uppercase">2. Dramaturgy</span>
+                    </div>
+                    <p className="text-[10px] text-[#6E4742] leading-tight">Artistic agenda reviewed</p>
+                  </div>
+
+                  <div className={`p-2.5 rounded-xl border space-y-1 ${
+                    (viewingDossierPitch.status || "").toLowerCase() === "approved"
+                      ? "bg-[#F5EAE6] border-emerald-700/30 text-emerald-900"
+                      : (viewingDossierPitch.status || "").toLowerCase() === "rejected"
+                      ? "bg-rose-50 border-rose-300"
+                      : "bg-[#F5EAE6]/70 border-amber-700/30"
+                  }`}>
+                    <div className="flex items-center gap-1.5">
+                      {(viewingDossierPitch.status || "").toLowerCase() === "approved" ? (
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-800" />
+                      ) : (viewingDossierPitch.status || "").toLowerCase() === "rejected" ? (
+                        <X className="w-3.5 h-3.5 text-rose-700" />
+                      ) : (
+                        <Clock className="w-3.5 h-3.5 text-amber-800" />
+                      )}
+                      <span className="font-bold text-[10px] uppercase text-[#2A1816]">3. Budget</span>
+                    </div>
+                    <p className="text-[10px] text-[#6E4742] leading-tight">
+                      {(viewingDossierPitch.status || "").toLowerCase() === "approved" ? "Budget & Space Sanctioned" : "Budget Assessment"}
+                    </p>
+                  </div>
+
+                  <div className={`p-2.5 rounded-xl border space-y-1 ${
+                    (viewingDossierPitch.status || "").toLowerCase() === "approved"
+                      ? "bg-[#F5EAE6] border-emerald-700/30 text-emerald-900"
+                      : "bg-[#F5EAE6]/40 border-[#DCBAB2]/40 text-[#8C5A54]"
+                  }`}>
+                    <div className="flex items-center gap-1.5">
+                      {(viewingDossierPitch.status || "").toLowerCase() === "approved" ? (
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-800" />
+                      ) : (
+                        <Clock className="w-3.5 h-3.5 text-[#8C5A54]" />
+                      )}
+                      <span className="font-bold text-[10px] uppercase">4. Staging</span>
+                    </div>
+                    <p className="text-[10px] text-[#6E4742] leading-tight">
+                      {(viewingDossierPitch.status || "").toLowerCase() === "approved" ? "Scheduled to Season Roster" : "Pending Approval"}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Proposal Agenda & Complete Description */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-[#8C5A54] uppercase tracking-wider block text-[11px]">
+                    Complete Theatrical Pitch & Agenda Brief
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      navigator.clipboard?.writeText(viewingDossierPitch.description || "");
+                    }}
+                    className="px-2.5 py-1 rounded-md hover:bg-[#EEDBD5] text-[#8C5A54] text-[10px] font-mono flex items-center gap-1 transition-colors"
+                    title="Copy full brief"
+                  >
+                    <Copy className="w-3 h-3" />
+                    <span>Copy Text</span>
+                  </button>
+                </div>
+                <div className="bg-[#FAF2EE] p-5 rounded-2xl border border-[#DCBAB2] text-xs sm:text-sm text-[#2A1816] font-sans font-light leading-relaxed shadow-xs whitespace-pre-line">
+                  {viewingDossierPitch.description}
+                </div>
+              </div>
+
+              {/* AI Keypoints */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-[#8C5A54] uppercase tracking-wider block text-[11px]">
+                    Gemini AI Concept Keypoints
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => handleExtractKeywords(viewingDossierPitch.id, viewingDossierPitch.description)}
+                    disabled={analyzingPitchId === viewingDossierPitch.id}
+                    className="px-3 py-1 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#8C241E] text-[10px] font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer shadow-xs disabled:opacity-50"
+                  >
+                    <Tag className="w-3 h-3 text-[#8C241E]" />
+                    <span>{analyzingPitchId === viewingDossierPitch.id ? "Analyzing..." : "Re-Analyze Keypoints"}</span>
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-2 flex-wrap">
+                  {extractedKeywords[viewingDossierPitch.id] && extractedKeywords[viewingDossierPitch.id].length > 0 ? (
+                    extractedKeywords[viewingDossierPitch.id].map((kw, idx) => (
+                      <span key={idx} className="bg-[#EEDBD5] text-[#8C241E] border border-[#D5AAA2] rounded-full px-3.5 py-1 text-xs font-mono font-semibold tracking-tight shadow-xs">
+                        {kw}
+                      </span>
+                    ))
+                  ) : (
+                    <span className="text-xs text-[#8C5A54] italic">
+                      Click "Re-Analyze Keypoints" above to generate AI tags with Gemini.
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Specifications Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="bg-[#FAF2EE] p-4 rounded-xl border border-[#DCBAB2] space-y-1 shadow-xs">
+                  <span className="text-[10px] font-bold uppercase text-[#8C5A54] flex items-center gap-1">
+                    <MapPin className="w-3.5 h-3.5 text-[#8C241E]" />
+                    <span>Venue Requirement</span>
+                  </span>
+                  <p className="font-serif text-xs text-[#2A1816] font-medium">{viewingDossierPitch.venue || "SAC Main Studio"}</p>
+                </div>
+
+                <div className="bg-[#FAF2EE] p-4 rounded-xl border border-[#DCBAB2] space-y-1 shadow-xs">
+                  <span className="text-[10px] font-bold uppercase text-[#8C5A54] flex items-center gap-1">
+                    <Clock className="w-3.5 h-3.5 text-[#8C241E]" />
+                    <span>Proposed Date</span>
+                  </span>
+                  <p className="font-serif text-xs text-[#2A1816] font-medium">{viewingDossierPitch.date || "Autumn 2026 Season"}</p>
+                </div>
+
+                <div className="bg-[#FAF2EE] p-4 rounded-xl border border-[#DCBAB2] space-y-1 shadow-xs">
+                  <span className="text-[10px] font-bold uppercase text-[#8C5A54] flex items-center gap-1">
+                    <DollarSign className="w-3.5 h-3.5 text-[#8C241E]" />
+                    <span>Financial Budget</span>
+                  </span>
+                  <p className="font-serif text-xs text-[#8C241E] font-bold">{viewingDossierPitch.budget || "₹25,000"}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Fixed Footer */}
+            <div className="px-7 sm:px-9 py-5 bg-[#FAF2EE] border-t border-[#DCBAB2]/70 flex flex-wrap items-center justify-between gap-3 shrink-0">
+              <button
+                type="button"
+                onClick={() => {
+                  handleRejectPitch(viewingDossierPitch.id);
+                  setViewingDossierPitch(null);
+                }}
+                className="px-5 py-2.5 rounded-full border border-stone-300 bg-[#FAF2EE] hover:bg-rose-100 hover:text-rose-900 text-stone-600 text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer shadow-xs"
+              >
+                Decline Pitch
+              </button>
+
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setViewingDossierPitch(null)}
+                  className="px-5 py-2.5 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer shadow-xs"
+                >
+                  Close
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    const p = viewingDossierPitch;
+                    setViewingDossierPitch(null);
+                    handleOpenEditPitch(p);
+                  }}
+                  className="px-5 py-2.5 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] hover:text-[#2A1816] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
+                >
+                  <SlidersHorizontal className="w-3.5 h-3.5 text-[#8C241E]" />
+                  <span>Review & Edit</span>
+                </button>
+
+                {(viewingDossierPitch.status || "").toLowerCase() !== "approved" && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const p = viewingDossierPitch;
+                      setViewingDossierPitch(null);
+                      handleQuickApprove(p);
+                    }}
+                    className="px-6 py-2.5 rounded-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] text-xs font-mono font-bold uppercase tracking-widest flex items-center gap-2 cursor-pointer shadow-md shadow-[#8C241E]/20 border border-[#A6352F] transition-all"
+                  >
+                    <Check className="w-4 h-4 text-[#FFD0CC]" />
+                    <span>Quick Approve</span>
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       {selectedEventForDonation && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
           <div className="bg-[#F5EAE6] border border-[#DEBEB7] text-[#2A1816] rounded-3xl max-w-lg w-full shadow-2xl relative max-h-[90vh] flex flex-col overflow-hidden">

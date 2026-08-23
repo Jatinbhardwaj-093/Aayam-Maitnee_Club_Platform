@@ -470,9 +470,10 @@ class SharedEvent(db.Model):
         s_initials = "".join([x[0] for x in s_name.split()]).upper()[:2] if s_name else "EM"
         return {
             'id': self.id,
+            'reference_id': f"AYM-PITCH-{self.id:04d}",
             'name': self.title,
             'description': self.description or '',
-            'date': self.event_date.strftime('%b %d, %Y') if self.event_date else 'Jul 29, 2026',
+            'date': self.event_date.strftime('%b %d, %Y') if self.event_date else 'Aug 23, 2026',
             'venue': self.location_or_link or 'Studio Lounge',
             'budget': self.budget or '₹50,000',
             'proposalType': self.proposal_type or 'Member Pitch',
@@ -481,6 +482,7 @@ class SharedEvent(db.Model):
             'status': self.status.capitalize() if self.status else 'Reviewing',
             'contact_email': self.contact_email or (self.submitter.email if self.submitter else 'partner@aayam.org'),
             'contact_phone': self.contact_phone or '+91 98110 44321',
+            'created_at': self.created_at.strftime('%b %d, %Y') if self.created_at else 'Recent',
             'submitter': {
                 'name': s_name,
                 'initials': s_initials,

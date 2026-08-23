@@ -8,31 +8,44 @@ description: >-
 
 Use this skill for Aayam frontend pages, components, restyling, and UI polish. The visual character is an **archival editorial theatre programme**: warm paper, ink-dark copy, dramatic serif display type, compact production metadata, and sparing coral/crimson moments of stage-light energy.
 
-## Source of truth
+## Dual Design Architecture
 
-- Treat `frontend/src/index.css`, `frontend/tailwind.config.js`, and the local component/page context as the implementation source of truth. Reuse existing tokens and nearby patterns before introducing a new value.
-- The public website primarily uses the paper-and-coral palette below. Some authenticated production/admin areas use the deeper `frontend/src/theme/theatricalCrimson.ts` palette; preserve that richer crimson variant where it is already established rather than mixing both systems arbitrarily.
-- Do not make a page feel like a generic SaaS dashboard: favour editorial grouping, meaningful whitespace, and production/rehearsal language over dense neutral cards and excessive UI chrome.
+Aayam features two distinct visual domains:
 
-## Type hierarchy
+1. **Public Website Landing Pages (`frontend/src/pages/website_landing/*`)**:
+   - **Canvas**: Warm paper `#E7DDD3`
+   - **Cards & Modals**: Deep Charcoal `#2C2A28` / Elevated `#353535` with terracotta borders
+   - **Typography on Cards**: Cream `#F7F5F0` headings, `text-white/70` body
+   - **Accent / CTA Buttons**: Terracotta Coral `#E85F57` (hover `#D94538`), Dark Charcoal `#2C2A28` secondary with `border-white/20`
+   - **Pills & Steppers**: `bg-[#353535]` / `border-white/10` with emerald and terracotta highlights
 
-- **Display and headings:** `font-serif` — Instrument Serif, with Playfair Display/serif fallback. Use it for page titles, production titles, feature statistics, and short editorial statements. Keep its weight light or normal, letter spacing tight, and allow an italic phrase as a restrained dramatic accent.
-- **Body:** `font-sans` — Plus Jakarta Sans, with Source Sans 3/sans-serif fallback. Use comfortable, quiet copy; primary body text is ink-dark and supporting copy is muted rather than low-contrast.
-- **Metadata and UI labels:** `font-mono` — use for dates, indices, venue/production details, statuses, badges, and compact controls. Labels are generally uppercase, bold or semibold, and tracked (`tracking-wider` / `tracking-widest`). Do not set paragraphs or prominent headings in mono.
-- Do not add a new font family unless it is properly loaded and deliberately adopted across the relevant surface.
+2. **Member & Maintainer ERP Portal (`frontend/src/pages/member/*` and `maintainers/*`)**:
+   - **Canvas & Containers**: `#E7DDD3` canvas, `#F2E5E0` elevated container
+   - **Cards & Dialogs**: Warm oatmeal parchment `#FAF2EE` / `#F5EAE6` with `#DCBAB2` borders
+   - **Typography**: Dark Walnut `#2A1816` headings, espresso `#5C3B37` body
+   - **Accent / CTA Buttons**: Master Theatrical Crimson `#8C241E` (hover `#731B16`)
 
-## Palette and surfaces
+## Palette and surfaces by area
 
+### Public Landing Palette
 | Role | Preferred value | Use |
 | --- | --- | --- |
 | Paper canvas | `#E7DDD3` | Main public-page background |
-| Ink | `#2C2A28` | Headings and high-emphasis text |
-| Muted ink | `#666361` | Body/supporting copy and metadata |
-| Coral accent | `#E85F57` | Primary calls to action, active states, highlights |
-| Coral hover | `#D94538` | Primary CTA hover |
-| Paper border | `#D5C9BE` | Dividers and light outlines |
-| Deep stage | `#2C2A28` / `#353535` | Feature cards, image overlays, dark callouts |
-| Light surface | `#EFE8E1`, `#E5E1D8`, or `#F7F5F0` | Subtle raised sections and quiet controls |
+| Stage Card | `#2C2A28` | Event, Play, and Tracker cards |
+| Raised Stage Panel | `#353535` / `#1F1E1D` | Steppers, filters, presets |
+| Coral accent | `#E85F57` (Hover: `#D94538`) | Primary CTA buttons, badges, highlights |
+| Dark button | `#2C2A28` (border: `white/20`) | Secondary public buttons |
+| Card text | `#F7F5F0` / `white/70` | Text on dark cards & modals |
+
+### Member ERP Palette
+| Role | Preferred value | Use |
+| --- | --- | --- |
+| Paper canvas | `#E7DDD3` | Workspace canvas |
+| Container | `#F2E5E0` | Elevated container frame |
+| Inside Card | `#FAF2EE` | Roster, script, audition cards |
+| ERP Modal | `#F5EAE6` | Internal dialogs & dossiers |
+| Crimson accent | `#8C241E` (Hover: `#731B16`) | Member primary CTA buttons |
+| Ink text | `#2A1816` / `#5C3B37` | Headings and body copy |
 
 - Use full-width paper canvas with fine borders and gently elevated, tactile surfaces. Do not introduce cool grey, blue, or glassmorphism as a dominant treatment.
 - Pure white is acceptable only as a restrained translucent/light control surface when it matches nearby public UI. Avoid large stark-white cards on the paper canvas; prefer the warm surface tokens.
