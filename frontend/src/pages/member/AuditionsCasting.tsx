@@ -19,7 +19,8 @@ import {
   X,
   PlayCircle,
   SlidersHorizontal,
-  RotateCcw
+  RotateCcw,
+  ExternalLink
 } from "lucide-react";
 
 interface OpenPosition {
@@ -86,6 +87,7 @@ export default function AuditionsCasting() {
   const [audioFile, setAudioFile] = useState<File | null>(null);
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [fileErrors, setFileErrors] = useState<{ [key: string]: string }>({});
+  const [detailAppId, setDetailAppId] = useState<string | null>(null);
 
   useEffect(() => {
     if (activeUser) {
@@ -254,18 +256,18 @@ export default function AuditionsCasting() {
 
       {/* Active Casting Applications Section */}
       {applications.length > 0 && (
-        <div className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-[2rem] p-6 sm:p-8 space-y-6 shadow-xs">
+        <div className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-[2rem] p-6 sm:p-8 space-y-5 shadow-xs">
           <div className="flex items-center justify-between border-b border-[#DCBAB2]/60 pb-4">
             <div className="space-y-0.5">
               <h2 className="text-xl sm:text-2xl font-serif text-[#2A1816] tracking-tight font-normal">
                 My Audition Applications
               </h2>
               <p className="text-xs text-[#6E4742] font-light">
-                Directorial review status, audition slot times, and candidate updates
+                Track your submission progress and directorial updates
               </p>
             </div>
             <span className="font-mono text-xs font-bold uppercase tracking-wider bg-[#EEDBD5] text-[#8C241E] px-3.5 py-1 rounded-full border border-[#D5AAA2]">
-              {applications.length} Active Calling{applications.length > 1 ? "s" : ""}
+              {applications.length} Active{applications.length > 1 ? "" : ""}
             </span>
           </div>
 
@@ -273,49 +275,84 @@ export default function AuditionsCasting() {
             {applications.map((app) => {
               const roleTitle = app.role_name || app.positionTitle || "Production Role";
               const isShortlisted = app.status === "Shortlisted" || app.status === "Selected";
+              const isRejected = app.status === "Declined" || app.status === "Rejected";
+              const isReview = app.status === "Under Review" || app.status === "In Review";
+              const progressStep = isShortlisted || isRejected ? 3 : isReview ? 2 : 1;
+              const matchedPosition = openPositions.find(
+                p => String(p.id) === String(app.position_id) || (p.role_name || p.title) === roleTitle
+              );
 
               return (
                 <div
                   key={app.id}
-                  className="bg-[#F5EAE6] border border-[#DEBEB7] rounded-2xl p-5 hover:border-[#B32D25]/50 transition-all flex flex-col justify-between space-y-4 shadow-xs relative group"
+                  className="bg-[#F5EAE6] border border-[#DEBEB7] rounded-2xl p-5 hover:border-[#B32D25]/40 transition-all flex flex-col justify-between space-y-3 shadow-xs group"
                 >
-                  <div className="space-y-2">
-                    <div className="flex items-start justify-between gap-2">
-                      <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#8C5A54]">
-                        {app.category || "Audition Role"}
-                      </span>
-                      <span
-                        className={`font-mono text-[9px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full border ${
-                          isShortlisted
-                            ? "bg-emerald-700/15 text-emerald-950 border-emerald-700/30"
-                            : app.status === "Pending Review"
-                            ? "bg-amber-700/15 text-amber-950 border-amber-700/30"
-                            : "bg-[#EEDBD5] text-[#5C3B37] border-[#D5AAA2]"
-                        }`}
-                      >
-                        {app.status}
-                      </span>
-                    </div>
-
-                    <h3 className="text-lg font-serif text-[#2A1816] tracking-tight font-normal leading-snug">
-                      {roleTitle}
-                    </h3>
-
-                    {app.audition_date && (
-                      <p className="text-xs font-mono text-[#8C241E] font-medium flex items-center gap-1.5 pt-1">
-                        <Calendar className="w-3.5 h-3.5" />
-                        <span>Audition Slot: {app.audition_date}</span>
-                      </p>
-                    )}
+                  {/* Meta + Status */}
+                  <div className="flex items-start justify-between gap-2">
+                    <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#8C241E]">
+                      {matchedPosition?.production_name || app.category || "Production"}
+                    </span>
+                    <span
+                      className={`font-mono text-[9px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full border shrink-0 ${
+                        isShortlisted
+                          ? "bg-emerald-700/15 text-emerald-950 border-emerald-700/30"
+                          : isRejected
+                          ? "bg-rose-700/15 text-rose-950 border-rose-700/30"
+                          : isReview
+                          ? "bg-[#8C241E]/10 text-[#8C241E] border-[#8C241E]/30"
+                          : "bg-amber-700/15 text-amber-950 border-amber-700/30"
+                      }`}
+                    >
+                      {app.status}
+                    </span>
                   </div>
 
-                  <div className="pt-3 border-t border-[#DEBEB7]/60 flex items-center justify-between">
-                    <span className="font-mono text-[10px] text-[#8C5A54]">
-                      {app.submitted_at ? `Date: ${app.submitted_at}` : "Under Review"}
-                    </span>
+                  {/* Role Title */}
+                  <h3 className="text-lg font-serif text-[#2A1816] tracking-tight font-normal leading-snug">
+                    {roleTitle}
+                  </h3>
+
+                  {/* Compact Inline Progress Bar */}
+                  <div className="flex items-center gap-1.5 py-1">
+                    <div className={`w-5 h-5 rounded-full flex items-center justify-center ${
+                      progressStep >= 1 ? "bg-[#8C241E] text-white" : "bg-[#D5AAA2]/40 text-[#8C5A54]"
+                    }`}>
+                      <Check className="w-3 h-3" />
+                    </div>
+                    <div className={`flex-1 h-[2px] rounded-full ${progressStep >= 2 ? "bg-[#8C241E]" : "bg-[#D5AAA2]"}`} />
+                    <div className={`w-5 h-5 rounded-full flex items-center justify-center ${
+                      progressStep >= 2 ? "bg-[#8C241E] text-white" : "bg-[#D5AAA2]/40 text-[#8C5A54]"
+                    }`}>
+                      <Search className="w-3 h-3" />
+                    </div>
+                    <div className={`flex-1 h-[2px] rounded-full ${
+                      progressStep >= 3 ? (isRejected ? "bg-rose-500" : "bg-emerald-600") : "bg-[#D5AAA2]"
+                    }`} />
+                    <div className={`w-5 h-5 rounded-full flex items-center justify-center ${
+                      progressStep >= 3
+                        ? isRejected ? "bg-rose-600 text-white" : "bg-emerald-600 text-white"
+                        : "bg-[#D5AAA2]/40 text-[#8C5A54]"
+                    }`}>
+                      <Award className="w-3 h-3" />
+                    </div>
+                  </div>
+
+                  {/* Submitted date */}
+                  <span className="font-mono text-[10px] text-[#8C5A54]">
+                    Submitted: {app.submitted_at || app.submittedAt || "Recently"}
+                  </span>
+
+                  {/* Actions */}
+                  <div className="pt-2 border-t border-[#DEBEB7]/60 flex items-center justify-between gap-2">
+                    <button
+                      onClick={() => setDetailAppId(String(app.id))}
+                      className="px-3.5 py-1.5 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-[10px] font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer"
+                    >
+                      <FileText className="w-3 h-3 text-[#8C241E]" /> Details
+                    </button>
                     <button
                       onClick={() => handleWithdrawApplication(app.id, roleTitle)}
-                      className="font-mono text-[10px] font-bold uppercase tracking-wider text-rose-700 hover:text-rose-900 flex items-center gap-1 opacity-80 hover:opacity-100 transition-all cursor-pointer"
+                      className="text-[10px] font-mono font-bold uppercase tracking-wider text-rose-600 hover:text-rose-800 flex items-center gap-1 transition-all cursor-pointer"
                     >
                       <Trash2 className="w-3 h-3" /> Withdraw
                     </button>
@@ -327,25 +364,186 @@ export default function AuditionsCasting() {
         </div>
       )}
 
-      
-      {/* Progress Phases Timeline */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-[#F2E5E0] p-6 rounded-[2rem] border border-[#DCBAB2] shadow-xs">
-        <div className="bg-[#FAF2EE] p-4 rounded-xl border border-[#DCBAB2] flex flex-col">
-          <span className="text-[10px] font-mono text-[#8C5A54] uppercase tracking-wider font-bold">Phase 1</span>
-          <span className="text-lg font-serif text-[#2A1816] mt-1">Application Pending</span>
-          <span className="text-xs font-mono text-[#6E4742] mt-2 flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> Closes: Aug 30, 2026</span>
-        </div>
-        <div className="bg-[#F5EAE6] p-4 rounded-xl border border-[#DEBEB7] flex flex-col">
-          <span className="text-[10px] font-mono text-[#8C5A54] uppercase tracking-wider font-bold">Phase 2</span>
-          <span className="text-lg font-serif text-[#2A1816] mt-1">Directorial Review</span>
-          <span className="text-xs font-mono text-[#6E4742] mt-2 flex items-center gap-1"><Search className="w-3.5 h-3.5" /> Est: Sep 5-10, 2026</span>
-        </div>
-        <div className="bg-[#FAF2EE] p-4 rounded-xl border border-[#DCBAB2] flex flex-col">
-          <span className="text-[10px] font-mono text-[#8C5A54] uppercase tracking-wider font-bold">Phase 3</span>
-          <span className="text-lg font-serif text-[#2A1816] mt-1">Selected / Callback</span>
-          <span className="text-xs font-mono text-[#6E4742] mt-2 flex items-center gap-1"><Award className="w-3.5 h-3.5" /> Live: Sep 15, 2026</span>
-        </div>
-      </div>
+      {/* Application Detail Modal */}
+      {detailAppId && (() => {
+        const app = applications.find(a => String(a.id) === detailAppId);
+        if (!app) return null;
+        const roleTitle = app.role_name || app.positionTitle || "Production Role";
+        const isShortlisted = app.status === "Shortlisted" || app.status === "Selected";
+        const isRejected = app.status === "Declined" || app.status === "Rejected";
+        const isReview = app.status === "Under Review" || app.status === "In Review";
+        const progressStep = isShortlisted || isRejected ? 3 : isReview ? 2 : 1;
+        const matchedPosition = openPositions.find(
+          p => String(p.id) === String(app.position_id) || (p.role_name || p.title) === roleTitle
+        );
+
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+            <div className="bg-[#F5EAE6] border border-[#DEBEB7] text-[#2A1816] rounded-[2.5rem] p-6 sm:p-8 max-w-xl w-full shadow-2xl relative flex flex-col max-h-[85vh]">
+              {/* Close Button */}
+              <button
+                type="button"
+                onClick={() => setDetailAppId(null)}
+                className="absolute top-6 right-6 w-9 h-9 rounded-full bg-[#EEDBD5] hover:bg-[#E3CEC6] text-[#5C3B37] hover:text-[#2A1816] flex items-center justify-center transition-all cursor-pointer border border-[#D5AAA2] shadow-xs group z-20"
+              >
+                <X className="w-4 h-4 group-hover:rotate-90 transition-transform duration-200" />
+              </button>
+
+              {/* Fixed Header */}
+              <div className="space-y-1.5 pr-12 pb-3 border-b border-[#DCBAB2]/70 shrink-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#8C241E] bg-[#EEDBD5] px-2.5 py-0.5 rounded-full border border-[#D5AAA2]">
+                    {matchedPosition?.production_name || "Upcoming Production"}
+                  </span>
+                  <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#8C5A54]">
+                    • {app.category || matchedPosition?.role_category || "Casting Role"}
+                  </span>
+                </div>
+                <h2 className="text-2xl sm:text-3xl font-serif text-[#2A1816] tracking-tight font-normal leading-snug">
+                  {roleTitle}
+                </h2>
+                {(matchedPosition?.character_description || matchedPosition?.description) && (
+                  <p className="text-xs text-[#5C3B37] font-light leading-relaxed line-clamp-2">
+                    {matchedPosition.character_description || matchedPosition.description}
+                  </p>
+                )}
+              </div>
+
+              {/* Scrollable Inner Body with Contained Scrollbar */}
+              <div className="overflow-y-auto custom-scrollbar flex-1 pr-3 my-4 space-y-4 text-xs font-sans">
+                {/* Progress Tracker */}
+                <div className="bg-[#FAF2EE] rounded-2xl border border-[#DCBAB2] p-4 sm:p-5 space-y-3.5 shadow-2xs">
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-[#8C5A54]">
+                      Audition Workflow Status
+                    </span>
+                    <span
+                      className={`font-mono text-[9px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full border ${
+                        isShortlisted
+                          ? "bg-emerald-700/15 text-emerald-950 border-emerald-700/30"
+                          : isRejected
+                          ? "bg-rose-700/15 text-rose-950 border-rose-700/30"
+                          : isReview
+                          ? "bg-[#8C241E]/10 text-[#8C241E] border-[#8C241E]/30"
+                          : "bg-amber-700/15 text-amber-950 border-amber-700/30"
+                      }`}
+                    >
+                      {app.status}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-0 pt-1">
+                    <div className="flex flex-col items-center flex-1">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all ${progressStep >= 1 ? "bg-[#8C241E] border-[#8C241E] text-white shadow-xs" : "bg-[#FAF2EE] border-[#D5AAA2] text-[#8C5A54]"}`}>
+                        <Check className="w-4 h-4" />
+                      </div>
+                      <span className={`text-[10px] font-mono font-bold uppercase mt-1.5 ${progressStep >= 1 ? "text-[#8C241E]" : "text-[#8C5A54]"}`}>Submitted</span>
+                    </div>
+                    <div className={`flex-1 h-[2.5px] rounded-full -mt-4 mx-1.5 ${progressStep >= 2 ? "bg-[#8C241E]" : "bg-[#D5AAA2]"}`} />
+                    <div className="flex flex-col items-center flex-1">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all ${progressStep >= 2 ? "bg-[#8C241E] border-[#8C241E] text-white shadow-xs" : "bg-[#FAF2EE] border-[#D5AAA2] text-[#8C5A54]"}`}>
+                        <Search className="w-4 h-4" />
+                      </div>
+                      <span className={`text-[10px] font-mono font-bold uppercase mt-1.5 ${progressStep >= 2 ? "text-[#8C241E]" : "text-[#8C5A54]"}`}>Under Review</span>
+                    </div>
+                    <div className={`flex-1 h-[2.5px] rounded-full -mt-4 mx-1.5 ${progressStep >= 3 ? (isRejected ? "bg-rose-500" : "bg-emerald-600") : "bg-[#D5AAA2]"}`} />
+                    <div className="flex flex-col items-center flex-1">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all ${progressStep >= 3 ? (isRejected ? "bg-rose-600 border-rose-600 text-white shadow-xs" : "bg-emerald-600 border-emerald-600 text-white shadow-xs") : "bg-[#FAF2EE] border-[#D5AAA2] text-[#8C5A54]"}`}>
+                        <Award className="w-4 h-4" />
+                      </div>
+                      <span className={`text-[10px] font-mono font-bold uppercase mt-1.5 ${progressStep >= 3 ? (isRejected ? "text-rose-700" : "text-emerald-700") : "text-[#8C5A54]"}`}>
+                        {isRejected ? "Declined" : "Selected"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Key Details 2x2 Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="bg-[#FAF2EE] rounded-xl border border-[#DCBAB2] p-3.5 space-y-1">
+                    <span className="font-mono text-[9px] font-bold uppercase tracking-widest text-[#8C5A54] flex items-center gap-1.5">
+                      <Calendar className="w-3.5 h-3.5 text-[#8C241E]" /> Application Date
+                    </span>
+                    <p className="text-xs font-mono text-[#2A1816] font-semibold">{app.submitted_at || app.submittedAt || "Aug 22, 2026"}</p>
+                  </div>
+                  <div className="bg-[#FAF2EE] rounded-xl border border-[#DCBAB2] p-3.5 space-y-1">
+                    <span className="font-mono text-[9px] font-bold uppercase tracking-widest text-[#8C5A54] flex items-center gap-1.5">
+                      <Layers className="w-3.5 h-3.5 text-[#8C241E]" /> Audition Slot
+                    </span>
+                    <p className="text-xs font-mono text-[#2A1816] font-semibold">{app.audition_date || "Slot Allocation in Progress"}</p>
+                  </div>
+                  <div className="bg-[#FAF2EE] rounded-xl border border-[#DCBAB2] p-3.5 space-y-1">
+                    <span className="font-mono text-[9px] font-bold uppercase tracking-widest text-[#8C5A54] flex items-center gap-1.5">
+                      <AlertCircle className="w-3.5 h-3.5 text-[#8C241E]" /> Callboard Closes
+                    </span>
+                    <p className="text-xs font-mono text-[#8C241E] font-bold">{matchedPosition?.deadline || "Sep 25, 2026"}</p>
+                  </div>
+                  <div className="bg-[#FAF2EE] rounded-xl border border-[#DCBAB2] p-3.5 space-y-1">
+                    <span className="font-mono text-[9px] font-bold uppercase tracking-widest text-[#8C5A54] flex items-center gap-1.5">
+                      <FileText className="w-3.5 h-3.5 text-[#8C241E]" /> Application Ref
+                    </span>
+                    <p className="text-xs font-mono text-[#2A1816] font-semibold">#APP-{String(app.id).padStart(4, "0")}</p>
+                  </div>
+                </div>
+
+                {/* Submitted Materials */}
+                <div className="bg-[#FAF2EE] rounded-xl border border-[#DCBAB2] p-4 space-y-2.5">
+                  <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-[#8C5A54] block">
+                    Audition Materials on Record
+                  </span>
+                  <div className="flex flex-wrap gap-2">
+                    {app.portfolio_link && (
+                      <a
+                        href={app.portfolio_link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#F5EAE6] border border-[#DCBAB2] hover:border-[#8C241E]/60 text-xs font-mono text-[#5C3B37] hover:text-[#8C241E] transition-all shadow-2xs"
+                      >
+                        <ExternalLink className="w-3 h-3 text-[#8C241E]" /> View Portfolio / Reel
+                      </a>
+                    )}
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#F5EAE6] border border-[#DCBAB2] text-xs font-mono text-[#5C3B37]">
+                      <FileText className="w-3 h-3 text-[#8C241E]" /> Candidate Profile
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#F5EAE6] border border-[#DCBAB2] text-xs font-mono text-[#5C3B37]">
+                      <CheckCircle2 className="w-3 h-3 text-emerald-800" /> Slate Verified
+                    </span>
+                  </div>
+                </div>
+
+                {/* Director Notes */}
+                {app.notes && (
+                  <div className="bg-[#FAF2EE] rounded-xl border border-[#DCBAB2] p-4 space-y-1">
+                    <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#8C5A54] block">
+                      Directorial Feedback & Remarks:
+                    </span>
+                    <p className="text-xs text-[#6E4742] leading-relaxed italic">
+                      "{app.notes}"
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Fixed Modal Footer */}
+              <div className="pt-4 border-t border-[#DCBAB2]/70 flex items-center justify-between shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setDetailAppId(null)}
+                  className="px-6 py-2.5 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer shadow-xs"
+                >
+                  Close Dossier
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { handleWithdrawApplication(app.id, roleTitle); setDetailAppId(null); }}
+                  className="px-4 py-2.5 rounded-full border border-rose-300 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
+                >
+                  <Trash2 className="w-3.5 h-3.5" /> Withdraw
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* TONED-DOWN EDITORIAL FILTER BAR */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-[#FAF2EE] border border-[#DCBAB2] rounded-2xl p-2.5 sm:p-3 shadow-xs">

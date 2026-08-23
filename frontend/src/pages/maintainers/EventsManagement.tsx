@@ -311,21 +311,28 @@ export default function EventsManagement() {
 
   const handleExtractKeywords = async (pitchId: number, description: string) => {
     setAnalyzingPitchId(pitchId);
-    // Simulate AI delay
-    await new Promise(resolve => setTimeout(resolve, 800));
-
-    // Mock extraction by getting 3 meaningful words from description
-    const words = description
-      .split(' ')
-      .map(w => w.replace(/[^a-zA-Z]/g, ''))
-      .filter(w => w.length > 4)
-      .slice(0, 3);
-      
-    // If no long words found, provide some fallbacks
-    const finalWords = words.length > 0 ? words : ["THEATRE", "EVENT", "PITCH"];
-    
-    setExtractedKeywords(prev => ({ ...prev, [pitchId]: finalWords }));
-    setAnalyzingPitchId(null);
+    const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005";
+    try {
+      const res = await fetch(`${baseUrl}/api/events/extract-keywords`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ description })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.keywords && Array.isArray(data.keywords) && data.keywords.length > 0) {
+          setExtractedKeywords(prev => ({ ...prev, [pitchId]: data.keywords }));
+          showToast("AI Theatrical Tags extracted via Gemini!");
+          return;
+        }
+      }
+      throw new Error("Failed to extract keywords from AI server");
+    } catch (err) {
+      console.error("AI extraction error:", err);
+      showToast("Unable to reach AI backend. Please verify your connection.");
+    } finally {
+      setAnalyzingPitchId(null);
+    }
   };
 
   useEffect(() => {
@@ -1335,26 +1342,40 @@ export default function EventsManagement() {
                         </p>
                         
                         {/* AI Keyword Filter */}
-                        <div className="flex items-center gap-2 flex-wrap">
-                          {!extractedKeywords[pitch.id] && (
+                        <div className="flex items-center gap-2.5 flex-wrap pt-1.5">
+                          {!extractedKeywords[pitch.id] ? (
                             <button
                               type="button"
                               onClick={() => handleExtractKeywords(pitch.id, pitch.description)}
                               disabled={analyzingPitchId === pitch.id}
-                              className="px-3 py-1.5 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] hover:text-[#2A1816] text-[10px] font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer shadow-xs disabled:opacity-50"
+                              className="px-4 py-2 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#8C241E] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer shadow-xs disabled:opacity-50 group/aibtn"
                             >
-                              <Sparkles className="w-3 h-3 text-[#8C241E]" />
-                              <span>{analyzingPitchId === pitch.id ? "Analyzing..." : "AI Keyword Filter"}</span>
+                              <Tag className="w-3.5 h-3.5 text-[#8C241E] group-hover/aibtn:scale-110 transition-transform" />
+                              <span>{analyzingPitchId === pitch.id ? "Analyzing with Gemini..." : "Extract AI Keypoints"}</span>
                             </button>
-                          )}
-                          {extractedKeywords[pitch.id] && (
+                          ) : (
                             <div className="flex items-center gap-2 flex-wrap">
-                              <Sparkles className="w-3.5 h-3.5 text-[#8C241E]" />
+                              <span className="text-[11px] font-mono text-[#8C5A54] font-bold uppercase flex items-center gap-1.5 mr-0.5">
+                                <Tag className="w-3.5 h-3.5 text-[#8C241E]" />
+                                <span>AI Tags:</span>
+                              </span>
                               {extractedKeywords[pitch.id].map((kw, idx) => (
-                                <span key={idx} className="bg-[#EEDBD5] text-[#8C241E] border border-[#D5AAA2] rounded-full px-2.5 py-1 text-[10px] font-mono font-bold uppercase tracking-wider shadow-xs">
-                                  {kw}
+                                <span
+                                  key={idx}
+                                  className="bg-[#FAF2EE] text-[#8C241E] border border-[#DCBAB2] rounded-full px-3 py-1 text-[11px] font-mono font-semibold tracking-tight shadow-xs inline-flex items-center gap-1"
+                                >
+                                  <span>{kw}</span>
                                 </span>
                               ))}
+                              <button
+                                type="button"
+                                title="Re-run AI extraction"
+                                onClick={() => handleExtractKeywords(pitch.id, pitch.description)}
+                                disabled={analyzingPitchId === pitch.id}
+                                className="w-7 h-7 rounded-full bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#8C5A54] hover:text-[#8C241E] border border-[#DCBAB2] flex items-center justify-center transition-all cursor-pointer shadow-xs ml-1"
+                              >
+                                <RefreshCw className={`w-3.5 h-3.5 ${analyzingPitchId === pitch.id ? 'animate-spin text-[#8C241E]' : ''}`} />
+                              </button>
                             </div>
                           )}
                         </div>
@@ -1578,13 +1599,22 @@ export default function EventsManagement() {
                     <label className="font-bold text-[#8C5A54] uppercase tracking-wider block">Description & Dramaturgy Agenda</label>
                     <div className="flex items-center gap-2">
                       {editingPitch && extractedKeywords[editingPitch.id] && (
-                        <div className="flex items-center gap-1.5">
-                          <Sparkles className="w-3 h-3 text-[#8C241E]" />
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <Tag className="w-3 h-3 text-[#8C241E]" />
                           {extractedKeywords[editingPitch.id].map((kw, idx) => (
-                            <span key={idx} className="bg-[#EEDBD5] text-[#8C241E] border border-[#D5AAA2] rounded-full px-2 py-0.5 text-[9px] font-mono font-bold uppercase tracking-wider shadow-xs">
+                            <span key={idx} className="bg-[#FAF2EE] text-[#8C241E] border border-[#DCBAB2] rounded-full px-2.5 py-0.5 text-[10px] font-mono font-semibold tracking-tight shadow-xs">
                               {kw}
                             </span>
                           ))}
+                          <button
+                            type="button"
+                            title="Re-analyze with Gemini AI"
+                            onClick={() => handleExtractKeywords(editingPitch.id, editFormData.description)}
+                            disabled={analyzingPitchId === editingPitch.id}
+                            className="w-6 h-6 rounded-full bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#8C5A54] hover:text-[#8C241E] border border-[#DCBAB2] flex items-center justify-center transition-all cursor-pointer shadow-xs"
+                          >
+                            <RefreshCw className={`w-3 h-3 ${analyzingPitchId === editingPitch.id ? 'animate-spin text-[#8C241E]' : ''}`} />
+                          </button>
                         </div>
                       )}
                       {editingPitch && !extractedKeywords[editingPitch.id] && (
@@ -1592,10 +1622,10 @@ export default function EventsManagement() {
                           type="button"
                           onClick={() => handleExtractKeywords(editingPitch.id, editFormData.description)}
                           disabled={analyzingPitchId === editingPitch.id}
-                          className="px-2.5 py-1 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] hover:text-[#2A1816] text-[9px] font-mono font-bold uppercase tracking-wider flex items-center gap-1 transition-all cursor-pointer shadow-xs disabled:opacity-50"
+                          className="px-3 py-1 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#8C241E] text-[10px] font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer shadow-xs disabled:opacity-50"
                         >
-                          <Sparkles className="w-2.5 h-2.5 text-[#8C241E]" />
-                          <span>{analyzingPitchId === editingPitch.id ? "Analyzing..." : "AI Filter"}</span>
+                          <Tag className="w-3 h-3 text-[#8C241E]" />
+                          <span>{analyzingPitchId === editingPitch.id ? "Analyzing..." : "Extract AI Keypoints"}</span>
                         </button>
                       )}
                     </div>

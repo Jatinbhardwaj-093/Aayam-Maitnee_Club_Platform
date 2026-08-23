@@ -771,7 +771,7 @@ def get_my_auditions():
     user = User.query.filter_by(email=email).first()
     if not user:
         return jsonify([])
-    apps = AuditionApplication.query.filter_by(user_id=user.id).order_by(AuditionApplication.submitted_at.desc()).all()
+    apps = AuditionApplication.query.filter_by(applicant_email=email).order_by(AuditionApplication.submitted_at.desc()).all()
     result = []
     for a in apps:
         pos = AuditionPosition.query.get(a.position_id) if a.position_id else None
@@ -795,7 +795,7 @@ def get_my_auditions():
             'submitted_at': a.submitted_at.strftime('%b %d, %Y') if a.submitted_at else '',
             'notes': a.notes or '',
             'portfolio_link': a.portfolio_link or '',
-            'portfolio_filename': a.portfolio_filename or None,
+            'portfolio_filename': getattr(a, 'portfolio_filename', None),
             'video_filename': getattr(a, 'video_filename', None),
         })
     return jsonify(result)
@@ -813,8 +813,8 @@ def submit_audition():
     portfolio_link = data.get('portfolio_link', '')
     notes = data.get('notes', '')
     user = User.query.filter_by(email=applicant_email).first() if applicant_email else None
-    if user and position_id:
-        existing = AuditionApplication.query.filter_by(user_id=user.id, position_id=int(position_id)).first()
+    if applicant_email and position_id:
+        existing = AuditionApplication.query.filter_by(applicant_email=applicant_email, position_id=int(position_id)).first()
         if existing:
             return jsonify({'error': 'Already applied', 'existing_id': existing.id}), 409
     app = AuditionApplication(
@@ -826,7 +826,6 @@ def submit_audition():
         experience_level=experience_level,
         portfolio_link=portfolio_link or '',
         notes=notes,
-        user_id=user.id if user else None,
         status='Pending Review'
     )
     db.session.add(app)
@@ -2469,52 +2468,51 @@ def extract_event_keywords():
         return jsonify({"status": "error", "message": "Description is required"}), 400
 
     api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY") or API_KEY
-    model = os.getenv("COMPLETIONS_MODEL", "gemini/gemini-3.6-flash")
+    model = os.getenv("GEMINI_MODEL", "gemini-3.6-flash")
 
     if not api_key:
         return jsonify({"status": "error", "message": "AI servers are down. API key missing."}), 503
 
     try:
-        prompt = f"""You are an AI assistant for an Event Management system. 
-Extract 4 to 6 concise, highly relevant keywords or short key phrases (e.g. monetary figures like ₹1,50,000, key deliverables, audio equipment, themes, or event categories) from the following description:
+        from google import genai
+        client = genai.Client(api_key=api_key)
+        prompt = f"""You are an expert AI event analyst and curator for Aayam Drama Society (IIT Madras).
+Carefully analyze the following theatrical event pitch/proposal description:
 
 "{description}"
 
-Return ONLY valid JSON matching this schema:
+Extract 4 to 6 concise, high-value tags and keywords that highlight:
+1. Production Genre / Format (e.g. "Sanskrit Classic", "Street Play", "Improv Workshop", "Annual Showcase")
+2. Financials / Budget / Sponsorship (e.g. "₹1,50,000 Budget", "Funded Pitch", "Ticketed Premiere")
+3. Technical / Venue Deliverables (e.g. "Open Air Theatre", "Spotlight Rig", "Acoustic Mics", "Custom Sets")
+4. Target Audience / Capacity (e.g. "Inter-College", "500+ Audience", "Club Members Only")
+
+Return ONLY valid JSON matching this schema with no markdown backticks or commentary:
 {{
-  "keywords": ["Keyword1", "Keyword2", ...]
+  "keywords": ["Classical Tragedy", "₹1,20,000 Budget", "OAT Auditorium", "Lighting Rig", "Repertoire Premiere"]
 }}
 """
-        completion_kwargs = {
-            "model": model,
-            "messages": [{"role": "user", "content": prompt}],
-            "api_key": api_key,
-            "response_format": {"type": "json_object"}
-        }
-        if os.getenv("COMPLETIONS_API_BASE") or not model.startswith("gemini/"):
-            completion_kwargs["api_base"] = API_BASE
+        response = client.models.generate_content(
+            model=model,
+            contents=prompt
+        )
+        content = response.text.strip()
+        if content.startswith("```"):
+            lines = content.splitlines()
+            if lines[0].startswith("```"):
+                lines = lines[1:]
+            if lines and lines[-1].startswith("```"):
+                lines = lines[:-1]
+            content = "\n".join(lines).strip()
 
-        resp = litellm.completion(**completion_kwargs)
-        content = resp.choices[0].message.content.strip()
-        if content.startswith("```json"):
-            content = content[7:]
-        if content.endswith("```"):
-            content = content[:-3]
-        res_json = json.loads(content.strip())
+        res_json = json.loads(content)
         keywords = res_json.get("keywords", [])
         if keywords and isinstance(keywords, list):
             return jsonify({"status": "success", "keywords": keywords[:6], "source": "gemini"}), 200
         raise ValueError("Invalid keywords response structure")
     except Exception as err:
         print(f"Gemini keyword extraction API call error: {err}")
-        import re
-        words = re.findall(r'\b[A-Za-z]{4,}\b', desc)
-        stop_words = {"this", "that", "with", "from", "have", "were", "what", "when", "your", "their", "about", "which", "will"}
-        filtered = [w for w in words if w.lower() not in stop_words]
-        fallback_keywords = list(dict.fromkeys(filtered))[:5]
-        if not fallback_keywords:
-            fallback_keywords = ["Theatre", "Production", "Auditions", "Rehearsals"]
-        return jsonify({"status": "success", "keywords": fallback_keywords, "source": "fallback"}), 200
+        return jsonify({"status": "error", "message": f"Gemini extraction failed: {str(err)}"}), 500
 
 
 @api_bp.route('/events/autofill-proposal', methods=['POST'])

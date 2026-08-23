@@ -860,8 +860,6 @@ class AuditionApplication(db.Model):
     def to_dict(self):
         return {
             'id': self.id,
-            'user_id': self.user_id,
-            'portfolio_filename': self.portfolio_filename,
             'position_id': self.position_id,
             'role_name': self.role_name,
             'applicant_name': self.applicant_name,

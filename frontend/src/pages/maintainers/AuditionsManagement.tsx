@@ -31,6 +31,10 @@ import {
   HeartHandshake,
   SlidersHorizontal,
   RotateCcw,
+  RefreshCw,
+  Calendar,
+  Tag,
+  Trash2,
   VenetianMask, Mic, Settings, Wrench, Clapperboard, Paintbrush, Scissors, Shirt, Palette,
 } from "lucide-react";
 import { CustomSelect } from "@/components/CustomSelect";
@@ -1174,168 +1178,174 @@ export default function AuditionsManagement() {
             </div>
           )}
 
-          {/* Applications Table Container */}
-          <div className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-[2.5rem] overflow-hidden shadow-xs">
-            <div className="overflow-x-auto custom-scrollbar">
-              <table className="w-full text-left border-collapse min-w-[700px]">
-                <thead>
-                  <tr className="bg-[#F5EAE6] rounded-xl overflow-hidden">
-                    <th className="px-6 py-4 text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
-                      Candidate Profile
-                    </th>
-                    <th className="px-6 py-4 text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
-                      Target Role Calling
-                    </th>
-                    <th className="px-6 py-4 text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
-                      Audition Reel / Slate
-                    </th>
-                    <th className="px-6 py-4 text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
-                      Review Status
-                    </th>
-                    <th className="px-6 py-4 text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54] text-right">
-                      Directorial Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[#DCBAB2]/50">
-                  {filteredApplications.length === 0 ? (
-                    <tr>
-                      <td colSpan={5} className="py-16 text-center">
-                        <Users className="w-8 h-8 text-[#8C5A54] mx-auto mb-2 opacity-50" />
-                        <p className="font-mono text-xs font-bold uppercase text-[#2A1816]">No applications matching filter</p>
-                        <p className="text-xs text-[#6E4742] font-serif mt-1">Try resetting search or adjusting your status filters.</p>
-                      </td>
-                    </tr>
-                  ) : (
-                    filteredApplications.map((app) => (
-                      <tr key={app.id} className="bg-[#FAF2EE] hover:bg-[#F5EAE6] transition-colors shadow-xs">
-                        {/* Candidate info */}
-                        <td className="px-6 py-4.5 align-top">
-                          <div className="space-y-1">
-                            <div className="flex items-center gap-2">
-                              <span className="font-serif text-base font-normal text-[#2A1816]">{app.applicant_name}</span>
-                              {app.ai_report && (
-                                <span className="inline-flex items-center gap-0.5 text-[9px] font-mono font-bold text-[#8C241E] bg-[#EEDBD5] px-1.5 py-0.5 rounded-full border border-[#D5AAA2]" title="AI Analyzed">
-                                  <Sparkle className="w-2.5 h-2.5 fill-[#8C241E]" /> AI
-                                </span>
-                              )}
-                            </div>
-                            <div className="text-[11px] font-mono text-[#8C5A54] flex items-center gap-2">
-                              <span>{app.applicant_email}</span>
-                              {app.applicant_phone && <span>• {app.applicant_phone}</span>}
-                            </div>
-                            <span className="inline-block text-[9px] font-mono font-semibold uppercase text-[#5C3B37] bg-[#EEDBD5]/60 px-2 py-0.5 rounded-full border border-[#D5AAA2]/60 mt-1">
-                              {app.experience_level || "Ensemble Candidate"}
-                            </span>
-                          </div>
-                        </td>
-
-                        {/* Target Role */}
-                        <td className="px-6 py-4.5 align-top">
-                          <div className="space-y-1">
-                            <span className="font-serif text-sm text-[#2A1816] font-medium block">
-                              {app.role_name}
-                            </span>
-                            <span className="text-[10px] font-mono text-[#8C5A54]">
-                              Submitted: {app.submitted_at || "Recent"}
-                            </span>
-                          </div>
-                        </td>
-
-                        {/* Audition Reel / Slate */}
-                        <td className="px-6 py-4.5 align-top">
-                          {app.portfolio_link && app.portfolio_link !== "#" ? (
-                            <a
-                              href={app.portfolio_link}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#FAF2EE] hover:bg-[#EEDBD5] border border-[#DCBAB2] text-[#8C241E] text-xs font-mono font-bold uppercase tracking-wider transition-all"
-                            >
-                              <Video className="w-3.5 h-3.5" />
-                              <span>View Slate</span>
-                              <ExternalLink className="w-3 h-3 ml-0.5" />
-                            </a>
-                          ) : (
-                            <span className="text-[10px] font-mono text-[#8C5A54] italic">In-Person Reading</span>
-                          )}
-                        </td>
-
-                        {/* Status */}
-                        <td className="px-6 py-4.5 align-top">
-                          <span
-                            className={`inline-block px-3 py-1 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider border ${
-                              app.status === "Selected"
-                                ? "bg-emerald-700/15 text-emerald-900 border-emerald-700/30"
-                                : app.status === "Shortlisted"
-                                ? "bg-[#8C241E] text-[#FDF8F7] border-[#A6352F]"
-                                : app.status === "Rejected"
-                                ? "bg-gray-200 text-gray-700 border-gray-300"
-                                : "bg-amber-700/15 text-amber-950 border-amber-700/30"
-                            }`}
-                          >
-                            {app.status}
-                          </span>
-                        </td>
-
-                        {/* Actions */}
-                        <td className="px-6 py-4.5 align-top text-right">
-                          <div className="flex flex-col items-end gap-2.5">
-                            <div className="flex items-center justify-end gap-2">
-                            {/* AI Scan Report Button */}
-
-                            <button
-                                onClick={() => handleFullAiScan(app)}
-                                className="px-3 py-1.5 rounded-full bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#2A1816] text-[10px] font-mono font-bold uppercase tracking-wider border border-[#DCBAB2] flex items-center gap-1.5 transition-all shadow-xs mr-2"
-                                title="Run Reviewdozer AI Scan"
-                              >
-                                <Sparkle className="w-3.5 h-3.5 text-[#8C241E]" />
-                                AI Scan
-                            </button>
-
-{/* View Dossier & AI Evaluation */}
-                            <button
-                              onClick={() => {
-                                setSelectedApp(app);
-                                setAiScanResult(app.ai_report ? JSON.parse(app.ai_report) : null);
-                                setViewAppOpen(true);
-                              }}
-                              className="px-3.5 py-1.5 rounded-full bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#2A1816] text-xs font-mono font-bold uppercase tracking-wider border border-[#DCBAB2] flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs"
-                              title="Review candidate dossier"
-                            >
-                              <Eye className="w-3.5 h-3.5 text-[#8C241E]" />
-                              <span>Dossier</span>
-                            </button>
-
-                            </div>
-                            {/* Quick Status Dropdown / Buttons */}
-                            {app.status.includes("Pending") && (
-                              <button
-                                onClick={() => handleUpdateApplicationStatus(app.id, "Shortlisted")}
-                                className="w-full flex items-center justify-center px-3 py-1.5 rounded-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] text-xs font-mono font-bold uppercase tracking-wider border border-[#A6352F] transition-all cursor-pointer shadow-xs"
-                                title="Shortlist candidate"
-                              >
-                                Shortlist
-                              </button>
-                            )}
-
-                            {app.status === "Shortlisted" && (
-                              <button
-                                onClick={() => handleUpdateApplicationStatus(app.id, "Selected")}
-                                className="w-full flex items-center justify-center px-3 py-1.5 rounded-full bg-emerald-800 hover:bg-emerald-900 text-[#FDF8F7] text-xs font-mono font-bold uppercase tracking-wider border border-emerald-900 transition-all cursor-pointer shadow-xs"
-                                title="Select for Cast"
-                              >
-                                Cast Role
-                              </button>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
+          {/* Editorial Applications Card Grid */}
+          {filteredApplications.length === 0 ? (
+            <div className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-[2.5rem] p-12 text-center shadow-xs">
+              <Users className="w-10 h-10 text-[#8C5A54] mx-auto mb-3 opacity-50" />
+              <p className="font-mono text-sm font-bold uppercase text-[#2A1816]">No Applications Matching Filter</p>
+              <p className="text-xs text-[#6E4742] font-serif mt-1 max-w-sm mx-auto">
+                Try adjusting your department filter, status selector, or search term above.
+              </p>
             </div>
-          </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {filteredApplications.map((app) => {
+                const isSelected = app.status === "Selected";
+                const isShortlisted = app.status === "Shortlisted";
+                const isRejected = app.status === "Rejected" || app.status === "Declined";
+                const isPending = app.status.includes("Pending") || app.status === "Applied";
+
+                return (
+                  <div
+                    key={app.id}
+                    className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-[2rem] p-6 hover:border-[#B32D25]/50 hover:shadow-md transition-all flex flex-col justify-between space-y-4 shadow-xs group"
+                  >
+                    {/* Top Row: Experience Badge + Status Pill */}
+                    <div className="space-y-3.5">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="font-mono text-[9px] font-bold uppercase tracking-wider text-[#8C5A54] bg-[#EEDBD5] px-2.5 py-0.5 rounded-full border border-[#D5AAA2]">
+                            {app.experience_level || "Ensemble Candidate"}
+                          </span>
+                          {app.ai_report && (
+                            <span className="inline-flex items-center gap-1 text-[9px] font-mono font-bold text-[#8C241E] bg-[#8C241E]/10 px-2 py-0.5 rounded-full border border-[#8C241E]/30">
+                              <Tag className="w-2.5 h-2.5 text-[#8C241E]" /> AI Fit Verified
+                            </span>
+                          )}
+                        </div>
+
+                        <span
+                          className={`font-mono text-[9px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full border shrink-0 ${
+                            isSelected
+                              ? "bg-emerald-700/15 text-emerald-950 border-emerald-700/30"
+                              : isShortlisted
+                              ? "bg-[#8C241E] text-[#FDF8F7] border-[#A6352F]"
+                              : isRejected
+                              ? "bg-rose-700/15 text-rose-950 border-rose-700/30"
+                              : "bg-amber-700/15 text-amber-950 border-amber-700/30"
+                          }`}
+                        >
+                          {app.status}
+                        </span>
+                      </div>
+
+                      {/* Candidate Name & Contact Info */}
+                      <div className="space-y-1">
+                        <h3 className="font-serif text-2xl text-[#2A1816] tracking-tight font-normal leading-snug group-hover:text-[#8C241E] transition-colors">
+                          {app.applicant_name}
+                        </h3>
+                        <div className="text-[11px] font-mono text-[#8C5A54] flex items-center gap-2 flex-wrap">
+                          <span>{app.applicant_email}</span>
+                          {app.applicant_phone && <span>• {app.applicant_phone}</span>}
+                        </div>
+                      </div>
+
+                      {/* Target Calling Banner */}
+                      <div className="bg-[#F5EAE6] rounded-xl border border-[#DEBEB7] p-3 space-y-1">
+                        <div className="flex items-center justify-between gap-1">
+                          <span className="font-mono text-[9px] font-bold uppercase tracking-wider text-[#8C241E]">
+                            Target Calling
+                          </span>
+                          <span className="font-mono text-[9px] text-[#8C5A54]">
+                            {app.submitted_at || "Recent"}
+                          </span>
+                        </div>
+                        <p className="font-serif text-sm font-medium text-[#2A1816] leading-snug">
+                          {app.role_name}
+                        </p>
+                      </div>
+
+                      {/* Reel / Slate Preview */}
+                      {app.portfolio_link && app.portfolio_link !== "#" ? (
+                        <div className="pt-1">
+                          <a
+                            href={app.portfolio_link}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#F5EAE6] hover:bg-[#EEDBD5] border border-[#DCBAB2] text-[#8C241E] text-[10px] font-mono font-bold uppercase tracking-wider transition-all"
+                          >
+                            <Video className="w-3 h-3" />
+                            <span>Audition Tape / Slate</span>
+                            <ExternalLink className="w-2.5 h-2.5 ml-0.5 opacity-70" />
+                          </a>
+                        </div>
+                      ) : (
+                        <p className="text-[10px] font-mono text-[#8C5A54] italic pt-1">
+                          In-person audition reading required
+                        </p>
+                      )}
+
+                      {/* Candidate Notes Preview */}
+                      {app.notes && (
+                        <p className="text-xs text-[#6E4742] leading-relaxed italic line-clamp-2 bg-[#F5EAE6]/50 p-2.5 rounded-xl border border-[#DEBEB7]/50">
+                          "{app.notes}"
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Directorial Actions Bar */}
+                    <div className="pt-3 border-t border-[#DCBAB2]/60 space-y-2">
+                      <div className="flex items-center justify-between gap-2">
+                        {/* AI Scan & Dossier */}
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => handleFullAiScan(app)}
+                            className="px-3 py-1.5 rounded-full bg-[#F5EAE6] hover:bg-[#EEDBD5] text-[#2A1816] text-[10px] font-mono font-bold uppercase tracking-wider border border-[#DCBAB2] flex items-center gap-1 transition-all cursor-pointer shadow-2xs"
+                            title="Run Reviewdozer AI Scan"
+                          >
+                            <Tag className="w-3 h-3 text-[#8C241E]" />
+                            <span>AI Scan</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedApp(app);
+                              setAiScanResult(app.ai_report ? JSON.parse(app.ai_report) : null);
+                              setViewAppOpen(true);
+                            }}
+                            className="px-3 py-1.5 rounded-full bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#2A1816] text-[10px] font-mono font-bold uppercase tracking-wider border border-[#DCBAB2] flex items-center gap-1 transition-all cursor-pointer shadow-2xs"
+                            title="Review full candidate dossier"
+                          >
+                            <Eye className="w-3 h-3 text-[#8C241E]" />
+                            <span>Dossier</span>
+                          </button>
+                        </div>
+
+                        {/* Status Quick-Actions */}
+                        {isPending && (
+                          <button
+                            type="button"
+                            onClick={() => handleUpdateApplicationStatus(app.id, "Shortlisted")}
+                            className="px-3.5 py-1.5 rounded-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] text-[10px] font-mono font-bold uppercase tracking-wider border border-[#A6352F] transition-all cursor-pointer shadow-xs"
+                          >
+                            Shortlist
+                          </button>
+                        )}
+
+                        {isShortlisted && (
+                          <button
+                            type="button"
+                            onClick={() => handleUpdateApplicationStatus(app.id, "Selected")}
+                            className="px-3.5 py-1.5 rounded-full bg-emerald-800 hover:bg-emerald-900 text-[#FDF8F7] text-[10px] font-mono font-bold uppercase tracking-wider border border-emerald-900 transition-all cursor-pointer shadow-xs"
+                          >
+                            Cast Role
+                          </button>
+                        )}
+
+                        {isSelected && (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-mono font-bold text-emerald-900 uppercase">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" /> Cast Confirmed
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </section>
       )}
 
