@@ -1,7 +1,5 @@
-import { useState } from "react";
-import { Heart, Upload, Filter, Download, Image as ImageIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { useState, useEffect } from "react";
+import { Heart, Upload, Filter, Download, Image as ImageIcon, Cloud, CheckCircle2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
   Dialog,
@@ -12,6 +10,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { CustomSelect } from "@/components/CustomSelect";
 
 interface MediaItem {
   id: string;
@@ -53,30 +52,44 @@ const initialMedia: MediaItem[] = [
   },
 ];
 
-const presetImages = [
-  { label: "Banquet Scene", url: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80" },
-  { label: "Stage Spotlight", url: "https://images.unsplash.com/photo-1465847899084-d164df4dedc6?auto=format&fit=crop&w=800&q=80" },
-  { label: "Cauldron Fog Test", url: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=800&q=80" },
-  { label: "Sword Staging", url: "https://images.unsplash.com/photo-1460723237483-7a6dc9d0b212?auto=format&fit=crop&w=800&q=80" },
-  { label: "Dressing Room Setup", url: "https://images.unsplash.com/photo-1503095391758-11200cf53674?auto=format&fit=crop&w=800&q=80" },
-];
-
 export default function ProductionGallery() {
-  const [media, setMedia] = useState<MediaItem[]>(initialMedia);
+  const [media, setMedia] = useState<MediaItem[]>(() => {
+    try {
+      const saved = localStorage.getItem("aayam_member_gallery");
+      return saved ? JSON.parse(saved) : initialMedia;
+    } catch {
+      return initialMedia;
+    }
+  });
+
   const [categoryFilter, setCategoryFilter] = useState<"All" | "Rehearsals" | "Live Show" | "Backstage">("All");
   
   // Upload dialog state
   const [uploadOpen, setUploadOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState<"Rehearsals" | "Live Show" | "Backstage">("Rehearsals");
-  const [photographer, setPhotographer] = useState("Jayesh Dave");
-  const [imageUrl, setImageUrl] = useState(presetImages[0].url);
+  const [photographer, setPhotographer] = useState("Aayam Member");
+  const [imageUrl, setImageUrl] = useState("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [dragActive, setDragActive] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("aayam_member_gallery", JSON.stringify(media));
+    } catch (e) {
+      console.error(e);
+    }
+  }, [media]);
+
   const sanitizeImageUrl = (value: string) => {
+    if (!value) return initialMedia[0].imageUrl;
+    if (value.startsWith("data:image/") || value.startsWith("blob:") || value.startsWith("/")) return value;
     try {
       const parsedUrl = new URL(value, window.location.origin);
-      return parsedUrl.protocol === "http:" || parsedUrl.protocol === "https:" ? parsedUrl.toString() : presetImages[0].url;
+      return parsedUrl.protocol === "http:" || parsedUrl.protocol === "https:" ? parsedUrl.toString() : initialMedia[0].imageUrl;
     } catch {
-      return presetImages[0].url;
+      return initialMedia[0].imageUrl;
     }
   };
 
@@ -94,7 +107,6 @@ export default function ProductionGallery() {
   };
 
   const handleDownload = (url: string, filename: string) => {
-    // Open image or simulate download
     const link = document.createElement("a");
     link.href = sanitizeImageUrl(url);
     link.target = "_blank";
@@ -104,23 +116,80 @@ export default function ProductionGallery() {
     document.body.removeChild(link);
   };
 
-  const handleUploadSubmit = (e: React.FormEvent) => {
+  const handleUploadSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title) return;
+    if (!title.trim()) {
+      alert("Please provide a photo title.");
+      return;
+    }
 
-    const newItem: MediaItem = {
-      id: `m${media.length + 1}`,
-      title,
-      category,
-      imageUrl: imageUrl || presetImages[0].url,
-      likes: 0,
-      liked: false,
-      photographer: photographer || "Aayam Member",
-    };
+    if (!selectedFile && !imageUrl) {
+      alert("Please select or drop an image file to upload.");
+      return;
+    }
 
-    setMedia([newItem, ...media]);
-    setTitle("");
-    setUploadOpen(false);
+    setIsSubmitting(true);
+    const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005";
+
+    try {
+      let finalUrl = imageUrl;
+
+      if (selectedFile) {
+        const fd = new FormData();
+        fd.append("file", selectedFile);
+        fd.append("title", title.trim());
+        fd.append("category", category);
+        fd.append("uploaderName", photographer || "Aayam Member");
+        fd.append("status", "approved");
+
+        const res = await fetch(`${baseUrl}/api/gallery`, {
+          method: "POST",
+          body: fd
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data.imageUrl || data.image_url) {
+            finalUrl = data.imageUrl || data.image_url;
+          }
+        }
+      }
+
+      const newItem: MediaItem = {
+        id: `m${Date.now()}`,
+        title: title.trim(),
+        category,
+        imageUrl: finalUrl || "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80",
+        likes: 0,
+        liked: false,
+        photographer: photographer.trim() || "Aayam Member",
+      };
+
+      setMedia([newItem, ...media]);
+      setTitle("");
+      setImageUrl("");
+      setSelectedFile(null);
+      setUploadOpen(false);
+    } catch (err) {
+      console.error("Gallery upload error:", err);
+      const newItem: MediaItem = {
+        id: `m${Date.now()}`,
+        title: title.trim(),
+        category,
+        imageUrl: imageUrl || "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80",
+        likes: 0,
+        liked: false,
+        photographer: photographer.trim() || "Aayam Member",
+      };
+
+      setMedia([newItem, ...media]);
+      setTitle("");
+      setImageUrl("");
+      setSelectedFile(null);
+      setUploadOpen(false);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const filteredMedia = categoryFilter === "All"
@@ -128,88 +197,161 @@ export default function ProductionGallery() {
     : media.filter(item => item.category === categoryFilter);
 
   return (
-    <div className="space-y-[32px] font-sans text-[#666361]">
+    <div className="space-y-8 font-sans text-[#5C3B37]">
       {/* Gallery Title Block */}
-      <div className="bg-[#E7DDD3] border border-[#D5C9BE]/70 rounded-xl p-[24px] md:p-[32px] flex flex-col md:flex-row justify-between items-start md:items-center gap-[24px] mb-[32px] md:mb-[48px]">
-        <div className="space-y-[8px]">
-          <span className="text-xs uppercase tracking-widest text-[#666361]/70 font-semibold">Media Center</span>
-          <h2 className="text-[32px] font-bold font-serif text-[#2C2A28]">Gallery</h2>
-          <p className="text-[14px] text-[#666361]">
+      <div className="bg-[#F2E5E0] border border-[#DCBAB2] rounded-[2rem] p-7 md:p-9 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 shadow-xs">
+        <div className="space-y-2">
+          <span className="text-xs uppercase font-mono tracking-widest text-[#8C5A54] font-bold">Media Center</span>
+          <h2 className="text-3xl sm:text-4xl font-normal font-serif text-[#2A1816] tracking-tight">Production Gallery</h2>
+          <p className="text-xs sm:text-sm text-[#6E4742] font-light max-w-xl leading-relaxed">
             Visual archive of live stage snapshots, backstage wardrobe fittings, and active scene rehearsals.
           </p>
         </div>
         
         <Dialog open={uploadOpen} onOpenChange={setUploadOpen}>
-          <DialogTrigger render={<Button className="bg-[#E85F57] hover:bg-[#E85F57]/90 text-[#2C2A28] font-semibold rounded-xl py-[10px] px-[20px] gap-2 shadow-sm transition-all active:scale-95" />}>
-            <Upload className="w-4 h-4" /> Upload Stage Photo
+          <DialogTrigger render={<button className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] font-mono text-xs font-bold uppercase tracking-wider rounded-full py-3 px-6 gap-2 shadow-md transition-all active:scale-95 flex items-center cursor-pointer border border-[#A6352F]" />}>
+            <Upload className="w-4 h-4 text-[#FFD0CC]" />
+            <span>Upload Stage Photo</span>
           </DialogTrigger>
-          <DialogContent className="bg-[#E7DDD3] border border-[#D5C9BE]/70 text-[#666361] max-w-md">
-            <form onSubmit={handleUploadSubmit}>
-              <DialogHeader>
-                <DialogTitle className="font-serif text-[#2C2A28] text-lg font-bold flex items-center gap-2">
-                  <ImageIcon className="w-5 h-5 text-[#E85F57]" /> Upload Stage Photo
+
+          <DialogContent className="bg-[#F5EAE6] border border-[#DEBEB7] text-[#2A1816] max-w-lg rounded-[2.5rem] p-8 shadow-2xl">
+            <form onSubmit={handleUploadSubmit} className="space-y-4">
+              <DialogHeader className="space-y-1 text-left pb-3 border-b border-[#DCBAB2]">
+                <DialogTitle className="font-serif text-[#2A1816] text-2xl font-normal flex items-center gap-2">
+                  <ImageIcon className="w-5 h-5 text-[#8C241E]" /> 
+                  <span>Upload Stage Photo</span>
                 </DialogTitle>
-                <DialogDescription className="text-xs text-[#666361]/85">
+                <DialogDescription className="text-xs text-[#6E4742]">
                   Share behind-the-scenes memories or workspace progress with the club.
                 </DialogDescription>
               </DialogHeader>
               
-              <div className="py-4 space-y-4 text-left">
+              <div className="space-y-3.5 text-left pt-2">
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-[#2C2A28]">Photo Title</label>
+                  <label className="text-xs font-mono font-bold uppercase text-[#8C5A54]">Photo Title *</label>
                   <Input 
-                    placeholder="e.g., Apparition Makeup Fitting" 
+                    placeholder="e.g. Apparition Makeup & Costume Fitting" 
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    className="border-[#D5C9BE]/70 focus-visible:ring-[#E85F57] text-xs h-9 bg-[#F7F5F0]"
+                    className="border-[#DCBAB2] focus-visible:ring-[#8C241E] text-xs h-10 bg-[#FAF2EE] rounded-xl text-[#2A1816]"
                     required
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-[#2C2A28] block mb-1">Category / Area</label>
-                  <select 
-                    value={category} 
-                    onChange={(e) => setCategory(e.target.value as any)}
-                    className="w-full border border-[#D5C9BE]/70 rounded-xl bg-[#F7F5F0] text-xs p-2 h-9 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#E85F57]"
-                  >
-                    <option value="Rehearsals">Rehearsals</option>
-                    <option value="Live Show">Live Show</option>
-                    <option value="Backstage">Backstage</option>
-                  </select>
+                  <label className="text-xs font-mono font-bold uppercase text-[#8C5A54] block">Category / Area</label>
+                  <CustomSelect
+                    value={category}
+                    onChange={(val) => setCategory(val as any)}
+                    options={[
+                      { value: "Rehearsals", label: "Rehearsals & Blocking" },
+                      { value: "Live Show", label: "Live Stage Performance" },
+                      { value: "Backstage", label: "Backstage & Wardrobe" }
+                    ]}
+                  />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-[#2C2A28]">Photographer / Contributor</label>
+                  <label className="text-xs font-mono font-bold uppercase text-[#8C5A54]">Photographer / Contributor</label>
                   <Input 
                     value={photographer}
                     onChange={(e) => setPhotographer(e.target.value)}
-                    className="border-[#D5C9BE]/70 focus-visible:ring-[#E85F57] text-xs h-9 bg-[#F7F5F0]"
+                    placeholder="e.g. Jayesh Dave"
+                    className="border-[#DCBAB2] focus-visible:ring-[#8C241E] text-xs h-10 bg-[#FAF2EE] rounded-xl text-[#2A1816]"
                     required
                   />
                 </div>
 
+                {/* Dropzone for Photo File */}
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-[#2C2A28] block mb-1">Select Stage Memory Template</label>
-                  <select 
-                    value={imageUrl} 
-                    onChange={(e) => setImageUrl(e.target.value)}
-                    className="w-full border border-[#D5C9BE]/70 rounded-xl bg-[#F7F5F0] text-xs p-2 h-9 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#E85F57]"
+                  <label className="text-xs font-mono font-bold uppercase text-[#8C5A54] block">
+                    Select Image File *
+                  </label>
+                  <div 
+                    className={`border-2 border-dashed rounded-2xl p-5 flex flex-col items-center justify-center text-center transition-colors cursor-pointer ${
+                      dragActive ? 'border-[#8C241E] bg-[#8C241E]/10' : 'border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5]/60'
+                    }`}
+                    onDragOver={(e) => { e.preventDefault(); setDragActive(true); }}
+                    onDragLeave={() => setDragActive(false)}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      setDragActive(false);
+                      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                        const file = e.dataTransfer.files[0];
+                        setSelectedFile(file);
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                          if (event.target?.result) {
+                            setImageUrl(event.target!.result as string);
+                          }
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                    onClick={() => document.getElementById('member-gallery-upload')?.click()}
                   >
-                    {presetImages.map((img, i) => (
-                      <option key={i} value={img.url}>{img.label}</option>
-                    ))}
-                  </select>
+                    <input 
+                      id="member-gallery-upload" 
+                      type="file" 
+                      accept="image/*" 
+                      className="hidden" 
+                      onChange={(e) => {
+                        if (e.target.files && e.target.files[0]) {
+                          const file = e.target.files[0];
+                          setSelectedFile(file);
+                          const reader = new FileReader();
+                          reader.onload = (event) => {
+                            if (event.target?.result) {
+                              setImageUrl(event.target!.result as string);
+                            }
+                          };
+                          reader.readAsDataURL(file);
+                        }
+                      }} 
+                    />
+                    {selectedFile || imageUrl ? (
+                      <div className="flex flex-col items-center gap-2">
+                        {imageUrl ? (
+                          <div className="w-20 h-20 rounded-xl overflow-hidden border border-[#D5AAA2] shadow-sm">
+                            <img src={imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                          </div>
+                        ) : (
+                          <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center">
+                            <CheckCircle2 className="w-6 h-6 text-emerald-700" />
+                          </div>
+                        )}
+                        <span className="text-xs font-bold text-[#2A1816]">{selectedFile?.name || "Photo Loaded"}</span>
+                        <span className="text-[10px] text-[#8C5A54] font-mono">Click to choose another photo</span>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center gap-2">
+                        <div className="w-12 h-12 rounded-full bg-[#EEDBD5] flex items-center justify-center border border-[#D5AAA2]">
+                          <Cloud className="w-6 h-6 text-[#8C241E]" />
+                        </div>
+                        <span className="text-xs font-bold text-[#2A1816]">Drag & drop stage photo here</span>
+                        <span className="text-[10px] text-[#6E4742] font-mono">or click to browse local files (PNG, JPG, WEBP)</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
               
-              <DialogFooter className="gap-2">
-                <Button type="button" variant="outline" onClick={() => setUploadOpen(false)} className="border-2 border-[#E85F57] text-[#E85F57] hover:bg-[#E85F57]/5 rounded-xl text-xs">
+              <DialogFooter className="gap-2 pt-4 border-t border-[#DCBAB2] flex items-center justify-end">
+                <button 
+                  type="button" 
+                  onClick={() => setUploadOpen(false)} 
+                  className="px-5 py-2.5 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer"
+                >
                   Cancel
-                </Button>
-                <Button type="submit" className="bg-[#E85F57] text-[#2C2A28] hover:bg-[#E85F57]/90 rounded-xl font-semibold text-xs">
-                  Upload Photo
-                </Button>
+                </button>
+                <button 
+                  type="submit" 
+                  disabled={isSubmitting}
+                  className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-6 py-2.5 rounded-full text-xs font-mono font-bold uppercase tracking-widest shadow-md flex items-center gap-2 transition-all cursor-pointer border border-[#A6352F] disabled:opacity-50"
+                >
+                  <Upload className="w-3.5 h-3.5" />
+                  <span>{isSubmitting ? "Uploading..." : "Upload Photo"}</span>
+                </button>
               </DialogFooter>
             </form>
           </DialogContent>
@@ -217,74 +359,74 @@ export default function ProductionGallery() {
       </div>
 
       {/* Categories Filtering */}
-      <div className="flex flex-wrap gap-[12px] items-center border-b border-[#D5C9BE]/70/80 pb-4 mb-[24px]">
-        <Filter className="w-4 h-4 text-[#2C2A28]" />
+      <div className="flex flex-wrap gap-2.5 items-center border-b border-[#DCBAB2] pb-4">
+        <Filter className="w-4 h-4 text-[#8C5A54] mr-1" />
         {(["All", "Rehearsals", "Live Show", "Backstage"] as const).map((cat) => (
-          <Button
+          <button
             key={cat}
-            variant={categoryFilter === cat ? "default" : "outline"}
             onClick={() => setCategoryFilter(cat)}
-            className={`rounded-xl font-semibold text-xs py-1.5 px-4 transition-all ${
+            className={`rounded-full font-mono font-bold text-xs py-2 px-4.5 uppercase tracking-wider transition-all cursor-pointer border ${
               categoryFilter === cat
-                ? "bg-[#E85F57] text-[#2C2A28] hover:bg-[#E85F57]/90"
-                : "border-2 border-[#D5C9BE]/70 text-[#666361] hover:bg-[#E7DDD3]"
+                ? "bg-[#8C241E] text-[#FDF8F7] border-[#A6352F] shadow-sm"
+                : "bg-[#FAF2EE] border-[#D5AAA2] text-[#5C3B37] hover:bg-[#EEDBD5] hover:text-[#2A1816]"
             }`}
           >
             {cat}
-          </Button>
+          </button>
         ))}
       </div>
 
       {/* Image Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[24px]">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredMedia.map((item) => (
-          <div key={item.id} className="bg-[#E7DDD3] border border-[#D5C9BE]/70 rounded-xl overflow-hidden flex flex-col justify-between transition-all hover:shadow-md hover:border-[#E85F57]/40 group">
+          <div key={item.id} className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-[2rem] overflow-hidden flex flex-col justify-between transition-all hover:shadow-md hover:border-[#8C241E]/40 group shadow-xs">
             {/* Image Wrapper */}
-            <div className="relative aspect-video overflow-hidden bg-gray-100">
+            <div className="relative aspect-video overflow-hidden bg-[#E2D4C8]">
               <img
                 src={sanitizeImageUrl(item.imageUrl)}
                 alt={item.title}
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = initialMedia[0].imageUrl;
+                }}
               />
-              <Badge className="absolute top-3 left-3 bg-[#E7DDD3] border border-[#D5C9BE]/70 text-[#2C2A28] hover:bg-[#E7DDD3]/90 rounded-[4px]">
+              <span className="absolute top-3 left-3 bg-[#FAF2EE]/95 backdrop-blur-xs border border-[#DCBAB2] text-[#2A1816] text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-md shadow-xs">
                 {item.category}
-              </Badge>
+              </span>
             </div>
 
-            {/* Info Body */}
-            <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
+            {/* Content Details */}
+            <div className="p-6 space-y-4">
               <div className="space-y-1">
-                <h4 className="font-bold text-[16px] text-[#2C2A28] font-serif group-hover:text-[#E85F57] transition-colors">
+                <h3 className="font-serif text-lg font-bold text-[#2A1816] tracking-tight line-clamp-1">
                   {item.title}
-                </h4>
-                <p className="text-xs text-[#666361]/70">Photo by {item.photographer}</p>
+                </h3>
+                <p className="text-xs text-[#6E4742] font-mono">
+                  Captured by <strong className="text-[#2A1816]">{item.photographer}</strong>
+                </p>
               </div>
 
-              <div className="flex justify-between items-center border-t border-[#D5C9BE]/70/60 pt-3">
-                <span className="text-xs text-[#666361]/70 font-semibold">{item.likes} Likes</span>
-                <div className="flex gap-1">
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => handleLike(item.id)}
-                    className={`h-8 px-2.5 rounded-[4px] gap-1.5 transition-colors ${
-                      item.liked ? "text-red-500 hover:text-red-600 bg-red-50" : "text-[#666361]/70 hover:text-red-500 hover:bg-red-50"
-                    }`}
-                  >
-                    <Heart className={`w-4 h-4 ${item.liked ? "fill-current" : ""}`} />
-                    <span className="text-xs font-semibold">{item.liked ? "Liked" : "Like"}</span>
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => handleDownload(item.imageUrl, item.title)}
-                    className="h-8 px-2.5 rounded-[4px] gap-1.5 text-[#666361]/70 hover:text-[#E85F57] hover:bg-[#E85F57]/10 transition-colors"
-                    title="Download high-resolution image"
-                  >
-                    <Download className="w-4 h-4" />
-                    <span className="text-xs font-semibold">Download</span>
-                  </Button>
-                </div>
+              {/* Interaction Bar */}
+              <div className="flex items-center justify-between pt-2 border-t border-[#DCBAB2]/60 text-xs">
+                <button
+                  type="button"
+                  onClick={() => handleLike(item.id)}
+                  className={`flex items-center gap-1.5 font-mono font-bold transition-colors cursor-pointer ${
+                    item.liked ? "text-[#8C241E]" : "text-[#6E4742] hover:text-[#8C241E]"
+                  }`}
+                >
+                  <Heart className={`w-4 h-4 ${item.liked ? "fill-[#8C241E]" : ""}`} />
+                  <span>{item.likes}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleDownload(item.imageUrl, item.title)}
+                  className="flex items-center gap-1.5 font-mono text-[11px] uppercase font-bold text-[#5C3B37] hover:text-[#2A1816] transition-colors cursor-pointer bg-[#F2E5E0] hover:bg-[#EEDBD5] px-3 py-1.5 rounded-full border border-[#DCBAB2]"
+                >
+                  <Download className="w-3.5 h-3.5 text-[#8C241E]" />
+                  <span>Save</span>
+                </button>
               </div>
             </div>
           </div>

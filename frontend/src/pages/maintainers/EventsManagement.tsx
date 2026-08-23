@@ -1292,39 +1292,31 @@ export default function EventsManagement() {
                 return (
                   <div
                     key={pitch.id}
-                    className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-[2.5rem] p-7 sm:p-8 md:p-9 hover:border-[#B32D25]/50 hover:shadow-xl transition-all flex flex-col justify-between space-y-6 shadow-xs group"
+                    className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-[2.5rem] p-7 sm:p-8 md:p-9 hover:border-[#B32D25]/50 hover:shadow-xl transition-all flex flex-col justify-between space-y-6 shadow-xs group text-left"
                   >
                     <div className="space-y-4">
-                      {/* Top Header: Submitter & Type Tag */}
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#DCBAB2]/50 pb-3.5">
-                        <div className="flex items-center gap-3 min-w-0">
-                          <div className="w-9 h-9 rounded-full bg-[#EEDBD5] border border-[#D5AAA2] text-[#8C241E] font-mono text-xs font-bold flex items-center justify-center shrink-0 shadow-xs">
+                      {/* Top Header: Submitter & Badges */}
+                      <div className="flex items-start justify-between gap-4 border-b border-[#DCBAB2]/50 pb-4">
+                        <div className="flex items-center gap-3.5 min-w-0">
+                          <div className="w-10 h-10 rounded-full bg-[#EEDBD5] border border-[#D5AAA2] text-[#8C241E] font-mono text-xs font-bold flex items-center justify-center shrink-0 shadow-xs">
                             {pitch.submitter?.initials || (isMember ? "M" : "SP")}
                           </div>
                           <div className="min-w-0">
-                            <h4 className="font-serif text-base text-[#2A1816] font-normal">
+                            <h4 className="font-serif text-lg text-[#2A1816] font-medium leading-tight">
                               {pitch.submitter?.name || "Ensemble Member"}
                             </h4>
-                            <p className="text-xs font-mono text-[#8C5A54] break-all select-all">
-                              {pitch.contact_email || pitch.submitter?.email || ""}
+                            <p className="text-xs font-mono text-[#8C5A54] truncate mt-0.5">
+                              {pitch.contact_email || pitch.submitter?.email || "Proposer Contact"}
                             </p>
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-2 shrink-0 flex-wrap">
-                          <span className="font-mono text-xs font-bold text-[#8C241E] bg-[#EEDBD5] px-2.5 py-0.5 rounded-full border border-[#D5AAA2] shadow-xs">
+                        <div className="flex items-center gap-2 shrink-0">
+                          <span className="font-mono text-[11px] font-bold text-[#8C241E] bg-[#EEDBD5] px-2.5 py-1 rounded-full border border-[#D5AAA2] shadow-xs">
                             {pitch.reference_id || `AYM-PITCH-${pitch.id.toString().padStart(4, '0')}`}
                           </span>
 
-                          <span className={`text-xs font-mono font-bold uppercase tracking-wider px-3 py-1 rounded-full border ${
-                            isMember 
-                              ? "bg-[#EEDBD5] text-[#8C241E] border-[#D5AAA2]"
-                              : "bg-amber-700/15 text-amber-950 border-amber-700/30"
-                          }`}>
-                            {isMember ? "Member Pitch" : "Sponsor Proposal"}
-                          </span>
-
-                          <span className={`text-xs font-mono font-bold uppercase tracking-wider px-3 py-1 rounded-full border ${
+                          <span className={`text-[11px] font-mono font-bold uppercase tracking-wider px-3 py-1 rounded-full border ${
                             isApproved
                               ? "bg-emerald-700/15 text-emerald-950 border-emerald-700/30"
                               : isRejected
@@ -1336,114 +1328,116 @@ export default function EventsManagement() {
                         </div>
                       </div>
 
+                      {/* Editorial Meta Ribbon */}
+                      <div className="text-xs font-mono text-[#8C5A54] uppercase tracking-wider font-semibold flex items-center gap-2 flex-wrap">
+                        <span className="text-[#8C241E] font-bold">
+                          {isMember ? "Member Event Pitch" : "Sponsor Ad Proposal"}
+                        </span>
+                        <span>•</span>
+                        <span>{pitch.venue || pitch.location_or_link || "SAC Studio"}</span>
+                        <span>•</span>
+                        <span className="text-emerald-900 font-bold">{pitch.budget || "Society Funded"}</span>
+                      </div>
+
                       {/* Pitch Title */}
                       <h3 className="font-serif text-2xl sm:text-3xl text-[#2A1816] leading-snug font-normal group-hover:text-[#8C241E] transition-colors break-words">
                         {pitch.name || pitch.title}
                       </h3>
 
                       {/* Description */}
-                      <div className="space-y-3">
-                        <p className="text-xs sm:text-sm text-[#5C3B37] font-light leading-relaxed line-clamp-3">
-                          {pitch.description}
-                        </p>
-                        
-                        {/* AI Keyword Filter */}
-                        <div className="flex items-center gap-2.5 flex-wrap pt-1.5">
-                          {!extractedKeywords[pitch.id] ? (
+                      <p className="text-xs sm:text-sm text-[#5C3B37] font-light leading-relaxed line-clamp-3">
+                        {pitch.description}
+                      </p>
+
+                      {/* AI Keypoints Strip */}
+                      <div className="pt-1">
+                        {!extractedKeywords[pitch.id] ? (
+                          <button
+                            type="button"
+                            onClick={() => handleExtractKeywords(pitch.id, pitch.description)}
+                            disabled={analyzingPitchId === pitch.id}
+                            className="px-3.5 py-1.5 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#8C241E] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer shadow-xs disabled:opacity-50 group/aibtn"
+                          >
+                            <Tag className="w-3.5 h-3.5 text-[#8C241E] group-hover/aibtn:scale-110 transition-transform" />
+                            <span>{analyzingPitchId === pitch.id ? "Analyzing..." : "Extract AI Keypoints"}</span>
+                          </button>
+                        ) : (
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-[11px] font-mono text-[#8C5A54] font-bold uppercase flex items-center gap-1">
+                              <Tag className="w-3 h-3 text-[#8C241E]" /> Keypoints:
+                            </span>
+                            {extractedKeywords[pitch.id].map((kw, idx) => (
+                              <span
+                                key={idx}
+                                className="bg-[#EEDBD5] text-[#8C241E] border border-[#D5AAA2] rounded-full px-2.5 py-0.5 text-[11px] font-mono font-medium shadow-xs"
+                              >
+                                {kw}
+                              </span>
+                            ))}
                             <button
                               type="button"
+                              title="Re-run AI extraction"
                               onClick={() => handleExtractKeywords(pitch.id, pitch.description)}
                               disabled={analyzingPitchId === pitch.id}
-                              className="px-4 py-2 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#8C241E] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer shadow-xs disabled:opacity-50 group/aibtn"
+                              className="w-6 h-6 rounded-full bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#8C5A54] hover:text-[#8C241E] border border-[#DCBAB2] flex items-center justify-center transition-all cursor-pointer shadow-xs"
                             >
-                              <Tag className="w-3.5 h-3.5 text-[#8C241E] group-hover/aibtn:scale-110 transition-transform" />
-                              <span>{analyzingPitchId === pitch.id ? "Analyzing with Gemini..." : "Extract AI Keypoints"}</span>
+                              <RefreshCw className={`w-3 h-3 ${analyzingPitchId === pitch.id ? 'animate-spin text-[#8C241E]' : ''}`} />
                             </button>
-                          ) : (
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <span className="text-[11px] font-mono text-[#8C5A54] font-bold uppercase flex items-center gap-1.5 mr-0.5">
-                                <Tag className="w-3.5 h-3.5 text-[#8C241E]" />
-                                <span>AI Tags:</span>
-                              </span>
-                              {extractedKeywords[pitch.id].map((kw, idx) => (
-                                <span
-                                  key={idx}
-                                  className="bg-[#FAF2EE] text-[#8C241E] border border-[#DCBAB2] rounded-full px-3 py-1 text-[11px] font-mono font-semibold tracking-tight shadow-xs inline-flex items-center gap-1"
-                                >
-                                  <span>{kw}</span>
-                                </span>
-                              ))}
-                              <button
-                                type="button"
-                                title="Re-run AI extraction"
-                                onClick={() => handleExtractKeywords(pitch.id, pitch.description)}
-                                disabled={analyzingPitchId === pitch.id}
-                                className="w-7 h-7 rounded-full bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#8C5A54] hover:text-[#8C241E] border border-[#DCBAB2] flex items-center justify-center transition-all cursor-pointer shadow-xs ml-1"
-                              >
-                                <RefreshCw className={`w-3.5 h-3.5 ${analyzingPitchId === pitch.id ? 'animate-spin text-[#8C241E]' : ''}`} />
-                              </button>
-                            </div>
-                          )}
-                        </div>
+                          </div>
+                        )}
                       </div>
 
-                      {/* Specifications Panel */}
-                      <div className="bg-[#F5EAE6] p-4 sm:p-5 rounded-2xl border border-[#DEBEB7] space-y-3 text-xs sm:text-sm font-mono text-[#5C3B37]">
-                        <div className="flex flex-wrap items-center justify-between gap-2">
-                          <span className="text-[#8C5A54] text-xs uppercase font-bold flex items-center gap-1.5">
-                            <MapPin className="w-3.5 h-3.5 text-[#8C241E] shrink-0" />
-                            <span>Target Venue & Date</span>
-                          </span>
-                          <span className="text-[#2A1816] font-medium truncate">
-                            {pitch.venue || pitch.location_or_link || "SAC Rehearsal Studio"} • {pitch.date || "Autumn 2026"}
+                      {/* Clean Specifications Grid */}
+                      <div className="bg-[#F5EAE6] p-4 rounded-2xl border border-[#DEBEB7] grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-mono">
+                        <div>
+                          <span className="text-[#8C5A54] uppercase font-bold text-[10px] block mb-0.5">Target Venue & Timeline</span>
+                          <span className="text-[#2A1816] font-medium block truncate">
+                            {pitch.venue || pitch.location_or_link || "SAC Studio"} • {pitch.date || "Autumn 2026"}
                           </span>
                         </div>
-                        <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-[#DCBAB2]/40">
-                          <span className="text-[#8C5A54] text-xs uppercase font-bold flex items-center gap-1.5">
-                            <DollarSign className="w-3.5 h-3.5 text-[#8C241E] shrink-0" />
-                            <span>Financial Terms</span>
-                          </span>
-                          <span className="text-[#2A1816] font-bold text-emerald-950">
-                            {pitch.budget || "₹25,000"}
+                        <div>
+                          <span className="text-[#8C5A54] uppercase font-bold text-[10px] block mb-0.5">Financial & Terms</span>
+                          <span className="text-emerald-950 font-bold block">
+                            {pitch.budget || "Society Funded"}
                           </span>
                         </div>
                       </div>
                     </div>
 
                     {/* Bottom Action Controls */}
-                    <div className="pt-4 border-t border-[#DCBAB2]/60 space-y-2.5">
-                      {/* Inspection Row: Full Dossier & Edit */}
-                      <div className="grid grid-cols-2 gap-2.5">
+                    <div className="pt-4 border-t border-[#DCBAB2]/60 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                      {/* Secondary Actions */}
+                      <div className="flex items-center gap-2">
                         <button
                           type="button"
                           onClick={() => setViewingDossierPitch(pitch)}
-                          className="py-2.5 px-3 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] hover:text-[#2A1816] text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-xs"
-                          title="View complete proposal dossier, submitter contact & full brief"
+                          className="px-4 py-2.5 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] hover:text-[#2A1816] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
+                          title="View complete proposal dossier"
                         >
                           <Eye className="w-3.5 h-3.5 text-[#8C241E]" />
-                          <span>View Dossier</span>
+                          <span>Dossier</span>
                         </button>
 
                         <button
                           type="button"
                           onClick={() => handleOpenEditPitch(pitch)}
-                          className="py-2.5 px-3 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] hover:text-[#2A1816] text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-xs"
-                          title="Review pitch details, adjust date/venue/budget, and schedule"
+                          className="px-4 py-2.5 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] hover:text-[#2A1816] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
+                          title="Review pitch details and edit"
                         >
                           <SlidersHorizontal className="w-3.5 h-3.5 text-[#8C241E]" />
-                          <span>Review & Edit</span>
+                          <span>Edit</span>
                         </button>
                       </div>
 
-                      {/* Decision Row */}
+                      {/* Primary Actions */}
                       <div className="flex items-center gap-2">
                         {!isApproved ? (
                           <>
                             <button
                               type="button"
                               onClick={() => handleQuickApprove(pitch)}
-                              className="flex-1 py-2.5 px-4 rounded-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md shadow-[#8C241E]/15 border border-[#A6352F]"
-                              title="Quick approve and schedule to upcoming events"
+                              className="px-5 py-2.5 rounded-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer shadow-md shadow-[#8C241E]/15 border border-[#A6352F]"
+                              title="Quick approve proposal"
                             >
                               <CheckCircle2 className="w-3.5 h-3.5 text-[#FFD0CC]" />
                               <span>Approve</span>
@@ -1453,7 +1447,7 @@ export default function EventsManagement() {
                               <button
                                 type="button"
                                 onClick={() => handleRejectPitch(pitch.id)}
-                                className="py-2.5 px-4 rounded-full border border-stone-300 bg-[#FAF2EE] hover:bg-stone-200 text-stone-600 hover:text-stone-900 text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-xs"
+                                className="px-3.5 py-2.5 rounded-full border border-stone-300 bg-[#FAF2EE] hover:bg-stone-200 text-stone-600 hover:text-stone-900 text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1 transition-all cursor-pointer shadow-xs"
                                 title="Decline proposal"
                               >
                                 <X className="w-3.5 h-3.5" />
@@ -1462,9 +1456,9 @@ export default function EventsManagement() {
                             )}
                           </>
                         ) : (
-                          <div className="w-full py-2 px-4 rounded-full bg-emerald-700/10 border border-emerald-700/30 text-emerald-950 text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-2">
+                          <div className="px-4 py-2 rounded-full bg-emerald-700/10 border border-emerald-700/30 text-emerald-950 text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5">
                             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-800" />
-                            <span>Approved & Staged to Diary</span>
+                            <span>Staged to Diary</span>
                           </div>
                         )}
                       </div>
