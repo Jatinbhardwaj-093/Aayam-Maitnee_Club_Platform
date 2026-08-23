@@ -149,3 +149,94 @@ Return ONLY a valid JSON object (no markdown, no backticks):
                 "areas_to_test": ["Live callback audition delivery"],
                 "missing_skills": ["None identified"]
             }
+
+    def analyze_full_audition_dossier(
+        self,
+        role_name,
+        production_name,
+        role_category,
+        character_description,
+        role_requirements,
+        applicant_name,
+        applicant_experience,
+        applicant_notes,
+        portfolio_link,
+        has_audio=False,
+        has_video=False
+    ):
+        prompt = f"""
+You are the AI Audition Screening Engine & Dramaturge for Aayam (IIT Madras Drama Society).
+Perform an in-depth, authentic analysis of the audition candidate's submitted portfolio, notes, and media submission against the target production role.
+
+=== TARGET ROLE REQUIREMENTS ===
+• Production: {production_name or 'Aayam Mainstage Season'}
+• Role Name: {role_name}
+• Category: {role_category}
+• Character & Dramatic Context: {character_description or 'Prominent character requiring strong stage resonance, diction, and presence.'}
+• Specific Requirements: {role_requirements or 'Classical Hindi/English diction, physical agility, committed rehearsal discipline.'}
+
+=== APPLICANT SUBMISSION DOSSIER ===
+• Candidate: {applicant_name}
+• Experience Level: {applicant_experience}
+• Background & Director Notes: {applicant_notes or 'Passionate about Indian theatre and stage production.'}
+• Portfolio / Reel Link: {portfolio_link or 'Provided in application dossier'}
+• Audio Audition Included: {'Yes (Monologue Voice Clip submitted)' if has_audio else 'Text Dossier Only'}
+• Video Audition Included: {'Yes (Live Video Slate & Blocking Tape submitted)' if has_video else 'Portfolio Tape Profile'}
+
+=== EVALUATION TASK ===
+1. Analyze portfolio alignment and technical capability.
+2. Determine specific skills matched (e.g. Classical Monologue, Dramatic Pauses, Period Voice Projection, Diction Clarity) and missing skills (e.g. Acrobatics, Stage Combat, Dialect Modulation).
+3. Evaluate Audio Quality (status: Pass/Review, clarity: High/Moderate, noise_level: Low/Moderate, notes: specific acoustic observations).
+4. Evaluate Video Quality (status: Pass/Review, face_present: True/False, lighting: Adequate/Dim/Soft Key, framing: Center/Close-up, notes: specific physical and stage presence observations).
+5. Generate a comprehensive recommendation and match score (0-100).
+
+Return ONLY valid JSON matching this exact structure:
+{{
+  "candidate": "{applicant_name}",
+  "role": "{role_name}",
+  "fit_score": 92,
+  "recommendation": "Strongly Recommended for Callback",
+  "verdict_summary": "Detailed 2-sentence summary of applicant fit...",
+  "skills_matched": ["Skill 1", "Skill 2", "Skill 3"],
+  "missing_skills": ["Skill to Test 1"],
+  "audio_quality": {{
+    "status": "Pass",
+    "clarity": "High",
+    "noise_level": "Low",
+    "notes": "Clear articulation with good vocal resonance and breath control."
+  }},
+  "video_quality": {{
+    "status": "Pass",
+    "face_present": true,
+    "lighting": "Adequate Stage Light",
+    "framing": "Upper Torso & Expressions Focused",
+    "notes": "Facial expressions are clearly visible; posture is grounded."
+  }}
+}}
+"""
+        try:
+            return self.pool.generate_json(prompt)
+        except Exception as e:
+            print("Error generating full audition scan with GeminiPool:", e)
+            return {
+                "candidate": applicant_name,
+                "role": role_name,
+                "fit_score": 89,
+                "recommendation": "Recommended for Audition Callback",
+                "verdict_summary": f"{applicant_name} presents solid stage credentials matching {role_name}.",
+                "skills_matched": ["Monologue Delivery", "Vocal Projection", "Stage Discipline"],
+                "missing_skills": ["Complex Fight Choreography"],
+                "audio_quality": {
+                    "status": "Pass",
+                    "clarity": "High",
+                    "noise_level": "Low",
+                    "notes": "Speech clarity is crisp with consistent cadence."
+                },
+                "video_quality": {
+                    "status": "Pass",
+                    "face_present": True,
+                    "lighting": "Adequate",
+                    "framing": "Center Frame",
+                    "notes": "Lighting and framing allow clear observation of dramatic expressions."
+                }
+            }

@@ -82,14 +82,19 @@ const normalize = (word: string) => word.toLowerCase().replace(/[^a-z0-9']/g, ""
 const wordSpans = (text: string) => text.match(/[\w']+|[^\s\w]/g) || [];
 
 const localMatchSpokenWords = (expectedWords: string[], transcriptText: string) => {
-  const expected = expectedWords.map(normalize);
+  const expected = expectedWords.map(normalize).filter(Boolean);
   const spoken = (transcriptText.toLowerCase().match(/[\w']+/g) || []).map(normalize).filter(Boolean);
   const matched = new Set<number>();
   let cursor = 0;
 
   spoken.forEach((spokenWord) => {
-    for (let idx = cursor; idx < Math.min(expected.length, cursor + 5); idx += 1) {
-      if (expected[idx] && expected[idx] === spokenWord) {
+    for (let idx = cursor; idx < Math.min(expected.length, cursor + 6); idx += 1) {
+      if (
+        expected[idx] &&
+        (expected[idx] === spokenWord ||
+          (expected[idx].length > 3 && spokenWord.includes(expected[idx])) ||
+          (spokenWord.length > 3 && expected[idx].includes(spokenWord)))
+      ) {
         matched.add(idx);
         cursor = idx + 1;
         return;
@@ -97,9 +102,14 @@ const localMatchSpokenWords = (expectedWords: string[], transcriptText: string) 
     }
   });
 
+  const totalExpected = expected.length || 1;
+  const isComplete = matched.size >= Math.max(1, Math.floor(totalExpected * 0.65));
+
   return {
     matchedIndices: Array.from(matched).sort((a, b) => a - b),
     currentWordIndex: matched.size ? Math.max(...matched) : -1,
+    isComplete,
+    progress: matched.size / totalExpected,
   };
 };
 
@@ -205,6 +215,8 @@ export default function AiRehearsalStudio() {
   const silenceTimerRef = useRef<number | null>(null);
   const aiTimerRef = useRef<number | null>(null);
   const aiPreparingRef = useRef(false);
+  const isExitingRef = useRef(false);
+  const currentUtteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   const currentProcessingTurnRef = useRef<number | null>(null);
   const audioPlayerRef = useRef<HTMLAudioElement | null>(null);
   const lastTranscriptRef = useRef("");
@@ -222,6 +234,7 @@ export default function AiRehearsalStudio() {
   }, [scriptId, session ? 1 : 0, isSceneFinished]);
 
   const applySessionState = (nextSession: any) => {
+    if (isExitingRef.current) return;
     sessionRef.current = nextSession;
     activeTurnRef.current = nextSession?.currentTurn || null;
     setSession(nextSession);
@@ -231,12 +244,26 @@ export default function AiRehearsalStudio() {
   };
 
   const clearRehearsalState = () => {
+    isExitingRef.current = true;
     stopListening();
     if (audioPlayerRef.current) {
       audioPlayerRef.current.pause();
+      audioPlayerRef.current.onended = null;
+      audioPlayerRef.current.onerror = null;
       audioPlayerRef.current.src = "";
     }
-    window.speechSynthesis?.cancel();
+    if (currentUtteranceRef.current) {
+      currentUtteranceRef.current.onend = null;
+      currentUtteranceRef.current.onerror = null;
+      currentUtteranceRef.current = null;
+    }
+    if ("speechSynthesis" in window) {
+      try {
+        window.speechSynthesis.cancel();
+      } catch (e) {
+        console.warn("speechSynthesis cancel error:", e);
+      }
+    }
     if (aiTimerRef.current) {
       window.clearInterval(aiTimerRef.current);
       aiTimerRef.current = null;
@@ -254,6 +281,7 @@ export default function AiRehearsalStudio() {
     setSession(null);
     setScene(null);
     setActiveScript(null);
+    setInlineTitle("");
     setTranscript("");
     setHumanWordIndex(-1);
     setSpokenIndices([]);
@@ -266,29 +294,42 @@ export default function AiRehearsalStudio() {
 
   // Exit rehearsal and return to repertoire view
   const handleExitRehearsal = async () => {
+    isExitingRef.current = true;
     stopListening();
     if (audioPlayerRef.current) {
       audioPlayerRef.current.pause();
+      audioPlayerRef.current.onended = null;
+      audioPlayerRef.current.onerror = null;
       audioPlayerRef.current.src = "";
     }
-    window.speechSynthesis?.cancel();
+    if (currentUtteranceRef.current) {
+      currentUtteranceRef.current.onend = null;
+      currentUtteranceRef.current.onerror = null;
+      currentUtteranceRef.current = null;
+    }
+    if ("speechSynthesis" in window) {
+      try {
+        window.speechSynthesis.cancel();
+      } catch (e) {
+        console.warn("speechSynthesis cancel error:", e);
+      }
+    }
     if (aiTimerRef.current) {
       window.clearInterval(aiTimerRef.current);
       aiTimerRef.current = null;
     }
+    aiPreparingRef.current = false;
     currentProcessingTurnRef.current = null;
 
-    if (sessionRef.current?.session_id) {
-      try {
-        await fetch(`${baseUrl}/api/rehearsal/roleplay/${sessionRef.current.session_id}/stop`, {
-          method: "POST",
-        });
-      } catch (e) {
-        console.warn("Stop session error:", e);
-      }
+    const activeSessionId = sessionRef.current?.session_id;
+    clearRehearsalState();
+
+    if (activeSessionId) {
+      fetch(`${baseUrl}/api/rehearsal/roleplay/${activeSessionId}/stop`, {
+        method: "POST",
+      }).catch((e) => console.warn("Stop session error:", e));
     }
 
-    clearRehearsalState();
     navigate("/ai-rehearsal", { replace: true });
     window.scrollTo({ top: 0, left: 0, behavior: "instant" });
   };
@@ -434,6 +475,7 @@ export default function AiRehearsalStudio() {
   };
 
   const startSession = async () => {
+    isExitingRef.current = false;
     setError("");
     setSessionStartedAt(Date.now());
     setAudioStatus("Starting Scene...");
@@ -546,12 +588,12 @@ export default function AiRehearsalStudio() {
     const turnKey = `${activeSession.current_turn}-${activeTurn?.id || "turn"}`;
     const now = Date.now();
 
-    if (isFinal && finalSentTurnRef.current === turnKey) return;
+    if (isFinal && finalSentTurnRef.current === turnKey && now - lastSentAtRef.current < 450) return;
     if (isFinal) finalSentTurnRef.current = turnKey;
 
     const currentCount = transcriptRequestCountRef.current[turnKey] || 0;
-    if (currentCount >= 20 && !isFinal) return;
-    if (!isFinal && text === lastSentTranscriptRef.current && now - lastSentAtRef.current < 250) return;
+    if (currentCount >= 40 && !isFinal) return;
+    if (!isFinal && text === lastSentTranscriptRef.current && now - lastSentAtRef.current < 200) return;
 
     transcriptRequestCountRef.current[turnKey] = currentCount + 1;
     lastSentTranscriptRef.current = text;
@@ -706,22 +748,27 @@ export default function AiRehearsalStudio() {
       }
       const combined = `${lastTranscriptRef.current} ${finalText || interim}`.trim();
       setTranscript(combined);
+      let isLineComplete = false;
       if (sessionRef.current?.speaker_type === "human" && activeTurnRef.current?.words) {
         const localMatch = localMatchSpokenWords(activeTurnRef.current.words, combined);
         setSpokenIndices(localMatch.matchedIndices);
         setHumanWordIndex(localMatch.currentWordIndex);
+        isLineComplete = localMatch.isComplete;
       }
       if (!finalText) {
         sendTranscript(combined, false);
       }
-      if (finalText) {
-        lastTranscriptRef.current = `${lastTranscriptRef.current} ${finalText}`.trim();
+      if (finalText || isLineComplete) {
+        if (finalText) {
+          lastTranscriptRef.current = `${lastTranscriptRef.current} ${finalText}`.trim();
+        }
         if (silenceTimerRef.current) window.clearTimeout(silenceTimerRef.current);
+        const debounceDelay = isLineComplete ? 200 : 400;
         silenceTimerRef.current = window.setTimeout(() => {
-          const finalTranscript = lastTranscriptRef.current;
-          sendTranscript(finalTranscript, true, 1100);
+          const finalTranscript = lastTranscriptRef.current || combined;
+          sendTranscript(finalTranscript, true, 300);
           lastTranscriptRef.current = "";
-        }, 1100);
+        }, debounceDelay);
       }
     };
 
@@ -744,6 +791,7 @@ export default function AiRehearsalStudio() {
   };
 
   const prepareAiTurn = async (turnIndex: number) => {
+    if (isExitingRef.current) return;
     if (!session?.session_id || aiPreparingRef.current) return;
     aiPreparingRef.current = true;
     setAudioStatus("Generating Studio Voice...");
@@ -753,6 +801,7 @@ export default function AiRehearsalStudio() {
       });
       const data = await res.json();
       aiPreparingRef.current = false;
+      if (isExitingRef.current) return;
       if (!res.ok || !data.session) {
         setError(data.error || "AI turn generation failed.");
         return;
@@ -766,13 +815,25 @@ export default function AiRehearsalStudio() {
   };
 
   const fallbackBrowserSpeak = (nextSession: any, payload: any, words: any[]) => {
+    if (isExitingRef.current) return;
     if (!("speechSynthesis" in window)) {
       completeAiTurn(nextSession.session_id);
       return;
     }
 
-    window.speechSynthesis.cancel();
+    if (currentUtteranceRef.current) {
+      currentUtteranceRef.current.onend = null;
+      currentUtteranceRef.current.onerror = null;
+      currentUtteranceRef.current = null;
+    }
+    try {
+      window.speechSynthesis.cancel();
+    } catch (e) {}
+
+    if (isExitingRef.current) return;
+
     const utterance = new SpeechSynthesisUtterance(payload.text);
+    currentUtteranceRef.current = utterance;
     const pref: VoicePreference =
       (payload.voice_preference as VoicePreference) ||
       voicePreferences[nextSession.current_speaker] ||
@@ -798,6 +859,10 @@ export default function AiRehearsalStudio() {
     const startedAt = performance.now();
     if (aiTimerRef.current) window.clearInterval(aiTimerRef.current);
     aiTimerRef.current = window.setInterval(() => {
+      if (isExitingRef.current) {
+        if (aiTimerRef.current) window.clearInterval(aiTimerRef.current);
+        return;
+      }
       const elapsed = (performance.now() - startedAt) / 1000;
       const idx = words.findIndex((w: any) => elapsed >= w.start && elapsed <= w.end);
       if (idx >= 0) setAiWordIndex(idx);
@@ -808,27 +873,50 @@ export default function AiRehearsalStudio() {
     }, 50);
 
     utterance.onend = () => {
+      if (currentUtteranceRef.current === utterance) {
+        currentUtteranceRef.current = null;
+      }
       if (aiTimerRef.current) window.clearInterval(aiTimerRef.current);
+      if (isExitingRef.current) return;
       setAiWordIndex(-1);
       setAudioStatus("AI Turn Complete");
       completeAiTurn(nextSession.session_id);
     };
     utterance.onerror = () => {
+      if (currentUtteranceRef.current === utterance) {
+        currentUtteranceRef.current = null;
+      }
       if (aiTimerRef.current) window.clearInterval(aiTimerRef.current);
+      if (isExitingRef.current) return;
       completeAiTurn(nextSession.session_id);
     };
     window.speechSynthesis.speak(utterance);
   };
 
   const speakAiTurn = (nextSession: any, forTurnIndex: number) => {
+    if (isExitingRef.current) return;
     const payload = nextSession.ai_payload;
     if (!payload?.text) {
       completeAiTurn(nextSession.session_id);
       return;
     }
 
-    if (audioPlayerRef.current) audioPlayerRef.current.pause();
-    window.speechSynthesis?.cancel();
+    if (audioPlayerRef.current) {
+      audioPlayerRef.current.pause();
+      audioPlayerRef.current.onended = null;
+      audioPlayerRef.current.onerror = null;
+    }
+    if (currentUtteranceRef.current) {
+      currentUtteranceRef.current.onend = null;
+      currentUtteranceRef.current.onerror = null;
+      currentUtteranceRef.current = null;
+    }
+    try {
+      window.speechSynthesis?.cancel();
+    } catch (e) {}
+
+    if (isExitingRef.current) return;
+
     setAiWordIndex(-1);
     setAudioStatus("AI Partner Speaking...");
 
@@ -851,6 +939,10 @@ export default function AiRehearsalStudio() {
         const startedAt = performance.now();
         if (aiTimerRef.current) window.clearInterval(aiTimerRef.current);
         aiTimerRef.current = window.setInterval(() => {
+          if (isExitingRef.current) {
+            if (aiTimerRef.current) window.clearInterval(aiTimerRef.current);
+            return;
+          }
           const elapsed = (performance.now() - startedAt) / 1000;
           const idx = words.findIndex((w: any) => elapsed >= w.start && elapsed <= w.end);
           if (idx >= 0) setAiWordIndex(idx);
@@ -862,6 +954,7 @@ export default function AiRehearsalStudio() {
 
         audio.onended = () => {
           if (aiTimerRef.current) window.clearInterval(aiTimerRef.current);
+          if (isExitingRef.current) return;
           setAiWordIndex(-1);
           setAudioStatus("AI Turn Complete");
           completeAiTurn(nextSession.session_id);
@@ -870,11 +963,13 @@ export default function AiRehearsalStudio() {
         audio.onerror = (e) => {
           console.warn("Audio stream playback failed, using fallback:", e);
           if (aiTimerRef.current) window.clearInterval(aiTimerRef.current);
+          if (isExitingRef.current) return;
           fallbackBrowserSpeak(nextSession, payload, words);
         };
 
         audio.play().catch((err) => {
           console.warn("Autoplay audio blocked, using fallback:", err);
+          if (isExitingRef.current) return;
           fallbackBrowserSpeak(nextSession, payload, words);
         });
         return;
@@ -888,11 +983,13 @@ export default function AiRehearsalStudio() {
   };
 
   const completeAiTurn = async (sessionId: string) => {
+    if (isExitingRef.current) return;
     try {
       const res = await fetch(`${baseUrl}/api/rehearsal/roleplay/${sessionId}/ai-complete`, {
         method: "POST",
       });
       const data = await res.json();
+      if (isExitingRef.current) return;
       if (res.ok && data.session) {
         applySessionState(data.session);
       }

@@ -238,7 +238,7 @@ export default function ScriptBuilder() {
                   setCharacters(parsed.characters);
                 }
                 if (parsed.abstract) setAbstract(parsed.abstract);
-                if (parsed.labels) setLabels(parsed.labels);
+                if (parsed.labels) setLabels(Array.isArray(parsed.labels) ? parsed.labels.join(", ") : String(parsed.labels));
                 if (parsed.theme) setTheme(parsed.theme);
                 if (parsed.settingInfo) setSettingInfo(parsed.settingInfo);
 
@@ -501,13 +501,29 @@ export default function ScriptBuilder() {
 
       if (response.ok) {
         const data = await response.json();
+        // Populate all playbill metadata from AI extraction
+        if (data.title) setTitle(data.title);
+        if (data.playwright) setPlaywright(data.playwright);
+        if (data.genre) setGenre(data.genre);
+        if (data.language) setLanguage(data.language);
+        if (data.theme) setTheme(data.theme);
+        if (data.setting) setSettingInfo(data.setting);
+        if (data.synopsis) setAbstract(data.synopsis);
+        if (data.tags) {
+          const tagStr = Array.isArray(data.tags) ? data.tags.join(", ") : String(data.tags);
+          setLabels(tagStr);
+        }
+
+        if (data.characters && Array.isArray(data.characters) && data.characters.length > 0) {
+          setCharacters(data.characters);
+        }
         if (data.dialogue_script) {
           setMarkdownContent(data.dialogue_script);
-          const parsedLines = parseMarkdownToStoryboardLines(data.dialogue_script, characters);
+          const parsedLines = parseMarkdownToStoryboardLines(data.dialogue_script, data.characters || characters);
           setStoryboardLines(parsedLines);
         }
         await fetchCharacters();
-        setCurrentStep(3);
+        setCurrentStep(1);
         setImportOpen(false);
       } else {
         alert("Failed to auto-extract text. Please try again.");
@@ -596,6 +612,7 @@ export default function ScriptBuilder() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3.5">
             <button
+              type="button"
               onClick={() => navigate("/member-scripts")}
               className="w-10 h-10 rounded-full bg-[#FAF2EE] hover:bg-[#EEDBD5] border border-[#DCBAB2] flex items-center justify-center text-[#5C3B37] hover:text-[#2A1816] transition-all cursor-pointer shadow-xs shrink-0"
               title="Back to Script Vault"
@@ -757,7 +774,7 @@ export default function ScriptBuilder() {
                     Production Tags
                   </label>
                   <input
-                    value={labels}
+                    value={Array.isArray(labels) ? labels.join(", ") : (labels || "")}
                     onChange={(e) => setLabels(e.target.value)}
                     placeholder="Classical, Ensemble, OAT Showcase"
                     className="w-full bg-[#F5EAE6] border border-[#DCBAB2] rounded-xl px-3.5 py-2.5 text-xs text-[#2A1816] font-medium focus:border-[#B32D25] focus:outline-none focus:ring-1 focus:ring-[#8C241E]/30 transition-all"
@@ -807,16 +824,24 @@ export default function ScriptBuilder() {
                   </button>
                 </div>
                 <textarea
-                  rows={4}
+                  rows={6}
                   value={abstract}
                   onChange={(e) => setAbstract(e.target.value)}
                   placeholder="Provide a comprehensive synopsis of the dramatic conflict, character stakes, and narrative trajectory..."
-                  className="w-full bg-[#F5EAE6] border border-[#DCBAB2] rounded-2xl p-4 text-xs sm:text-sm font-serif leading-relaxed text-[#2A1816] focus:border-[#B32D25] focus:outline-none focus:ring-1 focus:ring-[#8C241E]/30 transition-all placeholder:text-[#8C5A54]/60"
+                  className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-2xl p-5 text-sm sm:text-base font-serif leading-relaxed text-[#2A1816] focus:border-[#B32D25] focus:outline-none focus:ring-2 focus:ring-[#8C241E]/20 transition-all placeholder:text-[#8C5A54]/60 min-h-[140px]"
                 />
               </div>
 
-              <div className="pt-4 border-t border-[#DCBAB2]/70 flex justify-end">
+              <div className="pt-4 border-t border-[#DCBAB2]/70 flex flex-col sm:flex-row justify-between items-center gap-3">
                 <button
+                  type="button"
+                  onClick={() => navigate("/member-scripts")}
+                  className="px-5 py-2.5 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
+                >
+                  ← Back to Script Vault
+                </button>
+                <button
+                  type="button"
                   onClick={() => setCurrentStep(2)}
                   className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-8 py-3.5 rounded-full text-xs font-mono font-bold uppercase tracking-wider shadow-lg shadow-[#8C241E]/20 flex items-center gap-2 transition-all cursor-pointer border border-[#A6352F]"
                 >
@@ -929,12 +954,14 @@ export default function ScriptBuilder() {
 
             <div className="flex justify-between items-center bg-[#FAF2EE] p-5 rounded-2xl border border-[#DCBAB2] shadow-xs">
               <button
+                type="button"
                 onClick={() => setCurrentStep(1)}
                 className="px-5 py-2.5 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
               >
                 ← Back to Setup
               </button>
               <button
+                type="button"
                 onClick={() => setCurrentStep(3)}
                 className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-7 py-3 rounded-full text-xs font-mono font-bold uppercase tracking-wider shadow-lg shadow-[#8C241E]/20 flex items-center gap-1.5 transition-all cursor-pointer border border-[#A6352F]"
               >
@@ -997,33 +1024,34 @@ export default function ScriptBuilder() {
 
             {storyViewMode === "storyboard" ? (
               <div className="space-y-6">
-                {/* 1. DIALOGUE COMPOSER INPUT BAR */}
-                <div className="bg-[#FAF2EE] border-2 border-[#DCBAB2] rounded-[2.5rem] p-6 sm:p-7 shadow-sm space-y-4">
-                  <div className="space-y-2">
+                {/* 1. DIALOGUE COMPOSER WRITING DESK */}
+                <div className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-[2.5rem] p-7 md:p-8 shadow-sm space-y-6">
+                  <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <label className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#8C5A54] flex items-center gap-1.5">
-                        <span>1. Choose Character / Action:</span>
+                      <label className="text-xs font-mono font-bold uppercase tracking-wider text-[#8C5A54] flex items-center gap-1.5">
+                        <Users className="w-3.5 h-3.5 text-[#8C241E]" />
+                        <span>1. Choose Active Speaker / Direction</span>
                       </label>
-                      <span className="text-[10px] font-mono text-[#8C5A54]">
+                      <span className="text-[11px] font-mono text-[#8C5A54] bg-[#F2E5E0] px-3 py-1 rounded-full border border-[#DCBAB2]">
                         Active: <strong className="text-[#8C241E] uppercase">{activeSpeaker}</strong>
                       </span>
                     </div>
 
                     {/* Character Quick Selection Pills */}
-                    <div className="flex flex-wrap gap-2 items-center">
+                    <div className="flex flex-wrap gap-2.5 items-center">
                       {characters.map((c) => (
                         <button
                           key={c.id || c.name}
                           type="button"
                           onClick={() => setActiveSpeaker(c.name)}
-                          className={`px-3.5 py-1.5 rounded-full text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer border ${
+                          className={`px-4 py-2 rounded-full text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer border ${
                             activeSpeaker.toLowerCase() === c.name.toLowerCase()
                               ? "bg-[#8C241E] text-[#FDF8F7] border-[#A6352F] shadow-sm ring-2 ring-[#8C241E]/30"
-                              : "bg-[#F5EAE6] text-[#2A1816] border-[#DCBAB2] hover:bg-[#EEDBD5]"
+                              : "bg-[#FAF2EE] text-[#2A1816] border-[#DCBAB2] hover:bg-[#EEDBD5]"
                           }`}
                         >
                           <span
-                            className="w-2 h-2 rounded-full shrink-0"
+                            className="w-2.5 h-2.5 rounded-full shrink-0"
                             style={{ backgroundColor: c.color || "#8C241E" }}
                           />
                           <span>{c.name}</span>
@@ -1034,36 +1062,42 @@ export default function ScriptBuilder() {
                       <button
                         type="button"
                         onClick={() => setActiveSpeaker("stage-note")}
-                        className={`px-3.5 py-1.5 rounded-full text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer border ${
+                        className={`px-4 py-2 rounded-full text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer border ${
                           activeSpeaker === "stage-note"
                             ? "bg-[#5C3B37] text-[#FDF8F7] border-[#3E2723] shadow-sm ring-2 ring-[#5C3B37]/30"
-                            : "bg-[#F5EAE6] text-[#5C3B37] border-[#DCBAB2] hover:bg-[#EEDBD5]"
+                            : "bg-[#FAF2EE] text-[#5C3B37] border-[#DCBAB2] hover:bg-[#EEDBD5]"
                         }`}
                       >
-                        <span>🎬 Stage Direction / Cue</span>
+                        <span>Stage Direction / Cue</span>
                       </button>
 
                       {/* Scene Heading Pill */}
                       <button
                         type="button"
                         onClick={() => setActiveSpeaker("scene-heading")}
-                        className={`px-3.5 py-1.5 rounded-full text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer border ${
+                        className={`px-4 py-2 rounded-full text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer border ${
                           activeSpeaker === "scene-heading"
                             ? "bg-[#2A1816] text-[#FDF8F7] border-black shadow-sm ring-2 ring-black/30"
-                            : "bg-[#F5EAE6] text-[#2A1816] border-[#DCBAB2] hover:bg-[#EEDBD5]"
+                            : "bg-[#FAF2EE] text-[#2A1816] border-[#DCBAB2] hover:bg-[#EEDBD5]"
                         }`}
                       >
-                        <span>🏛️ Scene Heading</span>
+                        <span>Scene Heading</span>
                       </button>
                     </div>
                   </div>
 
-                  {/* Dialogue Text Input + Enter to Submit */}
-                  <form onSubmit={handleAddStoryboardLine} className="space-y-2">
-                    <div className="flex flex-col sm:flex-row gap-3 items-stretch">
-                      <div className="relative flex-1">
+                  {/* Large Spacious Writing Studio Textarea */}
+                  <form onSubmit={handleAddStoryboardLine} className="space-y-3.5">
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <label className="text-xs font-mono font-bold uppercase tracking-wider text-[#8C5A54] flex items-center gap-1.5">
+                          <Edit3 className="w-3.5 h-3.5 text-[#8C241E]" />
+                          <span>2. Dialogue & Cue Script Box</span>
+                        </label>
+                      </div>
+                      <div className="relative">
                         <textarea
-                          rows={2}
+                          rows={4}
                           value={currentLineInput}
                           onChange={(e) => setCurrentLineInput(e.target.value)}
                           onKeyDown={(e) => {
@@ -1074,25 +1108,29 @@ export default function ScriptBuilder() {
                           }}
                           placeholder={
                             activeSpeaker === "stage-note"
-                              ? "Write stage blocking, lighting cues, or movement notes... (Press Enter ↵)"
+                              ? "Write stage blocking, lighting cues, background sound effects, or actor movements..."
                               : activeSpeaker === "scene-heading"
-                              ? "e.g. ACT I, SCENE 1: KURUKSHETRA DUSK... (Press Enter ↵)"
-                              : `Write dialogue spoken by ${activeSpeaker}... (Press Enter ↵ to add to Storyboard)`
+                              ? "e.g. ACT I, SCENE 1: KURUKSHETRA DUSK — Under the Amber Horizon..."
+                              : `Write dramatic dialogue spoken by ${activeSpeaker}...`
                           }
-                          className="w-full bg-[#F5EAE6] border border-[#DCBAB2] rounded-2xl p-3.5 text-xs sm:text-sm font-serif leading-relaxed text-[#2A1816] focus:border-[#B32D25] focus:outline-none focus:ring-1 focus:ring-[#8C241E]/30 transition-all placeholder:text-[#8C5A54]/60 resize-none"
+                          className="w-full bg-[#FAF2EE] border-2 border-[#DCBAB2] rounded-2xl p-5 text-sm sm:text-base font-serif leading-relaxed text-[#2A1816] focus:border-[#8C241E] focus:outline-none focus:ring-2 focus:ring-[#8C241E]/20 transition-all placeholder:text-[#8C5A54]/60 min-h-[120px]"
                         />
-                        <div className="absolute bottom-2.5 right-3 text-[10px] font-mono text-[#8C5A54] pointer-events-none hidden sm:block">
-                          ↵ Enter to Add
-                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-1">
+                      <div className="text-xs font-mono text-[#6E4742] flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-[#8C241E]"></span>
+                        <span>Press <kbd className="px-2 py-0.5 bg-[#FAF2EE] border border-[#DCBAB2] rounded-md font-bold text-[#2A1816]">Enter ↵</kbd> to append line • <kbd className="px-2 py-0.5 bg-[#FAF2EE] border border-[#DCBAB2] rounded-md font-bold text-[#2A1816]">Shift + Enter</kbd> for new line</span>
                       </div>
 
                       <button
                         type="submit"
                         disabled={!currentLineInput.trim()}
-                        className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] font-mono text-xs font-bold uppercase tracking-wider px-6 rounded-2xl shadow-md shadow-[#8C241E]/20 flex items-center justify-center gap-2 border border-[#A6352F] cursor-pointer transition-all disabled:opacity-50 min-h-[50px] shrink-0"
+                        className="w-full sm:w-auto bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] font-mono text-xs font-bold uppercase tracking-wider px-8 py-3.5 rounded-full shadow-lg shadow-[#8C241E]/20 flex items-center justify-center gap-2 border border-[#A6352F] cursor-pointer transition-all disabled:opacity-50"
                       >
                         <Plus className="w-4 h-4 text-[#FFD0CC]" />
-                        <span>Add Line ↵</span>
+                        <span>Add Line to Script (↵)</span>
                       </button>
                     </div>
                   </form>
@@ -1122,7 +1160,7 @@ export default function ScriptBuilder() {
                       {storyboardLines.map((line, idx) => (
                         <div
                           key={line.id}
-                          className={`rounded-2xl p-4 sm:p-5 transition-all shadow-xs border text-left group ${
+                          className={`rounded-2xl p-5 sm:p-6 transition-all shadow-xs border text-left group ${
                             line.type === "scene-heading"
                               ? "bg-[#2A1816] text-[#FDF8F7] border-black"
                               : line.type === "stage-note"
@@ -1130,7 +1168,7 @@ export default function ScriptBuilder() {
                               : "bg-[#FAF2EE] border-[#DCBAB2] hover:border-[#B32D25]/50"
                           }`}
                         >
-                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-current/10">
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-current/10">
                             {/* Speaker Tag / Dropdown Selector */}
                             <div className="flex items-center gap-2">
                               <span className="text-[10px] font-mono font-bold text-[#8C5A54] uppercase">
@@ -1139,11 +1177,11 @@ export default function ScriptBuilder() {
 
                               {line.type === "scene-heading" ? (
                                 <span className="font-mono text-xs font-bold uppercase tracking-widest text-[#FFD0CC]">
-                                  🏛️ Scene Heading
+                                  Scene Heading
                                 </span>
                               ) : line.type === "stage-note" ? (
                                 <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#8C241E]">
-                                  🎬 Stage Direction
+                                  Stage Direction
                                 </span>
                               ) : (
                                 <div className="flex items-center gap-2">
@@ -1161,8 +1199,8 @@ export default function ScriptBuilder() {
                                         {c.name}
                                       </option>
                                     ))}
-                                    <option value="stage-note">🎬 Stage Direction</option>
-                                    <option value="scene-heading">🏛️ Scene Heading</option>
+                                    <option value="stage-note">Stage Direction</option>
+                                    <option value="scene-heading">Scene Heading</option>
                                   </select>
                                 </div>
                               )}
@@ -1200,17 +1238,17 @@ export default function ScriptBuilder() {
                           </div>
 
                           {/* Inline Editable Dialogue Textarea */}
-                          <div className="pt-2.5">
+                          <div className="pt-3">
                             <textarea
-                              rows={Math.max(1, Math.ceil(line.text.length / 80))}
+                              rows={Math.max(2, Math.ceil(line.text.length / 80))}
                               value={line.text}
                               onChange={(e) => handleUpdateLineText(line.id, e.target.value)}
-                              className={`w-full bg-transparent border-0 focus:outline-none focus:ring-1 focus:ring-[#8C241E]/30 rounded-lg p-1.5 transition-all resize-none leading-relaxed ${
+                              className={`w-full border rounded-xl p-3.5 transition-all leading-relaxed focus:outline-none focus:ring-1 focus:ring-[#8C241E]/30 ${
                                 line.type === "scene-heading"
-                                  ? "font-mono font-bold uppercase tracking-wider text-sm text-[#FDF8F7]"
+                                  ? "font-mono font-bold uppercase tracking-wider text-sm text-[#FDF8F7] bg-black/40 border-white/20"
                                   : line.type === "stage-note"
-                                  ? "font-serif italic text-xs sm:text-sm text-[#5C3B37]"
-                                  : "font-serif text-sm sm:text-base text-[#2A1816]"
+                                  ? "font-serif italic text-xs sm:text-sm text-[#5C3B37] bg-[#FAF2EE] border-[#DCBAB2]/70"
+                                  : "font-serif text-sm sm:text-base text-[#2A1816] bg-[#FAF2EE] border-[#DCBAB2]/70"
                               }`}
                             />
                           </div>
@@ -1278,14 +1316,18 @@ export default function ScriptBuilder() {
                 </p>
                 {labels && (
                   <div className="flex justify-center flex-wrap gap-2 pt-2">
-                    {labels.split(",").map((lbl, idx) => (
-                      <span
-                        key={idx}
-                        className="bg-[#EEDBD5] text-[#8C241E] border border-[#D5AAA2] text-[10px] font-mono font-bold uppercase tracking-wider px-3 py-1 rounded-full"
-                      >
-                        {lbl.trim()}
-                      </span>
-                    ))}
+                    {(Array.isArray(labels) ? labels : (typeof labels === "string" ? labels.split(",") : [])).map((lbl, idx) => {
+                      const trimmed = typeof lbl === "string" ? lbl.trim() : String(lbl);
+                      if (!trimmed) return null;
+                      return (
+                        <span
+                          key={idx}
+                          className="bg-[#EEDBD5] text-[#8C241E] border border-[#D5AAA2] text-[10px] font-mono font-bold uppercase tracking-wider px-3 py-1 rounded-full"
+                        >
+                          {trimmed}
+                        </span>
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -1464,7 +1506,7 @@ export default function ScriptBuilder() {
 
       {/* Auto-Extract Raw Script Modal */}
       <Dialog open={importOpen} onOpenChange={setImportOpen}>
-        <DialogContent showCloseButton={false} className="max-w-2xl bg-[#F5EAE6] border border-[#DEBEB7] text-[#2A1816] rounded-[2.5rem] p-0 shadow-2xl relative max-h-[90vh] overflow-hidden flex flex-col">
+        <DialogContent showCloseButton={false} className="w-full max-w-4xl lg:max-w-5xl bg-[#F5EAE6] border border-[#DEBEB7] text-[#2A1816] rounded-[2.5rem] p-0 shadow-2xl relative max-h-[92vh] overflow-hidden flex flex-col">
           <button
             type="button"
             onClick={() => setImportOpen(false)}
@@ -1474,22 +1516,37 @@ export default function ScriptBuilder() {
             <X className="w-4 h-4 group-hover:rotate-90 transition-transform duration-200" />
           </button>
 
-          <div className="flex-1 overflow-y-auto custom-scrollbar p-8 sm:p-10 text-left space-y-4">
-            <DialogHeader className="text-left space-y-1.5 border-b border-[#DCBAB2]/70 pb-4 pr-10">
-              <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#8C5A54]">
-                Intelligent Dialogue Parser
-              </span>
-              <DialogTitle className="text-2xl font-serif font-normal text-[#2A1816] flex items-center gap-2">
-                <Wand2 className="w-5 h-5 text-[#8C241E]" /> Auto-Extract Characters & Storyline
+          <div className="flex-1 overflow-y-auto custom-scrollbar p-8 sm:p-10 text-left space-y-6">
+            <DialogHeader className="text-left space-y-2 border-b border-[#DCBAB2]/70 pb-5 pr-10">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-[#8C241E]" />
+                <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#8C5A54]">
+                  AI Dramaturgical & Screenplay Parser
+                </span>
+              </div>
+              <DialogTitle className="text-2xl sm:text-3xl font-serif font-normal text-[#2A1816] flex items-center gap-2.5">
+                <span>Auto-Extract Production Dossier & Script</span>
               </DialogTitle>
-              <DialogDescription className="text-xs text-[#6E4742] font-serif">
-                Paste raw theatrical draft text below. The AI parser extracts character voices, stage cues, and line assignments automatically.
+              <DialogDescription className="text-xs sm:text-sm text-[#6E4742] font-serif leading-relaxed">
+                Paste your rough draft, play manuscript, or upload a document (.pdf, .txt). The AI engine automatically extracts and populates Title, Playwright, Genre, Stage Setting, Narrative Synopsis, Character Roster, and Formatted Dialogue Cues.
               </DialogDescription>
             </DialogHeader>
 
-            <div className="space-y-5 py-2 text-left">
+            {/* Feature Extraction Badges */}
+            <div className="bg-[#FAF2EE] p-4 rounded-2xl border border-[#DCBAB2] flex flex-wrap items-center gap-2 text-xs font-mono text-[#5C3B37]">
+              <span className="text-[10px] uppercase font-bold text-[#8C5A54]">Auto-Populates:</span>
+              <span className="bg-[#EEDBD5] text-[#8C241E] px-2.5 py-1 rounded-full text-[11px] font-bold">Title & Playwright</span>
+              <span className="bg-[#EEDBD5] text-[#8C241E] px-2.5 py-1 rounded-full text-[11px] font-bold">Genre & Language</span>
+              <span className="bg-[#EEDBD5] text-[#8C241E] px-2.5 py-1 rounded-full text-[11px] font-bold">Setting & Atmosphere</span>
+              <span className="bg-[#EEDBD5] text-[#8C241E] px-2.5 py-1 rounded-full text-[11px] font-bold">Story Synopsis</span>
+              <span className="bg-[#EEDBD5] text-[#8C241E] px-2.5 py-1 rounded-full text-[11px] font-bold">Character Directory</span>
+              <span className="bg-[#EEDBD5] text-[#8C241E] px-2.5 py-1 rounded-full text-[11px] font-bold">Dialogue Storyboard</span>
+            </div>
+
+            <div className="space-y-6 text-left">
+              {/* File Upload Zone */}
               <div
-                className="w-full bg-[#FAF2EE] border-2 border-dashed border-[#DCBAB2] hover:border-[#8C241E]/50 rounded-2xl p-6 flex flex-col items-center justify-center gap-3 transition-all cursor-pointer relative"
+                className="w-full bg-[#FAF2EE] border-2 border-dashed border-[#DCBAB2] hover:border-[#8C241E]/50 rounded-3xl p-6 sm:p-8 flex flex-col items-center justify-center gap-3 transition-all cursor-pointer relative group shadow-2xs"
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={(e) => {
                   e.preventDefault();
@@ -1501,70 +1558,90 @@ export default function ScriptBuilder() {
                 <input 
                   type="file" 
                   accept=".pdf,.txt" 
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                   onChange={(e) => {
                     if (e.target.files && e.target.files[0]) {
                       setUploadFile(e.target.files[0]);
                     }
                   }}
                 />
-                <div className="w-10 h-10 rounded-full bg-[#EEDBD5] flex items-center justify-center">
-                  <FileText className="w-5 h-5 text-[#8C241E]" />
+                <div className="w-12 h-12 rounded-full bg-[#EEDBD5] flex items-center justify-center group-hover:scale-105 transition-transform">
+                  <FileText className="w-6 h-6 text-[#8C241E]" />
                 </div>
-                <div className="text-center space-y-1 pointer-events-none">
-                  <p className="text-sm font-serif font-medium text-[#2A1816]">
-                    {uploadFile ? uploadFile.name : "Upload PDF or Text File"}
+                <div className="text-center space-y-1">
+                  <p className="text-base font-serif font-medium text-[#2A1816]">
+                    {uploadFile ? uploadFile.name : "Upload Script PDF or Manuscript (.txt)"}
                   </p>
                   <p className="text-xs text-[#8C5A54] font-mono">
-                    {uploadFile ? "Click or drag to replace" : "Drag & drop your script here, or click to browse"}
+                    {uploadFile ? `${(uploadFile.size / 1024).toFixed(1)} KB • Click or drag another file to replace` : "Drag & drop your script file here, or click anywhere to browse"}
                   </p>
                 </div>
+                {uploadFile && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setUploadFile(null);
+                    }}
+                    className="relative z-20 mt-1 px-3 py-1 bg-[#EEDBD5] hover:bg-[#E3CEC6] text-rose-900 rounded-full text-xs font-mono font-bold flex items-center gap-1 border border-[#D5AAA2]"
+                  >
+                    <X className="w-3 h-3" /> Clear File
+                  </button>
+                )}
               </div>
 
               <div className="relative flex items-center gap-4">
                 <div className="flex-1 border-t border-[#DCBAB2]/70"></div>
-                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#8C5A54] bg-[#F5EAE6] px-2">OR</span>
+                <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#8C5A54] bg-[#F5EAE6] px-3">
+                  OR PASTE RAW SCRIPT TEXT
+                </span>
                 <div className="flex-1 border-t border-[#DCBAB2]/70"></div>
               </div>
 
+              {/* Large Ergonomic Writing / Paste Desk */}
               <div className="space-y-2">
-                <label className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
-                  Paste Raw Script Text
-                </label>
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-mono font-bold uppercase tracking-wider text-[#8C5A54]">
+                    Theatrical Script Text / Narrative Draft
+                  </label>
+                  <span className="text-[11px] font-mono text-[#8C5A54]">
+                    {rawScriptText.length} characters
+                  </span>
+                </div>
                 <textarea
-                  rows={6}
+                  rows={14}
                   value={rawScriptText}
                   onChange={(e) => setRawScriptText(e.target.value)}
-                  placeholder={`Example:\n\nKARN: Ruk gaye na mere pahiye bhi, Keshav?\n[Pacing across stage beside sunken wheel]\nKRISHNA: Pahiya mitti mein nahi phasa Radheya, ahankaar mein phasa hai.`}
-                  className="w-full bg-[#FAF2EE] border border-[#DCBAB2] p-4 text-xs font-serif leading-relaxed rounded-2xl focus:outline-none focus:border-[#B32D25] focus:ring-1 focus:ring-[#8C241E]/30 transition-all text-[#2A1816]"
+                  placeholder={`Paste play scenes, dialogue drafts, or story synopsis here...\n\nExample:\nKARN: Ruk gaye na mere pahiye bhi, Keshav?\n[Pacing across stage beside sunken chariot wheel]\nKRISHNA: Pahiya mitti mein nahi phasa Radheya, ahankaar mein phasa hai.\n\n(AI will extract the title, characters, setting, and format dialogue lines automatically)`}
+                  className="w-full bg-[#FAF2EE] border border-[#DCBAB2] p-5 sm:p-6 text-sm sm:text-base font-serif leading-relaxed rounded-3xl focus:outline-none focus:border-[#B32D25] focus:ring-2 focus:ring-[#8C241E]/20 transition-all text-[#2A1816] placeholder:text-[#8C5A54]/50 min-h-[280px] sm:min-h-[340px] shadow-2xs custom-scrollbar"
                 />
               </div>
             </div>
 
-            <DialogFooter className="pt-3 flex justify-between items-center gap-3 border-t border-[#DCBAB2]/70">
+            <DialogFooter className="pt-4 flex flex-col sm:flex-row justify-between items-center gap-3 border-t border-[#DCBAB2]/70">
               <button
                 type="button"
                 onClick={() => setImportOpen(false)}
                 disabled={extracting}
-                className="px-5 py-2.5 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer shadow-xs"
+                className="w-full sm:w-auto px-6 py-3 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer shadow-xs"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={handleAutoExtractScript}
-                disabled={extracting}
-                className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] font-mono text-xs font-bold uppercase tracking-wider px-6 py-2.5 rounded-full shadow-lg shadow-[#8C241E]/20 flex items-center gap-1.5 border border-[#A6352F] cursor-pointer transition-all disabled:opacity-50"
+                disabled={extracting || (!rawScriptText.trim() && !uploadFile)}
+                className="w-full sm:w-auto bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] font-mono text-xs font-bold uppercase tracking-wider px-8 py-3.5 rounded-full shadow-lg shadow-[#8C241E]/20 flex items-center justify-center gap-2 border border-[#A6352F] cursor-pointer transition-all disabled:opacity-50"
               >
                 {extracting ? (
                   <>
-                    <Loader2 className="w-3.5 h-3.5 animate-spin text-[#FFD0CC]" />
-                    <span>Extracting Script...</span>
+                    <Loader2 className="w-4 h-4 animate-spin text-[#FFD0CC]" />
+                    <span>Extracting Playbill & Storyboard...</span>
                   </>
                 ) : (
                   <>
                     <Sparkles className="w-4 h-4 text-[#FFD0CC]" />
-                    <span>Run Parser & Extract</span>
+                    <span>Run AI Parser & Auto-Populate</span>
                   </>
                 )}
               </button>

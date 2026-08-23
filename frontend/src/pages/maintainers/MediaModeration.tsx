@@ -124,55 +124,88 @@ export default function MediaModeration() {
     // Handle adding new media item to backend database
     const handleAddMediaSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!newMedia.imageUrl || !newMedia.title) return;
+        if (!newMedia.title?.trim()) {
+            alert("Please enter a photo title.");
+            return;
+        }
+        if (!selectedFile && !newMedia.imageUrl) {
+            alert("Please select or drop an image file to upload.");
+            return;
+        }
 
         setSubmitting(true);
         const baseUrl = import.meta.env.VITE_API_URL || "";
         try {
-            const res = await fetch(`${baseUrl}/api/gallery`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(newMedia)
-            });
+            let res;
+            if (selectedFile) {
+                const fd = new FormData();
+                fd.append("file", selectedFile);
+                fd.append("title", newMedia.title.trim());
+                fd.append("category", newMedia.category);
+                fd.append("caption", newMedia.caption.trim());
+                fd.append("uploaderName", newMedia.uploaderName || "Core Maintainer");
+                fd.append("status", "approved");
 
-            if (res.ok) {
+                res = await fetch(`${baseUrl}/api/gallery`, {
+                    method: "POST",
+                    body: fd
+                });
+            } else {
+                res = await fetch(`${baseUrl}/api/gallery`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(newMedia)
+                });
+            }
+
+            if (res && res.ok) {
                 const added = await res.json();
                 setItems((prev) => [added, ...prev]);
-                setIsAddModalOpen(false);
-                setNewMedia({
-                    title: "",
-                    category: "Tamashbin Kathputliya",
-                    imageUrl: "",
-                    caption: "",
-                    uploaderName: "Core Maintainer"
-                });
             } else {
                 const mockNewItem: GalleryMediaItem = {
                     id: Date.now(),
-                    ...newMedia,
+                    title: newMedia.title,
+                    category: newMedia.category,
+                    imageUrl: newMedia.imageUrl || "https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?q=80&w=800&auto=format&fit=crop",
+                    caption: newMedia.caption,
+                    uploaderName: newMedia.uploaderName || "Core Maintainer",
                     uploadedAt: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
                     status: "approved"
                 };
                 setItems((prev) => [mockNewItem, ...prev]);
-                setIsAddModalOpen(false);
-                setNewMedia({
-                    title: "",
-                    category: "Tamashbin Kathputliya",
-                    imageUrl: "",
-                    caption: "",
-                    uploaderName: "Core Maintainer"
-                });
             }
+
+            setIsAddModalOpen(false);
+            setSelectedFile(null);
+            setNewMedia({
+                title: "",
+                category: "Tamashbin Kathputliya",
+                imageUrl: "",
+                caption: "",
+                uploaderName: "Core Maintainer"
+            });
         } catch (err) {
             console.error("Failed to add media:", err);
             const mockNewItem: GalleryMediaItem = {
                 id: Date.now(),
-                ...newMedia,
+                title: newMedia.title,
+                category: newMedia.category,
+                imageUrl: newMedia.imageUrl || "https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?q=80&w=800&auto=format&fit=crop",
+                caption: newMedia.caption,
+                uploaderName: newMedia.uploaderName || "Core Maintainer",
                 uploadedAt: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
                 status: "approved"
             };
             setItems((prev) => [mockNewItem, ...prev]);
             setIsAddModalOpen(false);
+            setSelectedFile(null);
+            setNewMedia({
+                title: "",
+                category: "Tamashbin Kathputliya",
+                imageUrl: "",
+                caption: "",
+                uploaderName: "Core Maintainer"
+            });
         } finally {
             setSubmitting(false);
         }
@@ -492,7 +525,15 @@ export default function MediaModeration() {
                                     e.preventDefault();
                                     setDragActive(false);
                                     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-                                        setSelectedFile(e.dataTransfer.files[0]);
+                                        const file = e.dataTransfer.files[0];
+                                        setSelectedFile(file);
+                                        const reader = new FileReader();
+                                        reader.onload = (event) => {
+                                            if (event.target?.result) {
+                                                setNewMedia((prev) => ({ ...prev, imageUrl: event.target!.result as string }));
+                                            }
+                                        };
+                                        reader.readAsDataURL(file);
                                     }
                                 }}
                                 onClick={() => document.getElementById('gallery-file-upload')?.click()}
@@ -504,17 +545,31 @@ export default function MediaModeration() {
                                     className="hidden" 
                                     onChange={(e) => {
                                         if (e.target.files && e.target.files[0]) {
-                                            setSelectedFile(e.target.files[0]);
+                                            const file = e.target.files[0];
+                                            setSelectedFile(file);
+                                            const reader = new FileReader();
+                                            reader.onload = (event) => {
+                                                if (event.target?.result) {
+                                                    setNewMedia((prev) => ({ ...prev, imageUrl: event.target!.result as string }));
+                                                }
+                                            };
+                                            reader.readAsDataURL(file);
                                         }
                                     }} 
                                 />
-                                {selectedFile ? (
+                                {selectedFile || newMedia.imageUrl ? (
                                     <div className="flex flex-col items-center gap-2">
-                                        <div className="w-12 h-12 rounded-full bg-[#B32D25]/20 flex items-center justify-center">
-                                            <CheckCircle2 className="w-6 h-6 text-[#B32D25]" />
-                                        </div>
-                                        <span className="text-xs font-bold text-[#2A1816]">{selectedFile.name}</span>
-                                        <span className="text-[10px] text-[#5C3B37]">Click to change</span>
+                                        {newMedia.imageUrl ? (
+                                            <div className="w-20 h-20 rounded-xl overflow-hidden border border-[#D5AAA2] shadow-sm">
+                                                <img src={newMedia.imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                                            </div>
+                                        ) : (
+                                            <div className="w-12 h-12 rounded-full bg-[#B32D25]/20 flex items-center justify-center">
+                                                <CheckCircle2 className="w-6 h-6 text-[#B32D25]" />
+                                            </div>
+                                        )}
+                                        <span className="text-xs font-bold text-[#2A1816]">{selectedFile?.name || "Photo Ready"}</span>
+                                        <span className="text-[10px] text-[#5C3B37]">Click to change photo</span>
                                     </div>
                                 ) : (
                                     <div className="flex flex-col items-center gap-2">
@@ -522,7 +577,7 @@ export default function MediaModeration() {
                                             <Cloud className="w-6 h-6 text-[#8C5A54]" />
                                         </div>
                                         <span className="text-xs font-bold text-[#2A1816]">Drag & drop an image here</span>
-                                        <span className="text-[10px] text-[#5C3B37]">or click to browse files</span>
+                                        <span className="text-[10px] text-[#5C3B37]">or click to browse files (PNG, JPG, WEBP)</span>
                                     </div>
                                 )}
                             </div>

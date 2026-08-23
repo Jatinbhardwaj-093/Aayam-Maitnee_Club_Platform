@@ -425,7 +425,7 @@ const defaultFallbackTrackPitches = [
 
   const [proposalForm, setProposalForm] = useState({
     title: "",
-    proposalType: activeUser ? "Member Event Pitch" : "Sponsor Ad Proposal",
+    proposalType: "Member Event Pitch",
     submitterName: activeUser ? activeUser.name : "",
     submitterEmail: activeUser ? activeUser.email : "",
     submitterPhone: activeUser?.phone || "",
@@ -434,99 +434,74 @@ const defaultFallbackTrackPitches = [
     description: ""
   });
 
-  const handleAiExtraction = () => {
+  const handleAiExtraction = async () => {
     if (!aiRawText || aiRawText.trim().length < 8) {
       setAiErrorMessage("Please paste an outline, rough ideas, or draft notes to extract.");
       return;
     }
     setIsExtractingAi(true);
     setAiErrorMessage(null);
+    setAiExtractedSuccess(false);
 
-    setTimeout(() => {
-      try {
-        const text = aiRawText.trim();
-        const textLower = text.toLowerCase();
+    try {
+      const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005";
+      const res = await fetch(`${baseUrl}/api/events/autofill-proposal`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ paragraph: aiRawText.trim() })
+      });
 
-        // 1. Extract Title
-        let extractedTitle = "";
-        const titleMatch = text.match(/(?:title|workshop|pitch|event|name|called|presenting|staging)[\s:]+([^\n.]+)/i);
-        if (titleMatch && titleMatch[1]) {
-          extractedTitle = titleMatch[1].trim().replace(/^["']|["']$/g, '');
-        } else {
-          const firstLine = text.split('\n')[0].trim();
-          extractedTitle = firstLine.length > 50 ? firstLine.substring(0, 50) + "..." : firstLine;
+      if (res.ok) {
+        const respData = await res.json();
+        const data = respData.data || respData;
+        
+        const extractedType = (data.proposalType && data.proposalType.includes("Sponsor"))
+          ? "Sponsor Ad Proposal"
+          : "Member Event Pitch";
+
+        let budget = data.sponsorshipTerms || "";
+        if (!budget || budget === "empty string") {
+          budget = extractedType === "Member Event Pitch" ? "Society Funded" : "₹1,50,000";
         }
-
-        // 2. Extract Type (strictly 2 options)
-        let extractedType = "Member Event Pitch";
-        if (textLower.includes("sponsor") || textLower.includes("brand") || textLower.includes("partnership") || textLower.includes("ad ")) {
-          extractedType = "Sponsor Ad Proposal";
-        } else {
-          extractedType = "Member Event Pitch";
-        }
-
-        // 3. Extract Submitter Name
-        let extractedName = activeUser?.name || "";
-        const nameMatch = text.match(/(?:by|from|submitter|contact|proposer|lead|organizer)[\s:]+([A-Za-z\s]+?)(?:,|\.|\n|email|phone|\(|$)/i);
-        if (nameMatch && nameMatch[1] && nameMatch[1].trim().length > 2) {
-          extractedName = nameMatch[1].trim();
-        }
-
-        // 4. Extract Email
-        let extractedEmail = activeUser?.email || "";
-        const emailMatch = text.match(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/);
-        if (emailMatch && emailMatch[1]) {
-          extractedEmail = emailMatch[1].trim();
-        }
-
-        // 5. Extract Phone
-        let extractedPhone = activeUser?.phone || "";
-        const phoneMatch = text.match(/(?:\+91[\s-]?)?[6-9]\d{9}/);
-        if (phoneMatch && phoneMatch[0]) {
-          extractedPhone = phoneMatch[0].trim();
-        }
-
-        // 6. Extract Venue
-        let extractedVenue = "SAC Main Studio, IIT Madras";
-        if (textLower.includes("clt") || textLower.includes("central lecture theatre")) {
-          extractedVenue = "CLT Main Stage, IIT Madras";
-        } else if (textLower.includes("oat") || textLower.includes("open air theatre") || textLower.includes("amphitheatre")) {
-          extractedVenue = "OAT Amphitheatre Lawns";
-        } else if (textLower.includes("black box") || textLower.includes("studio")) {
-          extractedVenue = "Aayam Black Box Studio, SAC";
-        } else if (textLower.includes("rehearsal hall")) {
-          extractedVenue = "Rehearsal Hall B, IIT Madras";
-        }
-
-        // 7. Extract Budget
-        let extractedBudget = "₹25,000";
-        const budgetMatch = text.match(/(?:₹|inr|rs\.?|budget|cost)[\s:]*([\d,]+(?:\s*(?:lakh|k|thousand))?)/i);
-        if (budgetMatch && budgetMatch[1]) {
-          extractedBudget = `₹${budgetMatch[1].trim()}`;
-        }
-
-        // 8. Extract Description
-        let extractedDescription = text;
 
         setProposalForm({
-          title: extractedTitle || "Theatrical Community Masterclass",
+          title: data.title || "Theatrical Community Showcase",
           proposalType: extractedType,
-          submitterName: extractedName || (activeUser?.name || "Ensemble Member"),
-          submitterEmail: extractedEmail || (activeUser?.email || "member@study.iitm.ac.in"),
-          submitterPhone: extractedPhone || "+91 98110 44321",
-          venue: extractedVenue,
-          sponsorshipTerms: extractedBudget,
-          description: extractedDescription
+          submitterName: data.submitterName || (activeUser?.name || "Ensemble Member"),
+          submitterEmail: data.submitterEmail || (activeUser?.email || "member@study.iitm.ac.in"),
+          submitterPhone: data.submitterPhone || (activeUser?.phone || "+91 98450 12345"),
+          venue: data.venue || "SAC Main Studio, IIT Madras",
+          sponsorshipTerms: budget,
+          description: data.description || aiRawText.trim()
         });
-
         setAiExtractedSuccess(true);
-        setIsExtractingAi(false);
-      } catch (err) {
-        console.error(err);
-        setIsExtractingAi(false);
-        setAiErrorMessage("Could not parse text automatically. Please verify the form fields.");
+      } else {
+        throw new Error("Server extraction returned status " + res.status);
       }
-    }, 350);
+    } catch (err) {
+      console.error("AI extraction error:", err);
+      // Smart local fallback if backend is unreachable
+      const text = aiRawText.trim();
+      const isSponsor = text.toLowerCase().includes("sponsor proposal") || text.toLowerCase().includes("brand deal");
+      const budgetMatch = text.match(/(?:₹|INR|Rs\.?)\s*[\d,]+(?:\s*(?:k|lakh|thousand))?/i);
+      const emailMatch = text.match(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/);
+      const phoneMatch = text.match(/(?:\+91[\s-]?)?[6-9]\d{9}/);
+      const nameMatch = text.match(/(?:by|from|submitter|contact|proposer|lead|organizer)[\s:]+([A-Za-z\s]+?)(?:,|\.|\n|email|phone|\(|$)/i);
+
+      setProposalForm({
+        title: text.split('\n')[0].substring(0, 55) || "Theatrical Community Masterclass",
+        proposalType: isSponsor ? "Sponsor Ad Proposal" : "Member Event Pitch",
+        submitterName: (nameMatch && nameMatch[1]) ? nameMatch[1].trim() : (activeUser?.name || "Ensemble Member"),
+        submitterEmail: (emailMatch && emailMatch[1]) ? emailMatch[1] : (activeUser?.email || "member@study.iitm.ac.in"),
+        submitterPhone: (phoneMatch && phoneMatch[0]) ? phoneMatch[0] : (activeUser?.phone || "+91 98450 12345"),
+        venue: text.toLowerCase().includes("black box") ? "Aayam Black Box Studio, SAC" : "SAC Main Studio, IIT Madras",
+        sponsorshipTerms: budgetMatch ? budgetMatch[0] : (isSponsor ? "₹1,50,000" : "Society Funded"),
+        description: text
+      });
+      setAiExtractedSuccess(true);
+    } finally {
+      setIsExtractingAi(false);
+    }
   };
 
   const handleSubmitProposal = async (e: React.FormEvent) => {

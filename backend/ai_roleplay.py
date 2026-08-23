@@ -236,8 +236,9 @@ class EdgeTTSProvider(TTSProvider):
         return {
             "text": text,
             "audio_url": audio_b64,
-            "voice": chosen_voice,
+            "voice": voice,
             "voice_preference": voice,
+            "neural_voice": chosen_voice,
             "words": timings,
             "duration": round(cursor, 2),
             "provider": "edge-tts" if audio_b64 else "browser-speech-synthesis",
@@ -266,7 +267,7 @@ def match_spoken_words(expected_words, transcript, start_index=0):
     for spoken_word in spoken:
         best_index = None
         best_score = 0
-        search_end = min(len(expected), cursor + 5)
+        search_end = min(len(expected), cursor + 6)
         for idx in range(cursor, search_end):
             if not expected[idx]:
                 continue
@@ -276,18 +277,19 @@ def match_spoken_words(expected_words, transcript, start_index=0):
             if score > best_score:
                 best_score = score
                 best_index = idx
-        if best_index is not None and best_score >= 0.72:
+        if best_index is not None and best_score >= 0.65:
             matched.add(best_index)
             cursor = best_index + 1
 
     spoken_count = len(matched)
     expected_count = len([word for word in expected if word])
     progress = spoken_count / expected_count if expected_count else 1
+    is_complete = progress >= 0.65 or (expected_count <= 2 and spoken_count >= 1)
     return {
         "matched_indices": sorted(matched),
         "current_word_index": max(matched) if matched else max(0, start_index - 1),
         "progress": round(progress, 3),
-        "is_complete": progress >= 0.78,
+        "is_complete": is_complete,
     }
 
 
@@ -312,20 +314,22 @@ class RehearsalService:
             raise ValueError("No playable dialogue lines found.")
         normalized_assignments = self._normalize_assignments(scene["characters"], assignments)
         normalized_voices = self._normalize_voice_preferences(scene["characters"], voice_preferences)
-        session_id = uuid.uuid4().hex
+        session_id = str(uuid.uuid4())
         session = {
             "session_id": session_id,
             "scene": scene,
             "assignments": normalized_assignments,
             "voice_preferences": normalized_voices,
+            "current_turn": 0,
+            "status": REHEARSAL_IDLE,
+            "scene_status": "in_progress",
+            "current_word_index": -1,
+            "human_progress": {},
+            "history": [],
+            "events": [],
             "transcript_request_counts": {},
             "gemini_call_counts": {},
-            "current_turn": 0,
-            "status": REHEARSAL_LOADING,
-            "scene_status": "active",
-            "events": [],
-            "human_progress": {},
-            "created_at": time.time(),
+            "last_human_turn_id": None,
         }
         self.sessions[session_id] = session
         self._advance_to_next_playable_turn(session)
@@ -378,8 +382,8 @@ class RehearsalService:
             "transcript": transcript,
             "match": match,
         })
-        enough_silence = int(silence_ms or 0) >= 850
-        if is_final and match["is_complete"] and enough_silence:
+        enough_silence = int(silence_ms or 0) >= 200 or match["is_complete"]
+        if (is_final and (match["is_complete"] or enough_silence)) or (match["is_complete"] and len(match["matched_indices"]) >= len(turn.get("words", []))):
             self._record_event(session, "human_turn_completed", {"turn_id": turn["id"]})
             logger.info("[REHEARSAL] human turn complete: session=%s turn=%s", session_id, turn["id"])
             self.advance(session_id)
@@ -407,19 +411,15 @@ class RehearsalService:
             turn["id"],
             session["gemini_call_counts"][turn["id"]],
         )
-        text = self.llm.generate_dialogue({
-            "turn": turn,
-            "previous_dialogue": previous[-4:],
-            "scene": session["scene"],
-            "assignments": session["assignments"],
-        })
-        if text != turn["text"]:
-            logger.warning(
-                "[AI REHEARSAL] Dialogue provider attempted to change scripted dialogue; reverting to script source: session=%s turn=%s",
-                session_id,
-                turn["id"],
-            )
-            text = turn["text"]
+        # Fast-path for scripted rehearsals: use scripted dialogue directly without blocking on remote LLM roundtrip
+        text = turn.get("text", "")
+        if not text:
+            text = self.llm.generate_dialogue({
+                "turn": turn,
+                "previous_dialogue": previous[-4:],
+                "scene": session["scene"],
+                "assignments": session["assignments"],
+            })
         performance = self._analyze_performance(session, turn, previous)
         voice_preference = session.get("voice_preferences", {}).get(turn["character"], "default")
         logger.info("[TTS] start")

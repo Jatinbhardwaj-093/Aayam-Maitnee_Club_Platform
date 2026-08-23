@@ -1455,6 +1455,18 @@ def update_audition_position(pos_id):
     db.session.commit()
     return jsonify({'status': 'success', 'position': pos.to_dict()})
 
+@api_bp.route('/audition-positions/<int:pos_id>', methods=['DELETE'])
+def delete_audition_position(pos_id):
+    from models import AuditionPosition, AuditionApplication, db
+    pos = AuditionPosition.query.get(pos_id)
+    if not pos:
+        return jsonify({'error': 'Position not found'}), 404
+        
+    AuditionApplication.query.filter_by(position_id=pos_id).delete()
+    db.session.delete(pos)
+    db.session.commit()
+    return jsonify({'status': 'success', 'message': 'Audition calling deleted successfully.'})
+
 @api_bp.route('/audition-applications', methods=['GET'])
 def get_audition_applications():
     from models import AuditionApplication
@@ -1534,8 +1546,76 @@ def run_portfolio_ai_scan():
                 db.session.commit()
         except Exception:
             pass
-            
-# --- VOLUNTEER & PRODUCTION CREW ENDPOINTS ---
+
+    return jsonify(result), 200
+
+@api_bp.route('/ai/audition_full_scan', methods=['POST'])
+def run_audition_full_ai_scan():
+    """
+    Runs multi-modal AI audition screening evaluating portfolio, audio monologue, video recording, and role criteria.
+    """
+    import json
+    from ai.report_service import ReportService
+    from models import AuditionPosition, AuditionApplication, db
+
+    data = request.json or {}
+    app_id = data.get('application_id')
+
+    role_name = data.get('role_name') or "Audition Position"
+    production_name = data.get('production_name') or "Aayam Mainstage"
+    role_category = data.get('role_category') or "Character Role"
+    character_description = data.get('character_description') or ""
+    role_requirements = data.get('role_requirements') or ""
+
+    applicant_name = data.get('applicant_name') or "Candidate"
+    applicant_experience = data.get('experience_level') or "Ensemble Senior"
+    applicant_notes = data.get('notes') or ""
+    portfolio_link = data.get('portfolio_link') or ""
+    has_audio = data.get('has_audio', False)
+    has_video = data.get('has_video', False)
+
+    if app_id:
+        app_record = AuditionApplication.query.get(app_id)
+        if app_record:
+            applicant_name = app_record.applicant_name
+            applicant_experience = app_record.experience_level or applicant_experience
+            applicant_notes = app_record.notes or applicant_notes
+            portfolio_link = app_record.portfolio_link or portfolio_link
+            role_name = app_record.role_name or role_name
+            if app_record.video_filename:
+                has_video = True
+
+            if app_record.position:
+                production_name = app_record.position.production_name or production_name
+                role_category = app_record.position.role_category or role_category
+                character_description = app_record.position.character_description or character_description
+                role_requirements = app_record.position.requirements or role_requirements
+
+    service = ReportService()
+    result = service.analyze_full_audition_dossier(
+        role_name=role_name,
+        production_name=production_name,
+        role_category=role_category,
+        character_description=character_description,
+        role_requirements=role_requirements,
+        applicant_name=applicant_name,
+        applicant_experience=applicant_experience,
+        applicant_notes=applicant_notes,
+        portfolio_link=portfolio_link,
+        has_audio=has_audio,
+        has_video=has_video
+    )
+
+    if app_id:
+        try:
+            app_record = AuditionApplication.query.get(app_id)
+            if app_record:
+                app_record.ai_report = json.dumps(result)
+                db.session.commit()
+        except Exception:
+            pass
+
+    return jsonify(result), 200
 
 @api_bp.route('/volunteer', methods=['POST'])
 def submit_volunteer_application():
@@ -2466,62 +2546,98 @@ def extract_script_route():
         return jsonify({"error": "Text or file is required"}), 400
         
     try:
-        system_instruction = """
-        You are a professional screenwriter and drama analyst assistant. 
-        Your task is to analyze the user's provided text content.
-        Perform the following operations:
-        1. Determine if the text is structured like a script/play (i.e. lists character names followed by their spoken dialogue/lines).
-        2. If it is already a play-like script, normalize it into neat Markdown dialogue styling (e.g. `**NAME**\nDialogue text...`).
-        3. If it is NOT a play-like script (e.g. it is prose, a summary, or description), rewrite it entirely into a rich theatrical play/script with dialogue between the key characters based on the context and storyline.
-        4. Extract all characters involved in the dialogue script, detailing their:
-           - name (string, capitalized name)
-           - description (string, rich context)
-           - traits (list of personality trait strings, e.g. ["brave", "honest"])
-           - motivation (string, core goal/desire)
-           - role (string, Protagonist, Antagonist, Rival, Supporting)
-        
-        Return the result strictly as a JSON object matching this schema:
-        {
-           "dialogue_script": "The final formatted markdown script",
-           "characters": [
-              {
-                 "name": "...",
-                 "description": "...",
-                 "traits": ["...", "..."],
-                 "motivation": "...",
-                 "role": "..."
-              }
-           ]
-        }
-        Ensure you output only valid, parseable raw JSON. Do not wrap it in markdown formatting (like ```json).
-        """
-        
-        completion_kwargs = {
-            "model": MODEL_NAME,
-            "messages": [
-                {"role": "system", "content": system_instruction},
-                {"role": "user", "content": text}
-            ],
-            "api_key": API_KEY,
-            "response_format": {"type": "json_object"}
-        }
-        if os.getenv("COMPLETIONS_API_BASE") or not MODEL_NAME.startswith("gemini/"):
-            completion_kwargs["api_base"] = API_BASE
-            
-        response = litellm.completion(**completion_kwargs)
-        content = response.choices[0].message.content.strip()
-        if content.startswith("```json"):
-            content = content[7:]
-        if content.endswith("```"):
-            content = content[:-3]
-        content = content.strip()
-        
-        parsed = json.loads(content)
+        from ai.gemini_pool import gemini_pool
+        prompt = f"""
+You are a master playwright, theatrical analyst, and dramaturgical director for Aayam (IIT Madras Drama Society).
+Carefully analyze the following theatrical draft/text content:
+
+=== INPUT SCRIPT CONTENT ===
+\"\"\"{text[:12000]}\"\"\"
+
+=== TASK ===
+1. Analyze the script content to determine or extract all relevant production metadata:
+   - "title": A compelling theatrical title for the play (either found in text or creatively determined from themes).
+   - "playwright": The playwright/author name (if mentioned, otherwise "Aayam Ensemble").
+   - "genre": Theatrical genre (e.g. "Classical Drama", "Historical Fiction", "Social Satire", "Psychological Tragedy", "Street Play / Nukkad", "Contemporary Verse").
+   - "language": Dialogue language (e.g. "Hindi", "English", "Hindustani", "Tamil", "Sanskrit", "Bilingual").
+   - "theme": Core dramatic thesis and philosophical conflict (1-2 sentences).
+   - "setting": Stage backdrop, era, lighting mood, and physical atmosphere.
+   - "synopsis": Concise 2-3 sentence narrative abstract/synopsis for the playbill.
+   - "tags": Array of 3-5 keywords (e.g. ["Epic", "Verse Drama", "Fate vs Karma"]).
+2. Dialogue Formatting:
+   - If already a script, polish into clean markdown dialogue (e.g., `**CHARACTER_NAME**\nDialogue text...\n\n(Stage direction/note)`).
+   - If prose/summary, adapt it into an authentic theatrical scene with expressive dialogue between key characters.
+3. Character Extraction:
+   - Extract all speaking characters with name (uppercase), rich description, personality traits array, core motivation, and role (Protagonist, Antagonist, Supporting, Foil, Narrator).
+
+Return STRICTLY a JSON object matching this schema:
+{{
+   "title": "Title of the Play",
+   "playwright": "Playwright Name",
+   "genre": "Classical Drama",
+   "language": "Hindi",
+   "theme": "Theme statement",
+   "setting": "Setting description",
+   "synopsis": "Narrative synopsis of the play",
+   "tags": ["Tag1", "Tag2", "Tag3"],
+   "dialogue_script": "Markdown dialogue script...",
+   "characters": [
+      {{
+         "name": "CHARACTER",
+         "description": "Character background and stage persona",
+         "traits": ["noble", "conflicted"],
+         "motivation": "Core desire",
+         "role": "Protagonist"
+      }}
+   ]
+}}
+"""
+        parsed = gemini_pool.generate_json(prompt)
+        title = parsed.get("title", "")
+        playwright = parsed.get("playwright", "")
+        genre = parsed.get("genre", "")
+        language = parsed.get("language", "")
+        theme = parsed.get("theme", "")
+        setting = parsed.get("setting", "")
+        synopsis = parsed.get("synopsis", "")
+        tags = parsed.get("tags", [])
         dialogue_script = parsed.get("dialogue_script", "")
         characters = parsed.get("characters", [])
             
     except Exception as e:
-        return jsonify({"error": f"Live LLM call failed: {str(e)}"}), 500
+        print("Gemini Pool extract failed, trying litellm:", e)
+        try:
+            completion_kwargs = {
+                "model": MODEL_NAME,
+                "messages": [
+                    {"role": "system", "content": "Extract title, playwright, genre, language, theme, setting, synopsis, tags, dialogue_script, and characters in JSON."},
+                    {"role": "user", "content": text}
+                ],
+                "api_key": API_KEY,
+                "response_format": {"type": "json_object"}
+            }
+            if os.getenv("COMPLETIONS_API_BASE") or not MODEL_NAME.startswith("gemini/"):
+                completion_kwargs["api_base"] = API_BASE
+                
+            response = litellm.completion(**completion_kwargs)
+            content = response.choices[0].message.content.strip()
+            if content.startswith("```json"):
+                content = content[7:]
+            if content.endswith("```"):
+                content = content[:-3]
+            parsed = json.loads(content.strip())
+            title = parsed.get("title", "")
+            playwright = parsed.get("playwright", "")
+            genre = parsed.get("genre", "")
+            language = parsed.get("language", "")
+            theme = parsed.get("theme", "")
+            setting = parsed.get("setting", "")
+            synopsis = parsed.get("synopsis", "")
+            tags = parsed.get("tags", [])
+            dialogue_script = parsed.get("dialogue_script", "")
+            characters = parsed.get("characters", [])
+        except Exception as e2:
+            return jsonify({"error": f"Live LLM call failed: {str(e2)}"}), 500
 
     # Save characters to the SQLite database
     saved_list = []
@@ -2555,6 +2671,14 @@ def extract_script_route():
             print(f"Stream analysis cache update error: {stream_err}")
             
     return jsonify({
+        "title": title,
+        "playwright": playwright,
+        "genre": genre,
+        "language": language,
+        "theme": theme,
+        "setting": setting,
+        "synopsis": synopsis,
+        "tags": tags,
         "dialogue_script": dialogue_script,
         "characters": saved_list
     })
@@ -2602,64 +2726,89 @@ def autofill_event_proposal():
     if not paragraph:
         return jsonify({"status": "error", "message": "Paragraph description is required"}), 400
 
-    api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY") or API_KEY
-    model = os.getenv("COMPLETIONS_MODEL", "gemini/gemini-3.6-flash")
+    prompt = f"""You are an intelligent dramaturgical event proposal assistant for Aayam (IIT Madras BS Drama Society).
+Carefully analyze the following raw event proposal text, email, or draft pitch:
 
-    if not api_key:
-        return jsonify({"status": "error", "message": "AI servers are down. API key missing."}), 503
+\"\"\"{paragraph}\"\"\"
 
-    try:
-        prompt = f"""You are an intelligent AI event proposal assistant for Aayam Matinee Club.
-Given the following raw event description/brief or email text:
-
-"{paragraph}"
-
-Extract structured event proposal details. Return ONLY valid JSON matching this schema:
+Extract structured event proposal fields precisely into valid JSON following this schema:
 {{
-  "title": "Short catchy title for the proposed event",
-  "proposalType": "Member Pitch" or "Sponsor Ad Proposal",
-  "submitterName": "Name of contact person or brand name",
-  "submitterEmail": "Email address if mentioned, else empty string",
-  "submitterPhone": "Phone number if mentioned, else empty string",
-  "venue": "Proposed venue/stage (e.g. Royal Stage Auditorium, Main Stage, Rehearsal Hall B)",
-  "sponsorshipTerms": "Monetary budget figure e.g. ₹1,50,000 or empty string",
-  "description": "Clean formatted full event description"
+  "title": "A concise, theatrical, and compelling title for the event / workshop / play showcase",
+  "proposalType": "Member Event Pitch" (Default to "Member Event Pitch" for all society workshops, member plays, student showcases, acting intensives, rehearsal proposals. ONLY set to "Sponsor Ad Proposal" if it is explicitly a corporate brand commercial sponsorship, brand partnership, product placement, or corporate advertising deal),
+  "submitterName": "Extracted contact person full name, artist name, or proposer (e.g., 'Aditi Sharma', 'Sneha Das', etc.)",
+  "submitterEmail": "Extracted email address (e.g. '@study.iitm.ac.in' or personal email if mentioned, otherwise '')",
+  "submitterPhone": "Extracted contact phone number if mentioned, otherwise ''",
+  "venue": "Specific target hall/stage (e.g. 'SAC Black Box Studio, IIT Madras', 'CLT Main Stage, IIT Madras', 'OAT Amphitheatre Lawns', 'Rehearsal Hall B, IIT Madras', or 'SAC Main Studio, IIT Madras')",
+  "sponsorshipTerms": "If Member Event Pitch, extract estimated budget (e.g. '₹20,000' or '₹25,000 (Society Funded)' or 'Society Funded'). If Sponsor Ad Proposal, extract sponsorship deal amount (e.g. '₹1,50,000')",
+  "description": "A polished, well-structured 2-4 sentence theatrical event description highlighting the workshop/play objective, syllabus/curriculum, target actors/audience, and production technical needs."
 }}
-"""
-        completion_kwargs = {
-            "model": model,
-            "messages": [{"role": "user", "content": prompt}],
-            "api_key": api_key,
-            "response_format": {"type": "json_object"}
-        }
-        if os.getenv("COMPLETIONS_API_BASE") or not model.startswith("gemini/"):
-            completion_kwargs["api_base"] = API_BASE
 
-        resp = litellm.completion(**completion_kwargs)
-        content = resp.choices[0].message.content.strip()
-        if content.startswith("```json"):
-            content = content[7:]
-        if content.endswith("```"):
-            content = content[:-3]
-        extracted = json.loads(content.strip())
-        return jsonify({"status": "success", "data": extracted}), 200
-    except Exception as err:
-        print(f"Gemini proposal autofill API call error: {err}")
+Return ONLY the raw JSON object. Do not include markdown code block backticks."""
+
+    extracted = None
+    try:
+        from ai.gemini_pool import gemini_pool
+        res_json = gemini_pool.generate_json(prompt)
+        if res_json and isinstance(res_json, dict) and (res_json.get("title") or res_json.get("description")):
+            extracted = res_json
+    except Exception as e:
+        print(f"Gemini pool proposal extraction error: {e}")
+
+    if not extracted:
+        try:
+            api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY") or API_KEY
+            model = os.getenv("COMPLETIONS_MODEL", "gemini/gemini-2.5-flash")
+            completion_kwargs = {
+                "model": model,
+                "messages": [{"role": "user", "content": prompt}],
+                "api_key": api_key,
+                "response_format": {"type": "json_object"}
+            }
+            if os.getenv("COMPLETIONS_API_BASE") or not model.startswith("gemini/"):
+                completion_kwargs["api_base"] = API_BASE
+
+            resp = litellm.completion(**completion_kwargs)
+            content = resp.choices[0].message.content.strip()
+            if content.startswith("```json"):
+                content = content[7:]
+            if content.endswith("```"):
+                content = content[:-3]
+            extracted = json.loads(content.strip())
+        except Exception as err:
+            print(f"LiteLLM proposal extraction error: {err}")
+
+    # Fallback if both LLM calls fail
+    if not extracted:
         import re
         email_match = re.search(r'[\w\.-]+@[\w\.-]+\.\w+', paragraph)
-        budget_match = re.search(r'(?:₹|INR|Rs\.?)\s*[\d,]+', paragraph)
-        first_sentence = paragraph.split('.')[0].strip()
-        fallback_data = {
-            "title": first_sentence[:60] if first_sentence else "Proposed Event",
-            "proposalType": "Sponsor Ad Proposal" if any(k in paragraph.lower() for k in ["sponsor", "budget", "showcase", "brand"]) else "Member Pitch",
-            "submitterName": "FabIndia" if "fabindia" in paragraph.lower() else "Event Submitter",
+        phone_match = re.search(r'(?:\+91[\s-]?)?[6-9]\d{9}', paragraph)
+        budget_match = re.search(r'(?:₹|INR|Rs\.?)\s*[\d,]+(?:\s*(?:k|lakh|thousand))?', paragraph, re.IGNORECASE)
+        name_match = re.search(r'(?:by|from|submitter|contact|proposer|lead|organizer)[\s:]+([A-Za-z\s]+?)(?:,|\.|\n|email|phone|\(|$)', paragraph, re.IGNORECASE)
+        is_sponsor = any(k in paragraph.lower() for k in ["sponsor proposal", "brand deal", "sponsorship terms", "commercial partner"])
+        
+        extracted = {
+            "title": paragraph.split('\n')[0][:55] if paragraph else "Theatrical Workshop Proposal",
+            "proposalType": "Sponsor Ad Proposal" if is_sponsor else "Member Event Pitch",
+            "submitterName": name_match.group(1).strip() if name_match else "Ensemble Member",
             "submitterEmail": email_match.group(0) if email_match else "",
-            "submitterPhone": "",
-            "venue": "Royal Stage Auditorium" if "royal stage" in paragraph.lower() else "CLT Main Auditorium",
-            "sponsorshipTerms": budget_match.group(0) if budget_match else "",
+            "submitterPhone": phone_match.group(0) if phone_match else "",
+            "venue": "Aayam Black Box Studio, SAC" if "black box" in paragraph.lower() else "SAC Main Studio, IIT Madras",
+            "sponsorshipTerms": budget_match.group(0) if budget_match else ("₹1,50,000" if is_sponsor else "Society Funded"),
             "description": paragraph
         }
-        return jsonify({"status": "success", "data": fallback_data, "source": "fallback"}), 200
+
+    # Ensure proposalType strictly matches expected UI strings
+    p_type = extracted.get("proposalType", "")
+    if "sponsor" in p_type.lower() or "brand" in p_type.lower() or "ad" in p_type.lower():
+        extracted["proposalType"] = "Sponsor Ad Proposal"
+    else:
+        extracted["proposalType"] = "Member Event Pitch"
+
+    # Default budget terms if empty
+    if not extracted.get("sponsorshipTerms"):
+        extracted["sponsorshipTerms"] = "Society Funded" if extracted["proposalType"] == "Member Event Pitch" else "₹1,00,000"
+
+    return jsonify({"status": "success", "data": extracted}), 200
 
 
 @api_bp.route('/audition-applications/<int:app_id>/withdraw', methods=['POST'])
