@@ -2467,15 +2467,8 @@ def extract_event_keywords():
     if not description:
         return jsonify({"status": "error", "message": "Description is required"}), 400
 
-    api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY") or API_KEY
-    model = os.getenv("GEMINI_MODEL", "gemini-3.6-flash")
-
-    if not api_key:
-        return jsonify({"status": "error", "message": "AI servers are down. API key missing."}), 503
-
     try:
-        from google import genai
-        client = genai.Client(api_key=api_key)
+        from ai.gemini_pool import gemini_pool
         prompt = f"""You are an expert AI event analyst and curator for Aayam Drama Society (IIT Madras).
 Carefully analyze the following theatrical event pitch/proposal description:
 
@@ -2492,20 +2485,7 @@ Return ONLY valid JSON matching this schema with no markdown backticks or commen
   "keywords": ["Classical Tragedy", "₹1,20,000 Budget", "OAT Auditorium", "Lighting Rig", "Repertoire Premiere"]
 }}
 """
-        response = client.models.generate_content(
-            model=model,
-            contents=prompt
-        )
-        content = response.text.strip()
-        if content.startswith("```"):
-            lines = content.splitlines()
-            if lines[0].startswith("```"):
-                lines = lines[1:]
-            if lines and lines[-1].startswith("```"):
-                lines = lines[:-1]
-            content = "\n".join(lines).strip()
-
-        res_json = json.loads(content)
+        res_json = gemini_pool.generate_json(prompt)
         keywords = res_json.get("keywords", [])
         if keywords and isinstance(keywords, list):
             return jsonify({"status": "success", "keywords": keywords[:6], "source": "gemini"}), 200

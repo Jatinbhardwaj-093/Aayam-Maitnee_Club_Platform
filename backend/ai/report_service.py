@@ -1,13 +1,11 @@
 import json
-from google import genai
-from config import GEMINI_API_KEY, GEMINI_MODEL
+from ai.gemini_pool import gemini_pool
 
 
 class ReportService:
 
     def __init__(self):
-        self.client = genai.Client(api_key=GEMINI_API_KEY)
-        self.model = GEMINI_MODEL or "gemini-3.6-flash"
+        self.pool = gemini_pool
 
     def generate_report(
         self,
@@ -50,22 +48,9 @@ Return strictly valid JSON with no markdown tags or conversational filler matchi
 }}
 """
         try:
-            response = self.client.models.generate_content(
-                model=self.model,
-                contents=prompt
-            )
-            content = response.text.strip()
-            if content.startswith("```"):
-                lines = content.splitlines()
-                if lines[0].startswith("```"):
-                    lines = lines[1:]
-                if lines and lines[-1].startswith("```"):
-                    lines = lines[:-1]
-                content = "\n".join(lines).strip()
-
-            return json.loads(content)
+            return self.pool.generate_json(prompt)
         except Exception as e:
-            print("Error generating technical audition report:", e)
+            print("Error generating technical audition report with GeminiPool:", e)
             return {
                 "overall_score": 85,
                 "lighting": "Good",
@@ -88,7 +73,7 @@ Return strictly valid JSON with no markdown tags or conversational filler matchi
         portfolio_link
     ):
         """
-        Uses Gemini 3.6 Flash to perform a deep AI portfolio scan matching applicant skills/resume against role requirements.
+        Uses rotating GeminiPool to perform deep AI portfolio scan matching applicant skills against role requirements.
         """
         prompt = f"""
 You are an expert Master Casting Director & Theatrical Dramaturge for Aayam (IIT Madras Drama Society).
@@ -138,20 +123,7 @@ Return ONLY a valid JSON object (no markdown, no backticks):
 }}
 """
         try:
-            response = self.client.models.generate_content(
-                model=self.model,
-                contents=prompt
-            )
-            content = response.text.strip()
-            if content.startswith("```"):
-                lines = content.splitlines()
-                if lines[0].startswith("```"):
-                    lines = lines[1:]
-                if lines and lines[-1].startswith("```"):
-                    lines = lines[:-1]
-                content = "\n".join(lines).strip()
-
-            parsed = json.loads(content)
+            parsed = self.pool.generate_json(prompt)
             
             # Ensure all expected keys exist for both formats
             if "fit_score" not in parsed and "match_score" in parsed:
@@ -165,7 +137,7 @@ Return ONLY a valid JSON object (no markdown, no backticks):
 
             return parsed
         except Exception as e:
-            print("Error running Gemini portfolio role fit scan:", e)
+            print("Error running Gemini portfolio role fit scan with GeminiPool:", e)
             return {
                 "fit_score": 90,
                 "match_score": 90,
