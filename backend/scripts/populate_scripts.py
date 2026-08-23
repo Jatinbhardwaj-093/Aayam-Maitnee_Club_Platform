@@ -1,8 +1,6 @@
 import sys
 import os
 import json
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from app import app
 from models import db, Script
 
 # Comprehensive, multi-character, fully-written theatrical playbooks with 35-50 lines
