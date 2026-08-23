@@ -355,6 +355,13 @@ export default function EventsManagement() {
   const [selectedEventForVolunteers, setSelectedEventForVolunteers] = useState<EventItem | null>(null);
   const [actionSuccessMsg, setActionSuccessMsg] = useState<string | null>(null);
 
+  const showToast = (msg: string) => {
+    setActionSuccessMsg(msg);
+    setTimeout(() => {
+      setActionSuccessMsg(null);
+    }, 4500);
+  };
+
   // Script Preview Modal
   const [previewScript, setPreviewScript] = useState<Playbook | null>(null);
   const [scriptModalOpen, setScriptModalOpen] = useState<boolean>(false);
@@ -371,7 +378,7 @@ export default function EventsManagement() {
   const [createEventOpen, setCreateEventOpen] = useState(false);
   const [newEventForm, setNewEventForm] = useState({ title: "", category: "Plays", date: "", venue: "", timeRange: "", description: "" });
   
-  const handleCreateEventSubmit = (e: React.FormEvent) => {
+  const handleCreateEventSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newEventForm.title) return;
     
@@ -379,9 +386,9 @@ export default function EventsManagement() {
       id: `evt-manual-${Date.now()}`,
       title: newEventForm.title,
       category: newEventForm.category,
-      date: newEventForm.date,
-      venue: newEventForm.venue,
-      timeRange: newEventForm.timeRange,
+      date: newEventForm.date || "2026-09-25",
+      venue: newEventForm.venue || "SAC Main Studio, IIT Madras",
+      timeRange: newEventForm.timeRange || "18:00 - 20:30",
       status: "Scheduled",
       is_past: false,
       description: newEventForm.description,
@@ -396,9 +403,24 @@ export default function EventsManagement() {
       volunteerCount: 0
     };
     
+    try {
+      const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005";
+      await fetch(`${baseUrl}/api/events/create`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: newEventForm.title,
+          category: newEventForm.category,
+          date: newEventForm.date,
+          venue: newEventForm.venue,
+          timeRange: newEventForm.timeRange,
+          description: newEventForm.description
+        })
+      }).catch(() => null);
+    } catch (_) {}
+
     setEventsList(prev => [newEvt, ...prev]);
-    setActionSuccessMsg(`Event '${newEventForm.title}' successfully scheduled!`);
-    setTimeout(() => setActionSuccessMsg(null), 4000);
+    showToast(`Event '${newEventForm.title}' successfully scheduled!`);
     setCreateEventOpen(false);
     setNewEventForm({ title: "", category: "Plays", date: "", venue: "", timeRange: "", description: "" });
   };
@@ -767,6 +789,48 @@ export default function EventsManagement() {
     }
   };
 
+  // Save Proposal Edits without immediately publishing as public event
+  const handleSavePitchDraft = async () => {
+    if (!editingPitch) return;
+    setSubmittingDecision(true);
+
+    try {
+      const payload = {
+        title: editFormData.title,
+        venue: editFormData.venue,
+        budget: editFormData.budget,
+        description: editFormData.description,
+        proposal_type: editFormData.is_sponsored ? "Sponsor Ad Proposal" : (editFormData.category === "Workshops" ? "Member Workshop Pitch" : "Member Event Pitch")
+      };
+
+      const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5005";
+      await fetch(`${baseUrl}/api/proposals/${editingPitch.id}/update`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      }).catch(() => null);
+
+      // Update proposal list locally
+      setProposalsList(prev => prev.map(p => p.id === editingPitch.id ? { 
+        ...p, 
+        name: payload.title, 
+        title: payload.title, 
+        venue: payload.venue, 
+        budget: payload.budget, 
+        description: payload.description,
+        proposalType: payload.proposal_type
+      } : p));
+
+      setActionSuccessMsg(`Saved changes to proposal '${payload.title}'.`);
+      setTimeout(() => setActionSuccessMsg(null), 4000);
+      setEditingPitch(null);
+    } catch (err) {
+      console.error("Error saving proposal edits:", err);
+    } finally {
+      setSubmittingDecision(false);
+    }
+  };
+
   // Quick Approve Pitch without opening modal
   const handleQuickApprove = async (pitch: ProposalItem) => {
     try {
@@ -918,13 +982,20 @@ export default function EventsManagement() {
   return (
     <div className="max-w-7xl mx-auto space-y-8 py-6 px-4 md:px-8 font-sans text-[#5C3B37] selection:bg-[#8C241E]/20">
       
-      {/* Toast Notification */}
+      {/* Theatrical Toast Notification */}
       {actionSuccessMsg && (
-        <div className="fixed bottom-6 right-6 z-50 bg-[#FAF2EE] text-[#2A1816] px-5 py-3.5 rounded-2xl border border-emerald-700/30 shadow-2xl flex items-center gap-3 animate-in fade-in">
-          <CheckCircle2 className="w-4 h-4 text-emerald-800 shrink-0" />
-          <span className="text-xs font-mono font-bold">{actionSuccessMsg}</span>
-          <button onClick={() => setActionSuccessMsg(null)} className="text-[#8C5A54] hover:text-[#2A1816] cursor-pointer">
-            <X className="w-3.5 h-3.5" />
+        <div className="fixed bottom-8 right-8 z-[100] bg-[#FAF2EE] text-[#2A1816] px-5 py-4 rounded-2xl border border-[#DCBAB2] shadow-2xl flex items-center gap-3.5 max-w-md animate-in slide-in-from-bottom-5 fade-in duration-200 pointer-events-auto">
+          <div className="w-8 h-8 rounded-full bg-[#EEDBD5] border border-[#D5AAA2] text-[#8C241E] flex items-center justify-center shrink-0 shadow-xs">
+            <CheckCircle2 className="w-4 h-4 text-[#8C241E]" />
+          </div>
+          <span className="text-xs font-mono font-medium leading-snug flex-1">{actionSuccessMsg}</span>
+          <button 
+            type="button"
+            onClick={() => setActionSuccessMsg(null)} 
+            className="w-6 h-6 rounded-full bg-[#EEDBD5] hover:bg-[#E3CEC6] text-[#5C3B37] hover:text-[#2A1816] flex items-center justify-center transition-all cursor-pointer border border-[#D5AAA2] shrink-0 ml-1"
+            title="Dismiss"
+          >
+            <X className="w-3 h-3" />
           </button>
         </div>
       )}
@@ -1125,18 +1196,22 @@ export default function EventsManagement() {
                       </div>
                     </div>
 
-                    {/* ACTION CONTROLS - 3 CLEAN BUTTONS WITH THEMED ICONS */}
+                    {/* ACTION CONTROLS - CLEAN BUTTONS WITH THEMED ICONS */}
                     <div className="pt-4 border-t border-[#DCBAB2]/60 flex items-center gap-3 w-full">
-                      <button
-                        onClick={() => handleOpenScriptPreview(ev)}
-                        className="flex-1 py-2.5 px-3 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] hover:text-[#2A1816] text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs"
-                        title="Preview Society Playbook Script"
-                      >
-                        <FileText className="w-3.5 h-3.5 text-[#8C241E]" />
-                        <span>Script</span>
-                      </button>
+                      {ev.category === "Plays" && (
+                        <button
+                          type="button"
+                          onClick={() => handleOpenScriptPreview(ev)}
+                          className="flex-1 py-2.5 px-3 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] hover:text-[#2A1816] text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs"
+                          title="Preview Society Playbook Script"
+                        >
+                          <FileText className="w-3.5 h-3.5 text-[#8C241E]" />
+                          <span>Script</span>
+                        </button>
+                      )}
 
                       <button
+                        type="button"
                         onClick={() => handleOpenDetails(ev)}
                         className="flex-1 py-2.5 px-3 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] hover:text-[#2A1816] text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs"
                         title="View detailed production dossier"
@@ -1684,7 +1759,7 @@ export default function EventsManagement() {
                   Decline Pitch
                 </button>
 
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center gap-3">
                   <button
                     type="button"
                     onClick={() => setEditingPitch(null)}
@@ -1693,12 +1768,21 @@ export default function EventsManagement() {
                     Cancel
                   </button>
                   <button
+                    type="button"
+                    onClick={handleSavePitchDraft}
+                    disabled={submittingDecision}
+                    className="px-5 py-2.5 rounded-full border border-[#8C241E] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#8C241E] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer shadow-xs disabled:opacity-50"
+                  >
+                    <CheckCircle2 className="w-3.5 h-3.5 text-[#8C241E]" />
+                    <span>Save Changes</span>
+                  </button>
+                  <button
                     type="submit"
                     disabled={submittingDecision}
-                    className="px-7 py-2.5 rounded-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] text-xs font-mono font-bold uppercase tracking-widest flex items-center gap-2 cursor-pointer shadow-md shadow-[#8C241E]/20 border border-[#A6352F] disabled:opacity-50 transition-all"
+                    className="px-6 py-2.5 rounded-full bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] text-xs font-mono font-bold uppercase tracking-widest flex items-center gap-2 cursor-pointer shadow-md shadow-[#8C241E]/20 border border-[#A6352F] disabled:opacity-50 transition-all"
                   >
                     <Check className="w-4 h-4 text-[#FFD0CC]" />
-                    <span>{submittingDecision ? "Publishing..." : "Approve & Publish to Upcoming Events"}</span>
+                    <span>{submittingDecision ? "Publishing..." : "Approve & Publish"}</span>
                   </button>
                 </div>
               </div>

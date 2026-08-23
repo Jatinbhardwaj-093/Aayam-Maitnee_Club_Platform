@@ -82,14 +82,19 @@ const normalize = (word: string) => word.toLowerCase().replace(/[^a-z0-9']/g, ""
 const wordSpans = (text: string) => text.match(/[\w']+|[^\s\w]/g) || [];
 
 const localMatchSpokenWords = (expectedWords: string[], transcriptText: string) => {
-  const expected = expectedWords.map(normalize);
+  const expected = expectedWords.map(normalize).filter(Boolean);
   const spoken = (transcriptText.toLowerCase().match(/[\w']+/g) || []).map(normalize).filter(Boolean);
   const matched = new Set<number>();
   let cursor = 0;
 
   spoken.forEach((spokenWord) => {
-    for (let idx = cursor; idx < Math.min(expected.length, cursor + 5); idx += 1) {
-      if (expected[idx] && expected[idx] === spokenWord) {
+    for (let idx = cursor; idx < Math.min(expected.length, cursor + 6); idx += 1) {
+      if (
+        expected[idx] &&
+        (expected[idx] === spokenWord ||
+          (expected[idx].length > 3 && spokenWord.includes(expected[idx])) ||
+          (spokenWord.length > 3 && expected[idx].includes(spokenWord)))
+      ) {
         matched.add(idx);
         cursor = idx + 1;
         return;
@@ -97,9 +102,14 @@ const localMatchSpokenWords = (expectedWords: string[], transcriptText: string) 
     }
   });
 
+  const totalExpected = expected.length || 1;
+  const isComplete = matched.size >= Math.max(1, Math.floor(totalExpected * 0.65));
+
   return {
     matchedIndices: Array.from(matched).sort((a, b) => a - b),
     currentWordIndex: matched.size ? Math.max(...matched) : -1,
+    isComplete,
+    progress: matched.size / totalExpected,
   };
 };
 
@@ -578,12 +588,12 @@ export default function AiRehearsalStudio() {
     const turnKey = `${activeSession.current_turn}-${activeTurn?.id || "turn"}`;
     const now = Date.now();
 
-    if (isFinal && finalSentTurnRef.current === turnKey) return;
+    if (isFinal && finalSentTurnRef.current === turnKey && now - lastSentAtRef.current < 450) return;
     if (isFinal) finalSentTurnRef.current = turnKey;
 
     const currentCount = transcriptRequestCountRef.current[turnKey] || 0;
-    if (currentCount >= 20 && !isFinal) return;
-    if (!isFinal && text === lastSentTranscriptRef.current && now - lastSentAtRef.current < 250) return;
+    if (currentCount >= 40 && !isFinal) return;
+    if (!isFinal && text === lastSentTranscriptRef.current && now - lastSentAtRef.current < 200) return;
 
     transcriptRequestCountRef.current[turnKey] = currentCount + 1;
     lastSentTranscriptRef.current = text;
@@ -738,22 +748,27 @@ export default function AiRehearsalStudio() {
       }
       const combined = `${lastTranscriptRef.current} ${finalText || interim}`.trim();
       setTranscript(combined);
+      let isLineComplete = false;
       if (sessionRef.current?.speaker_type === "human" && activeTurnRef.current?.words) {
         const localMatch = localMatchSpokenWords(activeTurnRef.current.words, combined);
         setSpokenIndices(localMatch.matchedIndices);
         setHumanWordIndex(localMatch.currentWordIndex);
+        isLineComplete = localMatch.isComplete;
       }
       if (!finalText) {
         sendTranscript(combined, false);
       }
-      if (finalText) {
-        lastTranscriptRef.current = `${lastTranscriptRef.current} ${finalText}`.trim();
+      if (finalText || isLineComplete) {
+        if (finalText) {
+          lastTranscriptRef.current = `${lastTranscriptRef.current} ${finalText}`.trim();
+        }
         if (silenceTimerRef.current) window.clearTimeout(silenceTimerRef.current);
+        const debounceDelay = isLineComplete ? 200 : 400;
         silenceTimerRef.current = window.setTimeout(() => {
-          const finalTranscript = lastTranscriptRef.current;
-          sendTranscript(finalTranscript, true, 1100);
+          const finalTranscript = lastTranscriptRef.current || combined;
+          sendTranscript(finalTranscript, true, 300);
           lastTranscriptRef.current = "";
-        }, 1100);
+        }, debounceDelay);
       }
     };
 

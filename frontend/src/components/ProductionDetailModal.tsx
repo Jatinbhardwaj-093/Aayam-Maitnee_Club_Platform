@@ -68,6 +68,8 @@ export default function ProductionDetailModal({
     (production.status || "").toLowerCase() === "concluded"
   );
 
+  const isPlay = production.category === "Plays" || (!production.category && Boolean(playbook));
+
   const handleOpenScript = () => {
     onClose();
     if (onOpenScript) {
@@ -208,38 +210,40 @@ export default function ProductionDetailModal({
               </p>
             </div>
 
-            {/* Cast & Ensemble */}
-            <div className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-2xl p-5 sm:p-6 shadow-xs space-y-3.5">
-              <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-[#8C5A54] flex items-center gap-1.5">
-                <Users className="w-3.5 h-3.5 text-[#8C241E]" />
-                <span>Cast & Character Ensemble</span>
-              </h3>
+            {/* Cast & Ensemble (Plays Only) */}
+            {isPlay && (
+              <div className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-2xl p-5 sm:p-6 shadow-xs space-y-3.5">
+                <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-[#8C5A54] flex items-center gap-1.5">
+                  <Users className="w-3.5 h-3.5 text-[#8C241E]" />
+                  <span>Cast & Character Ensemble</span>
+                </h3>
 
-              {playbook?.characters && playbook.characters.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
-                  {playbook.characters.map((char) => (
-                    <div key={char.id} className="p-3 rounded-xl bg-[#F5EAE6] border border-[#DEBEB7] flex items-start gap-2.5">
-                      <div className={`w-2.5 h-2.5 rounded-full mt-1 shrink-0 ${char.color || "bg-[#8C241E]"}`} />
-                      <div className="min-w-0">
-                        <span className="font-serif font-bold text-[#2A1816] block">{char.name}</span>
-                        <span className="text-[11px] text-[#6E4742] font-light leading-snug block">{char.traits}</span>
+                {playbook?.characters && playbook.characters.length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+                    {playbook.characters.map((char) => (
+                      <div key={char.id} className="p-3 rounded-xl bg-[#F5EAE6] border border-[#DEBEB7] flex items-start gap-2.5">
+                        <div className={`w-2.5 h-2.5 rounded-full mt-1 shrink-0 ${char.color || "bg-[#8C241E]"}`} />
+                        <div className="min-w-0">
+                          <span className="font-serif font-bold text-[#2A1816] block">{char.name}</span>
+                          <span className="text-[11px] text-[#6E4742] font-light leading-snug block">{char.traits}</span>
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              ) : production.cast ? (
-                <div className="bg-[#F5EAE6] p-3.5 rounded-xl border border-[#DEBEB7] text-xs font-mono text-[#5C3B37] leading-relaxed">
-                  {production.cast}
-                </div>
-              ) : (
-                <p className="text-xs font-serif italic text-[#8C5A54]">
-                  Ensemble auditions currently in progress. Character assignments updated post-casting call.
-                </p>
-              )}
-            </div>
+                    ))}
+                  </div>
+                ) : production.cast ? (
+                  <div className="bg-[#F5EAE6] p-3.5 rounded-xl border border-[#DEBEB7] text-xs font-mono text-[#5C3B37] leading-relaxed">
+                    {production.cast}
+                  </div>
+                ) : (
+                  <p className="text-xs font-serif italic text-[#8C5A54]">
+                    Ensemble auditions currently in progress. Character assignments updated post-casting call.
+                  </p>
+                )}
+              </div>
+            )}
 
-            {/* Scenography */}
-            {playbook?.settingInfo && (
+            {/* Scenography (Plays Only) */}
+            {isPlay && playbook?.settingInfo && (
               <div className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-2xl p-5 sm:p-6 shadow-xs space-y-2 text-xs">
                 <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#8C5A54] flex items-center gap-1.5">
                   <Compass className="w-3.5 h-3.5 text-[#8C241E]" />
@@ -259,7 +263,7 @@ export default function ProductionDetailModal({
               </span>
 
               <div className="flex items-center gap-2.5">
-                {onOpenScript && (
+                {isPlay && onOpenScript && (
                   <button
                     type="button"
                     onClick={handleOpenScript}
