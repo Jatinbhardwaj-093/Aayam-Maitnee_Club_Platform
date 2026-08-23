@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
-import { Phone, MapPin, ShieldAlert, Award, FileText, ArrowLeft, Edit3, Globe, Shield, Tag, Plus, X } from "lucide-react";
+import { Phone, MapPin, ShieldAlert, Award, FileText, ArrowLeft, ArrowRight, Edit3, Globe, Shield, Tag, Plus, X } from "lucide-react";
 
 export default function MemberProfileAudit() {
   const navigate = useNavigate();
@@ -88,207 +88,203 @@ export default function MemberProfileAudit() {
   }
 
   return (
-    <div className="flex-1 bg-[#E7DDD3] text-[#2C2A28] font-sans py-2 md:py-4 selection:bg-[#F8E8E4]">
-      <div className="max-w-5xl mx-auto px-6">
+    <div className="min-h-screen bg-[#EBE3DB] p-6 sm:p-10 font-sans">
+      <div className="max-w-5xl mx-auto space-y-6">
         
-        {/* Back header */}
-        <div className="mb-6 flex justify-between items-center">
-          <button
-            onClick={() => navigate("/directory-admin")}
-            className="flex items-center gap-2 text-xs font-semibold text-[#2C2A28] hover:text-[#2C2A28]/80 transition-all"
-          >
-            <ArrowLeft className="w-4 h-4" /> Back to Members Directory
-          </button>
-        </div>
+        {/* Navigation */}
+        <button 
+          onClick={() => navigate(-1)}
+          className="text-[#8C5A54] hover:text-[#8C241E] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors cursor-pointer"
+        >
+          <ArrowLeft className="w-4 h-4" /> Back to Previous View
+        </button>
 
-        {/* Profile Card Header */}
-        <div className="bg-[#F7F5F0] border border-[#D5C9BE]/30 rounded-3xl shadow-sm overflow-hidden mb-8">
-          <div className="bg-[#353535]/10 border-b border-[#D5C9BE]/70/60 p-8 flex flex-col md:flex-row items-center gap-6 relative overflow-visible">
-            <div className="w-20 h-20 rounded-full overflow-hidden bg-[#353535]/20 border-2 border-white flex items-center justify-center text-[#2C2A28] font-bold text-2xl shadow-sm flex-shrink-0">
-              {profile.avatarUrl || profile.image ? (
-                <img
-                  src={profile.avatarUrl || profile.image}
-                  alt={profile.name}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                profile.name?.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2)
-              )}
-            </div>
-            
-            <div className="text-center md:text-left flex-1 space-y-1.5">
-              <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
-                <h1 className="font-serif text-3xl font-bold text-[#2C2A28] tracking-tight">{profile.name}</h1>
-                <span className="inline-block px-3 py-1 rounded-full bg-[#E85F57]/20 text-[#E85F57] text-[10px] font-bold uppercase tracking-wider">
-                  {profile.roles && profile.roles.length > 0 ? profile.roles[0] : "Member"}
-                </span>
-                
-                {/* Discord-style Labels */}
-                {profile.labels?.map((label: any) => (
-                  <span 
-                    key={label.id} 
-                    className="group relative inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold"
-                    style={{
-                      backgroundColor: `${label.color}15`, 
-                      border: `1px solid ${label.color}40`,
-                      color: label.color
-                    }}
-                  >
-                    <span className="w-2 h-2 rounded-full" style={{backgroundColor: label.color}}></span>
-                    {label.name}
-                    <button 
-                      onClick={() => handleRemoveLabel(label.id)}
-                      className="opacity-0 group-hover:opacity-100 transition-opacity ml-1 hover:text-black"
-                    >
-                      <X className="w-3 h-3" />
-                    </button>
+        {/* Main Card */}
+        <div className="bg-[#FAF2EE] border border-[#DCBAB2] rounded-[2.5rem] shadow-xl overflow-hidden relative">
+          
+          {/* Header Region */}
+          <div className="bg-gradient-to-br from-[#F5EAE6] to-[#EEDBD5] border-b border-[#DCBAB2] p-8 md:p-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative">
+            <div className="flex items-center gap-6 relative z-10">
+              <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-[#FDF8F7] shadow-lg shrink-0">
+                {profile.avatarUrl ? (
+                  <img src={profile.avatarUrl} alt={profile.name} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full bg-[#D5AAA2] flex items-center justify-center text-3xl font-serif text-[#FDF8F7]">
+                    {profile.name?.charAt(0) || "U"}
+                  </div>
+                )}
+              </div>
+              <div className="space-y-1">
+                <div className="flex flex-wrap items-center gap-3">
+                  <h1 className="font-serif text-3xl font-normal text-[#2A1816] tracking-tight">{profile.name}</h1>
+                  <span className="inline-block px-3 py-1 rounded-full bg-[#8C241E] text-[#FDF8F7] text-[10px] font-mono font-bold uppercase tracking-wider shadow-sm">
+                    {profile.roles && profile.roles.length > 0 ? profile.roles[0] : "Member"}
                   </span>
-                ))}
+                </div>
+                <p className="text-sm font-mono text-[#8C5A54] tracking-wide">{profile.email}</p>
                 
-                {/* Add Label Button */}
-                <div className="relative">
-                  <button 
-                    onClick={() => setShowLabelDropdown(!showLabelDropdown)}
-                    className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#F7F5F0] border border-gray-300 text-gray-600 hover:bg-gray-50"
-                  >
-                    <Plus className="w-3 h-3" /> Add
-                  </button>
+                {/* Labels row */}
+                <div className="flex flex-wrap items-center gap-1.5 pt-2">
+                  {profile.labels?.map((label: any) => (
+                    <span 
+                      key={label.id} 
+                      className="group relative inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold font-mono tracking-wider shadow-sm"
+                      style={{ backgroundColor: label.color, color: "#fff" }}
+                    >
+                      <Tag className="w-3 h-3 opacity-70" />
+                      {label.name}
+                      <button onClick={() => handleRemoveLabel(label.id)} className="opacity-0 group-hover:opacity-100 transition-opacity ml-1 hover:text-black">
+                        <X className="w-3 h-3" />
+                      </button>
+                    </span>
+                  ))}
                   
-                  {showLabelDropdown && (
-                    <div className="absolute top-full mt-2 left-0 w-48 bg-[#F7F5F0] rounded-xl shadow-lg border border-gray-100 p-2 z-50 flex flex-col gap-1 max-h-48 overflow-y-auto">
-                      <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider px-2 py-1 mb-1 border-b border-gray-100">Assign Label</div>
-                      {allLabels.filter(l => !profile.labels?.find((pl: any) => pl.id === l.id)).map(label => (
-                        <button
-                          key={label.id}
-                          onClick={() => handleAssignLabel(label.id)}
-                          className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-gray-50 text-left text-xs font-semibold"
-                          style={{color: label.color}}
-                        >
-                          <span className="w-2 h-2 rounded-full" style={{backgroundColor: label.color}}></span>
-                          {label.name}
-                        </button>
-                      ))}
-                      {allLabels.filter(l => !profile.labels?.find((pl: any) => pl.id === l.id)).length === 0 && (
-                        <div className="text-xs text-gray-400 px-2 py-2">All labels assigned!</div>
-                      )}
-                    </div>
-                  )}
+                  {/* Add Label Button */}
+                  <div className="relative">
+                    <button 
+                      onClick={() => setShowLabelDropdown(!showLabelDropdown)}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-[#FAF2EE] border border-[#DCBAB2] text-[#8C5A54] hover:text-[#8C241E] hover:border-[#8C5A54] transition-all shadow-sm cursor-pointer"
+                    >
+                      <Plus className="w-3 h-3" /> Add Label
+                    </button>
+                    {showLabelDropdown && (
+                      <div className="absolute top-full mt-2 left-0 w-48 bg-[#FAF2EE] rounded-xl shadow-xl border border-[#DCBAB2] p-2 z-50 flex flex-col gap-1 max-h-48 overflow-y-auto custom-scrollbar">
+                        <div className="text-[10px] font-mono font-bold text-[#8C5A54] uppercase tracking-wider px-2 py-1 mb-1 border-b border-[#DCBAB2]/50">Assign Label</div>
+                        {allLabels.filter(l => !profile.labels?.find((pl: any) => pl.id === l.id)).map(label => (
+                          <button key={label.id} onClick={() => handleAssignLabel(label.id)} className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-[#FAF2EE] text-left text-xs font-semibold cursor-pointer" style={{color: label.color}}>
+                            <span className="w-2.5 h-2.5 rounded-full shadow-sm" style={{backgroundColor: label.color}}></span>
+                            {label.name}
+                          </button>
+                        ))}
+                        {allLabels.filter(l => !profile.labels?.find((pl: any) => pl.id === l.id)).length === 0 && (
+                          <div className="text-[10px] font-mono text-gray-400 px-2 py-2 text-center italic">All labels assigned!</div>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
-              <p className="text-sm text-[#666361]">{profile.email}</p>
             </div>
-
-            <div className="flex gap-4 items-center bg-[#F7F5F0]/60 backdrop-blur-xs border border-[#D5C9BE]/70/80 px-4 py-3 rounded-2xl">
-              <div className="text-right">
-                <p className="text-[10px] uppercase font-bold text-[#2C2A28]/75 tracking-wider">Member ID</p>
-                <p className="text-xs font-bold text-[#666361]">{profile.member_id || "AAY-PEND"}</p>
-              </div>
+            <div className="bg-[#FAF2EE] border border-[#DCBAB2] px-5 py-3 rounded-2xl shadow-sm text-center">
+              <p className="text-[9px] uppercase font-mono font-bold text-[#8C5A54] tracking-wider mb-0.5">Member ID</p>
+              <p className="text-sm font-bold font-mono text-[#2A1816]">{profile.member_id || "AAY-PEND"}</p>
             </div>
           </div>
 
           <div className="p-8 md:p-10 grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12">
             
-            {/* Left Column: Personal info & contacts */}
-            <div className="lg:col-span-5 space-y-6">
+            {/* Left Column */}
+            <div className="lg:col-span-5 space-y-8">
               
-              {/* Contact Info */}
               <div className="space-y-4">
-                <h2 className="text-xs font-bold uppercase tracking-widest text-[#2C2A28] flex items-center gap-2 border-b border-[#D5C9BE]/70/60 pb-2">
-                  <Phone className="w-4 h-4 text-[#E85F57]" /> Contact Information
+                <h2 className="text-[11px] font-mono font-bold uppercase tracking-widest text-[#8C5A54] flex items-center gap-2 border-b border-[#DCBAB2]/60 pb-2">
+                  <Phone className="w-4 h-4 text-[#8C241E]" /> Contact Info
                 </h2>
-                <div className="space-y-3 text-sm text-[#666361]/95">
-                  <p><strong>Phone:</strong> {profile.phone || "Not specified"}</p>
-                  <p><strong>Pronouns:</strong> {profile.pronouns || "Not specified"}</p>
-                  <p><strong>Age:</strong> {profile.age || "Not specified"}</p>
+                <div className="space-y-3 text-sm text-[#5C3B37]">
+                  <div className="flex justify-between items-center bg-[#FAF2EE] p-3 rounded-xl border border-[#DCBAB2]/50">
+                    <span className="text-[10px] font-mono uppercase font-bold tracking-wider text-[#8C5A54]">Phone</span>
+                    <span className="font-medium">{profile.phone || "Not specified"}</span>
+                  </div>
+                  <div className="flex justify-between items-center bg-[#FAF2EE] p-3 rounded-xl border border-[#DCBAB2]/50">
+                    <span className="text-[10px] font-mono uppercase font-bold tracking-wider text-[#8C5A54]">Pronouns</span>
+                    <span className="font-medium">{profile.pronouns || "Not specified"}</span>
+                  </div>
+                  <div className="flex justify-between items-center bg-[#FAF2EE] p-3 rounded-xl border border-[#DCBAB2]/50">
+                    <span className="text-[10px] font-mono uppercase font-bold tracking-wider text-[#8C5A54]">Age</span>
+                    <span className="font-medium">{profile.age || "Not specified"}</span>
+                  </div>
                 </div>
               </div>
 
-              {/* Address */}
               <div className="space-y-4">
-                <h2 className="text-xs font-bold uppercase tracking-widest text-[#2C2A28] flex items-center gap-2 border-b border-[#D5C9BE]/70/60 pb-2">
-                  <MapPin className="w-4 h-4 text-[#E85F57]" /> Address & Location
+                <h2 className="text-[11px] font-mono font-bold uppercase tracking-widest text-[#8C5A54] flex items-center gap-2 border-b border-[#DCBAB2]/60 pb-2">
+                  <MapPin className="w-4 h-4 text-[#8C241E]" /> Address
                 </h2>
-                <div className="space-y-2 text-sm text-[#666361]/95">
-                  <p><strong>Street:</strong> {profile.address || "Not specified"}</p>
-                  <p><strong>City:</strong> {profile.city || "Not specified"}</p>
-                  <p><strong>State:</strong> {profile.state || "Not specified"}</p>
-                  <p><strong>Country:</strong> {profile.country || "India"}</p>
+                <div className="space-y-2 text-sm text-[#5C3B37] bg-[#FAF2EE] p-4 rounded-xl border border-[#DCBAB2]/50">
+                  <p><strong className="font-mono text-[10px] uppercase tracking-wider text-[#8C5A54]">Street:</strong> {profile.address || "Not specified"}</p>
+                  <p><strong className="font-mono text-[10px] uppercase tracking-wider text-[#8C5A54]">City:</strong> {profile.city || "Not specified"}</p>
+                  <p><strong className="font-mono text-[10px] uppercase tracking-wider text-[#8C5A54]">State:</strong> {profile.state || "Not specified"}</p>
+                  <p><strong className="font-mono text-[10px] uppercase tracking-wider text-[#8C5A54]">Country:</strong> {profile.country || "India"}</p>
                 </div>
               </div>
 
               {/* Emergency Contacts */}
-              <div className="space-y-4 bg-red-50/30 border border-red-100 p-5 rounded-2xl">
-                <h2 className="text-xs font-bold uppercase tracking-widest text-red-800 flex items-center gap-2 border-b border-red-100 pb-2">
-                  <ShieldAlert className="w-4 h-4 text-red-600" /> Emergency Details
+              <div className="space-y-4 bg-gradient-to-br from-[#F5EAE6] to-[#EEDBD5] border border-[#DCBAB2] p-5 rounded-2xl shadow-xs">
+                <h2 className="text-[11px] font-mono font-bold uppercase tracking-widest text-[#8C241E] flex items-center gap-2 border-b border-[#DCBAB2] pb-2">
+                  <ShieldAlert className="w-4 h-4 text-[#8C241E]" /> Emergency Details
                 </h2>
-                <div className="space-y-2.5 text-sm text-[#666361]/95">
-                  <p><strong>Contact Name:</strong> {profile.emergency_name || "Not specified"}</p>
-                  <p><strong>Contact Phone:</strong> {profile.emergency_phone || "Not specified"}</p>
+                <div className="space-y-2.5 text-sm text-[#5C3B37]">
+                  <p><strong className="font-mono text-[10px] uppercase tracking-wider text-[#8C5A54]">Contact Name:</strong> {profile.emergency_name || "Not specified"}</p>
+                  <p><strong className="font-mono text-[10px] uppercase tracking-wider text-[#8C5A54]">Contact Phone:</strong> {profile.emergency_phone || "Not specified"}</p>
                 </div>
               </div>
 
             </div>
 
-            {/* Right Column: Bio & Skills */}
+            {/* Right Column */}
             <div className="lg:col-span-7 space-y-8">
               
-              {/* Bio block */}
-              <div className="space-y-3 text-left">
-                <h2 className="text-xs font-bold uppercase tracking-widest text-[#2C2A28] flex items-center gap-2 border-b border-[#D5C9BE]/70/60 pb-2">
-                  <FileText className="w-4 h-4 text-[#E85F57]" /> Artistic Biography
+              <div className="space-y-3">
+                <h2 className="text-[11px] font-mono font-bold uppercase tracking-widest text-[#8C5A54] flex items-center gap-2 border-b border-[#DCBAB2]/60 pb-2">
+                  <FileText className="w-4 h-4 text-[#8C241E]" /> Artistic Biography
                 </h2>
                 {profile.bio ? (
-                  <blockquote className="border-l-4 border-[#E85F57] pl-4 italic text-sm leading-relaxed text-[#666361]/90 my-4 bg-gray-50 py-3 pr-3 rounded-r-xl">
+                  <blockquote className="border-l-4 border-[#8C241E] pl-5 italic text-[15px] leading-relaxed text-[#5C3B37] py-2">
                     "{profile.bio}"
                   </blockquote>
                 ) : (
-                  <p className="text-xs text-gray-400 italic">No biography listed. Edit profile to add.</p>
+                  <p className="text-sm text-[#8C5A54] italic">No biography listed. Edit profile to add.</p>
                 )}
               </div>
 
-              {/* Theatrical Profile details */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 
-                {/* Interest & Avail */}
-                <div className="space-y-3">
-                  <h3 className="text-xs font-bold uppercase tracking-widest text-[#2C2A28] flex items-center gap-2 border-b border-[#D5C9BE]/70/40 pb-1.5">
-                    <Award className="w-4 h-4 text-[#E85F57]" /> Theatrical Profile
+                <div className="space-y-4">
+                  <h3 className="text-[11px] font-mono font-bold uppercase tracking-widest text-[#8C5A54] flex items-center gap-2 border-b border-[#DCBAB2]/60 pb-2">
+                    <Award className="w-4 h-4 text-[#8C241E]" /> Theatrical Profile
                   </h3>
-                  <div className="space-y-2 text-sm text-[#666361]/95">
-                    <p><strong>Primary Interest:</strong> {profile.interest || "Acting"}</p>
-                    <p><strong>Availability:</strong> {profile.availability || "Weekends"}</p>
+                  <div className="space-y-3 text-sm text-[#5C3B37]">
+                    <div className="bg-[#FAF2EE] p-3.5 rounded-xl border border-[#DCBAB2]/50 flex flex-col gap-1">
+                      <span className="text-[10px] font-mono uppercase font-bold tracking-wider text-[#8C5A54]">Primary Interest</span>
+                      <span className="font-medium leading-relaxed">{profile.interest || "Acting"}</span>
+                    </div>
+                    <div className="bg-[#FAF2EE] p-3.5 rounded-xl border border-[#DCBAB2]/50 flex flex-col gap-1">
+                      <span className="text-[10px] font-mono uppercase font-bold tracking-wider text-[#8C5A54]">Availability</span>
+                      <span className="font-medium">{profile.availability || "Weekends"}</span>
+                    </div>
                   </div>
                 </div>
 
-                {/* Portfolio */}
-                <div className="space-y-3">
-                  <h3 className="text-xs font-bold uppercase tracking-widest text-[#2C2A28] flex items-center gap-2 border-b border-[#D5C9BE]/70/40 pb-1.5">
-                    <Globe className="w-4 h-4 text-[#E85F57]" /> Portfolio Details
+                <div className="space-y-4">
+                  <h3 className="text-[11px] font-mono font-bold uppercase tracking-widest text-[#8C5A54] flex items-center gap-2 border-b border-[#DCBAB2]/60 pb-2">
+                    <Globe className="w-4 h-4 text-[#8C241E]" /> Portfolio
                   </h3>
-                  <div className="space-y-2 text-sm text-[#666361]/95">
-                    <p><strong>Link:</strong> {profile.portfolio ? (
-                      <a href={profile.portfolio} target="_blank" rel="noreferrer" className="text-[#E85F57] hover:underline font-medium break-all">{profile.portfolio}</a>
+                  <div className="bg-[#FAF2EE] p-3.5 rounded-xl border border-[#DCBAB2]/50 flex flex-col gap-1">
+                    <span className="text-[10px] font-mono uppercase font-bold tracking-wider text-[#8C5A54]">External Link</span>
+                    {profile.portfolio ? (
+                      <a href={profile.portfolio} target="_blank" rel="noreferrer" className="font-medium text-[#8C241E] hover:underline flex items-center gap-1.5 break-all">
+                        {profile.portfolio} <ArrowRight className="w-3.5 h-3.5 shrink-0" />
+                      </a>
                     ) : (
-                      <span className="text-gray-400 italic">None listed</span>
-                    )}</p>
+                      <span className="text-[#8C5A54] italic text-sm">None listed</span>
+                    )}
                   </div>
                 </div>
 
               </div>
 
-              {/* System Account Stats */}
-              <div className="bg-[#E7DDD3]/60 border border-[#D5C9BE]/40 p-5 rounded-2xl space-y-3">
-                <h3 className="text-xs font-bold uppercase tracking-widest text-[#2C2A28] flex items-center gap-2">
-                  <Shield className="w-4 h-4 text-[#E85F57]" /> System Privileges
+              <div className="bg-[#2A1816] text-[#FDF8F7] border border-[#5C3B37] p-6 rounded-2xl shadow-xl mt-4">
+                <h3 className="text-[11px] font-mono font-bold uppercase tracking-widest text-[#D5AAA2] flex items-center gap-2 mb-4">
+                  <Shield className="w-4 h-4 text-[#FDF8F7]" /> System Privileges
                 </h3>
-                <div className="grid grid-cols-2 gap-4 text-xs">
-                  <div>
-                    <span className="text-gray-500">Account status:</span>
-                    <p className="font-bold text-[#2C2A28]">{profile.status || "Active"}</p>
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#D5AAA2]">Account Status</span>
+                    <p className="text-lg font-serif">{profile.status || "Active"}</p>
                   </div>
-                  <div>
-                    <span className="text-gray-500">Experience level:</span>
-                    <p className="font-bold text-[#2C2A28]">{profile.level || "Intermediate"}</p>
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#D5AAA2]">Experience Level</span>
+                    <p className="text-lg font-serif">{profile.level || "Intermediate"}</p>
                   </div>
                 </div>
               </div>
@@ -301,4 +297,5 @@ export default function MemberProfileAudit() {
       </div>
     </div>
   );
+
 }

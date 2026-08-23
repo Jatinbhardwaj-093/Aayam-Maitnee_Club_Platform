@@ -138,7 +138,7 @@ export default function About() {
               Directorial Council
             </h2>
           </div>
-          <Link to="/directory" className="text-xs font-bold text-[#2C2A28] hover:text-[#E85F57] uppercase tracking-widest flex items-center gap-1.5 transition-colors bg-white/40 px-6 py-3 rounded-full border border-[#353535]/10 hover:bg-[#2C2A28] hover:text-white">
+          <Link to="/directory" className="text-xs font-bold text-[#2C2A28] hover:text-[#E85F57] uppercase tracking-widest flex items-center gap-1.5 transition-colors bg-[#FAF2EE]/40 px-6 py-3 rounded-full border border-[#353535]/10 hover:bg-[#2C2A28] hover:text-white">
             <span>View Ensemble Directory</span> <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
@@ -250,7 +250,7 @@ export default function About() {
 
             <div className="flex flex-wrap gap-4 justify-center">
               <Link to={auditionPath}>
-                <Button className="bg-[#E85F57] hover:bg-white hover:text-[#E85F57] text-white font-bold px-10 py-6 rounded-full text-sm uppercase tracking-widest transition-all shadow-xl active:scale-95">
+                <Button className="bg-[#E85F57] hover:bg-[#FAF2EE] hover:text-[#E85F57] text-white font-bold px-10 py-6 rounded-full text-sm uppercase tracking-widest transition-all shadow-xl active:scale-95">
                   {activeUser ? "Auditions & Casting Portal" : "Apply for Auditions"}
                 </Button>
               </Link>

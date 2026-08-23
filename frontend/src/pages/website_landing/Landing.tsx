@@ -112,7 +112,7 @@ export default function Landing() {
                 </Link>
                 <Link
                   to={auditionPath}
-                  className="bg-white/80 hover:bg-white text-[#2C2A28] border border-[#D5C9BE] px-8 py-4 rounded-full text-xs font-bold uppercase tracking-widest transition-all shadow-xs"
+                  className="bg-[#FAF2EE]/80 hover:bg-[#FAF2EE] text-[#2C2A28] border border-[#D5C9BE] px-8 py-4 rounded-full text-xs font-bold uppercase tracking-widest transition-all shadow-xs"
                 >
                   {activeUser ? "Auditions Portal" : "Audition Call"}
                 </Link>
@@ -488,14 +488,14 @@ export default function Landing() {
             <div className="pt-4 flex flex-wrap items-center justify-center gap-4">
               <Link
                 to={auditionPath}
-                className="bg-[#E85F57] hover:bg-white hover:text-[#E85F57] text-white font-bold px-10 py-4 rounded-full text-xs uppercase tracking-widest transition-all shadow-xl active:scale-95 flex items-center gap-2 group"
+                className="bg-[#E85F57] hover:bg-[#FAF2EE] hover:text-[#E85F57] text-white font-bold px-10 py-4 rounded-full text-xs uppercase tracking-widest transition-all shadow-xl active:scale-95 flex items-center gap-2 group"
               >
                 <span>{activeUser ? "Auditions & Casting Portal" : "Audition For Aayam"}</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link
                 to="/directory"
-                className="border border-white/20 hover:bg-white/10 text-white font-bold px-8 py-4 rounded-full text-xs uppercase tracking-widest transition-all"
+                className="border border-white/20 hover:bg-[#FAF2EE]/10 text-white font-bold px-8 py-4 rounded-full text-xs uppercase tracking-widest transition-all"
               >
                 Meet the Ensemble
               </Link>

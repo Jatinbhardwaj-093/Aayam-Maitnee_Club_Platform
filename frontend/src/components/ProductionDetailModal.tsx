@@ -114,7 +114,7 @@ export default function ProductionDetailModal({
                 </span>
                 <span className={`text-[10px] font-mono font-bold uppercase tracking-wider px-3 py-1 rounded-full border backdrop-blur-xs ${
                   isPast
-                    ? "bg-white/10 text-white/80 border-white/20"
+                    ? "bg-[#FAF2EE]/10 text-white/80 border-white/20"
                     : "bg-emerald-600/30 text-emerald-200 border-emerald-500/30"
                 }`}>
                   {production.status || (isPast ? "Archived Production" : "Upcoming Premiere")}

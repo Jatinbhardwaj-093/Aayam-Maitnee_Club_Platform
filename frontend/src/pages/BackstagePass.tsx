@@ -62,7 +62,7 @@ export default function BackstagePass() {
             Daily checklist and technical tasks for props, stage lighting cues, and audio syncs.
           </p>
         </div>
-        <div className="bg-white border border-[#DDD8CE] p-4 rounded-[8px] shadow-sm text-center min-w-[120px]">
+        <div className="bg-[#FAF2EE] border border-[#DDD8CE] p-4 rounded-[8px] shadow-sm text-center min-w-[120px]">
           <span className="text-[28px] font-bold font-serif text-[#E85F57]">{completionRate}%</span>
           <p className="text-[10px] text-[#666361]/70 uppercase font-semibold tracking-wider mt-1">Completed Rate</p>
         </div>
@@ -71,7 +71,7 @@ export default function BackstagePass() {
       {/* Main Container Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-[24px]">
         {/* Left 2 Cols: Checklists */}
-        <section className="lg:col-span-2 bg-white border border-[#DDD8CE] rounded-[8px] p-6 space-y-6">
+        <section className="lg:col-span-2 bg-[#FAF2EE] border border-[#DDD8CE] rounded-[8px] p-6 space-y-6">
           <div className="flex justify-between items-center border-b border-[#DDD8CE]/80 pb-4">
             <h3 className="font-bold text-[18px] text-[#353535] font-serif flex items-center gap-2">
               <ClipboardList className="w-5 h-5 text-[#E85F57]" /> Active Crew Checklist
@@ -146,7 +146,7 @@ export default function BackstagePass() {
                 placeholder="e.g., Fill fog machine fluid"
                 value={newTaskText}
                 onChange={(e) => setNewTaskText(e.target.value)}
-                className="border-[#DDD8CE] bg-white focus-visible:ring-[#E85F57]"
+                className="border-[#DDD8CE] bg-[#FAF2EE] focus-visible:ring-[#E85F57]"
                 required
               />
             </div>
@@ -157,7 +157,7 @@ export default function BackstagePass() {
                 placeholder="e.g., M. Chen"
                 value={newAssigned}
                 onChange={(e) => setNewAssigned(e.target.value)}
-                className="border-[#DDD8CE] bg-white focus-visible:ring-[#E85F57]"
+                className="border-[#DDD8CE] bg-[#FAF2EE] focus-visible:ring-[#E85F57]"
                 required
               />
             </div>
@@ -167,7 +167,7 @@ export default function BackstagePass() {
               <select
                 value={newCategory}
                 onChange={(e) => setNewCategory(e.target.value as CrewTask["category"])}
-                className="w-full rounded-md border border-[#DDD8CE] bg-white px-3 py-2 text-sm text-[#666361] outline-none focus:ring-1 focus:ring-[#E85F57] focus:border-[#E85F57]"
+                className="w-full rounded-md border border-[#DDD8CE] bg-[#FAF2EE] px-3 py-2 text-sm text-[#666361] outline-none focus:ring-1 focus:ring-[#E85F57] focus:border-[#E85F57]"
               >
                 <option value="Props">Props</option>
                 <option value="Wardrobe">Wardrobe</option>

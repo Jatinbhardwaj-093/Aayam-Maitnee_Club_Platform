@@ -766,57 +766,71 @@ def delete_maintainer_schedule():
 
 @api_bp.route('/my-auditions', methods=['GET'])
 def get_my_auditions():
+    from models import AuditionApplication, AuditionPosition, User
     email = request.args.get('email')
     user = User.query.filter_by(email=email).first()
     if not user:
-        return jsonify({'error': 'User not found'}), 404
-        
-    auditions = Audition.query.filter_by(user_id=user.id).all()
+        return jsonify([])
+    apps = AuditionApplication.query.filter_by(applicant_email=email).order_by(AuditionApplication.submitted_at.desc()).all()
     result = []
-    for a in auditions:
-        play = Play.query.get(a.play_id)
-        play_title = play.title if play else "Unknown Play"
-        
-        # map db status to UI status
+    for a in apps:
+        pos = AuditionPosition.query.get(a.position_id) if a.position_id else None
+        prod_name = pos.production_name if pos else ''
         status_map = {
-            'pending': 'Applied',
-            'reviewing': 'Reviewing',
-            'interview': 'Interview/Audition',
-            'decision': 'Casting Decision'
+            'Pending Review': 'submitted',
+            'Shortlisted': 'review',
+            'Selected': 'selected',
+            'Rejected': 'declined'
         }
-        ui_status = status_map.get(a.status.lower(), 'Applied')
-        
-        role_val = a.role_applied_for or "Ensemble"
+        progress = status_map.get(a.status, 'submitted')
         result.append({
-            'id': f"app{a.id}",
-            'positionId': f"{a.play_id}_{role_val}",
-            'positionTitle': f"{play_title} - {role_val}",
-            'category': role_val,
-            'submittedAt': a.submitted_at.strftime('%b %d, %Y') if a.submitted_at else '',
-            'status': ui_status,
-            'notes': "Application received and logged. Creative board is reviewing your materials.",
-            'files': ["application_details.pdf"]
+            'id': a.id,
+            'position_id': a.position_id,
+            'role_name': a.role_name,
+            'production_name': prod_name,
+            'category': pos.role_category if pos else 'Audition Role',
+            'status': a.status,
+            'progress': progress,
+            'audition_date': a.audition_date,
+            'submitted_at': a.submitted_at.strftime('%b %d, %Y') if a.submitted_at else '',
+            'notes': a.notes or '',
+            'portfolio_link': a.portfolio_link or '',
+            'portfolio_filename': getattr(a, 'portfolio_filename', None),
+            'video_filename': getattr(a, 'video_filename', None),
         })
     return jsonify(result)
 
 @api_bp.route('/audition/submit', methods=['POST'])
 def submit_audition():
+    from models import AuditionApplication, AuditionPosition, User, db
     data = request.json or {}
-    email = data.get('email')
-    user = User.query.filter_by(email=email).first()
-    if not user:
-        return jsonify({'error': 'User not found'}), 404
-        
-    play_id = data.get('play_id')
-    role = data.get('role') or data.get('category') or 'Ensemble'
-    notes = data.get('notes')
-    
-    a = Audition(user_id=user.id, play_id=play_id, role_applied_for=role, experience_notes=notes, status='pending')
-    db.session.add(a)
+    position_id = data.get('position_id')
+    role_name = data.get('role_name', 'Ensemble Role')
+    applicant_name = data.get('applicant_name', '')
+    applicant_email = data.get('applicant_email', '')
+    applicant_phone = data.get('applicant_phone', '')
+    experience_level = data.get('experience_level', 'Ensemble Member')
+    portfolio_link = data.get('portfolio_link', '')
+    notes = data.get('notes', '')
+    user = User.query.filter_by(email=applicant_email).first() if applicant_email else None
+    if applicant_email and position_id:
+        existing = AuditionApplication.query.filter_by(applicant_email=applicant_email, position_id=int(position_id)).first()
+        if existing:
+            return jsonify({'error': 'Already applied', 'existing_id': existing.id}), 409
+    app = AuditionApplication(
+        position_id=int(position_id) if position_id else None,
+        role_name=role_name,
+        applicant_name=applicant_name,
+        applicant_email=applicant_email,
+        applicant_phone=applicant_phone or '+91 98110 44321',
+        experience_level=experience_level,
+        portfolio_link=portfolio_link or '',
+        notes=notes,
+        status='Pending Review'
+    )
+    db.session.add(app)
     db.session.commit()
-    
-    return jsonify({'success': True, 'id': a.id})
-
+    return jsonify({'success': True, 'id': app.id})
 
 @api_bp.route('/labels', methods=['GET'])
 def get_labels():
@@ -901,7 +915,72 @@ def add_stage_booking():
     )
     db.session.add(new_booking)
     db.session.commit()
-    return jsonify({'status': 'success', 'id': f"B{new_booking.id}"}), 201
+@api_bp.route('/tickets/reserve', methods=['POST'])
+@api_bp.route('/reserve-ticket', methods=['POST'])
+def reserve_ticket():
+    from models import Booking, Event, User, db
+    import random
+    import string
+    from datetime import datetime
+
+    data = request.json or {}
+    name = data.get('name') or data.get('holder_name') or 'Patron'
+    email = data.get('email') or data.get('holder_email') or 'guest@aayam.org'
+    phone = data.get('phone') or data.get('holder_phone') or '+91 98402 12345'
+    play_title = data.get('play_title') or data.get('title') or 'Hayavadana'
+    seats_count = int(data.get('seats_count') or data.get('seats') or 1)
+    seat_tier = data.get('seat_tier') or 'General Free Admission'
+    venue = data.get('venue') or 'CLT Main Stage, IIT Madras'
+    event_date = data.get('date') or 'Sep 26 - 28, 2026'
+    time_slot = data.get('time') or '18:30 - 21:00'
+
+    rand_code = ''.join(random.choices(string.digits, k=4))
+    ticket_id = f"AYM-TKT-{rand_code}"
+    
+    rows = ['A', 'B', 'C', 'D', 'E', 'F']
+    selected_row = random.choice(rows)
+    start_seat = random.randint(1, 24)
+    if seats_count == 1:
+        seats_allocated = f"Row {selected_row} • Seat {start_seat:02d}"
+    else:
+        seats_allocated = f"Row {selected_row} • Seats {start_seat:02d}-{start_seat + seats_count - 1:02d}"
+
+    event = Event.query.filter(Event.title.ilike(f"%{play_title}%")).first()
+    user = User.query.filter_by(email=email).first()
+
+    if event:
+        new_booking = Booking(
+            user_id=user.id if user else None,
+            event_id=event.id,
+            booking_status="Confirmed"
+        )
+        db.session.add(new_booking)
+        try:
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+
+    ticket_data = {
+        'ticket_id': ticket_id,
+        'play_title': play_title,
+        'holder_name': name,
+        'holder_email': email,
+        'holder_phone': phone,
+        'seats_count': seats_count,
+        'seat_tier': seat_tier,
+        'seats_allocated': seats_allocated,
+        'venue': venue,
+        'date': event_date,
+        'time': time_slot,
+        'qr_data': f"AYM-PASS:{ticket_id}:{play_title}:{name}:{seats_count}",
+        'issued_at': datetime.utcnow().strftime('%b %d, %Y • %I:%M %p')
+    }
+
+    return jsonify({
+        'status': 'confirmed',
+        'message': f'Reservation confirmed! Ticket reference {ticket_id} created.',
+        'ticket': ticket_data
+    }), 201
 
 @api_bp.route('/revenue-metrics', methods=['GET'])
 def get_revenue_metrics():
@@ -991,17 +1070,38 @@ def get_gallery():
 
 @api_bp.route('/gallery', methods=['POST'])
 def create_gallery_item():
+    import os
+    from werkzeug.utils import secure_filename
     from models import GalleryItem, db
-    data = request.json or {}
-    title = data.get('title') or 'Untitled Photo'
-    category = data.get('category') or 'Stage Plays'
-    image_url = data.get('imageUrl') or data.get('image_url')
-    caption = data.get('caption', '')
-    uploader_name = data.get('uploaderName') or 'Aayam Media Team'
-    status = data.get('status') or 'approved'
+    
+    if request.content_type and 'multipart/form-data' in request.content_type:
+        title = request.form.get('title') or 'Untitled Photo'
+        category = request.form.get('category') or 'Stage Plays'
+        caption = request.form.get('caption', '')
+        uploader_name = request.form.get('uploaderName') or 'Aayam Media Team'
+        status = request.form.get('status') or 'approved'
+        
+        file = request.files.get('file')
+        if not file:
+            return jsonify({'error': 'Image file is required'}), 400
+            
+        upload_dir = os.path.join(os.path.dirname(__file__), 'uploads', 'gallery')
+        os.makedirs(upload_dir, exist_ok=True)
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(upload_dir, filename))
+        
+        image_url = f"/uploads/gallery/{filename}"
+    else:
+        data = request.json or {}
+        title = data.get('title') or 'Untitled Photo'
+        category = data.get('category') or 'Stage Plays'
+        image_url = data.get('imageUrl') or data.get('image_url')
+        caption = data.get('caption', '')
+        uploader_name = data.get('uploaderName') or 'Aayam Media Team'
+        status = data.get('status') or 'approved'
 
-    if not image_url:
-        return jsonify({'error': 'Image URL is required'}), 400
+        if not image_url:
+            return jsonify({'error': 'Image URL is required'}), 400
 
     item = GalleryItem(
         title=title,
@@ -1036,7 +1136,42 @@ def update_gallery_status(item_id):
     item.status = new_status
     db.session.commit()
     return jsonify({'status': 'updated', 'item': item.to_dict()})
-    return jsonify({'status': 'success', 'id': new_proposal.id}), 201
+@api_bp.route('/proposals/track', methods=['GET'])
+def track_proposal():
+    from models import SharedEvent
+    query = request.args.get('query', '').strip()
+    if not query:
+        return jsonify({'error': 'Tracking ID or email query parameter required'}), 400
+
+    clean_q = query.upper().replace("AYM-PITCH-", "").replace("AYM-PITCH", "").replace("PITCH-", "").replace("#", "").strip()
+    target_id = None
+    if clean_q.isdigit():
+        target_id = int(clean_q)
+
+    results = []
+    if target_id is not None:
+        p = SharedEvent.query.get(target_id)
+        if p:
+            results.append(p.to_dict())
+
+    # Also match email, submitter name, or title
+    matched = SharedEvent.query.filter(
+        (SharedEvent.contact_email.ilike(f"%{query}%")) |
+        (SharedEvent.submitter_name.ilike(f"%{query}%")) |
+        (SharedEvent.title.ilike(f"%{query}%"))
+    ).order_by(SharedEvent.created_at.desc()).all()
+    
+    for m in matched:
+        m_dict = m.to_dict()
+        if not any(r['id'] == m_dict['id'] for r in results):
+            results.append(m_dict)
+
+    return jsonify({
+        'status': 'success',
+        'query': query,
+        'count': len(results),
+        'proposals': results
+    }), 200
 
 @api_bp.route('/proposals', methods=['GET'])
 def get_proposals():
@@ -1269,6 +1404,7 @@ def get_audition_positions():
 @api_bp.route('/audition-positions/create', methods=['POST'])
 def create_audition_position():
     from models import AuditionPosition, db
+    from datetime import datetime
     data = request.json or {}
     new_pos = AuditionPosition(
         production_name=data.get('production_name', 'Mainstage Production'),
@@ -1277,7 +1413,10 @@ def create_audition_position():
         character_description=data.get('character_description', ''),
         requirements=data.get('requirements', ''),
         slots_available=int(data.get('slots_available', 1)),
-        status=data.get('status', 'Open Calling')
+        status=data.get('status', 'Open Calling'),
+        require_portfolio=bool(data.get('require_portfolio', False)),
+        require_video=bool(data.get('require_video', False)),
+        require_audio=bool(data.get('require_audio', False))
     )
     db.session.add(new_pos)
     db.session.commit()
@@ -1286,6 +1425,7 @@ def create_audition_position():
 @api_bp.route('/audition-positions/<int:pos_id>', methods=['PUT', 'POST'])
 def update_audition_position(pos_id):
     from models import AuditionPosition, db
+    from datetime import datetime
     data = request.json or {}
     pos = AuditionPosition.query.get(pos_id)
     if not pos:
@@ -1305,6 +1445,12 @@ def update_audition_position(pos_id):
         pos.slots_available = int(data['slots_available'])
     if 'status' in data:
         pos.status = data['status']
+    if 'require_portfolio' in data:
+        pos.require_portfolio = data['require_portfolio']
+    if 'require_video' in data:
+        pos.require_video = data['require_video']
+    if 'require_audio' in data:
+        pos.require_audio = data['require_audio']
         
     db.session.commit()
     return jsonify({'status': 'success', 'position': pos.to_dict()})
@@ -2284,14 +2430,40 @@ def suggest_character():
         return jsonify({"error": f"Live LLM call failed: {str(e)}"}), 500
 
 
-@api_bp.route('/auto-extract', methods=['POST'])
-def auto_extract():
-    data = request.json or {}
-    text = data.get("text", "")
-    script_id = data.get("script_id")
+@api_bp.route('/extract-script', methods=['POST'])
+def extract_script_route():
+    text = ""
+    script_id = None
     
+    if request.is_json:
+        data = request.json or {}
+        text = data.get("text", "")
+        script_id = data.get("script_id")
+    else:
+        # Handle file upload
+        file = request.files.get('file')
+        script_id = request.form.get("script_id")
+        text = request.form.get("text", "")
+        
+        if file and file.filename:
+            if file.filename.lower().endswith('.pdf'):
+                try:
+                    import PyPDF2
+                    pdf_reader = PyPDF2.PdfReader(file)
+                    extracted = []
+                    for page in pdf_reader.pages:
+                        extracted.append(page.extract_text() or "")
+                    text = "\n".join(extracted)
+                except Exception as e:
+                    return jsonify({"error": f"Failed to parse PDF: {str(e)}"}), 400
+            else:
+                try:
+                    text = file.read().decode('utf-8')
+                except Exception as e:
+                    return jsonify({"error": f"Failed to read text file: {str(e)}"}), 400
+                    
     if not text.strip():
-        return jsonify({"error": "Text is required"}), 400
+        return jsonify({"error": "Text or file is required"}), 400
         
     try:
         system_instruction = """
@@ -2395,53 +2567,32 @@ def extract_event_keywords():
     if not description:
         return jsonify({"status": "error", "message": "Description is required"}), 400
 
-    api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY") or API_KEY
-    model = os.getenv("COMPLETIONS_MODEL", "gemini/gemini-3.6-flash")
-
-    if not api_key:
-        return jsonify({"status": "error", "message": "AI servers are down. API key missing."}), 503
-
     try:
-        prompt = f"""You are an AI assistant for an Event Management system. 
-Extract 4 to 6 concise, highly relevant keywords or short key phrases (e.g. monetary figures like ₹1,50,000, key deliverables, audio equipment, themes, or event categories) from the following description:
+        from ai.gemini_pool import gemini_pool
+        prompt = f"""You are an expert AI event analyst and curator for Aayam Drama Society (IIT Madras).
+Carefully analyze the following theatrical event pitch/proposal description:
 
 "{description}"
 
-Return ONLY valid JSON matching this schema:
+Extract 4 to 6 concise, high-value tags and keywords that highlight:
+1. Production Genre / Format (e.g. "Sanskrit Classic", "Street Play", "Improv Workshop", "Annual Showcase")
+2. Financials / Budget / Sponsorship (e.g. "₹1,50,000 Budget", "Funded Pitch", "Ticketed Premiere")
+3. Technical / Venue Deliverables (e.g. "Open Air Theatre", "Spotlight Rig", "Acoustic Mics", "Custom Sets")
+4. Target Audience / Capacity (e.g. "Inter-College", "500+ Audience", "Club Members Only")
+
+Return ONLY valid JSON matching this schema with no markdown backticks or commentary:
 {{
-  "keywords": ["Keyword1", "Keyword2", ...]
+  "keywords": ["Classical Tragedy", "₹1,20,000 Budget", "OAT Auditorium", "Lighting Rig", "Repertoire Premiere"]
 }}
 """
-        completion_kwargs = {
-            "model": model,
-            "messages": [{"role": "user", "content": prompt}],
-            "api_key": api_key,
-            "response_format": {"type": "json_object"}
-        }
-        if os.getenv("COMPLETIONS_API_BASE") or not model.startswith("gemini/"):
-            completion_kwargs["api_base"] = API_BASE
-
-        resp = litellm.completion(**completion_kwargs)
-        content = resp.choices[0].message.content.strip()
-        if content.startswith("```json"):
-            content = content[7:]
-        if content.endswith("```"):
-            content = content[:-3]
-        res_json = json.loads(content.strip())
+        res_json = gemini_pool.generate_json(prompt)
         keywords = res_json.get("keywords", [])
         if keywords and isinstance(keywords, list):
             return jsonify({"status": "success", "keywords": keywords[:6], "source": "gemini"}), 200
         raise ValueError("Invalid keywords response structure")
     except Exception as err:
         print(f"Gemini keyword extraction API call error: {err}")
-        import re
-        words = re.findall(r'\b[A-Za-z]{4,}\b', desc)
-        stop_words = {"this", "that", "with", "from", "have", "were", "what", "when", "your", "their", "about", "which", "will"}
-        filtered = [w for w in words if w.lower() not in stop_words]
-        fallback_keywords = list(dict.fromkeys(filtered))[:5]
-        if not fallback_keywords:
-            fallback_keywords = ["Theatre", "Production", "Auditions", "Rehearsals"]
-        return jsonify({"status": "success", "keywords": fallback_keywords, "source": "fallback"}), 200
+        return jsonify({"status": "error", "message": f"Gemini extraction failed: {str(err)}"}), 500
 
 
 @api_bp.route('/events/autofill-proposal', methods=['POST'])
@@ -2510,3 +2661,45 @@ Extract structured event proposal details. Return ONLY valid JSON matching this 
         }
         return jsonify({"status": "success", "data": fallback_data, "source": "fallback"}), 200
 
+
+@api_bp.route('/audition-applications/<int:app_id>/withdraw', methods=['POST'])
+def withdraw_audition_application(app_id):
+    from models import AuditionApplication, db
+    app_record = AuditionApplication.query.get(app_id)
+    if not app_record:
+        return jsonify({'error': 'Application not found'}), 404
+    if app_record.status not in ['Pending Review', 'Shortlisted']:
+        return jsonify({'error': 'Cannot withdraw in current status'}), 400
+    db.session.delete(app_record)
+    db.session.commit()
+    return jsonify({'success': True})
+
+@api_bp.route('/audition-applications/<int:app_id>/upload', methods=['POST'])
+def upload_application_file(app_id):
+    import os
+    from models import AuditionApplication, db
+    app_record = AuditionApplication.query.get(app_id)
+    if not app_record:
+        return jsonify({'error': 'Application not found'}), 404
+    upload_dir = os.path.join(os.path.dirname(__file__), 'uploads', 'auditions')
+    os.makedirs(upload_dir, exist_ok=True)
+    if 'portfolio' in request.files:
+        f = request.files['portfolio']
+        fname = f'portfolio_{app_id}_{f.filename}'
+        f.save(os.path.join(upload_dir, fname))
+        app_record.portfolio_filename = fname
+    if 'video' in request.files:
+        f = request.files['video']
+        fname = f'video_{app_id}_{f.filename}'
+        f.save(os.path.join(upload_dir, fname))
+        app_record.video_filename = fname
+    db.session.commit()
+    return jsonify({'success': True, 'portfolio_filename': getattr(app_record, 'portfolio_filename', None)})
+
+
+@api_bp.route('/uploads/<path:filename>', methods=['GET'])
+def serve_uploads(filename):
+    import os
+    from flask import send_from_directory
+    upload_dir = os.path.join(os.path.dirname(__file__), 'uploads')
+    return send_from_directory(upload_dir, filename)

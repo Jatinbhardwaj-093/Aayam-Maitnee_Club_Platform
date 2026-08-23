@@ -1,16 +1,17 @@
 # Database Content Inventory — Aayam IIT Madras BS Drama Society
 
-> **Last Updated**: July 20, 2026  
+> **Last Updated**: August 23, 2026  
 > **Seed File**: [`backend/seed.py`](file:///Users/jatinbhardwaj/Github/software_project/backend/seed.py)  
 > **Gallery Data**: [`backend/scripts/seed_gallery_data.py`](file:///Users/jatinbhardwaj/Github/software_project/backend/scripts/seed_gallery_data.py)  
-> **Models**: [`backend/models.py`](file:///Users/jatinbhardwaj/Github/software_project/backend/models.py)
+> **Models**: [`backend/models.py`](file:///Users/jatinbhardwaj/Github/software_project/backend/models.py)  
+> **Database File**: `backend/aayam.db` (SQLite)
 
 ---
 
-## 1. Roles (7 Roles)
+## 1. Executive Roles (7 Roles)
 
-| # | Key | Role Name |
-|---|-----|-----------|
+| # | Role Key | Role Name |
+|---|----------|-----------|
 | 1 | `maintainer` | Core Maintainer |
 | 2 | `director` | Director Coordinator |
 | 3 | `sponsor` | Sponsorship & Outreach Lead |
@@ -21,203 +22,131 @@
 
 ---
 
-## 2. Users / Ensemble Members (13 Members)
+## 2. Ensemble Members & Mentors (13 Members)
 
-| # | Name | Email Prefix | Password | Role | Age | City | Bio Summary | Avatar File | Member ID | Pronouns |
-|---|------|-------------|----------|------|-----|------|-------------|-------------|-----------|----------|
-| 1 | **Abay Nandhiga** | `23f2000668` | abay123 | maintainer | 22 | Chennai | Secretary of Aayam. Directing operations, stagecraft, national festivals. | `abay_nandhiga.jpg` | MC-1001 | he/him |
-| 2 | **Yuuhi** | `21f1005042` | utkarsh123 | maintainer | 23 | Chennai | Deputy Secretary. Lead Nukkad Natak performer & stage productions. | `abay_nandhiga.jpg` | MC-1002 | she/her |
-| 3 | **Samarth Shrivastava** | `21f1002840` | samarth123 | coordinator | 22 | Chennai | Chief Coordinator. Production logistics, stage design, inter-college fests. | `samarth_shrivastava.jpg` | MC-1003 | he/him |
-| 4 | **Krishna Subramanian** | `23f1000655` | krishna123 | coordinator | 21 | Chennai | Dept. Chief Coordinator. DMX lighting, acoustic soundscapes, live cues. | `krishna_subramanian.jpg` | MC-1004 | she/her |
-| 5 | **Kaushal Raj** | `22f3003301` | kaushal123 | sponsor | 23 | Bengaluru | Outreach & Sponsorship Head. Corporate partnerships & patron circles. | `sneha_das.jpg` | MC-1005 | he/him |
-| 6 | **Sneha Das** | `23f1000100` | sneha123 | artist | 22 | Kolkata | Design Head. Scenic backdrops, prop design, visual brand identity. | `sylene_bansal.jpg` | MC-1006 | she/her |
-| 7 | **Anshi Jain** | `23f1000200` | anshi123 | artist | 21 | Jaipur | PR Head. Public relations, media engagement, audience growth. | `chirag_kumar.jpg` | MC-1007 | he/him |
-| 8 | **Swati Singh** | `23f1000300` | swati123 | maintainer | 22 | New Delhi | Web Admin & Tech Lead. Digital roster, booking engines, portal infra. | `swati_singh.jpg` | MC-1008 | she/her |
-| 9 | **Tanu Kurade** | `21f1005637` | tanu123 | director | 24 | Mumbai | Mentor (Acting). Method acting workshops, dialogue modulation. | `tanu_kurade.jpg` | MC-1009 | he/him |
-| 10 | **S. Sri Vaishnavi** | `21f3001698` | vaishnavi123 | director | 24 | Hyderabad | Mentor (Directing). Multi-act plays, script adaptation, blocking. | `vaishnavi_srivastava.jpg` | MC-10010 | she/her |
-| 11 | **Esha Hinde** | `esha.hinde` | esha123 | artist | 23 | Pune | Costume & Production Coordinator. Period costume, props, styling. | `esha_hinde.jpg` | MC-10011 | he/him |
-| 12 | **Kanishk Mishra** | `kanishk.mishra` | kanishk123 | director | 24 | Delhi | Stage & Technical Director. Acoustics, lighting rigs, set construction. | `kanishk_mishra.jpg` | MC-10012 | she/her |
-| 13 | **Aditi** | `aditi.drama` | aditi123 | actor | 22 | Bengaluru | Principal Dramatic Actress. Contemporary stage adaptations & street plays. | `aditi_drama.jpg` | MC-10013 | he/him |
+| # | Name | Email Prefix | Role | City | Member ID | Pronouns | Artistic Discipline |
+|---|------|--------------|------|------|-----------|----------|---------------------|
+| 1 | **Abay Nandhiga** | `23f2000668` | maintainer | Chennai | MC-1001 | he/him | Directing, Playwriting, Society Leadership |
+| 2 | **Yuuhi** | `21f1005042` | maintainer | Chennai | MC-1002 | she/her | Street Play, Acting, Script Supervision |
+| 3 | **Samarth Shrivastava** | `21f1002840` | coordinator | Chennai | MC-1003 | he/him | Production Logistics, Stage Lighting, Auditions |
+| 4 | **Krishna Subramanian** | `23f1000655` | coordinator | Chennai | MC-1004 | she/her | Technical Crew, DMX Lighting, Sound Design |
+| 5 | **Kaushal Raj** | `22f3003301` | sponsor | Bengaluru | MC-1005 | he/him | Sponsorship, Corporate Partnerships, Brand Events |
+| 6 | **Sneha Das** | `23f1000100` | artist | Kolkata | MC-1006 | she/her | Scenic Design, Set Painting, Poster Design |
+| 7 | **Anshi Jain** | `23f1000200` | artist | Jaipur | MC-1007 | he/him | PR Head, Public Relations, Audience Outreach |
+| 8 | **Swati Singh** | `23f1000300` | maintainer | New Delhi | MC-1008 | she/her | Web Admin, Digital Roster, Portal Infrastructure |
+| 9 | **Tanu Kurade** | `21f1005637` | director | Mumbai | MC-1009 | he/him | Method Acting Workshops, Dialogue Modulation |
+| 10 | **S. Sri Vaishnavi** | `21f3001698` | director | Hyderabad | MC-10010 | she/her | Multi-Act Plays, Script Adaptation, Blocking |
+| 11 | **Esha Hinde** | `esha.hinde` | artist | Pune | MC-10011 | he/him | Period Costumes, Prop Fabrication, Styling |
+| 12 | **Kanishk Mishra** | `kanishk.mishra` | director | Delhi | MC-10012 | she/her | Stage Acoustics, Lighting Rigs, Set Construction |
+| 13 | **Aditi** | `aditi.drama` | actor | Bengaluru | MC-10013 | he/him | Principal Dramatic Actress, Monologue Delivery |
 
-> **Email format**: Prefix starting with `2` → `{prefix}@ds.study.iitm.ac.in`, otherwise → `{prefix}@handle.com`  
-> **Shared defaults**: status=`Active`, availability=`Weekday evenings & weekend rehearsals`, level=`Ensemble Leader`, portfolio=`https://sites.google.com/study.iitm.ac.in/aayam/about`
-
----
-
-## 3. Admins (4 Admins)
-
-| # | User | Designation | Permissions |
-|---|------|-------------|-------------|
-| 1 | Abay Nandhiga | Secretary Aayam | All |
-| 2 | Yuuhi | Deputy Secretary | All |
-| 3 | Samarth Shrivastava | Chief Coordinator | Logistics, Stage |
-| 4 | Swati Singh | Web Admin & Tech Lead | Portal, DB |
+> **Email Format**: Numbers (`23f...`) map to `{prefix}@ds.study.iitm.ac.in`, names map to `{prefix}@handle.com`.
 
 ---
 
-## 4. Plays / Productions (6 Plays)
+## 3. Productions & Repertory Plays (6 Productions)
 
-| # | Title | Status | Director | Cast | Venue | Dates | Runtime | Price |
-|---|-------|--------|----------|------|-------|-------|---------|-------|
-| 1 | **Karn Ki Yachika** | SELLING FAST | S. Sri Vaishnavi | Abay, Yuuhi, Samarth | Kashiyatra Stage, IIT BHU / OAT IIT Madras | Aug 12 – Sep 04, 2026 | 75 min (no intermission) | Free Admission |
-| 2 | **Tamashbin Kathputliya** | LIMITED TICKETS | Utkarsh (Yuuhi) | Samarth, Krishna, Swati | Open Air Theatre (OAT), IIT Madras | Sep 12 – Sep 25, 2026 | 45 min (no intermission) | Free Open Stage |
-| 3 | **DDDJ – Stage Production** | TICKETS ON SALE | S. Sri Vaishnavi | Abay, Krishna, Sneha | CLT Auditorium, IIT Madras | Sep 28 – Oct 10, 2026 | 85 min (with intermission) | Registration Required |
-| 4 | **Samatvam** | TICKETS ON SALE | Tanu Kurade | Abay, Sneha, Anshi | CLT Auditorium, IIT Madras | Oct 05 – Oct 20, 2026 | 90 min (with intermission) | Free Entry |
-| 5 | **Speak Up Tara** | SELLING FAST | S. Sri Vaishnavi | Anshi, Sneha, Swati | Kashiyatra Festival Stage, IIT BHU | Nov 02 – Nov 15, 2026 | 60 min (no intermission) | Festival Pass Required |
-| 6 | **SNHJ – Virtual Play** | ARCHIVED PLAY | Abay Nandhiga | Aayam Core Ensemble | Aayam YouTube Channel & Portal | Available Online | 50 min | Free Stream |
-
----
-
-## 5. Events (14 Events)
-
-| # | Title | Category | Venue | Date | Time | Max | Poster | Status |
-|---|-------|----------|-------|------|------|-----|--------|--------|
-| 1 | August Orientation & Welcome Meetup | Meetups | Aayam Hub & SAC Courtyard | Aug 02, 2026 | 5:30–7:30 PM | 80 | `tamashbin_user_3.jpg` | Concluded |
-| 2 | Natyashastra Movement & Body Control | Workshops | Rehearsal Hall B | Aug 05, 2026 | 4:00–6:30 PM | 40 | `samatvam_user_4.jpg` | Concluded |
-| 3 | Sunday Chai & Monologue Jamming | Meetups | OAT Amphitheatre Lawns | Aug 09, 2026 | 4:30–6:30 PM | 50 | `kky_user_2.jpg` | Concluded |
-| 4 | Stage Lighting & DMX Rigging Masterclass | Workshops | CLT Tech Booth | Aug 12, 2026 | 2:00–5:00 PM | 35 | `krishna_subramanian.jpg` | Concluded |
-| 5 | Musimprov (with Akord) Session | Workshops | SAC, IIT Madras | Aug 15, 2026 | 5:00–7:30 PM | 60 | `tamashbin_user_3.jpg` | Concluded |
-| 6 | August Script Reading Circle | Meetups | Aayam Conf Room 2 | Aug 23, 2026 | 6:00–8:30 PM | 45 | `dddj_user_3.jpg` | Upcoming |
-| 7 | Backstage Props & Set Crafting | Meetups | Aayam Art Studio | Aug 27, 2026 | 3:00–6:00 PM | 40 | `sneha_das.jpg` | Upcoming |
-| 8 | Monthly Ensemble Showcase & Open Mic | Plays | Open Air Theatre (OAT) | Aug 30, 2026 | 6:30–9:30 PM | 200 | `tamashbin_user_4.jpg` | Upcoming |
-| 9 | Theatre Masterclass with Gyaneshwar Mishra | Workshops | CLT Seminar Room | Sep 05, 2026 | 10:00 AM–2:00 PM | 40 | `kky_user_2.jpg` | Upcoming |
-| 10 | Autumn Street Satire & Dholak Sync Lab | Workshops | SAC Courtyard | Sep 12, 2026 | 4:30–7:00 PM | 50 | `tamashbin_user_1.jpg` | Upcoming |
-| 11 | Classical Monologue & Navarasa Intensive | Workshops | Rehearsal Hall B | Sep 18, 2026 | 3:00–6:00 PM | 35 | `kky_user_5.jpg` | Upcoming |
-| 12 | Nukkad Natak Guidance with Om Bhope | Workshops | OAT Stage Grounds | Sep 24, 2026 | 4:00–6:30 PM | 45 | `tamashbin_user_4.jpg` | Upcoming |
-| 13 | Proscenium Tech Rehearsal & Live Cue Run | Plays | CLT Auditorium | Sep 29, 2026 | 5:00–9:00 PM | 100 | `dddj_user_1.jpg` | Upcoming |
-| 14 | Darpan 2026 Annual Drama Festival | Plays | OAT & CLT, IIT Madras | Oct 05, 2026 | All Day–10 PM | 300 | `dddj_user_3.jpg` | Upcoming |
+| # | Title | Playwright / Origin | Status | Venue | Cast Size | Runtime |
+|---|-------|---------------------|--------|-------|-----------|---------|
+| 1 | **Hayavadana** | Girish Karnad | Upcoming Premiere | IC&SR Auditorium | 12 Cast | 110 Mins |
+| 2 | **Ashadh Ka Ek Din** | Mohan Rakesh | Upcoming Premiere | CLT Amphitheatre | 9 Cast | 125 Mins |
+| 3 | **Charandas Chor** | Habib Tanvir | Upcoming Premiere | Open Air Theatre | 16 Cast | 95 Mins |
+| 4 | **Court Martial** | Swadesh Deepak | Past Repository | CLT Amphitheatre | 14 Cast | 105 Mins |
+| 5 | **Tughlaq** | Girish Karnad | Past Repository | Student Activity Centre | 18 Cast | 130 Mins |
+| 6 | **Andha Yug** | Dharamvir Bharati | Past Repository | Open Air Theatre | 20 Cast | 115 Mins |
 
 ---
 
-## 6. Gallery Items (67 Photos)
+## 4. Script Vault & Playbooks (11 Rich Canonical Scripts)
 
-| Category | Count | Image Files |
-|----------|-------|-------------|
-| Tamashbin Kathputliya | 15 | `tamashbin_user_1.jpg` → `tamashbin_user_15.jpg` |
-| DDDJ | 9 | `dddj_user_1.jpg` → `dddj_user_9.jpg` |
-| KKY (Karn Ki Yachika) | 21 | `kky_user_1.jpg` → `kky_user_21.jpg` |
-| Samatvam | 12 | `samatvam_user_1.jpg` → `samatvam_user_12.jpg` |
-| Speak Up Tara | 10 | `speak_up_tara_user_1.webp` → `speak_up_tara_user_10.webp` |
-| **Total** | **67** | |
-
-> All items: `status: "approved"`. Uploaders rotate among: Yuuhi, S. Sri Vaishnavi, Samarth, Krishna, Sneha Das, Abay Nandhiga.
-
----
-
-## 7. Notifications (52 Total = 13 users × 4 each)
-
-| Type | Title | Message | Read? |
-|------|-------|---------|-------|
-| `rehearsal` | Macbeth Dress Rehearsal Sync | Technical dress run confirmed for July 07 at 4:00 PM in Rehearsal Hall B. Lighting cues and full costume required. | ❌ |
-| `script` | Tamashbin Director's Script Released | The updated Hindustani Street Play script with modified courtyard cues is available in the Script Vault. | ❌ |
-| `logistics` | Stage Prop Checked Out | Logistics lead confirmed checkout of gold banquet goblets and throne props for upcoming showcase. | ✅ |
-| `workshop` | Natya Shastra Masterclass Pass | Your registration for the upcoming physical theatre masterclass has been confirmed by the executive committee. | ✅ |
+| # | Title | Playwright | Acts | Characters | Status |
+|---|-------|------------|------|------------|--------|
+| 1 | **Dharmakshetra: The Final Soliloquy of Karn** | Abay Nandhiga & Aayam Writing Cell | 3 Acts | 14 Performers | Approved (Pinned) |
+| 2 | **Ashadh Ka Ek Din** | Mohan Rakesh | 3 Acts | 9 Performers | Approved (Pinned) |
+| 3 | **Hayavadana** | Girish Karnad | 2 Acts | 12 Performers | Approved (Pinned) |
+| 4 | **Charandas Chor** | Habib Tanvir & Naya Theatre | 2 Acts | 16 Performers | Approved (Pinned) |
+| 5 | **Court Martial** | Swadesh Deepak | 2 Acts | 14 Performers | Approved (Pinned) |
+| 6 | **Tughlaq** | Girish Karnad | 13 Scenes | 18 Performers | Approved (Pinned) |
+| 7 | **Andha Yug** | Dharamvir Bharati | 5 Acts | 20 Performers | Approved (Pinned) |
+| 8 | **Sakharam Binder** | Vijay Tendulkar | 3 Acts | 5 Performers | Approved |
+| 9 | **Raktakalyan (Tale Danda)** | Girish Karnad | 3 Acts | 15 Performers | Approved |
+| 10 | **Jasma Odan** | Shanta Gandhi | 2 Acts | 14 Performers | Approved |
+| 11 | **The Silent Echo** | Aditi | 1 Act | 1 Performer | Pending Review |
 
 ---
 
-## 8. Avatar Map (22 Entries + Default Fallback)
+## 5. Audition Calling Positions & Casting Board (9 Open Positions)
 
-The `User.to_dict()` method in `models.py` maps display names to profile images:
-
-| Name | Avatar Path |
-|------|-------------|
-| Abay Nandhiga | `/aayam_assets/profiles/utkarsh_yuuhi.jpg` |
-| Yuuhi | `/aayam_assets/profiles/abay_nandhiga.jpg` |
-| Utkarsh / Yuuhi | `/aayam_assets/profiles/abay_nandhiga.jpg` |
-| Utkarsh (Yuuhi) | `/aayam_assets/profiles/abay_nandhiga.jpg` |
-| Samarth Shrivastava | `/aayam_assets/profiles/samarth_shrivastava.jpg` |
-| Krishna Subramanian | `/aayam_assets/profiles/krishna_subramanian.jpg` |
-| Harsh Aryan | `/aayam_assets/profiles/harsh_aryan.jpg` |
-| Swati Singh | `/aayam_assets/profiles/swati_singh.jpg` |
-| Sneha Das | `/aayam_assets/profiles/sylene_bansal.jpg` |
-| Tanu Kurade | `/aayam_assets/profiles/tanu_kurade.jpg` |
-| S. Sri Vaishnavi | `/aayam_assets/profiles/vaishnavi_srivastava.jpg` |
-| Akanksha Kadam | `/aayam_assets/profiles/akanksha_kadam.jpg` |
-| Anshi Jain | `/aayam_assets/profiles/chirag_kumar.jpg` |
-| Kaushal Raj | `/aayam_assets/profiles/sneha_das.jpg` |
-| Vaishnavi Srivastava | `/aayam_assets/profiles/vaishnavi_srivastava.jpg` |
-| Gaurav | `/aayam_assets/profiles/chirag_kumar.jpg` |
-| Shrit | `/aayam_assets/profiles/harsh_aryan.jpg` |
-| Dipanshu Bist | `/aayam_assets/profiles/utkarsh_yuuhi.jpg` |
-| Neelotpala | `/aayam_assets/profiles/tanu_kurade.jpg` |
-| Kanishk Mishra | `/aayam_assets/profiles/kanishk_mishra.jpg` |
-| Chirag Kumar | `/aayam_assets/profiles/chirag_kumar.jpg` |
-| Sylene Bansal | `/aayam_assets/profiles/sylene_bansal.jpg` |
-| Esha Hinde | `/aayam_assets/profiles/esha_hinde.jpg` |
-| Aditi | `/aayam_assets/profiles/aditi_drama.jpg` |
-
-> **Default fallback**: `/aayam_assets/profiles/abay_nandhiga.jpg`
+| # | Production | Calling Role | Department | Required Slots | Status |
+|---|------------|--------------|------------|----------------|--------|
+| 1 | Hayavadana | Lead Protagonists (Devadatta & Kapila) | Performer | 2 Slots | Open Calling |
+| 2 | Hayavadana | Mask Craft & Prosthetic SFX Stylist | Creative Designer | 2 Slots | Open Calling |
+| 3 | Hayavadana | Proscenium Lighting Master (DMX Cues) | Technical Crew | 2 Slots | Open Calling |
+| 4 | Ashadh Ka Ek Din | Kalidas (Poet Laureate) | Performer | 1 Slot | Open Calling |
+| 5 | Ashadh Ka Ek Din | Mallika (Sacrificial Muse) | Performer | 1 Slot | Open Calling |
+| 6 | Ashadh Ka Ek Din | Period Set & Acoustic Scenographer | Technical Crew | 2 Slots | Open Calling |
+| 7 | Charandas Chor | Charandas (The Honest Folk Thief) | Performer | 1 Slot | Open Calling |
+| 8 | Charandas Chor | Live Dholak, Harmonium & Folk Chorus | Music & Vocal | 4 Slots | Open Calling |
+| 9 | Charandas Chor | Costume Head (Chhattisgarhi Weaves) | Creative Designer | 2 Slots | Open Calling |
 
 ---
 
-## 9. Database Schema — All Model Classes (19 Models + 2 Association Tables)
+## 6. Audition Applications & AI Dossiers (6 Submissions)
 
-### Association Tables
-
-| Table | Columns |
-|-------|---------|
-| `user_roles` | `user_id` (FK→user.id), `role_id` (FK→role.id) |
-| `user_labels` | `user_id` (FK→user.id), `label_id` (FK→label.id) |
-
-### Model Classes
-
-| Model | Key Columns |
-|-------|-------------|
-| **User** | id, member_id, name, age, email (unique), password, address, city, phone, level, status, pronouns, availability, bio, portfolio, emergency_name, emergency_phone, state, country, interest |
-| **Role** | id, name |
-| **Label** | id, name (unique), color |
-| **Admin** | id, user_id (FK), designation, permissions |
-| **Play** | id, title, status, status_color, description, director, cast, season, image, venue, dates, runtime, price |
-| **Event** | id, title, description, category, venue, event_date, start_time, end_time, max_participants, poster, status, admin_id (FK) |
-| **GalleryItem** | id, title, category, image_url, caption, uploaded_at, status, uploader_name |
-| **Notification** | id, recipient_id (FK), type, title, message, reference_id, is_read, created_at |
-| **Audition** | id, user_id (FK), play_id (FK), audition_date, role_applied_for, experience_notes, status, submitted_at |
-| **OpenPosition** | id, play_id (FK), title, category, description, requirements, deadline, status |
-| **Membership** | id, membership_type, start_date, end_date, membership_status, user_id (FK) |
-| **Booking** | id, booking_date, booking_status, user_id (FK), event_id (FK) |
-| **StageBooking** | id, time, period, stage, details, is_secondary, created_at |
-| **RevenueMetric** | id, playbill_sold, corporate_patrons, updated_at |
-| **ScheduleSlot** | id, user_id (FK), date, day_of_week, start_time, end_time, notes |
-| **SharedEvent** | id, submitted_by (FK), title, description, event_date, location_or_link, status, created_at |
-| **Announcement** | id, title, content, posted_date, admin_id (FK) |
-| **Feedback** | id, rating, comments, user_id (FK), event_id (FK) |
-| **Gallery** | id, media_url, media_type, upload_date, event_id (FK) |
-| **Volunteer** | id, status, user_id (FK), event_id (FK) |
-| **Participation** | id, user_id (FK), event_id (FK), booking_id (FK), registration_date, status, remarks |
+| # | Applicant | Target Role | Declared Experience | AI Fit Score | Review Status |
+|---|-----------|-------------|---------------------|--------------|---------------|
+| 1 | **Aditi** (`aditi.drama@handle.com`) | Lead Protagonists (Devadatta & Kapila) | 4 yrs classical stage, voice projection | 94 / 100 | Shortlisted |
+| 2 | **Kanishk Mishra** (`kanishk.mishra@handle.com`) | Proscenium Lighting Master | 3 yrs DMX console, CLT stage manager | 96 / 100 | Selected (Cast) |
+| 3 | **Yuuhi** (`21f1005042@ds.study.iitm.ac.in`) | Kalidas (Poet Laureate) | 3 yrs street plays, classical Hindi | 92 / 100 | Shortlisted |
+| 4 | **Sneha Das** (`23f1000100@ds.study.iitm.ac.in`) | Period Set & Scenographer | Visual artist, set construction head | 95 / 100 | Selected (Cast) |
+| 5 | **Samarth Shrivastava** (`21f1002840@ds.study.iitm.ac.in`) | Charandas (Honest Folk Thief) | Lead actor in 4 campus productions | 91 / 100 | Applied (Pending) |
+| 6 | **Krishna Subramanian** (`23f1000655@ds.study.iitm.ac.in`) | Live Dholak & Folk Chorus | Classical percussionist, Carnatic rhythm | 97 / 100 | Selected (Cast) |
 
 ---
 
-## 10. Event Listeners (Auto-Notifications)
+## 7. Production Crew Volunteers (6 Crew Assignments)
 
-| Trigger | Action |
-|---------|--------|
-| **User insert** (status=pending) | Creates `new_member` notification for all admins |
-| **Audition insert** | Creates `new_audition` notification for all admins |
-| **SharedEvent insert** | Creates `new_event_share` notification for all admins |
-
----
-
-## 11. Unseeded Tables (14 — Populated at Runtime via Portal)
-
-These models exist in the schema but have **no seed data**. They are populated through the member/maintainer portal:
-
-`OpenPosition`, `Audition`, `Label`, `ScheduleSlot`, `StageBooking`, `RevenueMetric`, `Membership`, `Booking`, `Announcement`, `Feedback`, `Gallery` (event-linked), `SharedEvent`, `Volunteer`, `Participation`
+| # | Volunteer Name | Play Assignment | Department / Role | Availability | Status |
+|---|----------------|-----------------|-------------------|--------------|--------|
+| 1 | S. Sri Vaishnavi | Hayavadana | Stage Management & Blocking | 10+ Hrs/Wk | Approved & Assigned |
+| 2 | Chirag Kumar | Hayavadana | Sound & Foley Acoustic Loops | 6-8 Hrs/Wk | Approved & Assigned |
+| 3 | Swati Singh | Ashadh Ka Ek Din | Costumes & Makeup | 8 Hrs/Wk | Approved & Assigned |
+| 4 | Anshi Jain | Ashadh Ka Ek Din | Props & Ancient Set Fabrication | 5-8 Hrs/Wk | Approved & Assigned |
+| 5 | Sneha Das | Charandas Chor | Marketing & Ticketing Relations | 5 Hrs/Wk | Pending Review |
+| 6 | Kanishk Mishra | Charandas Chor | Lighting & CLT Spotlight Tracking | 8-10 Hrs/Wk | Approved & Assigned |
 
 ---
 
-## Summary
+## 8. Financial Ledger & Society Accounts (8 Audited Records)
 
-| Entity | Count |
-|--------|-------|
-| Roles | 7 |
-| Users / Members | 13 |
-| Admins | 4 |
-| Plays | 6 |
-| Events | 5 |
-| Gallery Photos | 67 |
-| Notifications | 52 |
-| Avatar Map Entries | 22 + fallback |
-| Model Classes | 19 + 2 association tables |
-| Seeded Tables | 7 |
-| Unseeded Tables | 14 |
-| **Total Seeded Records** | **~154** |
+| # | Transaction Title | Category | Type | Amount | Reference Play |
+|---|-------------------|----------|------|--------|----------------|
+| 1 | Titan Theatrical Sponsorship | Corporate Sponsorship | Income | +₹1,20,000 | Hayavadana |
+| 2 | Hayavadana Ticket Pre-Sales | Box Office Ticket Sales | Income | +₹85,000 | Hayavadana |
+| 3 | IITM Student Welfare Drama Grant | Institutional Grant | Income | +₹50,000 | Society Operations |
+| 4 | OAT Amphitheatre DMX Lighting Rig | Stage Lighting & Equipment | Expense | -₹35,000 | Charandas Chor |
+| 5 | Period Costumes & Chhattisgarhi Weaves | Wardrobe & Costumes | Expense | -₹22,500 | Charandas Chor |
+| 6 | Ashadh Ka Ek Din Set Carpentry | Scenic Set Construction | Expense | -₹18,000 | Ashadh Ka Ek Din |
+| 7 | Sound Console & Wireless Lapels | Acoustics & Audio Tech | Expense | -₹15,000 | Hayavadana |
+| 8 | Darpan Drama Festival Print Materials | Posters & Playbill Printing | Expense | -₹6,500 | All Productions |
+
+* **Total Income**: ₹2,55,000  
+* **Total Expenses**: ₹97,000  
+* **Net Society Treasury Surplus**: +₹1,58,000
+
+---
+
+## 9. Gallery & Archive Media (60 High-Resolution Assets)
+
+60 curated theatrical production photographs distributed across:
+* **Stagecraft & Dramatic Monologues**: 24 items
+* **Nukkad Natak & Street Theatre**: 16 items
+* **Backstage & Lighting Rigs**: 12 items
+* **Workshop Masterclasses**: 8 items
+
+---
+
+## 10. Rehearsal Schedules & Attendance (533 Records)
+
+* **Participation Logs**: 273 individual user rehearsal event allocations.
+* **August & September 2026 Time Slots**: 260 confirmed rehearsal slots distributed evenly across all 13 society ensemble members.

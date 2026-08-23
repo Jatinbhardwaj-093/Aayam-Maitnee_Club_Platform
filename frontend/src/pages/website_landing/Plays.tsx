@@ -23,9 +23,51 @@ import {
 import ScriptPreviewModal from "@/components/ScriptPreviewModal";
 import ProductionDetailModal from "@/components/ProductionDetailModal";
 import type { ProductionDetailData } from "@/components/ProductionDetailModal";
+import TicketPassModal from "@/components/TicketPassModal";
 import { getPlaybookForTitle } from "@/data/playbooksData";
 import type { Playbook } from "@/data/playbooksData";
-import { Info } from "lucide-react";
+import { 
+  Info, Plus, Gift, CreditCard, ChevronDown, 
+  QrCode, Copy, Heart, ShieldCheck, Printer, Download, Award, Loader2
+} from "lucide-react";
+
+const CustomSelect = ({ value, onChange, options, placeholder = "Select..." }: { value: string, onChange: (val: string) => void, options: {value: string, label: string}[], placeholder?: string }) => {
+  const [open, setOpen] = useState(false);
+  
+  return (
+    <div className="relative w-full">
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="w-full bg-[#E8D6CF]/70 border border-[#D5AAA2] rounded-xl px-4 py-2.5 text-xs text-[#2A1816] font-semibold flex items-center justify-between focus:outline-none"
+      >
+        <span className="truncate">{options.find(o => o.value === value)?.label || placeholder}</span>
+        <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
+      </button>
+      {open && (
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+          <div className="absolute top-full left-0 mt-1 w-full bg-[#F5EAE6] border border-[#DEBEB7] rounded-2xl p-2 shadow-2xl z-50 max-h-60 overflow-y-auto custom-scrollbar">
+            {options.map(opt => (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => { onChange(opt.value); setOpen(false); }}
+                className={`w-full text-left rounded-xl p-2.5 text-xs font-mono font-medium flex items-center gap-2 transition-colors ${
+                  value === opt.value
+                    ? "bg-[#8C241E] text-[#FDF8F7] font-bold shadow-xs"
+                    : "hover:bg-[#EEDBD5] text-[#2A1816]"
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
 
 interface PlayItem {
   id: number;
@@ -64,6 +106,21 @@ export default function Plays() {
   // Production Detail Modal State
   const [selectedDetailPlay, setSelectedDetailPlay] = useState<ProductionDetailData | null>(null);
 
+  // Donation Modal State
+  const [donationOpen, setDonationOpen] = useState(false);
+  const [selectedPlayForDonation, setSelectedPlayForDonation] = useState<PlayItem | null>(null);
+  const [donationAmount, setDonationAmount] = useState<number | string>(500);
+  const [customAmount, setCustomAmount] = useState("");
+  const [donationName, setDonationName] = useState("");
+  const [donationEmail, setDonationEmail] = useState("");
+  const [donationNumber, setDonationNumber] = useState("");
+  const [isAnonymous, setIsAnonymous] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<"upi_qr" | "card_instant">("upi_qr");
+  const [copiedVpa, setCopiedVpa] = useState(false);
+  const [receiptId, setReceiptId] = useState<string>("");
+  const [paymentStatus, setPaymentStatus] = useState<"idle" | "processing" | "success">("idle");
+  const [processingStep, setProcessingStep] = useState(1);
+
   // Volunteer Modal State
   const [volunteerOpen, setVolunteerOpen] = useState(false);
   const [selectedPlayForVolunteer, setSelectedPlayForVolunteer] = useState<PlayItem | null>(null);
@@ -77,6 +134,7 @@ export default function Plays() {
   const [volSuccess, setVolSuccess] = useState(false);
 
   // Reservation Modal State
+  const [selectedPlayForPass, setSelectedPlayForPass] = useState<PlayItem | null>(null);
   const [reserveSuccess, setReserveSuccess] = useState<string | null>(null);
 
   // Script Preview Modal State
@@ -90,6 +148,10 @@ export default function Plays() {
   };
 
   const handleOpenDetails = (play: PlayItem) => {
+    const past = Boolean(play.is_past) ||
+      ["archive", "concluded", "past", "completed", "closed", "historical"].some(
+        (kw) => (play.status || "").toLowerCase().includes(kw)
+      );
     setSelectedDetailPlay({
       id: play.id,
       title: play.title,
@@ -97,8 +159,8 @@ export default function Plays() {
       director: play.director,
       genre: play.genre,
       language: play.language,
-      status: play.status || (!play.is_past ? "Upcoming Premiere" : "Archived Production"),
-      is_past: play.is_past,
+      status: play.status || (past ? "Archived Production" : "Upcoming Premiere"),
+      is_past: past,
       tagline: play.tagline,
       acts: play.acts,
       description: play.description,
@@ -132,8 +194,14 @@ export default function Plays() {
       });
   }, []);
 
-  const upcomingPlays = plays.filter(p => !p.is_past);
-  const pastPlays = plays.filter(p => p.is_past);
+  const isPastPlay = (p: PlayItem) =>
+    Boolean(p.is_past) ||
+    ["archive", "concluded", "past", "completed", "closed", "historical"].some(
+      (kw) => (p.status || "").toLowerCase().includes(kw)
+    );
+
+  const upcomingPlays = plays.filter(p => !isPastPlay(p));
+  const pastPlays = plays.filter(p => isPastPlay(p));
   const displayedPlays = activeTab === "upcoming" ? upcomingPlays : pastPlays;
 
   const handleOpenVolunteer = (play: PlayItem) => {
@@ -285,11 +353,13 @@ export default function Plays() {
                       
                       <div className="absolute top-4 right-4">
                         <span className={`inline-flex items-center gap-1 px-3 py-1 text-[9px] font-mono font-bold rounded-full uppercase tracking-wider shadow-md backdrop-blur-md border ${
-                          !play.is_past
+                          !isPastPlay(play)
                             ? "bg-[#2C2A28]/90 text-emerald-300 border-emerald-500/40"
                             : "bg-[#2C2A28]/90 text-white/60 border-white/20"
                         }`}>
-                          {!play.is_past ? "Upcoming Premiere" : "Repertory"}
+                          {!isPastPlay(play)
+                            ? (play.status || "Upcoming Premiere")
+                            : "Repertory Archive"}
                         </span>
                       </div>
 
@@ -333,44 +403,71 @@ export default function Plays() {
                     </div>
                   </div>
 
-                  {/* Card Actions - CLEAN SINGLE LINE WITHOUT ICONS */}
-                  <div className="p-4 sm:p-5 pt-0 border-t border-white/10 pt-3.5 flex items-center gap-2 w-full flex-nowrap">
-                    <button
-                      onClick={() => handleOpenDetails(play)}
-                      className="flex-1 py-2 px-2 rounded-full border border-white/20 hover:bg-white/10 text-white text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer truncate"
-                      title="View full production dossier"
-                    >
-                      Details
-                    </button>
-
-                    <button
-                      onClick={() => handleOpenScriptPreview(play)}
-                      className="flex-1 py-2 px-2 rounded-full border border-white/20 hover:bg-white/10 text-[#E85F57] text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer truncate"
-                      title="Preview Script & Playbook"
-                    >
-                      Script
-                    </button>
-
-                    {!play.is_past ? (
+                  {/* Card Actions */}
+                  <div className="p-4 sm:p-5 pt-0 border-t border-white/10 pt-3.5 flex flex-col gap-2 w-full">
+                    {!isPastPlay(play) ? (
                       <>
-                        <button
-                          onClick={() => handleReservePass(play.title)}
-                          className="flex-1 py-2 px-2 rounded-full bg-[#E85F57] hover:bg-[#D94538] text-white text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer shadow-md truncate"
-                        >
-                          Reserve
-                        </button>
-                        <button
-                          onClick={() => handleOpenVolunteer(play)}
-                          className="flex-1 py-2 px-2 rounded-full border border-white/20 hover:bg-white/10 text-white text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer truncate"
-                          title="Volunteer for Backstage Crew"
-                        >
-                          Crew
-                        </button>
+                        <div className="flex gap-2 w-full">
+                          <button
+                            onClick={() => setSelectedPlayForPass(play)}
+                            className="flex-1 py-2.5 px-3 rounded-full bg-[#E85F57] hover:bg-[#D94538] text-white text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer shadow-md flex items-center justify-center gap-1.5"
+                          >
+                            <Ticket className="w-3.5 h-3.5" />
+                            <span className="truncate">Reserve Pass</span>
+                          </button>
+                          <button
+                            onClick={() => {
+                              setSelectedPlayForDonation(play);
+                              setDonationOpen(true);
+                              setPaymentStatus("idle");
+                            }}
+                            className="flex-1 py-2.5 px-3 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer shadow-md flex items-center justify-center gap-1.5"
+                          >
+                            <Gift className="w-3.5 h-3.5" />
+                            <span className="truncate">Donate</span>
+                          </button>
+                        </div>
+                        <div className="flex gap-2 w-full">
+                          <button
+                            onClick={() => handleOpenDetails(play)}
+                            className="flex-1 py-2 px-2 rounded-full border border-white/20 hover:bg-[#FAF2EE]/10 text-white text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer truncate"
+                            title="View full production dossier"
+                          >
+                            Details
+                          </button>
+                          <button
+                            onClick={() => handleOpenScriptPreview(play)}
+                            className="flex-1 py-2 px-2 rounded-full border border-white/20 hover:bg-[#FAF2EE]/10 text-[#E85F57] text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer truncate"
+                            title="Preview Script & Playbook"
+                          >
+                            Script
+                          </button>
+                          <button
+                            onClick={() => handleOpenVolunteer(play)}
+                            className="flex-1 py-2 px-2 rounded-full border border-white/20 hover:bg-[#FAF2EE]/10 text-white text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer truncate"
+                            title="Volunteer for Backstage Crew"
+                          >
+                            Volunteer
+                          </button>
+                        </div>
                       </>
                     ) : (
-                      <span className="flex-1 py-2 px-2 rounded-full bg-white/10 border border-white/10 text-white/60 text-xs font-mono font-bold uppercase tracking-wider text-center truncate">
-                        Archived
-                      </span>
+                      <div className="flex gap-2 w-full">
+                        <button
+                          onClick={() => handleOpenDetails(play)}
+                          className="flex-1 py-2 px-2 rounded-full border border-white/20 hover:bg-[#FAF2EE]/10 text-white text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer truncate"
+                          title="View full production dossier"
+                        >
+                          Details
+                        </button>
+                        <button
+                          onClick={() => handleOpenScriptPreview(play)}
+                          className="flex-1 py-2 px-2 rounded-full border border-white/20 hover:bg-[#FAF2EE]/10 text-[#E85F57] text-xs font-mono font-bold uppercase tracking-wider text-center transition-all cursor-pointer truncate"
+                          title="Preview Script & Playbook"
+                        >
+                          Script
+                        </button>
+                      </div>
                     )}
                   </div>
                 </div>
@@ -463,18 +560,18 @@ export default function Plays() {
                         <label className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#8C5A54] block">
                           Preferred Department
                         </label>
-                        <select
+                        <CustomSelect
                           value={volDepartment}
-                          onChange={e => setVolDepartment(e.target.value)}
-                          className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl px-3.5 py-2.5 text-xs text-[#2A1816] focus:outline-hidden focus:border-[#8C241E]"
-                        >
-                          <option value="Stage Management & Props">Stage Management & Props</option>
-                          <option value="Lighting Console & DMX Cues">Lighting Console & DMX Cues</option>
-                          <option value="Prosthetics, Mask Craft & SFX">Prosthetics, Mask Craft & SFX</option>
-                          <option value="Wardrobe & Period Costumes">Wardrobe & Period Costumes</option>
-                          <option value="Live Soundscape & Acoustic Audio">Live Soundscape & Acoustic Audio</option>
-                          <option value="Front of House & Ticketing">Front of House & Ticketing</option>
-                        </select>
+                          onChange={(val) => setVolDepartment(val)}
+                          options={[
+                            { value: "Stage Management & Props", label: "Stage Management & Props" },
+                            { value: "Lighting Console & DMX Cues", label: "Lighting Console & DMX Cues" },
+                            { value: "Prosthetics, Mask Craft & SFX", label: "Prosthetics, Mask Craft & SFX" },
+                            { value: "Wardrobe & Period Costumes", label: "Wardrobe & Period Costumes" },
+                            { value: "Live Soundscape & Acoustic Audio", label: "Live Soundscape & Acoustic Audio" },
+                            { value: "Front of House & Ticketing", label: "Front of House & Ticketing" }
+                          ]}
+                        />
                       </div>
                     </div>
 
@@ -482,16 +579,16 @@ export default function Plays() {
                       <label className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#8C5A54] block">
                         Weekly Availability
                       </label>
-                      <select
+                      <CustomSelect
                         value={volAvailability}
-                        onChange={e => setVolAvailability(e.target.value)}
-                        className="w-full bg-[#FAF2EE] border border-[#DCBAB2] rounded-xl px-3.5 py-2.5 text-xs text-[#2A1816] focus:outline-hidden focus:border-[#8C241E]"
-                      >
-                        <option value="2-4 Hours / Week (Light Support)">2-4 Hours / Week (Light Support)</option>
-                        <option value="4-6 Hours / Week (Regular Rehearsals)">4-6 Hours / Week (Regular Rehearsals)</option>
-                        <option value="8+ Hours / Week (Intensive Production Crew)">8+ Hours / Week (Intensive Production Crew)</option>
-                        <option value="Weekends Only">Weekends Only</option>
-                      </select>
+                        onChange={(val) => setVolAvailability(val)}
+                        options={[
+                          { value: "2-4 Hours / Week (Light Support)", label: "2-4 Hours / Week (Light Support)" },
+                          { value: "4-6 Hours / Week (Regular Rehearsals)", label: "4-6 Hours / Week (Regular Rehearsals)" },
+                          { value: "8+ Hours / Week (Intensive Production Crew)", label: "8+ Hours / Week (Intensive Production Crew)" },
+                          { value: "Weekends Only", label: "Weekends Only" }
+                        ]}
+                      />
                     </div>
 
                     <div className="space-y-1">
@@ -512,17 +609,18 @@ export default function Plays() {
                       <button
                         type="button"
                         onClick={() => setVolunteerOpen(false)}
-                        className="px-5 py-2.5 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer"
+                        className="px-5 py-3 rounded-full border border-[#D5AAA2] bg-[#FAF2EE] hover:bg-[#EEDBD5] text-[#5C3B37] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer shadow-xs"
                       >
-                        Cancel
+                        <X className="w-4 h-4 text-[#8C241E]" />
+                        <span>Cancel</span>
                       </button>
                       <button
                         type="submit"
                         disabled={volSubmitting}
-                        className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-6 py-2.5 rounded-full text-xs font-mono font-bold uppercase tracking-widest shadow-sm flex items-center gap-2 transition-all cursor-pointer border border-[#A6352F] disabled:opacity-50"
+                        className="bg-[#8C241E] hover:bg-[#731B16] text-[#FDF8F7] px-6 py-3 rounded-full text-xs font-mono font-bold uppercase tracking-widest shadow-lg shadow-[#8C241E]/20 flex items-center gap-2 transition-all cursor-pointer border border-[#A6352F] disabled:opacity-50"
                       >
-                        <Check className="w-4 h-4" />
-                        <span>{volSubmitting ? "Submitting..." : "Submit Volunteer Request"}</span>
+                        <Plus className="w-4 h-4 text-[#FFD0CC]" />
+                        <span>{volSubmitting ? "Submitting..." : "Submit Request"}</span>
                       </button>
                     </div>
                   </form>
@@ -530,6 +628,450 @@ export default function Plays() {
               </div>
             </div>
           </div>
+        )}
+
+        {/* DONATION & PATRONAGE CHECKOUT MODAL */}
+        {donationOpen && selectedPlayForDonation && (
+          <>
+            {/* FULL-PAGE MOVING THEATRICAL PROCESSING ANIMATION */}
+            {paymentStatus === "processing" && (
+              <div className="fixed inset-0 z-[100] bg-[#140808]/95 backdrop-blur-md flex items-center justify-center overflow-hidden animate-in fade-in duration-300">
+                {/* Dynamic Moving Spotlight Beams */}
+                <div className="absolute -top-40 -left-40 w-[600px] h-[600px] bg-gradient-to-br from-[#E85F57]/20 via-amber-500/10 to-transparent rounded-full blur-3xl pointer-events-none animate-stage-beam" />
+                <div className="absolute -bottom-40 -right-40 w-[700px] h-[700px] bg-gradient-to-tl from-[#8C241E]/30 via-[#E85F57]/15 to-transparent rounded-full blur-3xl pointer-events-none animate-stage-beam" style={{ animationDirection: "reverse", animationDuration: "8s" }} />
+
+                {/* Central Stage Wave Pulse & Stepper */}
+                <div className="relative z-10 max-w-lg w-full mx-4 p-8 sm:p-10 rounded-[2.5rem] bg-[#221312]/90 border-2 border-[#E85F57] shadow-2xl text-center space-y-6 text-white">
+                  
+                  {/* Glowing Pulsing Aura Icon */}
+                  <div className="relative mx-auto w-24 h-24 flex items-center justify-center">
+                    <div className="absolute inset-0 rounded-full bg-[#E85F57]/30 blur-xl animate-stage-pulse" />
+                    <div className="w-20 h-20 rounded-full bg-[#2C1817] border-2 border-[#E85F57] flex items-center justify-center relative z-10 shadow-lg shadow-[#E85F57]/30">
+                      <Heart className="w-10 h-10 text-[#E85F57] animate-pulse" />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-[#E85F57] bg-[#E85F57]/15 px-3.5 py-1 rounded-full border border-[#E85F57]/30 inline-block">
+                      Theatrical Patronage Authorisation
+                    </span>
+                    <h3 className="font-serif text-2xl sm:text-3xl text-[#F7F5F0] font-normal">
+                      Authorising ₹{customAmount || donationAmount}
+                    </h3>
+                    <p className="text-xs text-white/70 font-mono">
+                      Allocating to <strong className="text-white">{selectedPlayForDonation.title}</strong>
+                    </p>
+                  </div>
+
+                  {/* 3-Step Theatrical Stepper */}
+                  <div className="space-y-2.5 text-left bg-[#170B0B] p-4 rounded-2xl border border-white/10 text-xs font-mono">
+                    <div className={`flex items-center gap-3 transition-colors ${processingStep >= 1 ? "text-emerald-400 font-bold" : "text-white/40"}`}>
+                      {processingStep > 1 ? <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" /> : <Loader2 className="w-4 h-4 animate-spin text-[#E85F57] shrink-0" />}
+                      <span>1. Connecting Secure Patronage Gateway...</span>
+                    </div>
+                    <div className={`flex items-center gap-3 transition-colors ${processingStep >= 2 ? "text-emerald-400 font-bold" : "text-white/40"}`}>
+                      {processingStep > 2 ? <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" /> : processingStep === 2 ? <Loader2 className="w-4 h-4 animate-spin text-[#E85F57] shrink-0" /> : <div className="w-4 h-4 rounded-full border border-white/20 shrink-0" />}
+                      <span>2. Authorising Non-Profit Trust Transfer...</span>
+                    </div>
+                    <div className={`flex items-center gap-3 transition-colors ${processingStep >= 3 ? "text-emerald-400 font-bold" : "text-white/40"}`}>
+                      {processingStep === 3 ? <Loader2 className="w-4 h-4 animate-spin text-[#E85F57] shrink-0" /> : <div className="w-4 h-4 rounded-full border border-white/20 shrink-0" />}
+                      <span>3. Issuing Official 80G Society Certificate...</span>
+                    </div>
+                  </div>
+
+                  {/* Animated Progress Line */}
+                  <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
+                    <div 
+                      className="bg-gradient-to-r from-[#E85F57] to-amber-400 h-full transition-all duration-700 ease-out" 
+                      style={{ width: processingStep === 1 ? "35%" : processingStep === 2 ? "70%" : "95%" }}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* FULL-PAGE STAGE CONFETTI CELEBRATION OVERLAY ON SUCCESS */}
+            {paymentStatus === "success" && (
+              <div className="fixed inset-0 z-[90] pointer-events-none overflow-hidden">
+                {Array.from({ length: 36 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="absolute animate-confetti"
+                    style={{
+                      left: `${(i * 2.8) % 100}%`,
+                      top: `-${Math.random() * 20}px`,
+                      animationDuration: `${3 + (i % 4) * 0.8}s`,
+                      animationDelay: `${(i % 12) * 0.15}s`,
+                      width: `${8 + (i % 6) * 2}px`,
+                      height: `${12 + (i % 8) * 2}px`,
+                      backgroundColor: ["#E85F57", "#F59E0B", "#10B981", "#FCD34D", "#FFFFFF", "#E11D48"][i % 6],
+                      transform: `rotate(${i * 45}deg)`,
+                      borderRadius: i % 2 === 0 ? "2px" : "9999px"
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* MAIN WIDE PATRONAGE DIALOG */}
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/75 backdrop-blur-sm animate-in fade-in duration-200">
+              <div className="bg-[#2C2A28] border-2 border-[#E85F57] text-[#F7F5F0] rounded-[2.5rem] p-7 sm:p-9 max-w-3xl lg:max-w-4xl w-full shadow-2xl relative max-h-[92vh] flex flex-col overflow-hidden">
+                
+                {/* Close button */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPaymentStatus("idle");
+                    setDonationOpen(false);
+                  }}
+                  className="absolute top-6 right-6 w-9 h-9 rounded-full bg-[#353535] hover:bg-[#404040] text-white/70 hover:text-white flex items-center justify-center transition-all cursor-pointer border border-white/15 shadow-xs group z-20"
+                  title="Close"
+                >
+                  <X className="w-4 h-4 group-hover:rotate-90 transition-transform duration-200" />
+                </button>
+
+                {/* MODAL HEADER */}
+                <div className="border-b border-white/10 pb-5 pr-10">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#E85F57] bg-[#E85F57]/15 px-3 py-1 rounded-full border border-[#E85F57]/30 inline-flex items-center gap-1.5">
+                      <Heart className="w-3 h-3 text-[#E85F57]" />
+                      <span>Theatre Patronage & Support</span>
+                    </span>
+                    <span className="text-xs font-mono text-white/50">
+                      IIT Madras BS Drama Society
+                    </span>
+                  </div>
+                  <h2 className="text-2xl sm:text-3xl font-serif text-[#F7F5F0] tracking-tight font-normal pt-1.5">
+                    Contribute to {selectedPlayForDonation.title}
+                  </h2>
+                </div>
+
+                {/* MODAL BODY */}
+                <div className="overflow-y-auto flex-1 custom-scrollbar pt-6 pr-1">
+                  {paymentStatus === "success" ? (
+                    <div className="space-y-6 animate-in fade-in duration-300">
+                      
+                      {/* OFFICIAL PATRON CERTIFICATE */}
+                      <div className="bg-[#1A1817] border-2 border-[#E85F57] rounded-3xl p-6 sm:p-8 text-white space-y-6 shadow-2xl relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-80 h-80 bg-[#E85F57]/10 rounded-full blur-3xl pointer-events-none" />
+
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/15 pb-4">
+                          <div className="flex items-center gap-2.5">
+                            <div className="w-10 h-10 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center">
+                              <Award className="w-5 h-5 text-emerald-400" />
+                            </div>
+                            <div>
+                              <h4 className="font-serif text-lg text-white font-normal">Official Society Patron Certificate</h4>
+                              <p className="text-[10px] font-mono text-white/50 uppercase tracking-widest">Section 80G Tax Exempt Eligible</p>
+                            </div>
+                          </div>
+                          <span className="font-mono text-xs font-bold text-[#E85F57] bg-[#2C2A28] px-3 py-1 rounded-md border border-white/10 self-start sm:self-auto">
+                            {receiptId || "AYM-DON-8842"}
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div className="bg-[#242220] p-4 rounded-2xl border border-white/10 space-y-1">
+                            <span className="text-[10px] font-mono text-white/50 uppercase block font-semibold">Total Patronage Contributed</span>
+                            <h3 className="text-3xl sm:text-4xl font-serif text-white font-normal text-emerald-400">
+                              ₹{customAmount || donationAmount}
+                            </h3>
+                            <p className="text-[10px] font-mono text-white/60">Fully Transferred to Production Fund</p>
+                          </div>
+
+                          <div className="bg-[#242220] p-4 rounded-2xl border border-white/10 space-y-1.5 text-xs font-mono">
+                            <span className="text-[10px] font-mono text-white/50 uppercase block font-semibold">Allocated Production</span>
+                            <p className="font-bold text-white text-sm">{selectedPlayForDonation.title}</p>
+                            <p className="text-[11px] text-white/70">Patron: <strong className="text-white">{isAnonymous ? "Anonymous Patron" : (donationName || "Patron of the Arts")}</strong></p>
+                            {donationEmail && <p className="text-[10px] text-white/50">Receipt Sent To: {donationEmail}</p>}
+                          </div>
+                        </div>
+
+                        <div className="text-[11px] text-white/70 font-light border-t border-white/10 pt-3 flex items-center justify-between flex-wrap gap-2">
+                          <span>Aayam Repertory • IIT Madras Drama Society Trust</span>
+                          <span className="font-mono text-[10px] text-emerald-400 font-bold">VERIFIED PATRON RECORD</span>
+                        </div>
+                      </div>
+
+                      {/* Action Suite */}
+                      <div className="flex flex-wrap items-center justify-end gap-3 pt-2">
+                        <button
+                          type="button"
+                          onClick={() => window.print()}
+                          className="px-5 py-2.5 rounded-full border border-white/20 hover:bg-white/10 text-white text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer"
+                        >
+                          <Printer className="w-3.5 h-3.5" />
+                          <span>Print Receipt</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setPaymentStatus("idle");
+                            setDonationOpen(false);
+                          }}
+                          className="px-7 py-2.5 rounded-full bg-[#E85F57] hover:bg-[#D94538] text-white text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer shadow-lg"
+                        >
+                          Done & Return
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <form
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        setPaymentStatus("processing");
+                        setProcessingStep(1);
+                        const generatedId = `AYM-DON-${Math.floor(1000 + Math.random() * 9000)}`;
+                        setReceiptId(generatedId);
+                        setTimeout(() => setProcessingStep(2), 900);
+                        setTimeout(() => setProcessingStep(3), 1800);
+                        setTimeout(() => setPaymentStatus("success"), 2700);
+                      }}
+                      className="space-y-6"
+                    >
+                      {/* 2-COLUMN SPACIOUS CLEAN GRID */}
+                      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                        
+                        {/* LEFT COLUMN: AMOUNT PRESETS & TIER SELECTION (7 cols) */}
+                        <div className="lg:col-span-7 space-y-4">
+                          <div className="space-y-2">
+                            <label className="text-xs font-mono text-[#E85F57] uppercase font-bold block">
+                              1. Select Patronage Amount (INR) *
+                            </label>
+                            
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                              {[
+                                { amt: 250, label: "Student Supporter", desc: "Script & Print" },
+                                { amt: 500, label: "Rehearsal Patron", desc: "Studio Space" },
+                                { amt: 1000, label: "Costume Sponsor", desc: "Stage Outfits" },
+                                { amt: 2500, label: "Lighting Patron", desc: "Spotlights & Cues" },
+                                { amt: 5000, label: "Executive Patron", desc: "VIP Front Row" },
+                              ].map(({ amt, label, desc }) => {
+                                const isSelected = !customAmount && Number(donationAmount) === amt;
+                                return (
+                                  <button
+                                    key={amt}
+                                    type="button"
+                                    onClick={() => {
+                                      setDonationAmount(amt);
+                                      setCustomAmount("");
+                                    }}
+                                    className={`p-3 rounded-2xl text-left border transition-all cursor-pointer flex flex-col justify-between ${
+                                      isSelected
+                                        ? "bg-[#E85F57] text-white border-[#E85F57] shadow-lg scale-102"
+                                        : "bg-[#353535]/80 hover:bg-[#404040] text-white/80 border-white/15 hover:border-white/30"
+                                    }`}
+                                  >
+                                    <div className="flex items-center justify-between">
+                                      <span className="font-mono text-sm font-bold">₹{amt.toLocaleString("en-IN")}</span>
+                                      {isSelected && <Check className="w-3.5 h-3.5" />}
+                                    </div>
+                                    <span className="text-[10px] font-mono opacity-80 mt-1 block">{label}</span>
+                                  </button>
+                                );
+                              })}
+
+                              {/* Custom input card */}
+                              <div className="relative col-span-2 sm:col-span-1 bg-[#353535]/80 border border-white/15 rounded-2xl p-2.5 flex flex-col justify-center">
+                                <span className="text-[9px] font-mono text-white/50 uppercase block mb-1">Custom (₹)</span>
+                                <input
+                                  type="number"
+                                  min="50"
+                                  value={customAmount}
+                                  onChange={(e) => {
+                                    setCustomAmount(e.target.value);
+                                    setDonationAmount(e.target.value);
+                                  }}
+                                  placeholder="e.g. 750"
+                                  className="w-full bg-[#2C2A28] border border-white/15 rounded-lg px-2.5 py-1 text-xs text-white placeholder:text-white/40 focus:outline-hidden focus:border-[#E85F57] font-mono"
+                                />
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Impact Note */}
+                          <div className="bg-[#1F1E1D] p-4 rounded-2xl border border-white/10 space-y-1 text-xs font-light text-white/70">
+                            <span className="font-mono text-[10px] text-[#E85F57] uppercase font-bold block">
+                              Production Fund Impact
+                            </span>
+                            <p className="leading-relaxed">
+                              100% of your contribution directly funds stage props, live acoustics, lighting consoles, and rights for student drama productions at IIT Madras.
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* RIGHT COLUMN: PATRON DETAILS & PAYMENT MODE (5 cols) */}
+                        <div className="lg:col-span-5 space-y-4">
+                          
+                          {/* Patron Information Box */}
+                          <div className="space-y-3 bg-[#353535]/50 p-4 rounded-2xl border border-white/10">
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="text-[11px] font-mono text-white/80 uppercase font-bold">
+                                2. Patron Information
+                              </span>
+                              <label className="flex items-center gap-1.5 text-[11px] font-mono text-white/70 cursor-pointer">
+                                <input
+                                  type="checkbox"
+                                  checked={isAnonymous}
+                                  onChange={(e) => setIsAnonymous(e.target.checked)}
+                                  className="rounded accent-[#E85F57]"
+                                />
+                                <span>Anonymous</span>
+                              </label>
+                            </div>
+
+                            {!isAnonymous && (
+                              <div className="space-y-1">
+                                <label className="text-[10px] font-mono text-[#E85F57] uppercase font-bold block">
+                                  Full Name / Playbill Credit
+                                </label>
+                                <input
+                                  type="text"
+                                  value={donationName}
+                                  onChange={(e) => setDonationName(e.target.value)}
+                                  placeholder="e.g. Jatin Bhardwaj"
+                                  className="w-full bg-[#2C2A28] border border-white/15 rounded-xl px-3 py-2 text-xs text-white placeholder:text-white/30 focus:outline-hidden focus:border-[#E85F57]"
+                                />
+                              </div>
+                            )}
+
+                            <div className="space-y-2">
+                              <div className="space-y-1">
+                                <label className="text-[10px] font-mono text-white/60 uppercase block">
+                                  Email (Optional for 80G Receipt)
+                                </label>
+                                <input
+                                  type="email"
+                                  value={donationEmail}
+                                  onChange={(e) => setDonationEmail(e.target.value)}
+                                  placeholder="your.email@example.com"
+                                  className="w-full bg-[#2C2A28] border border-white/15 rounded-xl px-3 py-2 text-xs text-white placeholder:text-white/30 focus:outline-hidden focus:border-[#E85F57]"
+                                />
+                              </div>
+
+                              <div className="space-y-1">
+                                <label className="text-[10px] font-mono text-white/60 uppercase block">
+                                  Phone (Optional)
+                                </label>
+                                <input
+                                  type="tel"
+                                  value={donationNumber}
+                                  onChange={(e) => setDonationNumber(e.target.value)}
+                                  placeholder="+91 98402 12345"
+                                  className="w-full bg-[#2C2A28] border border-white/15 rounded-xl px-3 py-2 text-xs text-white placeholder:text-white/30 focus:outline-hidden focus:border-[#E85F57]"
+                                />
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Payment Mode Selector */}
+                          <div className="space-y-2">
+                            <label className="text-xs font-mono text-[#E85F57] uppercase font-bold block">
+                              3. Payment Mode
+                            </label>
+                            
+                            <div className="grid grid-cols-2 gap-2">
+                              <button
+                                type="button"
+                                onClick={() => setPaymentMethod("upi_qr")}
+                                className={`p-2.5 rounded-xl border flex flex-col items-center gap-1 transition-all cursor-pointer text-center ${
+                                  paymentMethod === "upi_qr"
+                                    ? "bg-[#353535] border-[#E85F57] text-white shadow-md"
+                                    : "bg-[#353535]/40 border-white/10 text-white/60 hover:text-white"
+                                }`}
+                              >
+                                <QrCode className="w-4 h-4 text-[#E85F57]" />
+                                <span className="font-mono text-[11px] font-bold">UPI QR & Apps</span>
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => setPaymentMethod("card_instant")}
+                                className={`p-2.5 rounded-xl border flex flex-col items-center gap-1 transition-all cursor-pointer text-center ${
+                                  paymentMethod === "card_instant"
+                                    ? "bg-[#353535] border-[#E85F57] text-white shadow-md"
+                                    : "bg-[#353535]/40 border-white/10 text-white/60 hover:text-white"
+                                }`}
+                              >
+                                <CreditCard className="w-4 h-4 text-[#E85F57]" />
+                                <span className="font-mono text-[11px] font-bold">Instant Gateway</span>
+                              </button>
+                            </div>
+
+                            {paymentMethod === "upi_qr" ? (
+                              <div className="bg-[#1F1E1D] p-3 rounded-xl border border-white/10 space-y-2 text-xs font-mono">
+                                <div className="flex items-center justify-between text-[11px]">
+                                  <span className="text-white/60">UPI VPA:</span>
+                                  <div className="flex items-center gap-1">
+                                    <code className="text-[#E85F57] font-bold bg-[#2C2A28] px-1.5 py-0.5 rounded text-[10px]">
+                                      aayam.drama@iitm
+                                    </code>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        navigator.clipboard?.writeText("aayam.drama@iitm");
+                                        setCopiedVpa(true);
+                                        setTimeout(() => setCopiedVpa(false), 2000);
+                                      }}
+                                      className="p-0.5 hover:text-[#E85F57]"
+                                      title="Copy VPA"
+                                    >
+                                      <Copy className="w-3 h-3" />
+                                    </button>
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-2.5">
+                                  <div className="w-12 h-12 bg-white p-1 rounded-lg shrink-0 flex items-center justify-center">
+                                    <QrCode className="w-10 h-10 text-black" />
+                                  </div>
+                                  <p className="text-[10px] text-white/70 font-sans leading-tight">
+                                    Scan with GPay, PhonePe, or Paytm to transfer ₹{customAmount || donationAmount}.
+                                  </p>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="bg-[#1F1E1D] p-3 rounded-xl border border-white/10 text-[11px] text-white/70 space-y-1 font-light">
+                                <div className="flex items-center gap-1.5 text-white font-mono font-bold text-[10px]">
+                                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                                  <span>256-Bit Encrypted Instant Checkout</span>
+                                </div>
+                                <p className="text-[10px]">Cards, NetBanking, and Wallets authorized immediately.</p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* SUBMIT ACTION BAR */}
+                      <div className="pt-4 flex items-center justify-between gap-3 border-t border-white/10">
+                        <span className="text-xs font-mono text-white/60">
+                          Amount: <strong className="text-white font-bold text-sm">₹{customAmount || donationAmount}</strong>
+                        </span>
+
+                        <div className="flex items-center gap-3">
+                          <button
+                            type="button"
+                            onClick={() => setDonationOpen(false)}
+                            className="px-5 py-2.5 rounded-full border border-white/20 hover:bg-white/10 text-white text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            type="submit"
+                            disabled={!(Number(customAmount || donationAmount) > 0)}
+                            className="bg-[#E85F57] hover:bg-[#D94538] text-white px-7 py-3 rounded-full text-xs font-mono font-bold uppercase tracking-widest shadow-lg shadow-[#E85F57]/30 flex items-center gap-2 transition-all cursor-pointer border border-[#E85F57] disabled:opacity-50 active:scale-95"
+                          >
+                            <Heart className="w-4 h-4" />
+                            <span>Complete ₹{customAmount || donationAmount} Contribution</span>
+                          </button>
+                        </div>
+                      </div>
+                    </form>
+                  )}
+                </div>
+              </div>
+            </div>
+          </>
         )}
 
         {/* SCRIPT PREVIEW MODAL */}
@@ -550,6 +1092,15 @@ export default function Plays() {
             setScriptModalOpen(true);
           }}
         />
+
+        {/* COMPLIMENTARY TICKET PASS RESERVATION & PRINTING MODAL */}
+        {selectedPlayForPass && (
+          <TicketPassModal
+            isOpen={Boolean(selectedPlayForPass)}
+            onClose={() => setSelectedPlayForPass(null)}
+            play={selectedPlayForPass}
+          />
+        )}
       </main>
     </div>
   );

@@ -470,9 +470,10 @@ class SharedEvent(db.Model):
         s_initials = "".join([x[0] for x in s_name.split()]).upper()[:2] if s_name else "EM"
         return {
             'id': self.id,
+            'reference_id': f"AYM-PITCH-{self.id:04d}",
             'name': self.title,
             'description': self.description or '',
-            'date': self.event_date.strftime('%b %d, %Y') if self.event_date else 'Jul 29, 2026',
+            'date': self.event_date.strftime('%b %d, %Y') if self.event_date else 'Aug 23, 2026',
             'venue': self.location_or_link or 'Studio Lounge',
             'budget': self.budget or '₹50,000',
             'proposalType': self.proposal_type or 'Member Pitch',
@@ -481,6 +482,7 @@ class SharedEvent(db.Model):
             'status': self.status.capitalize() if self.status else 'Reviewing',
             'contact_email': self.contact_email or (self.submitter.email if self.submitter else 'partner@aayam.org'),
             'contact_phone': self.contact_phone or '+91 98110 44321',
+            'created_at': self.created_at.strftime('%b %d, %Y') if self.created_at else 'Recent',
             'submitter': {
                 'name': s_name,
                 'initials': s_initials,
@@ -601,7 +603,12 @@ class Play(db.Model):
             'language': self.language or "Hindi & English",
             'status': self.status or ("Archived Production" if self.is_past else "Upcoming Premiere"),
             'statusColor': self.status_color or ("bg-[#E4D9D2]/80 text-[#6B5550] border-[#CBB3AC]" if self.is_past else "bg-emerald-700/15 text-emerald-950 border-emerald-700/30"),
-            'is_past': self.is_past or (self.status and "archive" in self.status.lower()),
+            'is_past': bool(self.is_past) or bool(
+                self.status and any(
+                    kw in self.status.lower()
+                    for kw in ("archive", "concluded", "past", "completed", "closed", "historical")
+                )
+            ),
             'tagline': self.tagline or "",
             'acts': self.acts or "Full Length Drama",
             'description': self.description,
@@ -775,6 +782,15 @@ class AuditionPosition(db.Model):
     slots_available = db.Column(db.Integer, default=1)
     status = db.Column(db.String(50), default="Open Calling") # Open Calling, In Review, Casting Closed
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    event_id = db.Column(db.Integer, db.ForeignKey("event.id"), nullable=True)
+    skills = db.Column(db.Text, nullable=True)
+    application_open_date = db.Column(db.Date, nullable=True)
+    application_close_date = db.Column(db.Date, nullable=True)
+    require_portfolio = db.Column(db.Boolean, default=False)
+    require_video = db.Column(db.Boolean, default=False)
+    require_audio = db.Column(db.Boolean, default=False)
+    event = db.relationship("Event", backref=db.backref("audition_positions", lazy="dynamic"))
 
     def to_dict(self):
         title_str = f"{self.production_name} - {self.role_name}" if self.production_name else self.role_name
@@ -790,10 +806,32 @@ class AuditionPosition(db.Model):
             'description': self.character_description or '',
             'requirements': self.requirements or '',
             'slots_available': self.slots_available or 1,
+            'event_id': self.event_id,
+            'skills': self.skills or '',
+            'application_open_date': self.application_open_date.strftime('%b %d, %Y') if self.application_open_date else None,
+            'application_close_date': self.application_close_date.strftime('%b %d, %Y') if self.application_close_date else None,
+            'require_portfolio': self.require_portfolio,
+            'require_video': self.require_video,
+            'require_audio': self.require_audio,
+            'period_status': self._compute_period_status(),
+            'slots_available': self.slots_available or 1,
             'status': self.status or 'Open Calling',
-            'deadline': 'Sep 25, 2026',
+            'deadline': self.application_close_date.strftime('%b %d, %Y') if self.application_close_date else 'Sep 25, 2026',
             'created_at': self.created_at.strftime('%b %d, %Y') if self.created_at else 'Jul 20, 2026'
         }
+
+    def _compute_period_status(self):
+        from datetime import date as d
+        today = d.today()
+        if self.status in ('Casting Closed', 'Concluded'):
+            return 'concluded'
+        if self.status == 'In Review':
+            return 'review'
+        if self.application_open_date and self.application_open_date > today:
+            return 'upcoming'
+        if self.application_close_date and self.application_close_date < today:
+            return 'review'
+        return 'application' 
 
 
 class AuditionApplication(db.Model):
